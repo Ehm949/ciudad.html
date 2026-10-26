@@ -79,9 +79,13 @@ header.top h1{font-size:clamp(24px,4.5vw,34px)}
 .k{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700}
 .v{font-family:var(--f-data);font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .v small{font-size:12px;margin-left:6px}
-.live{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;background:linear-gradient(90deg,color-mix(in srgb,var(--ren) 16%,var(--panel)),var(--panel));border:1px solid var(--line);border-radius:10px;padding:10px 14px}
-.live .big{font-family:var(--f-data);font-size:22px;color:var(--ok);font-variant-numeric:tabular-nums}
-.live .sub{font-size:13px;color:var(--muted)}
+.live{display:flex;flex-direction:column;gap:8px;background:linear-gradient(90deg,color-mix(in srgb,var(--ren) 16%,var(--panel)),var(--panel));border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.lhead{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.live .big{font-family:var(--f-data);font-size:26px;font-variant-numeric:tabular-nums;line-height:1.1}
+.lbreak{display:flex;flex-wrap:wrap;gap:6px}
+.lchip{display:inline-flex;gap:6px;align-items:center;font-size:12px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.lchip b{font-family:var(--f-data);font-weight:500}
+.live .sub{font-size:13px;color:var(--muted);margin:0}
 .live .sub b{font-family:var(--f-data);font-weight:500;color:var(--fg)}
 
 /* Escenario */
@@ -216,10 +220,10 @@ td.n{font-family:var(--f-data);text-align:right;font-variant-numeric:tabular-num
       <div class="stat"><div class="k">Racha</div><div class="v" id="hStreak">—</div></div>
     </div>
 
-    <div class="live" aria-live="off">
-      <span class="k">Tu ciudad ha generado hoy</span>
-      <span class="big" id="liveToday">$0.0000</span>
-      <span class="sub">en intereses, rentas y dividendos estimados · <b id="liveDay">$0</b> al día · <b id="liveMonth">$0</b> al mes · desde que abriste esta página <b id="liveSession">$0.000000</b></span>
+    <div class="live">
+      <div class="lhead"><span class="k" id="liveLabel">Hoy tu ciudad ganó</span><span class="big" id="liveToday">$0.00</span><span class="pill" id="livePct"></span></div>
+      <div class="lbreak" id="liveBreak"></div>
+      <p class="sub" id="liveFoot"></p>
     </div>
 
     <div class="stage" id="stage">
@@ -488,6 +492,7 @@ function applyStrategy(M) {
   const pesos = (raw.pesos && raw.pesos.length) ? raw.pesos : PESOS_DEF;
   const pw = {}; pesos.forEach(p => { pw[String(p.activo).toLowerCase()] = num(p.peso_pct, 0); });
   const assigned = new Set();
+  M.groups = [];
   M.items.forEach(i => { i.hold = false; i.cw = i.objetivo; });
   bandList().forEach(b => {
     const tG = num(b.objetivo_pct, NaN);
@@ -508,7 +513,8 @@ function applyStrategy(M) {
     const holdPct = holds.reduce((a, i) => a + i.pct, 0);
     holds.forEach(i => { i.objetivo = i.pct; i.hold = true; i.cw = 0; });
     const wsum = traders.reduce((a, t) => a + t.w, 0), avail = Math.max(0, tG - holdPct);
-    traders.forEach(t => { const sh = wsum > 0 ? t.w / wsum : 1 / traders.length; t.i.objetivo = avail * sh; t.i.cw = tG * sh; });
+    traders.forEach(t => { const sh = wsum > 0 ? t.w / wsum : 1 / traders.length; t.sh = sh; t.i.objetivo = avail * sh; t.i.cw = tG * sh; });
+    M.groups.push({ name: b.grupo, tG, members, traders, holds, valor: members.reduce((a, i) => a + i.valor, 0), holdValor: holds.reduce((a, i) => a + i.valor, 0) });
   });
   ORDER.forEach(k => { const c = M.classes[k]; c.objetivo = c.items.reduce((a, i) => a + i.objetivo, 0); c.diff = c.pct - c.objetivo; });
 }
@@ -665,7 +671,7 @@ async function logout(expired) {
 // Limpia todo lo del usuario anterior para que el siguiente vea solo lo suyo
 function resetState() {
   raw = null; model = null; view = null; zones = {}; travelYears = 0; focus = null; selected = null;
-  firstApply = true; MI = null; CE = null; ST = null; EV = null;
+  firstApply = true; liveShown = 0; MI = null; CE = null; ST = null; EV = null;
   clearInterval(setTravel._p);
 }
 function showApp() { $('login').hidden = true; $('app').hidden = false; sessionStart = performance.now(); resize(); }
@@ -740,7 +746,7 @@ function renderAll() {
     </article>`;
   }).join('');
 
-  renderBands(); renderMission(); renderStreak(); renderCeremony();
+  renderLive(); renderBands(); renderMission(); renderStreak(); renderCeremony();
   renderForm(); renderSim(); renderZoom(); renderTm(); renderCalc();
 }
 
@@ -956,27 +962,49 @@ $('pfForm').addEventListener('submit', async e => {
   if ($('btnSave')) $('btnSave').disabled = false;
 });
 
+// Reparte en cascada: primero entre grupos (Bandas) según cuánto le falta a cada uno,
+// luego dentro de cada grupo según Pesos internos (o su vehículo)
+function waterfall(list, amt) {
+  const r = list.filter(x => x.gap > 1).sort((a, b) => b.gap - a.gap);
+  let left = amt;
+  r.forEach(x => { x.amt = Math.min(x.gap, left); left -= x.amt; });
+  list.filter(x => !(x.gap > 1)).forEach(x => { x.amt = 0; });
+  if (left > 1) { const so = list.reduce((a, x) => a + x.w, 0) || 1; list.forEach(x => { x.amt += left * x.w / so; }); }
+  return list.slice().sort((a, b) => (b.gap - a.gap));
+}
 function renderSim() {
   const amt = Math.max(0, Number($('simAmt').value) || 0), M = model, out = $('simOut');
-  const cands = M.items.filter(i => i.objetivo > 0 && !i.hold);
-  if (!amt || !cands.length) { out.innerHTML = ''; return; }
-  // Prioridad: primero lo que más le falta (en pesos) para llegar a su ideal con el nuevo total
+  const groups = (M.groups || []).filter(g => g.traders.length);
+  if (!amt || !groups.length) { out.innerHTML = ''; return; }
   const newTotal = M.total + amt;
-  const ranked = cands.map(i => ({ i, gap: newTotal * i.objetivo / 100 - i.valor })).filter(x => x.gap > 1).sort((a, b) => b.gap - a.gap);
-  let left = amt;
-  ranked.forEach(x => { x.amt = Math.min(x.gap, left); left -= x.amt; });
-  if (left > 1) { const so = cands.reduce((a, i) => a + i.objetivo, 0) || 1; cands.forEach(i => { const r = ranked.find(x => x.i === i) || (ranked.push({ i, gap: 0, amt: 0 }), ranked[ranked.length - 1]); r.amt += left * i.objetivo / so; }); }
-  const units = x => {
-    const p = +x.i.precio_mxn;
-    if (x.i.key === 'RENTA_FIJA') return 'saldo';
+  const G1 = waterfall(groups.map(g => ({ g, w: g.tG, gap: newTotal * g.tG / 100 - g.valor })), amt);
+  G1.forEach(x => {
+    // dentro del grupo: el nuevo valor del grupo se reparte entre sus activos según su peso
+    const base = x.g.valor + x.amt - x.g.holdValor;
+    x.sub = waterfall(x.g.traders.map(t => ({ i: t.i, w: t.sh, gap: base * t.sh - t.i.valor })), x.amt);
+  });
+  const units = (i, a) => {
+    const p = +i.precio_mxn;
+    if (i.key === 'RENTA_FIJA') return 'saldo';
     if (!p) return '—';
-    if (x.i.key === 'BITCOIN') return (x.amt / p).toFixed(5) + ' ' + (/eth/i.test(x.i.activo) ? 'ETH' : /sol/i.test(x.i.activo) ? 'SOL' : 'BTC');
-    const n = Math.floor(x.amt / p);
-    return n ? n + (n === 1 ? ' título' : ' títulos') : `0 (cada uno cuesta ${mxn.format(p)})`;
+    if (i.key === 'BITCOIN') return (a / p).toFixed(5) + ' ' + (/eth/i.test(i.activo) ? 'ETH' : /sol/i.test(i.activo) ? 'SOL' : 'BTC');
+    const n = Math.floor(a / p);
+    return n ? n + (n === 1 ? ' título' : ' títulos') : `0 · ${mxn.format(p)} c/u`;
   };
-  out.innerHTML = `<div class="tbl"><table><thead><tr><th>#</th><th>Activo</th><th style="text-align:right">Le falta</th><th style="text-align:right">Invierte</th><th style="text-align:right">Aprox.</th></tr></thead><tbody>` +
-    ranked.map((x, n) => `<tr style="${x.amt < 1 ? 'opacity:.5' : ''}"><td class="n muted">${n + 1}</td><td><span class="dot" style="--c:${CLS[x.i.key].color};margin-right:6px"></span>${esc(x.i.activo)}</td><td class="n">${x.gap > 0 ? mxn.format(x.gap) : '—'}</td><td class="n ${x.amt >= 1 ? 'pos' : ''}">${x.amt >= 1 ? mxn.format(x.amt) : '—'}</td><td class="n muted">${x.amt >= 1 ? units(x) : ''}</td></tr>`).join('') +
-    `</tbody></table></div><p class="foot" style="margin-top:6px">Ordenado de lo que más hace falta a lo que menos. El dinero llena primero el #1, luego el #2 y así hasta acabarse. Los activos que solo se mantienen no aparecen. Títulos aproximados con el precio de hoy.</p>`;
+  const money = v => v > 1 ? mxn.format(v) : '—';
+  let rows = '';
+  G1.forEach((x, n) => {
+    const col = CLS[x.g.traders[0].i.key].color, on = x.amt >= 1;
+    rows += `<tr style="background:var(--panel2);${on ? '' : 'opacity:.5'}"><td class="n"><b>${n + 1}</b></td><td><span class="dot" style="--c:${col};margin-right:6px"></span><b>${esc(x.g.name)}</b></td><td class="n">${money(x.gap)}</td><td class="n ${on ? 'pos' : ''}"><b>${money(x.amt)}</b></td><td></td></tr>`;
+    if (!on) return;
+    const subs = x.sub.filter(y => y.amt >= 1 || y.gap > 1);
+    if (subs.length === 1 && x.sub.length === 1) { rows += `<tr><td></td><td style="padding-left:26px">${esc(subs[0].i.activo)}</td><td></td><td class="n pos">${money(subs[0].amt)}</td><td class="n muted">${units(subs[0].i, subs[0].amt)}</td></tr>`; return; }
+    subs.forEach((y, m) => {
+      rows += `<tr style="${y.amt >= 1 ? '' : 'opacity:.5'}"><td class="n muted">${n + 1}.${m + 1}</td><td style="padding-left:26px">${esc(y.i.activo)}</td><td class="n muted">${money(y.gap)}</td><td class="n ${y.amt >= 1 ? 'pos' : ''}">${money(y.amt)}</td><td class="n muted">${y.amt >= 1 ? units(y.i, y.amt) : ''}</td></tr>`;
+    });
+  });
+  out.innerHTML = `<div class="tbl"><table><thead><tr><th>#</th><th>Grupo / activo</th><th style="text-align:right">Le falta</th><th style="text-align:right">Invierte</th><th style="text-align:right">Aprox.</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="foot" style="margin-top:6px">Primero decide entre grupos según los objetivos de tu pestaña Bandas: el dinero llena al grupo que más le falta, luego al siguiente. Dentro de cada grupo se reparte según Pesos internos (o va completo a su vehículo, como VUAA o Bitcoin). Títulos aproximados con el precio de hoy.</p>`;
 }
 $('btnSim').addEventListener('click', renderSim);
 $('simAmt').addEventListener('keydown', e => { if (e.key === 'Enter') renderSim(); });
@@ -1014,17 +1042,34 @@ function renderZoom() {
   });
 }
 
-// ---------- contador en vivo ----------
-let sessionStart = performance.now(), liveLast = 0;
+// ---------- ganancia real del día ----------
+let sessionStart = performance.now(), liveLast = 0, liveTarget = 0, liveShown = 0;
+function renderLive() {
+  const M = model, hoy = M.hoy, ayer = M.total - hoy, pct = ayer > 0 ? hoy / ayer * 100 : 0;
+  liveTarget = hoy;
+  $('liveLabel').textContent = hoy >= 0 ? 'Hoy tu ciudad ganó' : 'Hoy tu ciudad perdió';
+  $('livePct').className = 'pill ' + (hoy >= 0 ? 'ok' : 'lo');
+  $('livePct').textContent = (pct >= 0 ? '+' : '−') + Math.abs(pct).toFixed(2) + '% contra ayer';
+  const groups = (M.groups && M.groups.length)
+    ? M.groups.map(g => ({ name: g.name, col: CLS[g.members[0].key].color, v: g.members.reduce((a, i) => a + i.hoy, 0), has: g.valor > 0 }))
+    : ORDER.map(k => ({ name: CLS[k].name, col: CLS[k].color, v: M.classes[k].hoy, has: M.classes[k].valor > 0 }));
+  $('liveBreak').innerHTML = groups.filter(g => g.has).sort((a, b) => b.v - a.v)
+    .map(g => `<span class="lchip"><span class="dot" style="--c:${g.col}"></span>${esc(g.name)} <b class="${g.v >= 0 ? 'pos' : 'neg'}">${signed2(g.v)}</b></span>`).join('');
+  const mov = M.items.filter(i => i.valor > 0 && i.key !== 'RENTA_FIJA').sort((a, b) => b.hoy - a.hoy);
+  const top = mov[0], worst = mov[mov.length - 1];
+  $('liveFoot').innerHTML = `Ayer al cierre tu ciudad valía <b>${mxn.format(ayer)}</b>; ahora vale <b>${mxn.format(M.total)}</b>.`
+    + (top && top.hoy > 0 ? ` Lo que más subió: <b>${esc(top.activo)}</b> (${signed2(top.hoy)}).` : '')
+    + (worst && worst.hoy < 0 ? ` Lo que más bajó: <b>${esc(worst.activo)}</b> (${signed2(worst.hoy)}).` : '')
+    + `<br>Acciones y FIBRAs se comparan contra el cierre anterior, incluyendo el tipo de cambio; cripto contra las 7:00 de hoy; renta fija suma el interés de un día. Aparte, tu ciudad genera unos <b>${mxn2.format(incomePerDay(M))}</b> al día en intereses, rentas y dividendos.`;
+}
 function tickLive(now) {
-  if (!model || now - liveLast < 100) return;
+  if (!model || now - liveLast < 40) return;
   liveLast = now;
-  const perDay = incomePerDay(model), d = new Date();
-  const secs = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds() + d.getMilliseconds() / 1000;
-  $('liveToday').textContent = mxn4.format(perDay * secs / 86400);
-  $('liveDay').textContent = mxn2.format(perDay);
-  $('liveMonth').textContent = mxn.format(perDay * 30.4);
-  $('liveSession').textContent = mxn6.format(perDay * (now - sessionStart) / 1000 / 86400);
+  liveShown = reduce ? liveTarget : liveShown + (liveTarget - liveShown) * 0.12;
+  if (Math.abs(liveTarget - liveShown) < 0.005) liveShown = liveTarget;
+  const el = $('liveToday');
+  el.textContent = signed2(liveShown);
+  el.className = 'big ' + (liveTarget >= 0 ? 'pos' : 'neg');
 }
 
 // ================= Escena =================
