@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Figtree:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
-/* Layout: login → HUD, ciudad con zoom por barrio y panel del barrio, tablero, simulador, captura del portafolio */
+/* Layout: login → avisos, HUD, contador en vivo, ciudad con zoom, máquina del tiempo, misión + racha, ceremonia + simulador, barrios, captura */
 :root{
   --bg:#0e1426; --panel:#151d35; --panel2:#1c2646; --line:#2a3560; --fg:#eef1f8; --muted:#9ba6c6;
   --acc:#f2b544; --fib:#ef7b6c; --ren:#4fc3b0; --btc:#f7931a;
@@ -20,11 +20,11 @@
 }
 html,body{background:var(--bg);color:var(--fg)}
 [hidden]{display:none!important}
-body{font-family:var(--f-body);font-size:15px;line-height:1.5}
-.wrap{max-width:1140px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 56px;display:flex;flex-direction:column;gap:18px}
+body{margin:0;font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1140px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 56px;display:flex;flex-direction:column;gap:16px}
 h1{font-family:var(--f-display);font-weight:400;margin:0;line-height:1;letter-spacing:.01em}
 h1 span{color:var(--ren)}
-h2{font-family:var(--f-display);font-weight:400;font-size:18px;margin:0;letter-spacing:.02em}
+h2{font-family:var(--f-display);font-weight:400;font-size:18px;margin:0;letter-spacing:.02em;text-wrap:balance}
 .muted{color:var(--muted)}
 .pos{color:var(--ok)} .neg{color:var(--bad)}
 button{background:var(--ren);color:#08201d;border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
@@ -34,33 +34,49 @@ button:disabled{opacity:.55;cursor:wait}
 button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 input{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font:inherit;min-width:0}
 input[type=number]{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+input[type=range]{accent-color:var(--ren);width:100%;padding:0;border:0;background:transparent}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none;display:inline-block}
 
 /* Login */
-#login{min-height:100%;display:grid;place-items:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:28px 24px;width:min(400px,100%);display:flex;flex-direction:column;gap:14px}
+#login{min-height:100vh;display:grid;place-items:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px;box-sizing:border-box}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:28px 24px;width:min(400px,100%);display:flex;flex-direction:column;gap:14px;box-sizing:border-box}
 .card h1{font-size:34px}
 .card label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);font-weight:600}
 .err{color:var(--bad);font-size:13px;min-height:1.2em}
 .demo-note{font-size:12px;color:var(--warn);border:1px dashed var(--warn);border-radius:8px;padding:8px 10px}
 
-/* App */
+/* Encabezado y HUD */
 header.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
 header.top h1{font-size:clamp(24px,4.5vw,34px)}
 .who{display:flex;align-items:center;gap:10px;font-size:14px}
+.events{display:flex;flex-direction:column;gap:8px}
+.ev{display:flex;gap:12px;align-items:flex-start;border-radius:10px;padding:10px 14px;border:1px solid var(--c);background:color-mix(in srgb,var(--c) 12%,var(--panel))}
+.ev .dot{margin-top:6px}
+.ev b{display:block;font-size:14px}
+.ev span{font-size:13px;color:var(--fg)}
+.ev.small{padding:6px 12px;background:var(--panel);border-color:var(--line)}
+.ev.small span{color:var(--muted)}
 .hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-width:0}
 .k{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700}
-.v{font-family:var(--f-data);font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.v{font-family:var(--f-data);font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .v small{font-size:12px;margin-left:6px}
+.live{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;background:linear-gradient(90deg,color-mix(in srgb,var(--ren) 16%,var(--panel)),var(--panel));border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.live .big{font-family:var(--f-data);font-size:22px;color:var(--ok);font-variant-numeric:tabular-nums}
+.live .sub{font-size:13px;color:var(--muted)}
+.live .sub b{font-family:var(--f-data);font-weight:500;color:var(--fg)}
+
+/* Escenario */
 .stage{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#1a2140}
 canvas{display:block;width:100%;cursor:pointer;touch-action:manipulation}
-.stage .tag{position:absolute;bottom:10px;right:10px;background:rgba(14,20,38,.85);border:1px solid var(--line);color:var(--warn);font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px}
-.stage .back{position:absolute;top:10px;left:10px}
-.stage .hint{position:absolute;bottom:56px;left:50%;transform:translateX(-50%);background:rgba(14,20,38,.85);border:1px solid var(--line);font-size:12px;padding:4px 12px;border-radius:999px;white-space:nowrap;pointer-events:none}
+.badge{position:absolute;background:rgba(14,20,38,.85);border:1px solid var(--line);font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;pointer-events:none;white-space:nowrap}
+#sampleTag{bottom:10px;right:10px;color:var(--warn)}
+#lvlTag{bottom:10px;left:10px;color:var(--fg)}
+.stage .back{position:absolute;top:10px;left:10px;background:rgba(14,20,38,.85)}
+.stage .hint{bottom:44px;left:50%;transform:translateX(-50%)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips button{background:var(--panel);color:var(--fg);border:1px solid var(--line);font-weight:600;display:flex;align-items:center;gap:8px;padding:7px 12px;font-size:14px}
 .chips button[aria-pressed=true]{border-color:var(--fg)}
-.dot{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
 .zoominfo{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:18px}
 @media (max-width:760px){.zoominfo{grid-template-columns:1fr}}
 .zoominfo h2{display:flex;align-items:center;gap:10px}
@@ -69,23 +85,44 @@ canvas{display:block;width:100%;cursor:pointer;touch-action:manipulation}
 .zrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:8px 10px;border-radius:8px;border:1px solid transparent;cursor:pointer;background:var(--panel2)}
 .zrow[aria-selected=true]{border-color:var(--c)}
 .zrow b{display:block;font-size:14px}
-.zrow span.zd{font-size:12px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zrow .zd{font-size:12px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .zrow .n{font-family:var(--f-data);font-size:13px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .empty-lot{font-size:11px;color:var(--warn);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
-.d{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
-.dh{display:flex;align-items:center;gap:10px}
-.dn{font-weight:800;font-size:16px}
-.row{display:flex;justify-content:space-between;gap:8px;font-size:13px}
-.row b{font-family:var(--f-data);font-weight:500;font-variant-numeric:tabular-nums}
-.bar{position:relative;height:10px;background:var(--panel2);border-radius:5px}
-.bar i{position:absolute;inset:0 auto 0 0;background:var(--c);border-radius:5px}
-.bar u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--fg);border-radius:1px}
-.chip{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid currentColor;margin-left:auto}
-.chip.ok{color:var(--ok)} .chip.hi{color:var(--warn)} .chip.lo{color:var(--bad)}
+
+/* Paneles */
 section.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.phead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
 .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+@media (max-width:400px){.two{grid-template-columns:1fr}}
+.pill{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.pill.ok{color:var(--ok)} .pill.hi{color:var(--warn)} .pill.lo{color:var(--bad)} .pill.info{color:var(--ren)}
+.pbar{height:10px;background:var(--panel2);border-radius:5px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--c,var(--ren));border-radius:5px;transition:width .6s}
 ul.list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+ul.tasks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:14px}
+ul.tasks li{display:flex;gap:10px;align-items:flex-start}
+ul.tasks li::before{content:"";flex:none;width:16px;height:16px;margin-top:2px;border-radius:4px;border:2px solid var(--line)}
+ul.tasks li.on::before{background:var(--ok);border-color:var(--ok);box-shadow:inset 0 0 0 2px var(--panel)}
+ul.tasks li.on{color:var(--muted)}
+.mission-scene{font-size:17px;font-weight:700;margin:0}
+.streak{display:flex;align-items:baseline;gap:10px}
+.streak .num{font-family:var(--f-display);font-size:40px;line-height:1;color:var(--acc)}
+.months{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px}
+.months div{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--muted);font-weight:700}
+.months i{width:100%;height:14px;border-radius:3px;background:var(--panel2);border:1px solid var(--line);box-sizing:border-box}
+.months i.on{background:var(--acc);border-color:var(--acc)}
+.months i.now{border:1px dashed var(--acc)}
+.ach{display:flex;flex-wrap:wrap;gap:8px}
+.ach div{border:1px dashed var(--line);border-radius:10px;padding:7px 11px;font-size:13px;color:var(--muted)}
+.ach div.on{border-style:solid;border-color:var(--ok);color:var(--fg)}
+.ach div.on::before{content:"★ ";color:var(--acc)}
+.ach div:not(.on)::before{content:"☆ "}
+.tmctl{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) auto auto;gap:10px 14px;align-items:end}
+@media (max-width:700px){.tmctl{grid-template-columns:1fr 1fr}.tmctl .tmr{grid-column:1/-1}}
+.tmctl label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);font-weight:600}
+.tmctl label b{color:var(--fg);font-family:var(--f-data);font-weight:500}
+.tmout{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.tmout .stat .v{font-size:18px}
 .sim{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .sim input{width:170px}
 .tbl{overflow-x:auto}
@@ -93,11 +130,16 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
 th{color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
 td.n{font-family:var(--f-data);text-align:right;font-variant-numeric:tabular-nums}
-.ach{display:flex;flex-wrap:wrap;gap:8px}
-.ach div{border:1px dashed var(--line);border-radius:10px;padding:8px 12px;font-size:13px;color:var(--muted)}
-.ach div.on{border-style:solid;border-color:var(--ok);color:var(--fg)}
-.ach div.on::before{content:"★ ";color:var(--acc)}
-.ach div:not(.on)::before{content:"☆ "}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.d{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.dh{display:flex;align-items:center;gap:10px}
+.dn{font-weight:800;font-size:16px}
+.d .pill{margin-left:auto}
+.row{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.row b{font-family:var(--f-data);font-weight:500;font-variant-numeric:tabular-nums}
+.bar{position:relative;height:10px;background:var(--panel2);border-radius:5px}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--c);border-radius:5px}
+.bar u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--fg);border-radius:1px}
 .fgroup{display:flex;flex-direction:column;gap:8px}
 .fgroup h3{margin:6px 0 0;font-size:14px;display:flex;align-items:center;gap:8px}
 .frow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:center}
@@ -105,12 +147,12 @@ td.n{font-family:var(--f-data);text-align:right;font-variant-numeric:tabular-num
 @media (max-width:560px){.frow{grid-template-columns:1fr 1fr}.frow .fname{grid-column:1/-1}.frow.renta{grid-template-columns:1fr}}
 .fname b{display:block;font-size:14px}
 .fname span{font-size:12px;color:var(--muted)}
-.frow input{width:100%}
+.frow input{width:100%;box-sizing:border-box}
 .fhead{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
 .save{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .toast{font-size:13px}
-.foot{font-size:12px;color:var(--muted)}
-body{margin:0}
+.foot{font-size:12px;color:var(--muted);margin:0}
+.celebrate{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--acc);color:#2a1c00;font-weight:800;padding:12px 20px;border-radius:999px;box-shadow:0 8px 30px rgba(0,0,0,.4);z-index:20;max-width:calc(100% - 32px);text-align:center}
 </style>
 </head>
 <body>
@@ -136,56 +178,85 @@ body{margin:0}
       <div class="who"><span id="whoName"></span><button class="ghost small" id="btnOut" type="button">Salir</button></div>
     </header>
 
+    <div class="events" id="events"></div>
+
     <div class="hud">
       <div class="stat"><div class="k">Valor de tu ciudad</div><div class="v" id="hTotal">—</div></div>
       <div class="stat"><div class="k">Ganancia total</div><div class="v" id="hGain">—</div></div>
       <div class="stat"><div class="k">Hoy</div><div class="v" id="hToday">—</div></div>
       <div class="stat"><div class="k">Equilibrio</div><div class="v" id="hBal">—</div></div>
+      <div class="stat"><div class="k">Racha</div><div class="v" id="hStreak">—</div></div>
+    </div>
+
+    <div class="live" aria-live="off">
+      <span class="k">Tu ciudad ha generado hoy</span>
+      <span class="big" id="liveToday">$0.0000</span>
+      <span class="sub">en intereses, rentas y dividendos estimados · <b id="liveDay">$0</b> al día · <b id="liveMonth">$0</b> al mes · desde que abriste esta página <b id="liveSession">$0.000000</b></span>
     </div>
 
     <div class="stage" id="stage">
       <canvas id="city" role="img" aria-label="Ciudad animada con cuatro barrios: acciones, FIBRAs, renta fija y bitcoin"></canvas>
-      <div class="tag" id="sampleTag" hidden>Datos de ejemplo</div>
-      <button class="ghost small back" id="btnBack" type="button" hidden style="background:rgba(14,20,38,.85)">← Toda la ciudad</button>
-      <div class="hint" id="hint">Toca un barrio para entrar</div>
+      <div class="badge" id="lvlTag"></div>
+      <div class="badge" id="sampleTag" hidden>Datos de ejemplo</div>
+      <button class="ghost small back" id="btnBack" type="button" hidden>← Toda la ciudad</button>
+      <div class="badge hint" id="hint">Toca un barrio para entrar</div>
     </div>
     <div class="chips" id="chips"></div>
     <div class="zoominfo" id="zoominfo" hidden></div>
 
-    <div class="grid" id="districts"></div>
+    <section class="panel" id="tm">
+      <div class="phead"><h2>Máquina del tiempo</h2><span class="pill info" id="tmLvl"></span></div>
+      <div class="tmctl">
+        <label class="tmr" for="tmYears">Viajar al futuro: <b id="tmYearsOut">hoy</b><input type="range" id="tmYears" min="0" max="30" step="1" value="0"></label>
+        <label for="tmAport">Aportación mensual<input id="tmAport" type="number" min="0" step="500" inputmode="decimal"></label>
+        <button id="tmPlay" type="button">Ver crecer</button>
+        <button id="tmNow" type="button" class="ghost">Volver a hoy</button>
+      </div>
+      <div id="tmOut"></div>
+      <p class="foot" id="tmNote"></p>
+    </section>
 
     <div class="two">
+      <section class="panel" id="mission"></section>
+      <section class="panel" id="streak"></section>
+    </div>
+
+    <div class="two">
+      <section class="panel" id="ceremony"></section>
       <section class="panel">
         <h2>¿Cuánto vas a invertir?</h2>
         <p class="muted" style="margin:0">Escribe tu aportación y te digo dónde ponerla para acercarte a la ciudad ideal.</p>
         <div class="sim"><input id="simAmt" type="number" min="0" step="500" value="10000" aria-label="Monto a invertir en pesos"><button id="btnSim" type="button">Repartir</button></div>
         <div id="simOut"></div>
       </section>
-      <section class="panel">
-        <h2>Logros</h2>
-        <div class="ach" id="ach"></div>
-        <p class="foot" style="margin:0">Los logros premian constancia y equilibrio, no comprar y vender seguido.</p>
-        <h2 style="margin-top:6px">Lo que se salió de rango</h2>
-        <div id="rebal"></div>
-      </section>
     </div>
 
-    <section class="panel">
+    <div class="grid" id="districts"></div>
+
+    <section class="panel" id="portafolio">
       <h2>Mi portafolio</h2>
-      <p class="muted" style="margin:0">Captura cuántos títulos tienes y a qué precio promedio compraste. En renta fija, solo tu saldo. Deja vacío lo que no tengas.</p>
+      <p class="muted" style="margin:0">Captura cuántos títulos tienes y a qué precio promedio compraste. En renta fija, solo tu saldo. Deja vacío lo que no tengas. Actualízalo al menos una vez al mes para mantener tu racha.</p>
       <form id="pfForm" style="display:flex;flex-direction:column;gap:14px"></form>
     </section>
-    <p class="foot">Ciudad Marea es una herramienta para visualizar tu portafolio. Las animaciones son representaciones, no obras ni inmuebles específicos.</p>
+    <p class="foot">Ciudad Marea es una herramienta para visualizar tu portafolio. Las animaciones son representaciones y las proyecciones suponen rendimientos constantes; no son una promesa de resultados.</p>
   </div>
 </div>
+<div class="celebrate" id="celebrate" hidden></div>
 
 <script>
 // ================= Configuración =================
 const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbwQ27XpCTCNOmOPxSGCu7gB8UJx40QPaoAlyXx2rvORM31OER6X9GQABBMS88Do-wCGIw/exec',   // URL /exec de tu Apps Script. Vacío = modo demostración
-  BAND: 3        // tolerancia en puntos porcentuales por barrio
+  API_URL: 'https://script.google.com/macros/s/AKfycbwQ27XpCTCNOmOPxSGCu7gB8UJx40QPaoAlyXx2rvORM31OER6X9GQABBMS88Do-wCGIw/exec'   // URL /exec de tu Apps Script. Vacío = modo demostración
 };
 const DEMO = !CONFIG.API_URL;
+
+// Valores por defecto; los reales vienen de la pestaña Juego de tu hoja
+const JUEGO_DEF = {
+  rend_acciones_pct: 8, rend_fibras_pct: 8, rend_bitcoin_pct: 10, inflacion_pct: 4,
+  dist_fibras_pct: 7, div_acciones_pct: 1.8, meses_rebalanceo: '3,9', banda_pct: 3,
+  umbral_tormenta_pct: 2, mision_activo: '', mision_texto: '', ceremonia_prueba: 'NO'
+};
+let J = { ...JUEGO_DEF };
 
 const ORDER = ['ACCIONES', 'FIBRAS', 'RENTA_FIJA', 'BITCOIN'];
 const CLS = {
@@ -198,80 +269,29 @@ const CLS = {
   BITCOIN: { name: 'Bitcoin', color: '#f7931a', scene: 'La bóveda',
     how: 'Bitcoin no cobra rentas ni intereses: su valor depende de cuánto esté dispuesta a pagar la gente. Puede subir o bajar mucho en un día, por eso es la parte más chica de la ciudad.' }
 };
-
-// ================= Demo =================
-const DEMO_CATALOGO = [
-  { activo: 'VTI', clase: 'ACCIONES', subclase: 'EE.UU.', objetivo: 20, descripcion: 'Mercado total de Estados Unidos', precio_mxn: 6100, cambio_dia: 0.6 },
-  { activo: 'VEA', clase: 'ACCIONES', subclase: 'Desarrollados', objetivo: 12, descripcion: 'Europa, Japón y otros desarrollados', precio_mxn: 1050, cambio_dia: -0.3 },
-  { activo: 'VWO', clase: 'ACCIONES', subclase: 'Emergentes', objetivo: 5, descripcion: 'China, India, Brasil y otros', precio_mxn: 920, cambio_dia: 0.9 },
-  { activo: 'VUAA', clase: 'ACCIONES', subclase: 'S&P 500', objetivo: 5, descripcion: 'S&P 500 que reinvierte dividendos', precio_mxn: 2350, cambio_dia: 0.5 },
-  { activo: 'IVVPESO', clase: 'ACCIONES', subclase: 'S&P 500 en pesos', objetivo: 3, descripcion: 'S&P 500 cubierto contra el dólar', precio_mxn: 72, cambio_dia: 0.4 },
-  { activo: 'FUNO11', clase: 'FIBRAS', subclase: 'Diversificada', objetivo: 5, descripcion: 'Oficinas, comercio e industria', precio_mxn: 24.1, cambio_dia: 1.2 },
-  { activo: 'FIBRAPL14', clase: 'FIBRAS', subclase: 'Industrial', objetivo: 4, descripcion: 'Naves industriales y logística', precio_mxn: 71.8, cambio_dia: 0.8 },
-  { activo: 'DANHOS13', clase: 'FIBRAS', subclase: 'Comercial', objetivo: 3, descripcion: 'Centros comerciales y oficinas', precio_mxn: 27.2, cambio_dia: -0.6 },
-  { activo: 'FNOVA17', clase: 'FIBRAS', subclase: 'Industrial', objetivo: 3, descripcion: 'Inmuebles industriales', precio_mxn: 44.5, cambio_dia: 0.3 },
-  { activo: 'FMTY14', clase: 'FIBRAS', subclase: 'Industrial', objetivo: 2, descripcion: 'Industria y oficinas en el norte', precio_mxn: 13.1, cambio_dia: -0.4 },
-  { activo: 'NEXT23', clase: 'FIBRAS', subclase: 'Industrial', objetivo: 3, descripcion: 'Naves industriales nuevas', precio_mxn: 30.5, cambio_dia: 1.5 },
-  { activo: 'Cetes 28 días', clase: 'RENTA_FIJA', subclase: '28 días', objetivo: 8, tasa: 7.0, descripcion: 'Préstamo al gobierno a 28 días' },
-  { activo: 'Cetes 91 días', clase: 'RENTA_FIJA', subclase: '91 días', objetivo: 6, tasa: 7.2, descripcion: 'Préstamo al gobierno a 3 meses' },
-  { activo: 'Cetes 182 días', clase: 'RENTA_FIJA', subclase: '182 días', objetivo: 6, tasa: 7.4, descripcion: 'Préstamo al gobierno a 6 meses' },
-  { activo: 'Udibonos', clase: 'RENTA_FIJA', subclase: 'Inflación', objetivo: 6, tasa: 8.0, descripcion: 'Protege contra la inflación' },
-  { activo: 'Bondia', clase: 'RENTA_FIJA', subclase: 'Liquidez diaria', objetivo: 4, tasa: 6.9, descripcion: 'Dinero disponible al día siguiente' },
-  { activo: 'Bitcoin', clase: 'BITCOIN', subclase: 'Cripto', objetivo: 5, descripcion: 'La parte pequeña y volátil', precio_mxn: 2050000, cambio_dia: -2.1 }
-];
-let demoPos = [
-  { activo: 'VTI', titulos: 30, precio_promedio: 5600 }, { activo: 'VEA', titulos: 80, precio_promedio: 1000 },
-  { activo: 'VWO', titulos: 40, precio_promedio: 900 }, { activo: 'FUNO11', titulos: 1200, precio_promedio: 22 },
-  { activo: 'FIBRAPL14', titulos: 250, precio_promedio: 64 }, { activo: 'DANHOS13', titulos: 600, precio_promedio: 27.5 },
-  { activo: 'FNOVA17', titulos: 300, precio_promedio: 41 }, { activo: 'Cetes 28 días', saldo: 60000 },
-  { activo: 'Cetes 91 días', saldo: 40000 }, { activo: 'Udibonos', saldo: 30000 }, { activo: 'Bondia', saldo: 15000 },
-  { activo: 'Bitcoin', titulos: 0.01, precio_promedio: 1500000 }
-];
-function demoCompute(p) {
-  const c = DEMO_CATALOGO.find(x => x.activo === p.activo) || {};
-  const renta = p.saldo != null;
-  const valor = renta ? p.saldo : (p.titulos || 0) * (c.precio_mxn || 0);
-  const costo = renta ? p.saldo : (p.titulos || 0) * (p.precio_promedio || 0);
-  const chg = c.cambio_dia || 0;
-  const hoy = renta ? p.saldo * (c.tasa || 0) / 100 / 360 : valor * chg / (100 + chg);
-  return { ...p, clase: c.clase, valor, costo, ganancia: valor - costo, cambio_hoy: hoy };
-}
-function demoApi(accion, data) {
-  if (accion === 'login') return { ok: true, token: 'demo', nombre: 'Inversor de ejemplo' };
-  if (accion === 'salir') return { ok: true };
-  if (accion === 'guardar') {
-    const map = {}; demoPos.forEach(p => map[p.activo] = p);
-    data.posiciones.forEach(p => {
-      const empty = p.saldo != null ? !p.saldo : !p.titulos;
-      if (empty) delete map[p.activo]; else map[p.activo] = p;
-    });
-    demoPos = Object.values(map);
-  }
-  return { ok: true, nombre: 'Inversor de ejemplo', catalogo: DEMO_CATALOGO, posiciones: demoPos.map(demoCompute) };
-}
-
-// ================= API =================
-let token = null;
-async function api(accion, data = {}) {
-  if (DEMO) { await new Promise(r => setTimeout(r, 250)); return demoApi(accion, data); }
-  const res = await fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ accion, token, ...data }) });
-  if (!res.ok) throw new Error('El servidor respondió ' + res.status + '. Inténtalo en un momento.');
-  const j = await res.json();
-  if (!j.ok) {
-    if (String(j.error).startsWith('SESION:')) { logout(true); throw new Error(j.error.slice(7).trim()); }
-    throw new Error(j.error || 'Algo falló en el servidor.');
-  }
-  return j;
-}
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const LEVELS = [[0, 'Campamento'], [50000, 'Pueblo'], [250000, 'Villa'], [1000000, 'Ciudad'], [5000000, 'Metrópoli'], [20000000, 'Megalópolis']];
 
 // ================= Utilidades =================
 const $ = id => document.getElementById(id);
 const mxn = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 });
-const mxn2 = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 2 });
+const mxn2 = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 2, minimumFractionDigits: 2 });
+const mxn4 = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 4, minimumFractionDigits: 4 });
+const mxn6 = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 6, minimumFractionDigits: 6 });
 const signed = v => (v > 0 ? '+' : v < 0 ? '−' : '') + mxn.format(Math.abs(v));
+const signed2 = v => (v > 0 ? '+' : v < 0 ? '−' : '') + mxn2.format(Math.abs(v));
 const pct1 = v => (Math.round(v * 10) / 10).toFixed(1) + '%';
+const short = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(v >= 1e7 ? 0 : 1) + ' M' : v >= 1e4 ? '$' + Math.round(v / 1e3) + ' mil' : mxn.format(v);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const idOf = s => 'a_' + String(s).replace(/[^a-zA-Z0-9]/g, '_');
+const pad2 = n => String(n).padStart(2, '0');
+const ym = d => d.getFullYear() + '-' + pad2(d.getMonth() + 1);
+const ymd = d => ym(d) + '-' + pad2(d.getDate());
+function prevYm(s) { let [y, m] = s.split('-').map(Number); m--; if (!m) { m = 12; y--; } return y + '-' + pad2(m); }
+const fechaLarga = d => d.getDate() + ' de ' + MESES[d.getMonth()];
+const parseYmd = s => { const [y, m, d] = String(s).split('-').map(Number); return new Date(y, (m || 1) - 1, d || 1); };
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function classKey(s) {
   const t = String(s || '').toLowerCase();
   if (t.includes('fibra') || t.includes('reit')) return 'FIBRAS';
@@ -293,15 +313,110 @@ function kindOf(k, it) {
   return 'fabrica';
 }
 const OBRA = { calle: 'Calles', puente: 'Puente', escuela: 'Escuela', hospital: 'Hospital', tesoreria: 'Tesorería' };
+function obraName(it) {
+  return {
+    fabrica: 'una fábrica nueva de ' + (it.subclase || it.activo), nave: 'una nave industrial nueva', torre: 'una torre de oficinas',
+    plaza: 'una plaza comercial', calle: 'repavimentar sus calles', puente: 'un puente nuevo', escuela: 'una escuela nueva',
+    hospital: 'un hospital', tesoreria: 'reforzar la tesorería', boveda: 'reforzar la bóveda'
+  }[kindOf(it.key, it)];
+}
+function levelOf(v) { let i = 0; LEVELS.forEach((l, j) => { if (v >= l[0]) i = j; }); return { i, name: LEVELS[i][1], next: LEVELS[i + 1] || null }; }
+const num = (v, d) => { const n = parseFloat(String(v ?? '').replace(',', '.')); return isNaN(n) ? d : n; };
+
+// ================= Demo =================
+const DEMO_CATALOGO = [
+  { activo: 'VTI', clase: 'ACCIONES', subclase: 'EE.UU.', objetivo: 20, descripcion: 'Mercado total de Estados Unidos', precio_mxn: 6100, cambio_dia: 0.6 },
+  { activo: 'VEA', clase: 'ACCIONES', subclase: 'Desarrollados', objetivo: 12, descripcion: 'Europa, Japón y otros desarrollados', precio_mxn: 1050, cambio_dia: -0.3 },
+  { activo: 'VWO', clase: 'ACCIONES', subclase: 'Emergentes', objetivo: 5, descripcion: 'China, India, Brasil y otros', precio_mxn: 920, cambio_dia: 0.9 },
+  { activo: 'VUAA', clase: 'ACCIONES', subclase: 'S&P 500', objetivo: 5, descripcion: 'S&P 500 que reinvierte dividendos', precio_mxn: 2350, cambio_dia: 0.5 },
+  { activo: 'IVVPESO', clase: 'ACCIONES', subclase: 'S&P 500 en pesos', objetivo: 3, descripcion: 'S&P 500 cubierto contra el dólar', precio_mxn: 72, cambio_dia: 0.4 },
+  { activo: 'FUNO11', clase: 'FIBRAS', subclase: 'Diversificada', objetivo: 5, descripcion: 'Oficinas, comercio e industria', precio_mxn: 33.4, cambio_dia: 1.5 },
+  { activo: 'FIBRAPL14', clase: 'FIBRAS', subclase: 'Industrial', objetivo: 4, descripcion: 'Naves industriales y logística', precio_mxn: 82.8, cambio_dia: 2.4 },
+  { activo: 'DANHOS13', clase: 'FIBRAS', subclase: 'Comercial', objetivo: 3, descripcion: 'Centros comerciales y oficinas', precio_mxn: 29.1, cambio_dia: -0.6 },
+  { activo: 'FNOVA17', clase: 'FIBRAS', subclase: 'Industrial', objetivo: 3, descripcion: 'Inmuebles industriales', precio_mxn: 44.5, cambio_dia: 0.3 },
+  { activo: 'FMTY14', clase: 'FIBRAS', subclase: 'Industrial', objetivo: 2, descripcion: 'Industria y oficinas en el norte', precio_mxn: 13.1, cambio_dia: -0.4 },
+  { activo: 'NEXT23', clase: 'FIBRAS', subclase: 'Industrial', objetivo: 3, descripcion: 'Naves industriales nuevas', precio_mxn: 30.5, cambio_dia: 1.1 },
+  { activo: 'Cetes 28 días', clase: 'RENTA_FIJA', subclase: '28 días', objetivo: 8, tasa: 7.0, descripcion: 'Préstamo al gobierno a 28 días' },
+  { activo: 'Cetes 91 días', clase: 'RENTA_FIJA', subclase: '91 días', objetivo: 6, tasa: 7.2, descripcion: 'Préstamo al gobierno a 3 meses' },
+  { activo: 'Cetes 182 días', clase: 'RENTA_FIJA', subclase: '182 días', objetivo: 6, tasa: 7.4, descripcion: 'Préstamo al gobierno a 6 meses' },
+  { activo: 'Udibonos', clase: 'RENTA_FIJA', subclase: 'Inflación', objetivo: 6, tasa: 8.0, descripcion: 'Protege contra la inflación' },
+  { activo: 'Bondia', clase: 'RENTA_FIJA', subclase: 'Liquidez diaria', objetivo: 4, tasa: 6.9, descripcion: 'Dinero disponible al día siguiente' },
+  { activo: 'Bitcoin', clase: 'BITCOIN', subclase: 'Cripto', objetivo: 5, descripcion: 'La parte pequeña y volátil', precio_mxn: 1495000, cambio_dia: -5.4 }
+];
+let demoPos = [
+  { activo: 'VTI', titulos: 30, precio_promedio: 5600 }, { activo: 'VEA', titulos: 80, precio_promedio: 1000 },
+  { activo: 'VWO', titulos: 40, precio_promedio: 900 }, { activo: 'FUNO11', titulos: 1200, precio_promedio: 29 },
+  { activo: 'FIBRAPL14', titulos: 250, precio_promedio: 70 }, { activo: 'DANHOS13', titulos: 600, precio_promedio: 27.5 },
+  { activo: 'FNOVA17', titulos: 300, precio_promedio: 41 }, { activo: 'Cetes 28 días', saldo: 60000 },
+  { activo: 'Cetes 91 días', saldo: 40000 }, { activo: 'Udibonos', saldo: 30000 }, { activo: 'Bondia', saldo: 15000 },
+  { activo: 'Bitcoin', titulos: 0.01, precio_promedio: 1300000 }
+];
+function demoCompute(p) {
+  const c = DEMO_CATALOGO.find(x => x.activo === p.activo) || {};
+  const renta = p.saldo != null;
+  const valor = renta ? p.saldo : (p.titulos || 0) * (c.precio_mxn || 0);
+  const costo = renta ? p.saldo : (p.titulos || 0) * (p.precio_promedio || 0);
+  const chg = c.cambio_dia || 0;
+  const hoy = renta ? p.saldo * (c.tasa || 0) / 100 / 360 : valor * chg / (100 + chg);
+  return { ...p, clase: c.clase, valor, costo, ganancia: valor - costo, cambio_hoy: hoy };
+}
+function demoSnapshot(f, fv) {
+  const pos = demoPos.map(demoCompute), det = {};
+  let costo = 0, valor = 0;
+  pos.forEach(p => { det[p.activo] = [p.costo * f, p.valor * f * fv]; costo += p.costo * f; valor += p.valor * f * fv; });
+  return { costo, valor, detalle: det };
+}
+let demoHist = (() => {
+  const rows = []; let m = prevYm(ym(new Date()));
+  // cinco meses con aportaciones; uno con caída del mercado en el que no se vendió
+  [[0.97, 1], [0.93, 1], [0.89, 0.93], [0.85, 1], [0.81, 1]].forEach(([f, fv]) => { rows.unshift({ mes: m, ...demoSnapshot(f, fv) }); m = prevYm(m); });
+  return rows;
+})();
+function demoApi(accion, data) {
+  if (accion === 'login') return { ok: true, token: 'demo', nombre: 'Inversor de ejemplo' };
+  if (accion === 'salir') return { ok: true };
+  if (accion === 'guardar') {
+    const map = {}; demoPos.forEach(p => map[p.activo] = p);
+    data.posiciones.forEach(p => { const empty = p.saldo != null ? !p.saldo : !p.titulos; if (empty) delete map[p.activo]; else map[p.activo] = p; });
+    demoPos = Object.values(map);
+    const cm = ym(new Date());
+    demoHist = demoHist.filter(r => r.mes !== cm).concat([{ mes: cm, ...demoSnapshot(1, 1) }]);
+  }
+  const hoy = new Date(), fin = new Date(Date.now() + 2 * 864e5), prox = new Date(Date.now() + 20 * 864e5);
+  return {
+    ok: true, nombre: 'Inversor de ejemplo', catalogo: DEMO_CATALOGO, posiciones: demoPos.map(demoCompute), juego: {},
+    historial: demoHist,
+    eventos: [
+      { inicio: ymd(hoy), fin: ymd(fin), tipo: 'RENTAS', objetivo: 'FUNO11', mensaje: 'FUNO11 está repartiendo las rentas del trimestre a sus dueños.' },
+      { inicio: ymd(prox), fin: ymd(prox), tipo: 'RENTAS', objetivo: 'FIBRAPL14', mensaje: '' }
+    ]
+  };
+}
+
+// ================= API =================
+let token = null;
+async function api(accion, data = {}) {
+  if (DEMO) { await new Promise(r => setTimeout(r, 250)); return demoApi(accion, data); }
+  const res = await fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ accion, token, ...data }) });
+  if (!res.ok) throw new Error('El servidor respondió ' + res.status + '. Inténtalo en un momento.');
+  const j = await res.json();
+  if (!j.ok) {
+    if (String(j.error).startsWith('SESION:')) { logout(true); throw new Error(j.error.slice(7).trim()); }
+    throw new Error(j.error || 'Algo falló en el servidor.');
+  }
+  return j;
+}
 
 // ================= Modelo =================
-let raw = null, model = null;
-function buildModel(d) {
+let raw = null, model = null, view = null, travelYears = 0, refMax = {};
+function buildModel(d, proj) {
   const posMap = {}; (d.posiciones || []).forEach(p => posMap[p.activo] = p);
   const items = (d.catalogo || []).map(c => {
     const p = posMap[c.activo];
-    return { ...c, key: classKey(c.clase), pos: p || null, valor: p ? +p.valor || 0 : 0, costo: p ? +p.costo || 0 : 0,
-      ganancia: p ? +p.ganancia || 0 : 0, hoy: p ? +p.cambio_hoy || 0 : 0, objetivo: +c.objetivo || 0 };
+    let valor = p ? +p.valor || 0 : 0, costo = p ? +p.costo || 0 : 0, hoy = p ? +p.cambio_hoy || 0 : 0;
+    if (proj && proj[c.activo]) { valor = proj[c.activo].valor; costo = proj[c.activo].costo; hoy = 0; }
+    return { ...c, key: classKey(c.clase), pos: p || null, valor, costo, ganancia: valor - costo, hoy,
+      objetivo: +c.objetivo || 0, cambio_dia: +c.cambio_dia || 0 };
   });
   const total = items.reduce((a, i) => a + i.valor, 0);
   const classes = {};
@@ -311,12 +426,121 @@ function buildModel(d) {
     its.forEach(i => { c.valor += i.valor; c.costo += i.costo; c.ganancia += i.ganancia; c.hoy += i.hoy; c.objetivo += i.objetivo; });
     c.pct = total ? c.valor / total * 100 : 0;
     c.diff = c.pct - c.objetivo;
+    c.chg = c.valor - c.hoy > 0 ? c.hoy / (c.valor - c.hoy) * 100 : 0;
     classes[k] = c;
   });
   items.forEach(i => { i.pct = total ? i.valor / total * 100 : 0; });
-  const sumObj = items.reduce((a, i) => a + i.objetivo, 0);
   return { items, classes, total, costo: items.reduce((a, i) => a + i.costo, 0), ganancia: items.reduce((a, i) => a + i.ganancia, 0),
-    hoy: items.reduce((a, i) => a + i.hoy, 0), sumObj };
+    hoy: items.reduce((a, i) => a + i.hoy, 0) };
+}
+const BAND = () => num(J.banda_pct, 3);
+const maxDev = M => Math.max(...ORDER.map(k => Math.abs(M.classes[k].diff)));
+
+function rateOf(it) {
+  if (it.key === 'RENTA_FIJA') return num(it.tasa, 7);
+  if (it.key === 'FIBRAS') return num(J.rend_fibras_pct, 8);
+  if (it.key === 'BITCOIN') return num(J.rend_bitcoin_pct, 10);
+  return num(J.rend_acciones_pct, 8);
+}
+function project(years, monthly) {
+  const n = Math.round(years * 12), sumObj = model.items.reduce((a, i) => a + i.objetivo, 0) || 1, out = {};
+  let aport = 0;
+  model.items.forEach(it => {
+    const m = Math.pow(1 + rateOf(it) / 100, 1 / 12) - 1, f = Math.pow(1 + m, n), c = monthly * it.objetivo / sumObj;
+    out[it.activo] = { valor: it.valor * f + (m ? c * (f - 1) / m : c * n), costo: it.costo + c * n };
+    aport += c * n;
+  });
+  return { out, aport };
+}
+function incomePerDay(M) {
+  let d = 0;
+  M.items.forEach(it => {
+    if (!it.valor) return;
+    const r = it.key === 'RENTA_FIJA' ? rateOf(it) : it.key === 'FIBRAS' ? num(J.dist_fibras_pct, 7) : it.key === 'ACCIONES' ? num(J.div_acciones_pct, 1.8) : 0;
+    d += it.valor * r / 100 / 365;
+  });
+  return d;
+}
+
+// ---------- historial: racha, misión, ceremonia, eventos ----------
+function hist() { return (raw.historial || []).filter(r => r.mes).slice().sort((a, b) => a.mes < b.mes ? -1 : 1); }
+function isContrib(rows, i) {
+  if (i === 0) return rows[0].costo > 0;
+  const p = rows[i - 1];
+  return rows[i].costo - p.costo > Math.max(100, p.costo * 0.01);
+}
+function streakInfo() {
+  const rows = hist(), cm = ym(new Date());
+  let i = rows.length - 1, s = 0;
+  const thisMonth = i >= 0 && rows[i].mes === cm && isContrib(rows, i);
+  const savedThisMonth = i >= 0 && rows[i].mes === cm;
+  if (i >= 0 && rows[i].mes === cm) { if (thisMonth) s++; i--; }
+  let exp = prevYm(cm);
+  for (; i >= 0; i--) { if (rows[i].mes !== exp || !isContrib(rows, i)) break; s++; exp = prevYm(exp); }
+  let best = 0, run = 0;
+  rows.forEach((r, j) => {
+    const consecutive = j > 0 && prevYm(r.mes) === rows[j - 1].mes;
+    if (isContrib(rows, j)) run = consecutive || j === 0 ? run + 1 : 1; else run = 0;
+    best = Math.max(best, run);
+  });
+  const contribMonths = new Set(rows.filter((r, j) => isContrib(rows, j)).map(r => r.mes));
+  let captain = false;
+  for (let j = 1; j < rows.length; j++) if (rows[j].valor < rows[j - 1].valor * 0.95 && rows[j].costo >= rows[j - 1].costo * 0.995) captain = true;
+  const deltas = [];
+  for (let j = 1; j < rows.length; j++) if (prevYm(rows[j].mes) === rows[j - 1].mes) { const d = rows[j].costo - rows[j - 1].costo; if (d > 0) deltas.push(d); }
+  const avg = deltas.length ? deltas.slice(-6).reduce((a, b) => a + b, 0) / Math.min(6, deltas.length) : 0;
+  return { s, best: Math.max(best, s), thisMonth, savedThisMonth, contribMonths, captain, avg };
+}
+function missionInfo() {
+  const rows = hist(), cm = ym(new Date());
+  const prev = [...rows].reverse().find(r => r.mes < cm) || null;
+  let it = null, custom = false;
+  if (J.mision_activo) { it = model.items.find(i => i.activo.toLowerCase() === String(J.mision_activo).trim().toLowerCase()) || null; custom = !!it; }
+  if (!prev && !it) return { type: 'fundar', done: model.total > 0 };
+  const base = a => (prev && prev.detalle && prev.detalle[a]) ? prev.detalle[a] : [0, 0];
+  const tot = (prev ? prev.valor : model.total) || 1;
+  let amt = 0;
+  if (!it) {
+    let best = -Infinity;
+    model.items.filter(i => i.objetivo > 0 && !i.retirado).forEach(c => { const sh = tot * c.objetivo / 100 - base(c.activo)[1]; if (sh > best) { best = sh; it = c; } });
+    amt = best;
+  } else amt = tot * it.objetivo / 100 - base(it.activo)[1];
+  if (!it) return { type: 'fundar', done: model.total > 0 };
+  amt = Math.max(500, Math.round(amt / 100) * 100);
+  const before = base(it.activo)[0], added = it.costo - before;
+  return { type: 'obra', it, amt, custom, done: added > Math.max(100, before * 0.01), progress: Math.max(0, Math.min(1, added / amt)) };
+}
+function ceremonyInfo(st) {
+  const months = (String(J.meses_rebalanceo || '3,9').match(/\d+/g) || []).map(Number).filter(m => m >= 1 && m <= 12);
+  const now = new Date(), test = String(J.ceremonia_prueba || '').trim().toUpperCase() === 'SI';
+  const active = months.includes(now.getMonth() + 1) || test;
+  let next = null;
+  for (let add = 1; add <= 12 && months.length; add++) { const d = new Date(now.getFullYear(), now.getMonth() + add, 1); if (months.includes(d.getMonth() + 1)) { next = d; break; } }
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const daysLeft = Math.max(0, Math.ceil((endOfMonth - now) / 864e5));
+  const daysTo = next ? Math.ceil((next - now) / 864e5) : null;
+  const inRange = maxDev(model) <= BAND();
+  return { months, active, test, next, daysLeft, daysTo, inRange, done: active && inRange && st.savedThisMonth };
+}
+function eventsInfo() {
+  const today = ymd(new Date()), evs = raw.eventos || [];
+  const act = evs.filter(e => e.inicio <= today && e.fin >= today);
+  const upcoming = evs.filter(e => e.inicio > today).sort((a, b) => a.inicio < b.inicio ? -1 : 1).slice(0, 2);
+  const storms = [];
+  ['ACCIONES', 'FIBRAS', 'BITCOIN'].forEach(k => {
+    const c = model.classes[k];
+    if (!c.valor) return;
+    const th = num(J.umbral_tormenta_pct, 2) * (k === 'BITCOIN' ? 2.5 : 1);
+    if (c.chg <= -th) storms.push({ k, pct: c.chg });
+  });
+  act.filter(e => e.tipo === 'TORMENTA').forEach(e => { const k = classKey(e.objetivo); if (!storms.find(s => s.k === k)) storms.push({ k, pct: null, msg: e.mensaje }); });
+  const rentAct = new Set(), rentCls = new Set();
+  const rentas = act.filter(e => e.tipo === 'RENTAS').map(e => {
+    const it = model.items.find(i => i.activo.toLowerCase() === e.objetivo.toLowerCase());
+    if (it) rentAct.add(it.activo); else rentCls.add(e.objetivo ? classKey(e.objetivo) : 'FIBRAS');
+    return { ...e, it };
+  });
+  return { storms, rentas, rentAct, rentCls, avisos: act.filter(e => e.tipo === 'AVISO'), upcoming };
 }
 
 // ================= Sesión =================
@@ -342,14 +566,35 @@ async function logout(expired) {
   $('app').hidden = true; $('login').hidden = false;
   if (expired) $('lgErr').textContent = 'Tu sesión terminó. Vuelve a entrar.';
 }
-function showApp() { $('login').hidden = true; $('app').hidden = false; resize(); }
-async function loadData() { raw = await api('datos'); apply(raw); }
+function showApp() { $('login').hidden = true; $('app').hidden = false; sessionStart = performance.now(); resize(); }
+async function loadData() { apply(await api('datos')); }
+
+let ST = null, MI = null, CE = null, EV = null, firstApply = true;
 function apply(d) {
-  raw = d; model = buildModel(d);
+  const prevMission = MI ? MI.done : null, prevCer = CE ? CE.done : null;
+  raw = d;
+  J = { ...JUEGO_DEF };
+  Object.entries(d.juego || {}).forEach(([k, v]) => { if (v !== '' && v != null) J[k] = v; });
+  model = buildModel(d);
+  // altura de referencia por barrio: el edificio más grande de hoy
+  const gmax = Math.max(1, ...model.items.map(i => i.valor));
+  ORDER.forEach(k => { const m = Math.max(0, ...model.classes[k].items.map(i => i.valor)); refMax[k] = m || gmax; });
+  ST = streakInfo(); MI = missionInfo(); CE = ceremonyInfo(ST); EV = eventsInfo();
+  if (!firstApply && MI.done && prevMission === false) celebrate('¡Misión cumplida! Tu ciudad estrena ' + (MI.it ? obraName(MI.it).replace(/^(una|un) /, '') : 'barrio') + '.');
+  else if (!firstApply && CE.done && prevCer === false) celebrate('¡Ceremonia completada! Tu ciudad quedó en equilibrio.');
+  firstApply = false;
   $('whoName').textContent = 'Hola, ' + (d.nombre || '');
   $('sampleTag').hidden = !DEMO;
+  if (!$('tmAport').value) $('tmAport').value = Math.round((ST.avg || 5000) / 500) * 500 || 5000;
+  setTravel(travelYears, true);
   renderAll();
-  layout();
+}
+
+let celebrateT = 0;
+function celebrate(msg) {
+  const c = $('celebrate'); c.textContent = msg; c.hidden = false;
+  celebrateT = 4;
+  clearTimeout(celebrate._t); celebrate._t = setTimeout(() => c.hidden = true, 4500);
 }
 
 // ================= Render DOM =================
@@ -358,47 +603,126 @@ function renderAll() {
   $('hTotal').textContent = mxn.format(M.total);
   const gp = M.costo ? M.ganancia / M.costo * 100 : 0;
   $('hGain').innerHTML = `<span class="${M.ganancia >= 0 ? 'pos' : 'neg'}">${signed(M.ganancia)}</span><small class="muted">${pct1(gp)}</small>`;
-  $('hToday').innerHTML = `<span class="${M.hoy >= 0 ? 'pos' : 'neg'}">${signed(M.hoy)}</span>`;
-  const maxDev = Math.max(...ORDER.map(k => Math.abs(M.classes[k].diff)));
-  $('hBal').innerHTML = maxDev <= CONFIG.BAND ? '<span class="pos">En rango</span>' : `<span style="color:var(--warn)">${pct1(maxDev)} fuera</span>`;
+  $('hToday').innerHTML = `<span class="${M.hoy >= 0 ? 'pos' : 'neg'}">${signed2(M.hoy)}</span>`;
+  const md = maxDev(M);
+  $('hBal').innerHTML = md <= BAND() ? '<span class="pos">En rango</span>' : `<span style="color:var(--warn)">${pct1(md)} fuera</span>`;
+  $('hStreak').innerHTML = `<span style="color:var(--acc)">${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}</span>`;
 
+  renderEvents();
   $('chips').innerHTML = ORDER.map(k => `<button type="button" data-k="${k}" aria-pressed="${focus === k}" style="--c:${CLS[k].color}"><span class="dot"></span>${CLS[k].scene}</button>`).join('');
   $('chips').querySelectorAll('button').forEach(b => b.onclick = () => setFocus(focus === b.dataset.k ? null : b.dataset.k));
 
   $('districts').innerHTML = ORDER.map(k => {
     const c = M.classes[k], col = CLS[k].color;
-    const st = Math.abs(c.diff) <= CONFIG.BAND ? ['ok', 'En rango'] : c.diff > 0 ? ['hi', 'Sobrepeso'] : ['lo', 'Bajo peso'];
+    const st = Math.abs(c.diff) <= BAND() ? ['ok', 'En rango'] : c.diff > 0 ? ['hi', 'Sobrepeso'] : ['lo', 'Bajo peso'];
     const scale = Math.max(60, c.objetivo * 1.6);
     return `<article class="d" style="--c:${col}">
-      <div class="dh"><span class="dot"></span><span class="dn">${CLS[k].name}</span><span class="chip ${st[0]}">${st[1]}</span></div>
+      <div class="dh"><span class="dot"></span><span class="dn">${CLS[k].name}</span><span class="pill ${st[0]}">${st[1]}</span></div>
       <div class="row"><span>Valor</span><b>${mxn.format(c.valor)}</b></div>
-      <div class="row"><span>Hoy</span><b class="${c.hoy >= 0 ? 'pos' : 'neg'}">${signed(c.hoy)}</b></div>
+      <div class="row"><span>Hoy</span><b class="${c.hoy >= 0 ? 'pos' : 'neg'}">${signed2(c.hoy)}</b></div>
       <div class="row"><span>Ganancia</span><b class="${c.ganancia >= 0 ? 'pos' : 'neg'}">${signed(c.ganancia)}</b></div>
       <div class="row"><span>Tienes / ideal</span><b>${pct1(c.pct)} / ${pct1(c.objetivo)}</b></div>
       <div class="bar" title="La línea blanca es el porcentaje ideal"><i style="width:${Math.min(100, c.pct / scale * 100)}%"></i><u style="left:${Math.min(100, c.objetivo / scale * 100)}%"></u></div>
     </article>`;
   }).join('');
 
-  // Fuera de rango (por barrio)
-  const out = ORDER.filter(k => Math.abs(M.classes[k].diff) > CONFIG.BAND);
-  $('rebal').innerHTML = out.length
-    ? '<ul class="list">' + out.map(k => { const c = M.classes[k]; return `<li>${CLS[k].name}: tienes ${pct1(c.pct)} y lo ideal es ${pct1(c.objetivo)} (${c.diff > 0 ? 'sobran' : 'faltan'} ${mxn.format(Math.abs(c.valor - M.total * c.objetivo / 100))}).</li>`; }).join('') + '</ul><p class="foot" style="margin:0">La forma más sencilla de corregir es dirigir tus aportaciones nuevas al barrio que falta, sin vender.</p>'
-    : `<p style="margin:0">Todos los barrios están a menos de ${CONFIG.BAND} puntos de su ideal.</p>`;
+  renderMission(); renderStreak(); renderCeremony();
+  renderForm(); renderSim(); renderZoom(); renderTm();
+}
 
-  const owned = M.items.filter(i => i.valor > 0);
+function renderEvents() {
+  const out = [];
+  EV.storms.forEach(s => out.push(`<div class="ev" style="--c:var(--bad)"><span class="dot"></span><div><b>Tormenta en ${CLS[s.k].scene.toLowerCase()}</b><span>${s.pct != null ? `${CLS[s.k].name} baja ${pct1(Math.abs(s.pct))} hoy. ` : esc(s.msg || '') + ' '}Los capitanes no venden en tormenta: tu plan ya cuenta con días así. Si aguantas, ganas el logro "Capitán en la tormenta".</span></div></div>`));
+  EV.rentas.forEach(e => {
+    const name = e.it ? e.it.activo : CLS[classKey(e.objetivo || 'fibra')].name;
+    const own = e.it ? e.it.valor > 0 : true;
+    out.push(`<div class="ev" style="--c:var(--fib)"><span class="dot"></span><div><b>Día de rentas: ${esc(name)}</b><span>${esc(e.mensaje || name + ' está repartiendo rentas a sus dueños.')}${own ? '' : ' Tú todavía no tienes este inmueble.'}</span></div></div>`);
+  });
+  if (CE.active) out.push(`<div class="ev" style="--c:var(--acc)"><span class="dot"></span><div><b>${CE.done ? 'Ceremonia completada' : 'Ceremonia de rebalanceo'}</b><span>${CE.done ? 'Tu ciudad quedó en equilibrio. Hasta la próxima ceremonia.' : `Este mes toca equilibrar la ciudad. ${CE.test ? 'Modo de prueba activado.' : `Te quedan ${CE.daysLeft} días.`}`}</span></div></div>`);
+  else if (CE.daysTo != null && CE.daysTo <= 14) out.push(`<div class="ev" style="--c:var(--acc)"><span class="dot"></span><div><b>Se acerca la ceremonia de rebalanceo</b><span>Empieza el ${fechaLarga(CE.next)}, en ${CE.daysTo} días.</span></div></div>`);
+  EV.avisos.forEach(e => out.push(`<div class="ev" style="--c:var(--ren)"><span class="dot"></span><div><b>Aviso</b><span>${esc(e.mensaje)}</span></div></div>`));
+  EV.upcoming.forEach(e => {
+    const what = e.tipo === 'RENTAS' ? 'Día de rentas de ' + (e.objetivo || 'FIBRAs') : e.tipo === 'AVISO' ? esc(e.mensaje) : 'Evento';
+    out.push(`<div class="ev small" style="--c:var(--line)"><span class="dot" style="--c:var(--muted)"></span><div><span>Próximamente: ${esc(what)} el ${fechaLarga(parseYmd(e.inicio))}.</span></div></div>`);
+  });
+  $('events').innerHTML = out.join('');
+}
+
+function renderMission() {
+  const box = $('mission'), mes = MESES[new Date().getMonth()];
+  let html = `<div class="phead"><h2>Misión de ${mes}</h2><span class="pill ${MI.done ? 'ok' : 'info'}">${MI.done ? '¡Cumplida!' : 'En curso'}</span></div>`;
+  if (MI.type === 'fundar') {
+    html += `<p class="mission-scene">Funda tu ciudad.</p><p class="muted" style="margin:0">Captura tu portafolio completo para que aparezcan tus primeros edificios. La próxima misión llega el mes que entra.</p>`;
+  } else {
+    const it = MI.it, col = CLS[it.key].color;
+    const scene = J.mision_texto ? esc(J.mision_texto) : `La ciudad necesita ${obraName(it)}.`;
+    html += `<p class="mission-scene" style="--c:${col}"><span class="dot"></span> ${scene}</p>
+      <p class="muted" style="margin:0">Aporta alrededor de <b style="color:var(--fg)">${mxn.format(MI.amt)}</b> a <b style="color:var(--fg)">${esc(it.activo)}</b> este mes${MI.custom ? '' : ': es lo que más le falta a tu ciudad para llegar a su forma ideal'}.</p>
+      <div class="pbar" style="--c:${col}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(MI.progress * 100)}"><i style="width:${MI.done ? 100 : Math.round(MI.progress * 100)}%"></i></div>`;
+  }
+  html += `<ul class="tasks">
+    <li class="${MI.done ? 'on' : ''}">${MI.type === 'fundar' ? 'Captura tu portafolio' : 'Cumple la misión principal'}</li>
+    <li class="${ST.savedThisMonth ? 'on' : ''}">Actualiza tus saldos de ${mes}</li>
+    <li class="${ST.thisMonth ? 'on' : ''}">Haz tu aportación del mes y mantén tu racha</li>
+  </ul>
+  <div><button type="button" class="small" id="goForm">Ir a capturar</button></div>`;
+  box.innerHTML = html;
+  $('goForm').onclick = () => $('portafolio').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+}
+
+function renderStreak() {
+  const box = $('streak'), cm = ym(new Date());
+  const months = []; let m = cm;
+  for (let i = 0; i < 12; i++) { months.unshift(m); m = prevYm(m); }
+  const msg = ST.thisMonth ? 'Ya aportaste este mes. Tu racha está a salvo.'
+    : ST.s > 0 ? `Aporta y captura antes de que termine ${MESES[new Date().getMonth()]} para llegar a ${ST.s + 1} meses.`
+    : 'Aporta este mes y captura tus saldos para empezar tu racha.';
+  const md = maxDev(model);
   const ach = [
-    ['Cuatro barrios', ORDER.every(k => M.classes[k].valor > 0)],
-    ['Ciudad en equilibrio', maxDev <= CONFIG.BAND],
-    ['Ciudad en verde', M.ganancia > 0],
-    ['Casero', M.classes.FIBRAS.items.filter(i => i.valor > 0).length >= 3],
-    ['Constructor de obras', M.classes.RENTA_FIJA.items.filter(i => i.valor > 0).length >= 3],
-    ['Ciudad completa', M.items.filter(i => i.objetivo > 0).every(i => i.valor > 0)]
+    ['Cuatro barrios', ORDER.every(k => model.classes[k].valor > 0)],
+    ['Ciudad en equilibrio', md <= BAND()],
+    ['Ciudad en verde', model.ganancia > 0],
+    ['Racha de 3 meses', ST.best >= 3], ['Racha de 6 meses', ST.best >= 6], ['Racha de 12 meses', ST.best >= 12],
+    ['Misión del mes', MI.done],
+    ['Capitán en la tormenta', ST.captain],
+    ['Ceremonia completada', CE.done],
+    ['Ciudad completa', model.items.filter(i => i.objetivo > 0).every(i => i.valor > 0)]
   ];
-  $('ach').innerHTML = ach.map(([t, on]) => `<div class="${on ? 'on' : ''}">${t}</div>`).join('');
+  box.innerHTML = `<div class="phead"><h2>Racha de aportaciones</h2><span class="pill info">Mejor: ${ST.best} ${ST.best === 1 ? 'mes' : 'meses'}</span></div>
+    <div class="streak"><span class="num">${ST.s}</span><span>${ST.s === 1 ? 'mes seguido' : 'meses seguidos'} construyendo</span></div>
+    <p class="muted" style="margin:0">${msg}</p>
+    <div class="months" aria-label="Últimos 12 meses">${months.map(x => `<div><i class="${ST.contribMonths.has(x) ? 'on' : ''} ${x === cm && !ST.contribMonths.has(x) ? 'now' : ''}" title="${MESES[+x.slice(5) - 1]} ${x.slice(0, 4)}"></i>${MESES[+x.slice(5) - 1].slice(0, 1).toUpperCase()}</div>`).join('')}</div>
+    <h2 style="font-size:15px;margin-top:4px">Logros</h2>
+    <div class="ach">${ach.map(([t, on]) => `<div class="${on ? 'on' : ''}">${t}</div>`).join('')}</div>
+    <p class="foot">La racha cuenta los meses en que aumentaste lo invertido. Captura tus saldos al menos una vez al mes.</p>`;
+}
 
-  renderForm();
-  renderSim();
-  renderZoom();
+function renderCeremony() {
+  const box = $('ceremony'), M = model, band = BAND();
+  const calendario = CE.months.map(m => MESES[m - 1]).join(' y ') || 'sin fechas';
+  let html = `<div class="phead"><h2>Ceremonia de rebalanceo</h2><span class="pill ${CE.done ? 'ok' : CE.active ? 'hi' : 'info'}">${CE.done ? 'Completada' : CE.active ? 'Este mes' : CE.next ? 'En ' + CE.daysTo + ' días' : 'Sin fecha'}</span></div>`;
+  if (!CE.active) {
+    const out = ORDER.filter(k => Math.abs(M.classes[k].diff) > band);
+    html += `<p class="muted" style="margin:0">Dos veces al año (${calendario}) el alcalde revisa la ciudad y la regresa a su forma ideal.${CE.next ? ` La próxima empieza el <b style="color:var(--fg)">${fechaLarga(CE.next)}</b>.` : ''}</p>`;
+    html += out.length
+      ? '<p style="margin:0;font-weight:700">Mientras tanto, esto se salió de rango:</p><ul class="list">' + out.map(k => { const c = M.classes[k]; return `<li>${CLS[k].name}: tienes ${pct1(c.pct)} y lo ideal es ${pct1(c.objetivo)}.</li>`; }).join('') + '</ul><p class="foot">Lo más sencillo es dirigir tus aportaciones nuevas al barrio que falta, sin vender. La misión del mes ya te dice a dónde.</p>'
+      : `<p style="margin:0">Todos los barrios están a menos de ${band} puntos de su ideal.</p>`;
+    box.innerHTML = html; return;
+  }
+  const T0 = M.total, minMove = Math.max(200, T0 * 0.005);
+  const moves = M.items.map(it => ({ it, d: T0 * it.objetivo / 100 - it.valor })).filter(x => Math.abs(x.d) >= minMove).sort((a, b) => a.d - b.d);
+  const w = M.items.filter(i => i.objetivo > 0);
+  const Tn = Math.max(T0, ...w.map(i => i.valor / (i.objetivo / 100)));
+  const needNoSell = Math.max(0, Tn - T0);
+  html += CE.done
+    ? `<p class="mission-scene">Tu ciudad quedó en equilibrio. Cada barrio está a menos de ${band} puntos de su ideal.</p>`
+    : `<p class="muted" style="margin:0">Así quedaría tu ciudad en su forma ideal. Haz estos movimientos en tu casa de bolsa y luego captura tus nuevos saldos aquí; la ceremonia se completa cuando todos los barrios queden en rango.</p>`;
+  if (!CE.done && moves.length) {
+    html += `<div class="tbl"><table><thead><tr><th>Activo</th><th>Movimiento</th><th style="text-align:right">Monto</th></tr></thead><tbody>${moves.map(x => `<tr><td><span class="dot" style="--c:${CLS[x.it.key].color};margin-right:6px"></span>${esc(x.it.activo)}</td><td class="${x.d > 0 ? 'pos' : 'neg'}">${x.d > 0 ? 'Comprar' : 'Vender'}</td><td class="n">${mxn.format(Math.abs(x.d))}</td></tr>`).join('')}</tbody></table></div>`;
+    if (needNoSell > 0) html += `<p class="foot">Si prefieres no vender (y no pagar impuestos por ganancias), necesitarías aportar unos ${mxn.format(needNoSell)} repartidos con el simulador de al lado.</p>`;
+  }
+  html += `<ul class="tasks"><li class="on">Revisa los movimientos</li><li class="${ST.savedThisMonth ? 'on' : ''}">Captura tus nuevos saldos</li><li class="${CE.inRange ? 'on' : ''}">Deja todos los barrios en rango</li></ul>`;
+  box.innerHTML = html;
 }
 
 function renderForm() {
@@ -438,36 +762,75 @@ $('pfForm').addEventListener('submit', async e => {
   if (noPrice) { toast.className = 'toast neg'; toast.textContent = 'Falta el precio promedio de ' + noPrice.activo + '.'; return; }
   btn.disabled = true; toast.className = 'toast muted'; toast.textContent = 'Guardando…';
   try {
-    const d = await api('guardar', { posiciones });
-    apply(d);
+    apply(await api('guardar', { posiciones }));
     $('toast').className = 'toast pos'; $('toast').textContent = 'Guardado. Tu ciudad ya se actualizó.';
-    $('stage').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+    $('stage').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
   } catch (err) { $('toast').className = 'toast neg'; $('toast').textContent = err.message; }
   if ($('btnSave')) $('btnSave').disabled = false;
 });
 
 function renderSim() {
-  const amt = Math.max(0, Number($('simAmt').value) || 0);
-  const M = model, out = $('simOut');
+  const amt = Math.max(0, Number($('simAmt').value) || 0), M = model, out = $('simOut');
   const cands = M.items.filter(i => i.objetivo > 0);
   if (!amt || !cands.length) { out.innerHTML = ''; return; }
   const newTotal = M.total + amt;
   const need = cands.map(i => ({ i, need: Math.max(0, newTotal * i.objetivo / 100 - i.valor) }));
-  const sumNeed = need.reduce((a, x) => a + x.need, 0);
-  const sumObj = cands.reduce((a, i) => a + i.objetivo, 0);
-  need.forEach(x => {
-    x.amt = sumNeed >= amt ? amt * x.need / sumNeed : x.need + (amt - sumNeed) * x.i.objetivo / sumObj;
-  });
+  const sumNeed = need.reduce((a, x) => a + x.need, 0), sumObj = cands.reduce((a, i) => a + i.objetivo, 0);
+  need.forEach(x => { x.amt = sumNeed >= amt ? amt * x.need / sumNeed : x.need + (amt - sumNeed) * x.i.objetivo / sumObj; });
   const rows = need.filter(x => x.amt >= 1).sort((a, b) => b.amt - a.amt);
   out.innerHTML = `<div class="tbl"><table><thead><tr><th>Activo</th><th style="text-align:right">Monto</th><th style="text-align:right">Aprox.</th></tr></thead><tbody>` +
     rows.map(x => {
       const p = x.i.precio_mxn;
       const aprox = x.i.key === 'RENTA_FIJA' ? 'saldo' : (p ? (x.i.key === 'BITCOIN' ? (x.amt / p).toFixed(5) + ' BTC' : Math.floor(x.amt / p) + ' títulos') : '—');
-      return `<tr><td><span class="dot" style="--c:${CLS[x.i.key].color};display:inline-block;margin-right:6px"></span>${esc(x.i.activo)}</td><td class="n">${mxn.format(x.amt)}</td><td class="n muted">${aprox}</td></tr>`;
-    }).join('') + `</tbody></table></div><p class="foot" style="margin:6px 0 0">Reparto para acercar cada activo a su porcentaje ideal. Los títulos son aproximados con el precio de hoy.</p>`;
+      return `<tr><td><span class="dot" style="--c:${CLS[x.i.key].color};margin-right:6px"></span>${esc(x.i.activo)}</td><td class="n">${mxn.format(x.amt)}</td><td class="n muted">${aprox}</td></tr>`;
+    }).join('') + `</tbody></table></div><p class="foot" style="margin-top:6px">Reparto para acercar cada activo a su porcentaje ideal. Los títulos son aproximados con el precio de hoy.</p>`;
 }
 $('btnSim').addEventListener('click', renderSim);
 $('simAmt').addEventListener('keydown', e => { if (e.key === 'Enter') renderSim(); });
+
+// ---------- máquina del tiempo ----------
+let tmProj = null;
+function setTravel(years, silent) {
+  travelYears = years;
+  $('tmYears').value = years;
+  if (years > 0) {
+    tmProj = project(years, Math.max(0, Number($('tmAport').value) || 0));
+    view = buildModel(raw, tmProj.out);
+  } else { tmProj = null; view = model; }
+  layout();
+  if (!silent) renderTm();
+}
+function renderTm() {
+  const y = travelYears, now = new Date(), lvNow = levelOf(model.total);
+  $('tmYearsOut').textContent = y ? `${y} ${y === 1 ? 'año' : 'años'} (${now.getFullYear() + y})` : 'hoy';
+  const lv = levelOf(view.total);
+  $('tmLvl').textContent = 'Nivel: ' + lv.name;
+  $('lvlTag').textContent = y ? `Año ${now.getFullYear() + y} · ${lv.name}` : `Nivel: ${lvNow.name}`;
+  const inf = num(J.inflacion_pct, 4);
+  if (!y) {
+    $('tmOut').innerHTML = `<p style="margin:0">Mueve la barra para ver cómo crece tu ciudad si sigues aportando cada mes. ${lvNow.next ? `Hoy eres nivel <b>${lvNow.name}</b>; para llegar a <b>${lvNow.next[1]}</b> te faltan ${mxn.format(lvNow.next[0] - model.total)}.` : `Ya llegaste al nivel más alto: <b>${lvNow.name}</b>.`}</p>`;
+  } else {
+    const real = view.total / Math.pow(1 + inf / 100, y), aport = tmProj.aport, puesto = model.total + aport, interes = view.total - puesto;
+    $('tmOut').innerHTML = `<div class="tmout">
+      <div class="stat"><div class="k">Tu ciudad valdría</div><div class="v pos">${mxn.format(view.total)}</div></div>
+      <div class="stat"><div class="k">En pesos de hoy</div><div class="v">${mxn.format(real)}</div></div>
+      <div class="stat"><div class="k">Lo que tú pusiste</div><div class="v">${mxn.format(puesto)}</div></div>
+      <div class="stat"><div class="k">Lo que puso el interés</div><div class="v" style="color:var(--acc)">${mxn.format(interes)}</div></div>
+    </div>`;
+  }
+  $('tmNote').textContent = `Supone rendimientos anuales constantes: acciones ${num(J.rend_acciones_pct, 8)}%, FIBRAs ${num(J.rend_fibras_pct, 8)}%, bitcoin ${num(J.rend_bitcoin_pct, 10)}% y renta fija a su tasa actual, con inflación de ${inf}%. Las aportaciones se reparten según los porcentajes ideales. Es un escenario, no una promesa.`;
+}
+$('tmYears').addEventListener('input', e => setTravel(+e.target.value));
+$('tmAport').addEventListener('input', () => { if (travelYears) setTravel(travelYears); });
+$('tmNow').addEventListener('click', () => setTravel(0));
+$('tmPlay').addEventListener('click', () => {
+  const target = travelYears || 20;
+  if (reduce) { setTravel(target); return; }
+  let y = 0; setTravel(0);
+  clearInterval(setTravel._p);
+  setTravel._p = setInterval(() => { y++; setTravel(y); if (y >= target) clearInterval(setTravel._p); }, Math.max(90, 2400 / target));
+  $('stage').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
 
 function renderZoom() {
   const box = $('zoominfo');
@@ -481,14 +844,14 @@ function renderZoom() {
   box.innerHTML = `<div>
       <h2><span class="dot"></span>${CLS[k].scene}: ${CLS[k].name}</h2>
       <p><b>Cómo se gana dinero aquí.</b> ${CLS[k].how}</p>
-      <p class="muted">Hoy este barrio ${c.hoy >= 0 ? 'ganó' : 'perdió'} <b class="${c.hoy >= 0 ? 'pos' : 'neg'}">${mxn2.format(Math.abs(c.hoy))}</b>${k === 'RENTA_FIJA' ? ' en intereses estimados' : ''}.</p>
+      <p class="muted">Hoy este barrio ${c.hoy >= 0 ? 'ganó' : 'perdió'} <b class="${c.hoy >= 0 ? 'pos' : 'neg'}">${mxn2.format(Math.abs(c.hoy))}</b>${k === 'RENTA_FIJA' ? ' en intereses estimados' : ''}. Los edificios con brillo verde subieron hoy; los que tienen nube bajaron.</p>
     </div>
     <div class="zlist">${c.items.map(it => {
-      const chg = it.key === 'RENTA_FIJA' ? (it.tasa != null ? it.tasa + '% anual' : '') : (it.cambio_dia >= 0 ? '+' : '') + (+it.cambio_dia || 0).toFixed(2) + '%';
+      const chg = it.key === 'RENTA_FIJA' ? (it.tasa != null && it.tasa !== '' ? it.tasa + '% anual' : '') : (it.cambio_dia >= 0 ? '▲ ' : '▼ ') + Math.abs(it.cambio_dia).toFixed(2) + '%';
       const chgCls = it.key === 'RENTA_FIJA' ? 'muted' : (it.cambio_dia >= 0 ? 'pos' : 'neg');
       return `<div class="zrow" tabindex="0" role="option" aria-selected="${selected === it.activo}" data-a="${esc(it.activo)}">
         <div style="min-width:0"><b>${esc(it.activo)}${it.key === 'RENTA_FIJA' ? ' · ' + OBRA[kindOf(k, it)] : ''}</b><span class="zd">${it.valor > 0 ? esc(it.descripcion || '') : '<span class="empty-lot">Lote por construir</span>'}</span></div>
-        <div class="n ${chgCls}">${chg}</div>
+        <div class="n ${chgCls}">${chg}${it.valor > 0 && it.key !== 'RENTA_FIJA' ? `<br><span class="${it.hoy >= 0 ? 'pos' : 'neg'}">${signed2(it.hoy)}</span>` : ''}</div>
         <div class="n">${mxn.format(it.valor)}<br><span class="muted">${pct1(it.pct)} de ${pct1(it.objetivo)}</span></div>
       </div>`;
     }).join('')}</div>`;
@@ -498,78 +861,97 @@ function renderZoom() {
   });
 }
 
+// ---------- contador en vivo ----------
+let sessionStart = performance.now(), liveLast = 0;
+function tickLive(now) {
+  if (!model || now - liveLast < 100) return;
+  liveLast = now;
+  const perDay = incomePerDay(model), d = new Date();
+  const secs = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds() + d.getMilliseconds() / 1000;
+  $('liveToday').textContent = mxn4.format(perDay * secs / 86400);
+  $('liveDay').textContent = mxn2.format(perDay);
+  $('liveMonth').textContent = mxn.format(perDay * 30.4);
+  $('liveSession').textContent = mxn6.format(perDay * (now - sessionStart) / 1000 / 86400);
+}
+
 // ================= Escena =================
 const cv = $('city'), ctx = cv.getContext('2d');
-const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let W = 800, H = 420, G = 374, DPR = 1, BASE = 120;
 let zones = {}, cam = { x: 0, s: 1 }, camT = { x: 0, s: 1 }, focus = null, selected = null;
-let parts = [], people = [], cars = [], stars = [], far = [], T = 0;
+let parts = [], fws = [], people = [], cars = [], stars = [], far = [], T = 0;
 
 function rng(seed) { let a = (seed * 9301 + 49297) >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
 function resize() {
   const w = cv.parentElement.clientWidth || 800;
-  W = w; H = Math.max(320, Math.min(500, Math.round(w * 0.52)));
+  W = w; H = Math.max(330, Math.min(500, Math.round(w * 0.52)));
   DPR = Math.min(2, window.devicePixelRatio || 1);
   cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cv.style.height = H + 'px';
   layout();
 }
 
 function layout() {
-  if (!model) return;
+  if (!view) return;
+  const prevH = {};
+  Object.values(zones).forEach(z => (z.items || []).forEach(b => prevH[b.it.activo] = b.h));
   G = H - 46; BASE = (G - 70) * 0.42;
-  const sh = ORDER.map(k => Math.max(model.classes[k].pct / 100, 0.13));
+  const V = view;
+  const sh = ORDER.map(k => Math.max(V.classes[k].pct / 100, 0.13));
   const sum = sh.reduce((a, b) => a + b, 0);
   let x = 0;
   zones = {};
   ORDER.forEach((k, zi) => {
-    const w = W * sh[zi] / sum, list = model.classes[k].items, n = Math.max(1, list.length);
-    const pad = 6, iw = (w - pad * 2) / n, maxV = Math.max(1, ...list.map(i => i.valor));
-    const z = { k, x, w, items: [], act: 1 };
-    const hoy = model.classes[k].hoy;
-    z.act = k === 'RENTA_FIJA' ? 1 : hoy > 0 ? 1.4 : hoy < 0 ? 0.55 : 1;
+    const w = W * sh[zi] / sum, list = V.classes[k].items, pad = 6, ref = refMax[k] || 1;
+    const z = { k, x, w, items: [], flash: 0 };
+    // los edificios con dinero ocupan más espacio que los lotes vacíos
+    const wt = list.map(it => it.valor > 0 ? 0.75 + 0.55 * Math.min(1.6, Math.sqrt(it.valor / ref)) : 0.38);
+    const wsum = wt.reduce((a, b) => a + b, 0) || 1;
+    let cx = x + pad;
     list.forEach((it, j) => {
-      const owned = it.valor > 0, kind = kindOf(k, it);
-      let h = owned ? BASE * (0.42 + 0.58 * Math.sqrt(it.valor / maxV)) : 16;
-      if (kind === 'calle') h = owned ? BASE * 0.35 : 16;
-      z.items.push({ it, x: x + pad + j * iw + 2, w: Math.max(4, iw - 4), h, owned, kind, seed: zi * 31 + j * 7 + 1, cyc: -1 });
+      const iw = (w - pad * 2) * wt[j] / wsum, owned = it.valor > 0, kind = kindOf(k, it);
+      let ht = owned ? BASE * Math.min(2.1, 0.42 + 0.58 * Math.sqrt(it.valor / ref)) : 16;
+      if (kind === 'calle') ht = owned ? BASE * 0.35 : 16;
+      const act = travelYears || k === 'RENTA_FIJA' ? 1 : it.cambio_dia > 0 ? 1.4 : it.cambio_dia < 0 ? 0.55 : 1;
+      const h0 = reduce ? ht : (prevH[it.activo] ?? ht);
+      z.items.push({ it, x: cx + 2, w: Math.max(4, iw - 4), h: h0, ht, owned, kind, act, seed: zi * 31 + j * 7 + 1, cyc: -1, ft: 1 + j * 0.7 });
+      cx += iw;
     });
     zones[k] = z; x += w;
   });
-  const r = rng(11);
+  const r = rng(11), lv = levelOf(V.total).i;
   stars = Array.from({ length: 70 }, () => ({ x: r() * W, y: r() * G * 0.5, s: r() * 1.4 + .3, p: r() * 6 }));
-  far = []; for (let fx = -W * .3; fx < W * 1.3;) { const fw = 18 + r() * 40; far.push({ x: fx, w: fw, h: 30 + r() * BASE * 0.9 }); fx += fw + 3; }
+  const farMul = 1 + 0.2 * lv;
+  far = []; for (let fx = -W * .3; fx < W * 1.3;) { const fw = 18 + r() * 40; far.push({ x: fx, w: fw, h: Math.min(G - 80, (30 + r() * BASE * 0.9) * farMul) }); fx += fw + 3; }
 
   const zf = zones.FIBRAS, doors = zf.items.filter(b => b.owned);
-  const np = doors.length ? Math.max(4, Math.min(28, Math.round(4 + model.classes.FIBRAS.pct * 0.9))) : 0;
+  const np = doors.length ? Math.max(4, Math.min(30, Math.round(4 + V.classes.FIBRAS.pct * 0.9 + lv * 2))) : 0;
   people = Array.from({ length: np }, () => ({ x: zf.x + r() * zf.w, tgt: Math.floor(r() * doors.length), st: 'walk', t: 0, ph: r() * 6,
     col: ['#ffd6a5', '#caffbf', '#9bf6ff', '#ffadad', '#fdffb6', '#bdb2ff'][Math.floor(r() * 6)] }));
   people.doors = doors;
-  cars = Array.from({ length: Math.max(4, Math.round(W / 150)) }, (_, i) => ({ x: -W * .3 + r() * W * 1.6, v: (38 + r() * 40) * (i % 2 ? -1 : 1), col: ['#e9ecf5', '#f2b544', '#4fc3b0', '#ef7b6c', '#8fa2ff', '#c4b5fd'][i % 6] }));
+  cars = Array.from({ length: Math.max(4, Math.round(W / 150) + lv) }, (_, i) => ({ x: -W * .3 + r() * W * 1.6, v: (38 + r() * 40) * (i % 2 ? -1 : 1), col: ['#e9ecf5', '#f2b544', '#4fc3b0', '#ef7b6c', '#8fa2ff', '#c4b5fd'][i % 6] }));
   parts = [];
   if (focus) aimCamera(focus, true); else { camT = { x: 0, s: 1 }; cam = { x: 0, s: 1 }; }
 }
 
+function extraTop(b) { return b.kind === 'fabrica' ? b.ht * 0.6 + 40 : b.kind === 'boveda' ? 70 : (b.kind === 'escuela' || b.kind === 'hospital' || b.kind === 'tesoreria' || b.kind === 'puente') ? 50 : 26; }
+function tagTop(b) { return b.kind === 'fabrica' ? b.h * .55 + 22 : b.kind === 'boveda' ? 62 : (b.kind === 'escuela' || b.kind === 'hospital' || b.kind === 'tesoreria') ? 34 : b.kind === 'puente' ? 16 : b.owned ? 14 : 8; }
 function aimCamera(k, snap) {
-  if (!k) { camT = { x: 0, s: 1 }; } else {
+  if (!k) camT = { x: 0, s: 1 };
+  else {
     const z = zones[k];
-    const maxTop = Math.max(...z.items.map(b => b.h + extraTop(b))) + 30;
-    let s = Math.min(3.2, W / z.w * 0.94, (G - 20) / maxTop);
-    s = Math.max(1, s);
+    const maxTop = Math.max(...z.items.map(b => b.ht + extraTop(b))) + 30;
+    let s = Math.max(1, Math.min(3.2, W / z.w * 0.94, (G - 20) / maxTop));
     let x = z.x + z.w / 2 - W / (2 * s);
     x = Math.max(-W * 0.2, Math.min(W * 1.2 - W / s, x));
     camT = { x, s };
   }
   if (snap || reduce) cam = { ...camT };
 }
-function tagTop(b) { return b.kind === 'fabrica' ? b.h * .55 + 22 : b.kind === 'boveda' ? 62 : (b.kind === 'escuela' || b.kind === 'hospital' || b.kind === 'tesoreria') ? 34 : b.kind === 'puente' ? 16 : b.owned ? 12 : 8; }
-function extraTop(b) { return b.kind === 'fabrica' ? b.h * 0.6 + 40 : b.kind === 'boveda' ? 70 : (b.kind === 'escuela' || b.kind === 'hospital' || b.kind === 'tesoreria' || b.kind === 'puente') ? 50 : 26; }
-
 function setFocus(k) { focus = k; selected = null; aimCamera(k, false); renderZoom(); }
 $('btnBack').addEventListener('click', () => setFocus(null));
 
 cv.addEventListener('click', e => {
-  if (!model) return;
+  if (!view) return;
   const rect = cv.getBoundingClientRect();
   const sx = (e.clientX - rect.left) * (W / rect.width), sy = (e.clientY - rect.top) * (H / rect.height);
   const wx = sx / cam.s + cam.x, wy = G + (sy - G) / cam.s;
@@ -582,7 +964,7 @@ cv.addEventListener('click', e => {
 });
 
 // ---------- dibujo ----------
-function rr(x, y, w, h, r) { r = Math.min(r, w / 2, h / 2); ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function rr(x, y, w, h, r) { r = Math.max(0, Math.min(r, w / 2, h / 2)); ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
 function person(x, y, col, ph, hat) {
   const st = Math.sin(ph) * 1.6;
   ctx.fillStyle = '#20263f'; ctx.fillRect(x - 1.6 + st * .5, y - 4, 1.5, 4); ctx.fillRect(x - st * .5, y - 4, 1.5, 4);
@@ -591,19 +973,42 @@ function person(x, y, col, ph, hat) {
   if (hat) { ctx.fillStyle = '#ffd23f'; ctx.fillRect(x - 2.6, y - 15.3, 5.2, 2); }
 }
 function text(t, x, y, size, col, align, weight) { ctx.font = `${weight || 700} ${size}px Figtree, system-ui, sans-serif`; ctx.fillStyle = col; ctx.textAlign = align || 'center'; ctx.fillText(t, x, y); }
-function spawn(p) { if (parts.length < 160) parts.push(p); }
+function spawn(p) { if (parts.length < 220) parts.push(p); }
 
 function lot(b) {
-  ctx.strokeStyle = 'rgba(238,241,248,.35)'; ctx.setLineDash([3, 3]); ctx.lineWidth = 1;
-  ctx.strokeRect(b.x + 1, G - BASE * 0.5, b.w - 2, BASE * 0.5); ctx.setLineDash([]);
+  ctx.strokeStyle = 'rgba(238,241,248,.28)'; ctx.setLineDash([3, 3]); ctx.lineWidth = 1;
+  ctx.strokeRect(b.x + 1, G - BASE * 0.45, b.w - 2, BASE * 0.45); ctx.setLineDash([]);
   ctx.fillStyle = '#8a7a5a';
   for (let x = b.x; x < b.x + b.w; x += 6) ctx.fillRect(x, G - 7, 1.5, 7);
   ctx.fillRect(b.x, G - 6, b.w, 1.2);
-  if (b.w > 22) { ctx.fillStyle = '#f2b544'; ctx.fillRect(b.x + b.w / 2 - 9, G - 22, 18, 9); ctx.fillStyle = '#5a4a2a'; ctx.fillRect(b.x + b.w / 2 - .5, G - 13, 1, 6); text('?', b.x + b.w / 2, G - 15, 7, '#1a1a1a'); }
+  if (b.w > 18) { ctx.fillStyle = '#f2b544'; ctx.fillRect(b.x + b.w / 2 - 8, G - 21, 16, 9); ctx.fillStyle = '#5a4a2a'; ctx.fillRect(b.x + b.w / 2 - .5, G - 12, 1, 5); text('?', b.x + b.w / 2, G - 14, 7, '#1a1a1a'); }
 }
 
-function fabrica(b, act) {
-  const top = G - b.h, sd = b.seed;
+// brillo verde cuando el edificio subió hoy
+function glow(b) {
+  const top = G - b.h, a = .12 + .07 * Math.sin(T * 2.2 + b.seed);
+  const g = ctx.createLinearGradient(0, top - 10, 0, G);
+  g.addColorStop(0, `rgba(93,211,158,${a * 1.6})`); g.addColorStop(1, 'rgba(93,211,158,0)');
+  ctx.fillStyle = g; rr(b.x - 5, top - 10, b.w + 10, b.h + 10, 6); ctx.fill();
+}
+function upChevrons(b) {
+  for (let i = 0; i < 2; i++) {
+    const ph = (T * .6 + i * .5 + b.seed * .1) % 1, x = b.x + 6, y = G - b.h + 18 - ph * 20;
+    ctx.strokeStyle = `rgba(93,211,158,${1 - ph})`; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(x - 3.5, y + 3); ctx.lineTo(x, y); ctx.lineTo(x + 3.5, y + 3); ctx.stroke();
+  }
+}
+// nube con lluvia cuando el edificio bajó hoy
+function cloud(b) {
+  const cx = b.x + b.w - 8, cy = G - b.h - 12 + Math.sin(T * .8 + b.seed) * 1.5;
+  ctx.fillStyle = 'rgba(132,140,172,.92)';
+  [[-6, 1, 4.5], [0, -2, 6], [6, 1, 4.5], [0, 2.5, 5]].forEach(([dx, dy, r]) => { ctx.beginPath(); ctx.arc(cx + dx, cy + dy, r, 0, 7); ctx.fill(); });
+  ctx.strokeStyle = 'rgba(155,200,255,.75)'; ctx.lineWidth = 1;
+  for (let i = 0; i < 4; i++) { const rx = cx - 6 + i * 4, ry = cy + 6 + ((T * 40 + i * 7) % 12); ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(rx - 1, ry + 3.5); ctx.stroke(); }
+}
+
+function fabrica(b) {
+  const act = b.act, top = G - b.h, sd = b.seed;
   ctx.fillStyle = '#4a4268'; ctx.fillRect(b.x, top, b.w, b.h);
   ctx.fillStyle = '#3d365a'; ctx.fillRect(b.x, top + b.h * .62, b.w, b.h * .38);
   const teeth = Math.max(2, Math.floor(b.w / 16)), tw = b.w / teeth;
@@ -629,28 +1034,24 @@ function fabrica(b, act) {
     ctx.fillStyle = on ? '#ffd27a' : '#2b2744';
     ctx.fillRect(b.x + 4 + w * ((b.w - 8) / wn), top + b.h * .2, (b.w - 8) / wn - 3, b.h * .14);
   }
-  // rótulo
   if (b.w > 30) { ctx.fillStyle = 'rgba(14,20,38,.8)'; rr(b.x + 3, top + b.h * .42, b.w - 6, 11, 2); ctx.fill(); text(b.it.subclase || b.it.activo, b.x + b.w / 2, top + b.h * .42 + 8.5, 7, '#f2b544'); }
-  // banda transportadora
   ctx.fillStyle = '#29243e'; ctx.fillRect(b.x - 2, G - 5, b.w + 4, 3.5);
   const nb = Math.max(1, Math.floor(b.w / 16));
   for (let i = 0; i < nb; i++) {
     const bx = b.x + ((T * 22 * act + i * 16 + sd * 9) % b.w);
     ctx.fillStyle = '#c99a4a'; ctx.fillRect(bx - 3, G - 10.5, 6, 5.5); ctx.fillStyle = '#e8c27a'; ctx.fillRect(bx - 3, G - 10.5, 6, 1.5);
   }
-  // gente trabajando
   for (let i = 0; i < Math.min(3, Math.floor(b.w / 18)); i++) person(b.x + 6 + ((Math.sin(T * .8 * act + i * 2 + sd) + 1) / 2) * (b.w - 12), G + 8, '#7fb7ff', T * 7 * act + i, true);
 }
 
-function nave(b, act) {
-  const top = G - b.h * .6, h = b.h * .6;
+function nave(b) {
+  const act = b.act, h = b.h * .6, top = G - h;
   ctx.fillStyle = '#5b4b72'; ctx.fillRect(b.x, top, b.w, h);
   ctx.fillStyle = '#7a6890'; ctx.beginPath(); ctx.moveTo(b.x - 2, top); ctx.lineTo(b.x + b.w / 2, top - 10); ctx.lineTo(b.x + b.w + 2, top); ctx.fill();
   const dw = Math.min(16, b.w * .4), dh = Math.min(h * .7, 18), dx = b.x + b.w * .35 - dw / 2;
   ctx.fillStyle = '#ffd9a0'; ctx.fillRect(dx, G - dh, dw, dh);
   ctx.fillStyle = 'rgba(14,20,38,.35)'; for (let l = 0; l < 4; l++) ctx.fillRect(dx, G - dh + l * dh / 4, dw, 1);
   text(b.it.activo.replace(/\d+$/, ''), b.x + b.w / 2, top + 9, 6.5, '#ffe7c2');
-  // camión cargando
   if (b.w > 26) {
     const tx = b.x + b.w * .62;
     ctx.fillStyle = '#e9ecf5'; ctx.fillRect(tx, G - 11, 14, 9); ctx.fillStyle = '#ef7b6c'; ctx.fillRect(tx + 14, G - 8, 5, 6);
@@ -660,14 +1061,14 @@ function nave(b, act) {
   }
 }
 
-function torre(b, act, plaza) {
-  const top = G - b.h, R = rng(b.seed);
+function torre(b, plaza) {
+  const act = b.act, top = G - b.h, R = rng(b.seed);
   ctx.fillStyle = plaza ? '#6d4f66' : ['#4f5a7c', '#5f5578', '#56607f'][b.seed % 3];
   ctx.fillRect(b.x, top, b.w, b.h);
   ctx.fillStyle = 'rgba(255,255,255,.06)'; ctx.fillRect(b.x, top, b.w * .3, b.h);
   const cols = Math.max(2, Math.floor(b.w / 9)), rows = Math.max(2, Math.floor((b.h - 22) / 11)), cw = (b.w - 6) / cols;
   for (let ry = 0; ry < rows; ry++) for (let cx = 0; cx < cols; cx++) {
-    const base = R(), on = base > (act < 1 ? .55 : .3) && Math.sin(T * .5 + base * 40) > -.85;
+    const base = R(), on = base > (act < 1 ? .55 : act > 1 ? .18 : .3) && Math.sin(T * .5 + base * 40) > -.85;
     ctx.fillStyle = on ? (base > .82 ? '#9be7ff' : '#ffd98a') : '#2b2a48';
     ctx.fillRect(b.x + 3 + cx * cw + .8, top + 6 + ry * 11, cw - 2.2, 6);
   }
@@ -681,14 +1082,19 @@ function torre(b, act, plaza) {
   ctx.fillStyle = Math.sin(T * 3 + b.seed) > 0 ? '#ff7a7a' : '#5a2a3a'; ctx.fillRect(b.x + b.w * .7 - 1, top - 13, 3, 2.5);
   if (b.w > 22 && b.h > 40) { ctx.fillStyle = 'rgba(14,20,38,.75)'; rr(b.x + 2, top + b.h - 32, b.w - 4, 10, 2); ctx.fill(); text(b.it.activo.replace(/\d+$/, ''), b.x + b.w / 2, top + b.h - 24.5, 6.5, '#ffe7c2'); }
 }
-function doorOf(b) { return b.kind === 'nave' ? b.x + b.w * .35 : b.x + b.w / 2; }
+const doorOf = b => b.kind === 'nave' ? b.x + b.w * .35 : b.x + b.w / 2;
 
 function obra(b) {
   const periods = { calle: 6, puente: 10, escuela: 13, hospital: 16, tesoreria: 5 };
   const per = periods[b.kind] || 12, tt = T + b.seed * 3.7, cyc = Math.floor(tt / per), p = (tt % per) / per;
-  if (b.cyc !== cyc) { if (b.cyc >= 0 && b.owned) { spawn({ x: b.x + b.w / 2, y: G - b.h - 10, vy: -24, life: 0, max: 2.4, type: 'coin', col: '#4fc3b0' }); spawn({ x: b.x + b.w / 2, y: G - b.h - 26, vy: -18, life: 0, max: 2.4, type: 'text', col: '#5dd39e', t: '+ interés' }); } b.cyc = cyc; }
-  const done = p > .82;
-  const cx = b.x + b.w / 2;
+  if (b.cyc !== cyc) {
+    if (b.cyc >= 0 && b.owned) {
+      spawn({ x: b.x + b.w / 2, y: G - b.h - 10, vy: -24, life: 0, max: 2.4, type: 'coin' });
+      spawn({ x: b.x + b.w / 2, y: G - b.h - 26, vy: -18, life: 0, max: 2.4, type: 'text', col: '#5dd39e', t: '+ interés' });
+    }
+    b.cyc = cyc;
+  }
+  const done = p > .82, cx = b.x + b.w / 2;
   if (b.kind === 'calle') {
     const len = b.w * Math.min(1, p / .82);
     ctx.fillStyle = '#4a4f6d'; ctx.fillRect(b.x, G - 4, b.w, 4);
@@ -721,10 +1127,8 @@ function obra(b) {
     text('PUENTE', cx, G - b.h - 6, 7, '#9be7ff');
     return;
   }
-  // edificio en construcción: escuela, hospital, tesorería
   const floors = Math.max(2, Math.round(b.h / 13)), fh = b.h / floors, built = Math.min(floors, Math.floor(p / .82 * floors) + 1);
-  const top = G - b.h;
-  const colr = b.kind === 'hospital' ? '#dfe6f2' : b.kind === 'tesoreria' ? '#8a7aa8' : '#c96f5b';
+  const top = G - b.h, colr = b.kind === 'hospital' ? '#dfe6f2' : b.kind === 'tesoreria' ? '#8a7aa8' : '#c96f5b';
   ctx.strokeStyle = 'rgba(242,193,78,.6)'; ctx.lineWidth = .8;
   for (let f = 0; f < floors; f++) ctx.strokeRect(b.x + .5, G - (f + 1) * fh, b.w - 1, fh);
   for (let f = 0; f < built; f++) {
@@ -759,13 +1163,12 @@ function obra(b) {
   if (b.w > 24) { ctx.fillStyle = 'rgba(14,20,38,.8)'; rr(b.x + 2, G - 22, b.w - 4, 9, 2); ctx.fill(); text(OBRA[b.kind].toUpperCase(), cx, G - 15.5, 5.8, '#4fc3b0'); }
 }
 
-function boveda(b, act) {
-  const cx = b.x + b.w / 2, vw = Math.min(b.w - 4, BASE * .9), vh = Math.min(b.h, BASE * .55), top = G - vh;
+function boveda(b) {
+  const act = b.act, cx = b.x + b.w / 2, vw = Math.min(b.w - 4, BASE * .9), vh = Math.min(b.h, BASE * .55), top = G - vh;
   ctx.fillStyle = '#2b2436'; rr(cx - vw / 2, top, vw, vh, 5); ctx.fill();
   ctx.strokeStyle = '#4a3d5c'; ctx.lineWidth = 1.5; ctx.stroke();
   ctx.fillStyle = '#4a3d5c'; ctx.beginPath(); ctx.arc(cx, top + vh * .55, vh * .27, 0, 7); ctx.fill();
   ctx.strokeStyle = '#f7931a'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(cx, top + vh * .55, vh * .27, T * act, T * act + 4.5); ctx.stroke();
-  // equipos de minado
   for (let i = 0; i < 3; i++) { const mx = cx - vw / 2 + 4 + i * (vw - 8) / 3; ctx.fillStyle = '#1e1a28'; ctx.fillRect(mx, G - 7, (vw - 8) / 3 - 3, 6); ctx.fillStyle = Math.sin(T * 6 * act + i * 2) > 0 ? '#5dd39e' : '#2a4a3a'; ctx.fillRect(mx + 2, G - 5, 2, 2); }
   const r = Math.min(18, b.w * .25 + 4), cy = top - r - 10 - Math.sin(T * 2) * 3, sx = Math.abs(Math.cos(T * 1.6 * act));
   ctx.save(); ctx.translate(cx, cy); ctx.scale(Math.max(.08, sx), 1);
@@ -775,20 +1178,27 @@ function boveda(b, act) {
   ctx.restore();
 }
 
-function weather(z) {
-  const c = model.classes[z.k];
-  if (z.k === 'RENTA_FIJA' || !c.valor) return;
-  const cx = z.x + z.w / 2, cy = G - BASE - 60;
-  if (c.hoy < 0) {
-    ctx.fillStyle = 'rgba(120,128,160,.85)';
-    [[-14, 0, 10], [0, -5, 13], [14, 0, 10], [-5, 4, 10], [8, 4, 10]].forEach(([dx, dy, r]) => { ctx.beginPath(); ctx.arc(cx + dx + Math.sin(T * .3) * 4, cy + dy, r, 0, 7); ctx.fill(); });
-    ctx.strokeStyle = 'rgba(155,200,255,.6)'; ctx.lineWidth = 1;
-    for (let i = 0; i < 10; i++) { const rx = cx - 20 + (i * 4.4) + Math.sin(T * .3) * 4, ry = cy + 10 + ((T * 60 + i * 13) % 50); ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(rx - 1.5, ry + 5); ctx.stroke(); }
-  } else if (c.hoy > 0) {
-    const pulse = 1 + Math.sin(T * 2) * .08;
-    ctx.fillStyle = 'rgba(93,211,158,.18)'; ctx.beginPath(); ctx.arc(cx, cy, 18 * pulse, 0, 7); ctx.fill();
-    ctx.fillStyle = '#5dd39e'; ctx.beginPath(); ctx.moveTo(cx, cy - 9); ctx.lineTo(cx + 8, cy + 3); ctx.lineTo(cx + 3, cy + 3); ctx.lineTo(cx + 3, cy + 9); ctx.lineTo(cx - 3, cy + 9); ctx.lineTo(cx - 3, cy + 3); ctx.lineTo(cx - 8, cy + 3); ctx.closePath(); ctx.fill();
+function garland(x0, x1, y) {
+  const cols = ['#ef7b6c', '#f2b544', '#4fc3b0', '#8fa2ff', '#ff9fd1'];
+  ctx.strokeStyle = 'rgba(238,241,248,.6)'; ctx.lineWidth = .8;
+  ctx.beginPath(); ctx.moveTo(x0, y); ctx.quadraticCurveTo((x0 + x1) / 2, y + 8, x1, y); ctx.stroke();
+  const n = Math.max(3, Math.floor((x1 - x0) / 8));
+  for (let i = 0; i < n; i++) {
+    const t = (i + .5) / n, x = x0 + (x1 - x0) * t, yy = y + 8 * 4 * t * (1 - t) * .5 * 2 * .5 + Math.sin(T * 3 + i) * .6;
+    ctx.fillStyle = cols[i % cols.length];
+    ctx.beginPath(); ctx.moveTo(x - 3, yy); ctx.lineTo(x + 3, yy); ctx.lineTo(x, yy + 6); ctx.closePath(); ctx.fill();
   }
+}
+
+function storm(z) {
+  ctx.fillStyle = 'rgba(8,10,28,.32)'; ctx.fillRect(z.x, G - BASE * 2.4 - 60, z.w, BASE * 2.4 + 60);
+  ctx.strokeStyle = 'rgba(155,200,255,.45)'; ctx.lineWidth = 1;
+  const n = Math.floor(z.w / 7);
+  for (let i = 0; i < n; i++) {
+    const rx = z.x + (i * 7 + (i * 13) % 5), ry = G - BASE * 2.2 + ((T * 160 + i * 37) % (BASE * 2.2));
+    ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(rx - 2, ry + 7); ctx.stroke();
+  }
+  if (z.flash > 0) { ctx.fillStyle = `rgba(230,236,255,${z.flash * 2})`; ctx.fillRect(z.x, G - BASE * 2.4 - 60, z.w, BASE * 2.4 + 60); }
 }
 
 function drawGround() {
@@ -810,91 +1220,144 @@ function drawGround() {
 
 function drawParts() {
   parts.forEach(p => {
-    const a = Math.max(0, Math.min(1, (p.max - p.life) / .6));
-    ctx.globalAlpha = a;
+    ctx.globalAlpha = Math.max(0, Math.min(1, (p.max - p.life) / .6));
     if (p.type === 'coin') {
-      ctx.fillStyle = p.col; ctx.beginPath(); ctx.arc(p.x, p.y, 4.5, 0, 7); ctx.fill();
-      text('$', p.x, p.y + 2.5, 6.5, '#0e1426');
+      ctx.fillStyle = '#f2b544'; ctx.beginPath(); ctx.arc(p.x, p.y, 4.5, 0, 7); ctx.fill();
+      ctx.fillStyle = '#ffe08a'; ctx.beginPath(); ctx.arc(p.x - 1, p.y - 1, 2, 0, 7); ctx.fill();
+      text('$', p.x, p.y + 2.5, 6.5, '#5a3d00', 'center', 800);
     } else if (p.type === 'down') {
-      ctx.fillStyle = '#ff7a7a'; ctx.fillRect(p.x - 2.5, p.y - 1, 5, 2);
+      ctx.strokeStyle = '#ff7a7a'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(p.x - 3.5, p.y - 2); ctx.lineTo(p.x, p.y + 1.5); ctx.lineTo(p.x + 3.5, p.y - 2); ctx.stroke();
+    } else if (p.type === 'conf') {
+      ctx.fillStyle = p.col; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.life * 6 + p.r); ctx.fillRect(-1.8, -1, 3.6, 2); ctx.restore();
     } else if (p.type === 'text') {
-      text(p.t, p.x, p.y, 8, p.col, 'center', 800);
+      const fs = 9 * Math.min(cam.s, 1.35) / cam.s;
+      ctx.font = `800 ${fs}px Figtree, system-ui, sans-serif`; ctx.textAlign = 'center';
+      ctx.lineWidth = 3 * fs / 9; ctx.strokeStyle = 'rgba(14,20,38,.85)'; ctx.strokeText(p.t, p.x, p.y);
+      ctx.fillStyle = p.col; ctx.fillText(p.t, p.x, p.y);
     }
   });
   ctx.globalAlpha = 1;
 }
 
+function spawnFirework() {
+  const x = W * (.12 + Math.random() * .76), y = 40 + Math.random() * G * .3;
+  const col = ['#f2b544', '#ef7b6c', '#4fc3b0', '#8fa2ff', '#ff9fd1'][Math.floor(Math.random() * 5)];
+  for (let i = 0; i < 30; i++) { const a = i / 30 * Math.PI * 2, v = 40 + Math.random() * 30; fws.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: 1.3, col }); }
+}
+
 function update(dt) {
   const k = 1 - Math.exp(-dt * 5);
   cam.x += (camT.x - cam.x) * k; cam.s += (camT.s - cam.s) * k;
-  if (reduce) return;
+  Object.values(zones).forEach(z => z.items.forEach(b => { b.h += (b.ht - b.h) * (reduce ? 1 : 1 - Math.exp(-dt * 4)); }));
+  if (reduce || !view) return;
   T += dt;
-  if (!model) return;
+  const travel = travelYears > 0;
   const zf = zones.FIBRAS, doors = people.doors || [];
   people.forEach(p => {
-    p.ph += dt * 9 * zf.act;
+    if (!doors.length) return;
+    const d0 = doors[p.tgt % doors.length];
+    p.ph += dt * 9 * d0.act;
     if (p.st === 'walk') {
-      const tx = doorOf(doors[p.tgt]), d = tx - p.x;
-      if (Math.abs(d) < 1.2) { p.st = 'in'; p.t = .8 + Math.random() * 3; if (Math.random() < .25 * zf.act) spawn({ x: tx, y: G - 18, vy: -22, life: 0, max: 2, type: 'coin', col: '#ef7b6c' }); }
-      else p.x += Math.sign(d) * Math.min(Math.abs(d), 18 * zf.act * dt);
+      const tx = doorOf(d0), d = tx - p.x;
+      if (Math.abs(d) < 1.2) {
+        p.st = 'in'; p.t = .8 + Math.random() * 3;
+        const rent = EV.rentAct.has(d0.it.activo) || EV.rentCls.has('FIBRAS');
+        if (Math.random() < (rent ? .8 : .3 * d0.act)) spawn({ x: tx, y: G - 18, vy: -22, life: 0, max: 2, type: 'coin' });
+      } else p.x += Math.sign(d) * Math.min(Math.abs(d), 18 * d0.act * dt);
     } else { p.t -= dt; if (p.t <= 0) { p.st = 'walk'; p.tgt = Math.floor(Math.random() * doors.length); } }
   });
   cars.forEach(c => { c.x += c.v * dt; if (c.v > 0 && c.x > W * 1.4) c.x = -W * .4; if (c.v < 0 && c.x < -W * .4) c.x = W * 1.4; });
-  ['ACCIONES', 'BITCOIN'].forEach(key => {
-    const z = zones[key], h = model.classes[key].hoy;
+  ORDER.forEach(key => {
+    const z = zones[key];
     z.items.forEach(b => {
-      if (!b.owned || Math.random() > dt * .45) return;
-      const x = b.x + b.w / 2 + (Math.random() - .5) * b.w * .6;
-      if (h >= 0) spawn({ x, y: G - b.h - 6, vy: -22, life: 0, max: 2.2, type: 'coin', col: CLS[key].color });
-      else spawn({ x, y: G - b.h - 6, vy: 20, life: 0, max: 1.6, type: 'down' });
+      if (!b.owned) return;
+      const it = b.it;
+      // monedas que salen de acciones y bitcoin según su día; marcas rojas si bajó
+      if (!travel && (key === 'ACCIONES' || key === 'BITCOIN') && Math.random() < dt * .45) {
+        const x = b.x + b.w / 2 + (Math.random() - .5) * b.w * .6;
+        if (it.cambio_dia >= 0) spawn({ x, y: G - b.h - 6, vy: -22, life: 0, max: 2.2, type: 'coin' });
+        else spawn({ x, y: G - b.h - 6, vy: 20, life: 0, max: 1.6, type: 'down' });
+      }
+      // día de rentas: lluvia de monedas y confeti
+      if (!travel && (EV.rentAct.has(it.activo) || EV.rentCls.has(key))) {
+        if (Math.random() < dt * 1.6) spawn({ x: b.x + Math.random() * b.w, y: G - b.h - 4, vy: -26, life: 0, max: 2.2, type: 'coin' });
+        if (Math.random() < dt * 6) spawn({ x: b.x - 6 + Math.random() * (b.w + 12), y: G - b.h - 20, vy: 22 + Math.random() * 14, life: 0, max: 2.4, type: 'conf', r: Math.random() * 6, col: ['#ef7b6c', '#f2b544', '#4fc3b0', '#8fa2ff', '#ff9fd1'][Math.floor(Math.random() * 5)] });
+      }
+      // cuánto ganó o perdió hoy este edificio
+      if (!travel && key !== 'RENTA_FIJA' && Math.abs(it.hoy) >= .01) {
+        b.ft -= dt;
+        if (b.ft <= 0) { b.ft = 4 + Math.random() * 2; spawn({ x: b.x + b.w / 2, y: G - b.h * .45, vy: -10, life: 0, max: 2.6, type: 'text', col: it.hoy >= 0 ? '#5dd39e' : '#ff7a7a', t: signed2(it.hoy) + ' hoy' }); }
+      }
     });
+    if (EV.storms.find(s => s.k === key) && !travel) { z.flash = Math.max(0, z.flash - dt); if (Math.random() < dt * .25) z.flash = .12; }
   });
   parts.forEach(p => { p.life += dt; p.y += p.vy * dt; });
   parts = parts.filter(p => p.life < p.max);
+  // fuegos artificiales: ceremonia activa, ceremonia completada o celebración
+  if (celebrateT > 0) { celebrateT -= dt; if (Math.random() < dt * 3) spawnFirework(); }
+  else if (CE && CE.active && !travel && Math.random() < dt * (CE.done ? .6 : .12)) spawnFirework();
+  fws.forEach(f => { f.life += dt; f.x += f.vx * dt; f.y += f.vy * dt; f.vy += 40 * dt; f.vx *= .985; });
+  fws = fws.filter(f => f.life < f.max);
 }
 
 function draw() {
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   ctx.clearRect(0, 0, W, H);
+  const travel = travelYears > 0;
   const g = ctx.createLinearGradient(0, 0, 0, G);
-  g.addColorStop(0, '#111936'); g.addColorStop(.5, '#2e3268'); g.addColorStop(.85, '#8a5c7a'); g.addColorStop(1, '#e58d6b');
+  if (travel) { g.addColorStop(0, '#1a2350'); g.addColorStop(.5, '#3d3f80'); g.addColorStop(.85, '#a46a8a'); g.addColorStop(1, '#f2a16f'); }
+  else { g.addColorStop(0, '#111936'); g.addColorStop(.5, '#2e3268'); g.addColorStop(.85, '#8a5c7a'); g.addColorStop(1, '#e58d6b'); }
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   stars.forEach(s => { ctx.globalAlpha = .3 + .35 * Math.sin(T * 1.4 + s.p); ctx.fillStyle = '#fff'; ctx.fillRect(s.x, s.y, s.s, s.s); });
   ctx.globalAlpha = 1;
+  if (travel) {
+    ctx.font = `400 ${Math.round(Math.min(90, W * .14))}px Bungee, 'Arial Black', sans-serif`; ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(238,241,248,.08)'; ctx.fillText(String(new Date().getFullYear() + travelYears), W / 2, G * .42);
+  }
   ctx.fillStyle = '#fbe3c4'; ctx.beginPath(); ctx.arc(W * .47 - cam.x * .1, G * .3, 16, 0, 7); ctx.fill();
   ctx.fillStyle = 'rgba(40,40,86,.6)';
   far.forEach(f => ctx.fillRect(f.x - cam.x * .25, G - f.h, f.w, f.h));
-  if (!model) return;
+  fws.forEach(f => { ctx.globalAlpha = Math.max(0, 1 - f.life / f.max); ctx.fillStyle = f.col; ctx.fillRect(f.x - 1, f.y - 1, 2.2, 2.2); });
+  ctx.globalAlpha = 1;
+  if (!view) return;
 
   const s = cam.s;
   ctx.setTransform(DPR * s, 0, 0, DPR * s, -DPR * cam.x * s, DPR * (G - G * s));
-  ORDER.forEach(k => {
-    const z = zones[k];
-    ctx.fillStyle = CLS[k].color + (focus === k ? '22' : '12'); ctx.fillRect(z.x, G - BASE - 90, z.w, BASE + 90);
-    weather(z);
-  });
+  ORDER.forEach(k => { const z = zones[k]; ctx.fillStyle = CLS[k].color + (focus === k ? '22' : '12'); ctx.fillRect(z.x, G - BASE * 2.4 - 60, z.w, BASE * 2.4 + 60); });
   ORDER.forEach(k => {
     const z = zones[k];
     z.items.forEach(b => {
-      if (!b.owned && b.kind !== 'calle') { lot(b); return; }
       if (!b.owned) { lot(b); return; }
-      if (b.kind === 'fabrica') fabrica(b, z.act);
-      else if (b.kind === 'nave') nave(b, z.act);
-      else if (b.kind === 'torre' || b.kind === 'plaza') torre(b, z.act, b.kind === 'plaza');
-      else if (b.kind === 'boveda') boveda(b, z.act);
+      const up = !travel && k !== 'RENTA_FIJA' && b.it.cambio_dia > 0, down = !travel && k !== 'RENTA_FIJA' && b.it.cambio_dia < 0;
+      if (up) glow(b);
+      if (b.kind === 'fabrica') fabrica(b);
+      else if (b.kind === 'nave') nave(b);
+      else if (b.kind === 'torre' || b.kind === 'plaza') torre(b, b.kind === 'plaza');
+      else if (b.kind === 'boveda') boveda(b);
       else obra(b);
-      if (selected === b.it.activo) { ctx.strokeStyle = '#eef1f8'; ctx.lineWidth = 1.5 / s; ctx.setLineDash([4 / s, 3 / s]); ctx.strokeRect(b.x - 3, G - b.h - extraTop(b) + 10, b.w + 6, b.h + extraTop(b) - 6); ctx.setLineDash([]); }
+      if (up) upChevrons(b);
+      if (down) cloud(b);
+      if (!travel && (EV.rentAct.has(b.it.activo) || EV.rentCls.has(k))) garland(b.x - 4, b.x + b.w + 4, G - b.h - 6);
+      if (selected === b.it.activo) {
+        ctx.strokeStyle = CLS[k].color; ctx.lineWidth = 2 / s;
+        rr(b.x - 3, G - b.h - 4, b.w + 6, b.h + 4, 3); ctx.stroke();
+        ctx.fillStyle = 'rgba(238,241,248,.18)'; ctx.beginPath(); ctx.ellipse(b.x + b.w / 2, G + 3, b.w * .7, 4, 0, 0, 7); ctx.fill();
+      }
     });
+    if (!travel && EV.storms.find(x => x.k === k)) storm(z);
   });
   drawGround();
   people.forEach(p => { if (p.st === 'walk') person(p.x, G + 9, p.col, p.ph, false); });
   drawParts();
 
-  // capa de etiquetas en pantalla
+  // etiquetas en pantalla
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   const toS = (wx, wy) => [(wx - cam.x) * s, G + (wy - G) * s];
+  const placed = [];
+  const free = (x, y, w, h) => !placed.some(r => x < r[0] + r[2] + 4 && x + w + 4 > r[0] && y < r[1] + r[3] + 2 && y + h + 2 > r[1]);
   ORDER.forEach(k => {
-    const z = zones[k], c = model.classes[k];
+    const z = zones[k], c = view.classes[k];
     const [zx] = toS(z.x, 0), zw = z.w * s;
     if (zx > W || zx + zw < 0) return;
     if (k !== 'BITCOIN') { ctx.fillStyle = 'rgba(238,241,248,.12)'; ctx.fillRect(zx + zw - 1, 44, 1, G - 44); }
@@ -904,32 +1367,33 @@ function draw() {
     const tw = ctx.measureText(label).width + 22;
     const lx = Math.max(zx + 4, Math.min(zx + zw - tw - 4, zx + 6));
     if (zw > 44) {
+      placed.push([lx, 10, tw, 46]);
       ctx.fillStyle = 'rgba(14,20,38,.82)'; rr(lx, 10, tw, 22, 11); ctx.fill();
       ctx.fillStyle = CLS[k].color; ctx.beginPath(); ctx.arc(lx + 11, 21, 3.5, 0, 7); ctx.fill();
       text(label, lx + 18, 25, 12, '#eef1f8', 'left', 800);
       if (c.valor) {
-        const hoyTxt = (k === 'RENTA_FIJA' ? 'intereses ' : 'hoy ') + signed(c.hoy);
+        const sub = travel ? '≈ ' + short(c.valor) : (k === 'RENTA_FIJA' ? 'intereses ' : 'hoy ') + signed2(c.hoy);
         ctx.font = '700 11px Figtree, system-ui, sans-serif';
-        const hw = ctx.measureText(hoyTxt).width + 14;
+        const hw = ctx.measureText(sub).width + 14;
         if (hw + 8 <= zw) {
-        ctx.fillStyle = 'rgba(14,20,38,.7)'; rr(lx, 36, hw, 18, 9); ctx.fill();
-        text(hoyTxt, lx + 7, 49, 11, c.hoy >= 0 ? '#5dd39e' : '#ff7a7a', 'left', 700);
+          ctx.fillStyle = 'rgba(14,20,38,.7)'; rr(lx, 36, hw, 18, 9); ctx.fill();
+          text(sub, lx + 7, 49, 11, travel ? '#f2b544' : c.hoy >= 0 ? '#5dd39e' : '#ff7a7a', 'left', 700);
         }
       }
     }
-    // etiquetas por edificio cuando hay espacio
     z.items.forEach(b => {
       const bw = b.w * s;
       if (bw < 40) return;
       const [bx, by] = toS(b.x + b.w / 2, G - b.h - tagTop(b));
       const tk = b.it.activo.length > 12 ? b.it.activo.replace('Cetes ', 'C') : b.it.activo;
-      const ch = k === 'RENTA_FIJA' ? (b.it.tasa != null ? b.it.tasa + '%' : '') : ((b.it.cambio_dia >= 0 ? '▲' : '▼') + Math.abs(+b.it.cambio_dia || 0).toFixed(1) + '%');
+      const ch = travel ? short(b.it.valor) : k === 'RENTA_FIJA' ? (b.it.tasa != null && b.it.tasa !== '' ? b.it.tasa + '%' : '') : ((b.it.cambio_dia >= 0 ? '▲' : '▼') + Math.abs(b.it.cambio_dia).toFixed(1) + '%');
       const t1 = tk + (b.owned ? '  ' + ch : (bw > 120 ? '  por construir' : ''));
       ctx.font = '700 11px Figtree, system-ui, sans-serif';
-      const w1 = ctx.measureText(t1).width + 12;
-      const y = Math.max(72, by - 4);
-      ctx.fillStyle = selected === b.it.activo ? 'rgba(238,241,248,.95)' : 'rgba(14,20,38,.78)'; rr(bx - w1 / 2, y - 13, w1, 17, 8); ctx.fill();
-      const col = selected === b.it.activo ? '#0e1426' : (!b.owned ? '#ffb454' : k === 'RENTA_FIJA' ? '#4fc3b0' : (b.it.cambio_dia >= 0 ? '#5dd39e' : '#ff7a7a'));
+      const w1 = ctx.measureText(t1).width + 12, y = Math.max(72, by - 4), sel = selected === b.it.activo;
+      if (!sel && !free(bx - w1 / 2, y - 13, w1, 17)) return;
+      placed.push([bx - w1 / 2, y - 13, w1, 17]);
+      ctx.fillStyle = sel ? 'rgba(238,241,248,.95)' : 'rgba(14,20,38,.78)'; rr(bx - w1 / 2, y - 13, w1, 17, 8); ctx.fill();
+      const col = sel ? '#0e1426' : !b.owned ? '#ffb454' : travel ? '#f2b544' : k === 'RENTA_FIJA' ? '#4fc3b0' : (b.it.cambio_dia >= 0 ? '#5dd39e' : '#ff7a7a');
       text(t1, bx, y, 11, col, 'center', 700);
     });
   });
@@ -938,13 +1402,12 @@ function draw() {
 let last = performance.now();
 function frame(now) {
   const dt = Math.min(.05, (now - last) / 1000); last = now;
-  if (!$('app').hidden) { update(dt); draw(); }
+  if (!$('app').hidden) { update(dt); draw(); tickLive(now); }
   requestAnimationFrame(frame);
 }
 window.addEventListener('resize', () => { if (!$('app').hidden) resize(); });
 requestAnimationFrame(frame);
 
-// Reanudar sesión si sigue vigente
 (async () => {
   let t = null;
   try { t = sessionStorage.getItem('cm_token'); } catch (_) {}
@@ -953,6 +1416,5 @@ requestAnimationFrame(frame);
   try { await loadData(); showApp(); } catch (_) { token = null; }
 })();
 </script>
-
 </body>
 </html>
