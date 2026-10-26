@@ -43,6 +43,7 @@ input[type=range]{accent-color:var(--ren);width:100%;padding:0;border:0;backgrou
 .card h1{font-size:34px}
 .card label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);font-weight:600}
 .err{color:var(--bad);font-size:13px;min-height:1.2em}
+.resume{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--panel2)}
 .demo-note{font-size:12px;color:var(--warn);border:1px dashed var(--warn);border-radius:8px;padding:8px 10px}
 
 /* Encabezado y HUD */
@@ -162,6 +163,10 @@ td.n{font-family:var(--f-data);text-align:right;font-variant-numeric:tabular-num
   <form class="card" id="loginForm" autocomplete="on">
     <h1>Ciudad <span>Marea</span></h1>
     <p class="muted" style="margin:0">Entra para ver cómo trabaja tu dinero.</p>
+    <div class="resume" id="resume" hidden>
+      <p style="margin:0">Hay una sesión abierta como <b id="resumeName"></b>.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="btnResume">Continuar</button><button type="button" class="ghost" id="btnSwitch">Entrar con otro usuario</button></div>
+    </div>
     <label for="lgUser">Usuario<input id="lgUser" name="username" autocomplete="username" required></label>
     <label for="lgPin">PIN<input id="lgPin" name="password" type="password" inputmode="numeric" autocomplete="current-password" required></label>
     <div class="err" id="lgErr"></div>
@@ -550,8 +555,10 @@ $('loginForm').addEventListener('submit', async e => {
   const btn = $('lgBtn'); btn.disabled = true; $('lgErr').textContent = '';
   try {
     const r = await api('login', { usuario: $('lgUser').value, pin: $('lgPin').value });
+    resetState();
     token = r.token;
-    try { sessionStorage.setItem('cm_token', token); } catch (_) {}
+    try { sessionStorage.setItem('cm_token', token); sessionStorage.setItem('cm_name', r.nombre || $('lgUser').value); } catch (_) {}
+    $('resume').hidden = true;
     $('lgPin').value = '';
     await loadData();
     showApp();
@@ -562,9 +569,18 @@ $('btnOut').addEventListener('click', () => logout(false));
 async function logout(expired) {
   if (!expired) { try { await api('salir'); } catch (_) {} }
   token = null;
-  try { sessionStorage.removeItem('cm_token'); } catch (_) {}
+  try { sessionStorage.removeItem('cm_token'); sessionStorage.removeItem('cm_name'); } catch (_) {}
+  resetState();
+  $('resume').hidden = true; $('lgUser').value = '';
   $('app').hidden = true; $('login').hidden = false;
   if (expired) $('lgErr').textContent = 'Tu sesión terminó. Vuelve a entrar.';
+}
+// Limpia todo lo del usuario anterior para que el siguiente vea solo lo suyo
+function resetState() {
+  raw = null; model = null; view = null; zones = {}; travelYears = 0; focus = null; selected = null;
+  firstApply = true; MI = null; CE = null; ST = null; EV = null;
+  $('tmAport').value = ''; $('tmYears').value = 0;
+  clearInterval(setTravel._p);
 }
 function showApp() { $('login').hidden = true; $('app').hidden = false; sessionStart = performance.now(); resize(); }
 async function loadData() { apply(await api('datos')); }
@@ -576,6 +592,11 @@ function apply(d) {
   J = { ...JUEGO_DEF };
   Object.entries(d.juego || {}).forEach(([k, v]) => { if (v !== '' && v != null) J[k] = v; });
   model = buildModel(d);
+  const nCrypto = model.classes.BITCOIN.items.length;
+  CLS.BITCOIN.name = nCrypto > 1 ? 'Cripto' : 'Bitcoin';
+  CLS.BITCOIN.how = nCrypto > 1
+    ? 'Las criptomonedas no cobran rentas ni intereses: su valor depende de cuánto esté dispuesta a pagar la gente. Pueden subir o bajar mucho en un día, por eso son la parte más chica de la ciudad. Cada moneda que gira es una de tus criptos.'
+    : 'Bitcoin no cobra rentas ni intereses: su valor depende de cuánto esté dispuesta a pagar la gente. Puede subir o bajar mucho en un día, por eso es la parte más chica de la ciudad.';
   // altura de referencia por barrio: el edificio más grande de hoy
   const gmax = Math.max(1, ...model.items.map(i => i.valor));
   ORDER.forEach(k => { const m = Math.max(0, ...model.classes[k].items.map(i => i.valor)); refMax[k] = m || gmax; });
@@ -737,7 +758,7 @@ function renderForm() {
                   : `<div class="frow"><span></span><span class="fhead">Títulos</span><span class="fhead">Precio promedio</span></div>`;
     its.forEach(it => {
       const p = it.pos || {}, id = idOf(it.activo);
-      const name = `<div class="fname"><b>${esc(it.activo)}${it.retirado ? ' <span class="empty-lot">ya no en el plan</span>' : ''}</b><span>${esc(it.descripcion || '')}</span></div>`;
+      const name = `<div class="fname"><b>${esc(it.activo)}${it.retirado ? ' <span class="empty-lot">ya no en el plan</span>' : ''}${it.privado ? ' <span class="empty-lot" style="color:var(--ren)">solo tú</span>' : ''}</b><span>${esc(it.descripcion || '')}</span></div>`;
       html += renta
         ? `<div class="frow renta">${name}<input id="${id}_s" type="number" min="0" step="any" inputmode="decimal" placeholder="0" value="${p.saldo ?? ''}" aria-label="Saldo de ${esc(it.activo)}"></div>`
         : `<div class="frow">${name}<input id="${id}_t" type="number" min="0" step="any" inputmode="decimal" placeholder="0" value="${p.titulos ?? ''}" aria-label="Títulos de ${esc(it.activo)}"><input id="${id}_p" type="number" min="0" step="any" inputmode="decimal" placeholder="0.00" value="${p.precio_promedio ?? ''}" aria-label="Precio promedio de ${esc(it.activo)}"></div>`;
@@ -781,7 +802,7 @@ function renderSim() {
   out.innerHTML = `<div class="tbl"><table><thead><tr><th>Activo</th><th style="text-align:right">Monto</th><th style="text-align:right">Aprox.</th></tr></thead><tbody>` +
     rows.map(x => {
       const p = x.i.precio_mxn;
-      const aprox = x.i.key === 'RENTA_FIJA' ? 'saldo' : (p ? (x.i.key === 'BITCOIN' ? (x.amt / p).toFixed(5) + ' BTC' : Math.floor(x.amt / p) + ' títulos') : '—');
+      const aprox = x.i.key === 'RENTA_FIJA' ? 'saldo' : (p ? (x.i.key === 'BITCOIN' ? (x.amt / p).toFixed(5) + ' ' + (/eth/i.test(x.i.activo) ? 'ETH' : /sol/i.test(x.i.activo) ? 'SOL' : 'BTC') : Math.floor(x.amt / p) + ' títulos') : '—');
       return `<tr><td><span class="dot" style="--c:${CLS[x.i.key].color};margin-right:6px"></span>${esc(x.i.activo)}</td><td class="n">${mxn.format(x.amt)}</td><td class="n muted">${aprox}</td></tr>`;
     }).join('') + `</tbody></table></div><p class="foot" style="margin-top:6px">Reparto para acercar cada activo a su porcentaje ideal. Los títulos son aproximados con el precio de hoy.</p>`;
 }
@@ -1167,14 +1188,17 @@ function boveda(b) {
   const act = b.act, cx = b.x + b.w / 2, vw = Math.min(b.w - 4, BASE * .9), vh = Math.min(b.h, BASE * .55), top = G - vh;
   ctx.fillStyle = '#2b2436'; rr(cx - vw / 2, top, vw, vh, 5); ctx.fill();
   ctx.strokeStyle = '#4a3d5c'; ctx.lineWidth = 1.5; ctx.stroke();
-  ctx.fillStyle = '#4a3d5c'; ctx.beginPath(); ctx.arc(cx, top + vh * .55, vh * .27, 0, 7); ctx.fill();
-  ctx.strokeStyle = '#f7931a'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(cx, top + vh * .55, vh * .27, T * act, T * act + 4.5); ctx.stroke();
+  const dr = Math.min(vh * .27, vw * .36);
+  ctx.fillStyle = '#4a3d5c'; ctx.beginPath(); ctx.arc(cx, top + vh * .55, dr, 0, 7); ctx.fill();
+  ctx.strokeStyle = '#f7931a'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(cx, top + vh * .55, dr, T * act, T * act + 4.5); ctx.stroke();
   for (let i = 0; i < 3; i++) { const mx = cx - vw / 2 + 4 + i * (vw - 8) / 3; ctx.fillStyle = '#1e1a28'; ctx.fillRect(mx, G - 7, (vw - 8) / 3 - 3, 6); ctx.fillStyle = Math.sin(T * 6 * act + i * 2) > 0 ? '#5dd39e' : '#2a4a3a'; ctx.fillRect(mx + 2, G - 5, 2, 2); }
   const r = Math.min(18, b.w * .25 + 4), cy = top - r - 10 - Math.sin(T * 2) * 3, sx = Math.abs(Math.cos(T * 1.6 * act));
   ctx.save(); ctx.translate(cx, cy); ctx.scale(Math.max(.08, sx), 1);
-  ctx.fillStyle = '#c66f0c'; ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.fill();
-  ctx.fillStyle = '#f7931a'; ctx.beginPath(); ctx.arc(0, 0, r * .85, 0, 7); ctx.fill();
-  if (sx > .3) { ctx.fillStyle = '#fff4e0'; ctx.font = `800 ${Math.round(r * 1.1)}px Figtree, system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('₿', 0, 1); ctx.textBaseline = 'alphabetic'; }
+  const nm = b.it.activo.toLowerCase();
+  const coin = nm.includes('eth') ? ['#4b56a8', '#8fa2ff', 'Ξ'] : nm.includes('sol') ? ['#6b3fb0', '#b48cff', '◎'] : ['#c66f0c', '#f7931a', '₿'];
+  ctx.fillStyle = coin[0]; ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.fill();
+  ctx.fillStyle = coin[1]; ctx.beginPath(); ctx.arc(0, 0, r * .85, 0, 7); ctx.fill();
+  if (sx > .3) { ctx.fillStyle = '#fff4e0'; ctx.font = `800 ${Math.round(r * 1.1)}px Figtree, system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(coin[2], 0, 1); ctx.textBaseline = 'alphabetic'; }
   ctx.restore();
 }
 
@@ -1408,12 +1432,21 @@ function frame(now) {
 window.addEventListener('resize', () => { if (!$('app').hidden) resize(); });
 requestAnimationFrame(frame);
 
-(async () => {
-  let t = null;
-  try { t = sessionStorage.getItem('cm_token'); } catch (_) {}
+// Si hay una sesión abierta en esta pestaña, pregunta antes de entrar con ella
+(() => {
+  let t = null, n = '';
+  try { t = sessionStorage.getItem('cm_token'); n = sessionStorage.getItem('cm_name') || ''; } catch (_) {}
   if (!t) return;
-  token = t;
-  try { await loadData(); showApp(); } catch (_) { token = null; }
+  $('resumeName').textContent = n || 'tu usuario';
+  $('resume').hidden = false;
+  $('btnResume').onclick = async () => {
+    $('btnResume').disabled = true;
+    token = t;
+    try { resetState(); await loadData(); showApp(); }
+    catch (err) { token = null; $('resume').hidden = true; $('lgErr').textContent = err.message; }
+    $('btnResume').disabled = false;
+  };
+  $('btnSwitch').onclick = () => logout(false);
 })();
 </script>
 </body>
