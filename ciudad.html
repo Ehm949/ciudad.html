@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ciudad Marea</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -105,7 +110,10 @@ td.n{font-family:var(--f-data);text-align:right;font-variant-numeric:tabular-num
 .save{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .toast{font-size:13px}
 .foot{font-size:12px;color:var(--muted)}
+body{margin:0}
 </style>
+</head>
+<body>
 
 <!-- ============ LOGIN ============ -->
 <div id="login">
@@ -945,3 +953,6 @@ requestAnimationFrame(frame);
   try { await loadData(); showApp(); } catch (_) { token = null; }
 })();
 </script>
+
+</body>
+</html>
