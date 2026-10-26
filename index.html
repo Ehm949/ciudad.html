@@ -244,15 +244,13 @@ td.n{font-family:var(--f-data);text-align:right;font-variant-numeric:tabular-num
       <section class="panel" id="streak"></section>
     </div>
 
-    <div class="two">
-      <section class="panel" id="ceremony"></section>
+    <section class="panel" id="ceremony"></section>
       <section class="panel">
         <h2>¿Cuánto vas a invertir?</h2>
         <p class="muted" style="margin:0">Escribe tu aportación y te digo dónde ponerla para acercarte a la ciudad ideal.</p>
         <div class="sim"><input id="simAmt" type="number" min="0" step="500" value="10000" aria-label="Monto a invertir en pesos"><button id="btnSim" type="button">Repartir</button></div>
         <div id="simOut"></div>
       </section>
-    </div>
 
     <div class="grid" id="districts"></div>
 
@@ -900,7 +898,7 @@ function renderCeremony() {
     const unidades = x => { const p = +x.it.precio_mxn; if (x.it.key === 'RENTA_FIJA' || !p) return '—'; const u = Math.abs(x.d) / p; return x.it.key === 'BITCOIN' ? u.toFixed(5) : '≈ ' + Math.round(u); };
     html += `<div class="tbl"><table><thead><tr><th>Activo</th><th>Movimiento</th><th style="text-align:right">Monto</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${moves.map(x => `<tr><td><span class="dot" style="--c:${CLS[x.it.key].color};margin-right:6px"></span>${esc(x.it.activo)}</td><td class="${x.d > 0 ? 'pos' : 'neg'}">${x.d > 0 ? 'Comprar' : 'Vender'}</td><td class="n">${mxn.format(Math.abs(x.d))}</td><td class="n muted">${unidades(x)}</td></tr>`).join('')}</tbody></table></div>`;
     if (holds.length) html += `<p class="foot">${holds.map(i => esc(i.activo)).join(', ')} se mantienen como están: cuentan en su grupo, pero no se compran ni venden. El rebalanceo de cada grupo se hace con su vehículo (pestaña Bandas).</p>`;
-    if (needNoSell > 0) html += `<p class="foot">Si prefieres no vender (y no pagar impuestos por ganancias): aportando unos ${mxn.format(needNoSell)} a lo que falta, todos los grupos regresan a su banda. El simulador de al lado te dice en qué orden.</p>`;
+    if (needNoSell > 0) html += `<p class="foot">Si prefieres no vender (y no pagar impuestos por ganancias): aportando unos ${mxn.format(needNoSell)} a lo que falta, todos los grupos regresan a su banda. El simulador de abajo te dice cómo repartirlo.</p>`;
   }
   html += `<ul class="tasks"><li class="on">Revisa los movimientos</li><li class="${ST.savedThisMonth ? 'on' : ''}">Captura tus nuevos saldos</li><li class="${CE.inRange ? 'on' : ''}">Deja todos los grupos dentro de su banda</li></ul>`;
   box.innerHTML = html;
@@ -962,49 +960,74 @@ $('pfForm').addEventListener('submit', async e => {
   if ($('btnSave')) $('btnSave').disabled = false;
 });
 
-// Reparte en cascada: primero entre grupos (Bandas) según cuánto le falta a cada uno,
-// luego dentro de cada grupo según Pesos internos (o su vehículo)
-function waterfall(list, amt) {
-  const r = list.filter(x => x.gap > 1).sort((a, b) => b.gap - a.gap);
-  let left = amt;
-  r.forEach(x => { x.amt = Math.min(x.gap, left); left -= x.amt; });
-  list.filter(x => !(x.gap > 1)).forEach(x => { x.amt = 0; });
-  if (left > 1) { const so = list.reduce((a, x) => a + x.w, 0) || 1; list.forEach(x => { x.amt += left * x.w / so; }); }
-  return list.slice().sort((a, b) => (b.gap - a.gap));
+// Reparto "nivelado": busca un factor λ para que cada destino quede en λ × su objetivo.
+// Así todos quedan igual de cerca de su ideal y ninguno se lleva todo ni se queda sin nada.
+function levelFill(list, NT, A) {
+  const f = l => list.reduce((a, x) => a + Math.max(0, l * x.t * NT - x.v), 0);
+  if (A <= 0 || !list.length) return list.map(() => 0);
+  let lo = 0, hi = 1;
+  while (f(hi) < A && hi < 1e6) hi *= 2;
+  for (let k = 0; k < 80; k++) { const m = (lo + hi) / 2; if (f(m) < A) lo = m; else hi = m; }
+  const out = list.map(x => Math.max(0, hi * x.t * NT - x.v)), tot = out.reduce((a, b) => a + b, 0) || 1;
+  return out.map(v => v * A / tot);
 }
+const isUnit = i => i.key !== 'RENTA_FIJA' && i.key !== 'BITCOIN' && +i.precio_mxn > 0;
 function renderSim() {
   const amt = Math.max(0, Number($('simAmt').value) || 0), M = model, out = $('simOut');
   const groups = (M.groups || []).filter(g => g.traders.length);
   if (!amt || !groups.length) { out.innerHTML = ''; return; }
-  const newTotal = M.total + amt;
-  const G1 = waterfall(groups.map(g => ({ g, w: g.tG, gap: newTotal * g.tG / 100 - g.valor })), amt);
-  G1.forEach(x => {
-    // dentro del grupo: el nuevo valor del grupo se reparte entre sus activos según su peso
-    const base = x.g.valor + x.amt - x.g.holdValor;
-    x.sub = waterfall(x.g.traders.map(t => ({ i: t.i, w: t.sh, gap: base * t.sh - t.i.valor })), x.amt);
+  const NT = M.total + amt;
+  // 1) entre grupos, con los objetivos de Bandas
+  const gAlloc = levelFill(groups.map(g => ({ t: g.tG / 100, v: g.valor })), NT, amt);
+  // 2) dentro de cada grupo, con Pesos internos (o todo al vehículo)
+  const plan = [];
+  groups.forEach((g, gi) => {
+    const pool = g.traders.reduce((a, t) => a + t.i.valor, 0) + gAlloc[gi];
+    const a = levelFill(g.traders.map(t => ({ t: t.sh, v: t.i.valor })), pool, gAlloc[gi]);
+    g.traders.forEach((t, k) => plan.push({ g, gi, i: t.i, ideal: a[k], amt: a[k], units: null }));
   });
-  const units = (i, a) => {
-    const p = +i.precio_mxn;
-    if (i.key === 'RENTA_FIJA') return 'saldo';
-    if (!p) return '—';
-    if (i.key === 'BITCOIN') return (a / p).toFixed(5) + ' ' + (/eth/i.test(i.activo) ? 'ETH' : /sol/i.test(i.activo) ? 'SOL' : 'BTC');
-    const n = Math.floor(a / p);
-    return n ? n + (n === 1 ? ' título' : ' títulos') : `0 · ${mxn.format(p)} c/u`;
+  // 3) títulos completos: se compra lo que alcanza y el resto se usa donde más falte
+  plan.forEach(x => { if (isUnit(x.i)) { x.units = Math.floor(x.ideal / x.i.precio_mxn); x.amt = x.units * x.i.precio_mxn; } });
+  let left = amt - plan.reduce((a, x) => a + x.amt, 0);
+  const after = x => x.i.valor + x.amt, goal = x => x.i.objetivo / 100 * NT;
+  for (let guard = 0; guard < 500 && left > 0; guard++) {
+    const c = plan.filter(x => isUnit(x.i) && x.i.precio_mxn <= left && goal(x) - after(x) > x.i.precio_mxn * 0.5)
+      .sort((a, b) => (goal(b) - after(b)) / goal(b) - (goal(a) - after(a)) / goal(a))[0];
+    if (!c) break;
+    c.units++; c.amt += c.i.precio_mxn; left -= c.i.precio_mxn;
+  }
+  // lo que no alcanza para un título completo va a renta fija o cripto (aceptan montos libres)
+  const flex = plan.filter(x => !isUnit(x.i));
+  if (left > 1 && flex.length) {
+    const fa = levelFill(flex.map(x => ({ t: x.i.objetivo / 100, v: after(x) })), NT, left);
+    flex.forEach((x, k) => { x.amt += fa[k]; }); left = 0;
+  }
+  // resumen por grupo, ordenado por cuánto recibe
+  const pctNow = v => v / M.total * 100, pctAfter = v => v / NT * 100;
+  const rowsG = groups.map((g, gi) => {
+    const items = plan.filter(x => x.gi === gi), inv = items.reduce((a, x) => a + x.amt, 0);
+    return { g, inv, items, now: pctNow(g.valor), after: pctAfter(g.valor + inv) };
+  }).sort((a, b) => b.inv - a.inv);
+  const u = x => {
+    if (x.i.key === 'RENTA_FIJA') return 'saldo';
+    if (x.i.key === 'BITCOIN') return +x.i.precio_mxn ? (x.amt / x.i.precio_mxn).toFixed(5) + ' ' + (/eth/i.test(x.i.activo) ? 'ETH' : /sol/i.test(x.i.activo) ? 'SOL' : 'BTC') : '—';
+    return x.units + (x.units === 1 ? ' título' : ' títulos');
   };
-  const money = v => v > 1 ? mxn.format(v) : '—';
+  const pc = v => (Math.round(v * 10) / 10).toFixed(1) + '%';
+  const tone = (a, t, tol) => Math.abs(a - t) <= tol * 0.5 ? 'pos' : Math.abs(a - t) <= tol ? '' : 'neg';
   let rows = '';
-  G1.forEach((x, n) => {
-    const col = CLS[x.g.traders[0].i.key].color, on = x.amt >= 1;
-    rows += `<tr style="background:var(--panel2);${on ? '' : 'opacity:.5'}"><td class="n"><b>${n + 1}</b></td><td><span class="dot" style="--c:${col};margin-right:6px"></span><b>${esc(x.g.name)}</b></td><td class="n">${money(x.gap)}</td><td class="n ${on ? 'pos' : ''}"><b>${money(x.amt)}</b></td><td></td></tr>`;
+  rowsG.forEach((r, n) => {
+    const col = CLS[r.g.members[0].key].color, on = r.inv >= 1, band = BD.find(b => b.name === r.g.name), tol = band ? band.tol : 2;
+    rows += `<tr style="background:var(--panel2);${on ? '' : 'opacity:.6'}"><td class="n"><b>${n + 1}</b></td><td><span class="dot" style="--c:${col};margin-right:6px"></span><b>${esc(r.g.name)}</b></td><td class="n">${pc(r.now)}</td><td class="n muted">${pc(r.g.tG)}</td><td class="n ${tone(r.after, r.g.tG, tol)}">${pc(r.after)}</td><td class="n ${on ? 'pos' : ''}"><b>${on ? mxn.format(r.inv) : '—'}</b></td><td></td></tr>`;
     if (!on) return;
-    const subs = x.sub.filter(y => y.amt >= 1 || y.gap > 1);
-    if (subs.length === 1 && x.sub.length === 1) { rows += `<tr><td></td><td style="padding-left:26px">${esc(subs[0].i.activo)}</td><td></td><td class="n pos">${money(subs[0].amt)}</td><td class="n muted">${units(subs[0].i, subs[0].amt)}</td></tr>`; return; }
-    subs.forEach((y, m) => {
-      rows += `<tr style="${y.amt >= 1 ? '' : 'opacity:.5'}"><td class="n muted">${n + 1}.${m + 1}</td><td style="padding-left:26px">${esc(y.i.activo)}</td><td class="n muted">${money(y.gap)}</td><td class="n ${y.amt >= 1 ? 'pos' : ''}">${money(y.amt)}</td><td class="n muted">${y.amt >= 1 ? units(y.i, y.amt) : ''}</td></tr>`;
+    r.items.filter(x => x.amt >= 1).sort((a, b) => b.amt - a.amt).forEach(x => {
+      rows += `<tr><td></td><td style="padding-left:26px">${esc(x.i.activo)}</td><td class="n muted">${pc(pctNow(x.i.valor))}</td><td class="n muted">${pc(x.i.objetivo)}</td><td class="n muted">${pc(pctAfter(after(x)))}</td><td class="n pos">${mxn.format(x.amt)}</td><td class="n muted">${u(x)}</td></tr>`;
     });
   });
-  out.innerHTML = `<div class="tbl"><table><thead><tr><th>#</th><th>Grupo / activo</th><th style="text-align:right">Le falta</th><th style="text-align:right">Invierte</th><th style="text-align:right">Aprox.</th></tr></thead><tbody>${rows}</tbody></table></div>
-    <p class="foot" style="margin-top:6px">Primero decide entre grupos según los objetivos de tu pestaña Bandas: el dinero llena al grupo que más le falta, luego al siguiente. Dentro de cada grupo se reparte según Pesos internos (o va completo a su vehículo, como VUAA o Bitcoin). Títulos aproximados con el precio de hoy.</p>`;
+  const spent = plan.reduce((a, x) => a + x.amt, 0), rest = amt - spent;
+  out.innerHTML = `<div class="tbl"><table><thead><tr><th>#</th><th>Grupo / activo</th><th style="text-align:right">Hoy</th><th style="text-align:right">Ideal</th><th style="text-align:right">Después</th><th style="text-align:right">Invierte</th><th style="text-align:right">Aprox.</th></tr></thead><tbody>${rows}</tbody></table></div>
+    ${rest > 1 ? `<p class="foot" style="margin-top:6px">Sobran ${mxn.format(rest)} que no alcanzan para un título completo.</p>` : ''}
+    <p class="foot" style="margin-top:6px">El dinero se reparte para que todos los grupos queden igual de cerca de su objetivo de Bandas; dentro de cada grupo, igual con Pesos internos (o todo al vehículo). Se redondea a títulos completos y lo que sobra va a renta fija. Si un grupo está pasado (como Cripto hoy), no recibe nada y los demás quedan un poco abajo de su ideal en la misma proporción. Precios de hoy.</p>`;
 }
 $('btnSim').addEventListener('click', renderSim);
 $('simAmt').addEventListener('keydown', e => { if (e.key === 'Enter') renderSim(); });
