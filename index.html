@@ -330,6 +330,7 @@ function kindOf(k, it) {
   if (k === 'RENTA_FIJA') {
     if (s.includes('bondia') || s.includes('liquidez')) return 'tesoreria';
     if (s.includes('udi') || s.includes('infla')) return 'hospital';
+    if (s.includes('364') || s.includes('1 año')) return 'carretera';
     if (s.includes('28')) return 'calle';
     if (s.includes('91')) return 'puente';
     return 'escuela';
@@ -337,11 +338,11 @@ function kindOf(k, it) {
   if (k === 'BITCOIN') return 'boveda';
   return 'fabrica';
 }
-const OBRA = { calle: 'Calles', puente: 'Puente', escuela: 'Escuela', hospital: 'Hospital', tesoreria: 'Tesorería' };
+const OBRA = { calle: 'Calles', carretera: 'Carretera', puente: 'Puente', escuela: 'Escuela', hospital: 'Hospital', tesoreria: 'Tesorería' };
 function obraName(it) {
   return {
     fabrica: 'una fábrica nueva de ' + (it.subclase || it.activo), nave: 'una nave industrial nueva', torre: 'una torre de oficinas',
-    plaza: 'una plaza comercial', calle: 'repavimentar sus calles', puente: 'un puente nuevo', escuela: 'una escuela nueva',
+    plaza: 'una plaza comercial', calle: 'repavimentar sus calles', carretera: 'una carretera nueva', puente: 'un puente nuevo', escuela: 'una escuela nueva',
     hospital: 'un hospital', tesoreria: 'reforzar la tesorería', boveda: 'reforzar la bóveda'
   }[kindOf(it.key, it)];
 }
@@ -361,7 +362,7 @@ const DEMO_CATALOGO = [
   { activo: 'FNOVA17', clase: 'FIBRAS', subclase: 'Industrial', objetivo: 3, descripcion: 'Inmuebles industriales', precio_mxn: 44.5, cambio_dia: 0.3 },
   { activo: 'FMTY14', clase: 'FIBRAS', subclase: 'Industrial', objetivo: 2, descripcion: 'Industria y oficinas en el norte', precio_mxn: 13.1, cambio_dia: -0.4 },
   { activo: 'NEXT23', clase: 'FIBRAS', subclase: 'Industrial', objetivo: 3, descripcion: 'Naves industriales nuevas', precio_mxn: 30.5, cambio_dia: 1.1 },
-  { activo: 'Cetes 28 días', clase: 'RENTA_FIJA', subclase: '28 días', objetivo: 8, tasa: 7.0, descripcion: 'Préstamo al gobierno a 28 días' },
+  { activo: 'Cetes 364 días', clase: 'RENTA_FIJA', subclase: '1 año', objetivo: 6, tasa: 7.6, descripcion: 'Préstamo al gobierno a 1 año' },
   { activo: 'Cetes 91 días', clase: 'RENTA_FIJA', subclase: '91 días', objetivo: 6, tasa: 7.2, descripcion: 'Préstamo al gobierno a 3 meses' },
   { activo: 'Cetes 182 días', clase: 'RENTA_FIJA', subclase: '182 días', objetivo: 6, tasa: 7.4, descripcion: 'Préstamo al gobierno a 6 meses' },
   { activo: 'Udibonos', clase: 'RENTA_FIJA', subclase: 'Inflación', objetivo: 6, tasa: 8.0, descripcion: 'Protege contra la inflación' },
@@ -372,7 +373,7 @@ let demoPos = [
   { activo: 'VTI', titulos: 30, precio_promedio: 5600 }, { activo: 'VEA', titulos: 80, precio_promedio: 1000 },
   { activo: 'VWO', titulos: 40, precio_promedio: 900 }, { activo: 'FUNO11', titulos: 1200, precio_promedio: 29 },
   { activo: 'FIBRAPL14', titulos: 250, precio_promedio: 70 }, { activo: 'DANHOS13', titulos: 600, precio_promedio: 27.5 },
-  { activo: 'FNOVA17', titulos: 300, precio_promedio: 41 }, { activo: 'Cetes 28 días', saldo: 60000 },
+  { activo: 'FNOVA17', titulos: 300, precio_promedio: 41 }, { activo: 'Cetes 364 días', saldo: 60000 },
   { activo: 'Cetes 91 días', saldo: 40000 }, { activo: 'Udibonos', saldo: 30000 }, { activo: 'Bondia', saldo: 15000 },
   { activo: 'Bitcoin', titulos: 0.01, precio_promedio: 1300000 }
 ];
@@ -463,26 +464,64 @@ const maxDev = M => Math.max(...ORDER.map(k => Math.abs(M.classes[k].diff)));
 
 // Bandas por defecto (las reales vienen de la pestaña Bandas de tu hoja)
 const BANDAS_DEF = [
-  { grupo: 'FIBRAs', miembros: 'FIBRAS', tolerancia_pts: 5 },
-  { grupo: 'Acciones de Estados Unidos', miembros: 'VTI, VUAA, IVVPESO, VIG', tolerancia_pts: 5 },
-  { grupo: 'Mercados desarrollados (VEA)', miembros: 'VEA', tolerancia_pts: 3.5 },
-  { grupo: 'Mercados emergentes (VWO)', miembros: 'VWO', tolerancia_pts: 1.25 },
-  { grupo: 'Renta fija', miembros: 'RENTA_FIJA', tolerancia_pts: 5 },
-  { grupo: 'Cripto', miembros: 'CRIPTO', tolerancia_pts: 1.25 }
+  { grupo: 'Estados Unidos', miembros: 'VTI, VUAA, IVVPESO, VIG', tolerancia_pts: 5, objetivo_pct: 28, vehiculo: 'VUAA' },
+  { grupo: 'Desarrollados sin EE.UU. (VEA)', miembros: 'VEA', tolerancia_pts: 3.5, objetivo_pct: 12, vehiculo: 'VEA' },
+  { grupo: 'Emergentes (VWO)', miembros: 'VWO', tolerancia_pts: 1.25, objetivo_pct: 5, vehiculo: 'VWO' },
+  { grupo: 'FIBRAs', miembros: 'FIBRAS', tolerancia_pts: 5, objetivo_pct: 20, vehiculo: '' },
+  { grupo: 'Renta fija', miembros: 'RENTA_FIJA', tolerancia_pts: 5, objetivo_pct: 30, vehiculo: '' },
+  { grupo: 'Cripto', miembros: 'CRIPTO', tolerancia_pts: 1.25, objetivo_pct: 5, vehiculo: 'Bitcoin' }
 ];
+const PESOS_DEF = [
+  ['FUNO11', 25], ['FIBRAPL14', 20], ['DANHOS13', 15], ['FNOVA17', 15], ['FMTY14', 10], ['NEXT23', 15],
+  ['Cetes 91 días', 20], ['Cetes 182 días', 20], ['Cetes 364 días', 20], ['Udibonos', 20], ['Bondia', 20]
+].map(([activo, peso_pct]) => ({ activo, peso_pct }));
+const bandList = () => (raw && raw.bandas && raw.bandas.length) ? raw.bandas : BANDAS_DEF;
+function resolveMembers(M, txt) {
+  const set = new Set();
+  String(txt || '').split(/[,;]+/).map(t => t.trim()).filter(Boolean).forEach(t => {
+    const up = t.toUpperCase().replace(/\s+/g, '_');
+    const ck = up === 'CRIPTO' || up === 'BITCOIN_CLASE' ? 'BITCOIN' : ['ACCIONES', 'FIBRAS', 'RENTA_FIJA'].includes(up) ? up : null;
+    if (ck) M.classes[ck].items.forEach(i => set.add(i));
+    else { const it = M.items.find(i => i.activo.toLowerCase() === t.toLowerCase()); if (it) set.add(it); }
+  });
+  return [...set];
+}
+// Convierte tu estrategia por grupo en un objetivo por activo:
+//  vehículo → absorbe todo el rebalanceo del grupo; los demás miembros se mantienen como están
+//  sin vehículo → se reparte según Pesos internos; lo que no esté en Pesos se mantiene
+function applyStrategy(M) {
+  const pesos = (raw.pesos && raw.pesos.length) ? raw.pesos : PESOS_DEF;
+  const pw = {}; pesos.forEach(p => { pw[String(p.activo).toLowerCase()] = num(p.peso_pct, 0); });
+  const assigned = new Set();
+  M.items.forEach(i => { i.hold = false; i.cw = i.objetivo; });
+  bandList().forEach(b => {
+    const tG = num(b.objetivo_pct, NaN);
+    const members = resolveMembers(M, b.miembros).filter(i => !assigned.has(i));
+    members.forEach(i => assigned.add(i));
+    if (!members.length || isNaN(tG)) return;
+    const live = members.filter(i => !i.retirado);
+    members.filter(i => i.retirado).forEach(i => { i.objetivo = 0; i.cw = 0; });
+    const veh = resolveMembers(M, b.vehiculo).filter(i => live.includes(i));
+    let traders;
+    if (veh.length) traders = veh.map(i => ({ i, w: pw[i.activo.toLowerCase()] ?? 1 }));
+    else {
+      const wm = live.filter(i => pw[i.activo.toLowerCase()] != null);
+      traders = wm.length ? wm.map(i => ({ i, w: pw[i.activo.toLowerCase()] })) : live.map(i => ({ i, w: i.objetivo || 1 }));
+    }
+    const tset = new Set(traders.map(t => t.i));
+    const holds = live.filter(i => !tset.has(i));
+    const holdPct = holds.reduce((a, i) => a + i.pct, 0);
+    holds.forEach(i => { i.objetivo = i.pct; i.hold = true; i.cw = 0; });
+    const wsum = traders.reduce((a, t) => a + t.w, 0), avail = Math.max(0, tG - holdPct);
+    traders.forEach(t => { const sh = wsum > 0 ? t.w / wsum : 1 / traders.length; t.i.objetivo = avail * sh; t.i.cw = tG * sh; });
+  });
+  ORDER.forEach(k => { const c = M.classes[k]; c.objetivo = c.items.reduce((a, i) => a + i.objetivo, 0); c.diff = c.pct - c.objetivo; });
+}
 let BD = [], ALERT = new Map();
 function bandsInfo(M) {
   if (!M.total) return [];
-  const list = (raw.bandas && raw.bandas.length) ? raw.bandas : BANDAS_DEF;
-  return list.map(b => {
-    const set = new Set();
-    String(b.miembros || '').split(/[,;]+/).map(t => t.trim()).filter(Boolean).forEach(t => {
-      const up = t.toUpperCase().replace(/\s+/g, '_');
-      const ck = up === 'CRIPTO' || up === 'BITCOIN' ? 'BITCOIN' : ['ACCIONES', 'FIBRAS', 'RENTA_FIJA'].includes(up) ? up : null;
-      if (ck) M.classes[ck].items.forEach(i => set.add(i));
-      else { const it = M.items.find(i => i.activo.toLowerCase() === t.toLowerCase()); if (it) set.add(it); }
-    });
-    const items = [...set];
+  return bandList().map(b => {
+    const items = resolveMembers(M, b.miembros);
     if (!items.length) return null;
     const actual = items.reduce((a, i) => a + i.pct, 0), target = items.reduce((a, i) => a + i.objetivo, 0), tol = num(b.tolerancia_pts, 5);
     const dev = actual - target;
@@ -501,10 +540,10 @@ function rateOf(it) {
   return num(J.rend_acciones_pct, 8);
 }
 function project(years, monthly) {
-  const n = Math.round(years * 12), sumObj = model.items.reduce((a, i) => a + i.objetivo, 0) || 1, out = {};
+  const n = Math.round(years * 12), sumObj = model.items.reduce((a, i) => a + (i.cw || 0), 0) || 1, out = {};
   let aport = 0;
   model.items.forEach(it => {
-    const m = Math.pow(1 + rateOf(it) / 100, 1 / 12) - 1, f = Math.pow(1 + m, n), c = monthly * it.objetivo / sumObj;
+    const m = Math.pow(1 + rateOf(it) / 100, 1 / 12) - 1, f = Math.pow(1 + m, n), c = monthly * (it.cw || 0) / sumObj;
     out[it.activo] = { valor: it.valor * f + (m ? c * (f - 1) / m : c * n), costo: it.costo + c * n };
     aport += c * n;
   });
@@ -560,7 +599,7 @@ function missionInfo() {
   let amt = 0;
   if (!it) {
     let best = -Infinity;
-    model.items.filter(i => i.objetivo > 0 && !i.retirado).forEach(c => { const sh = tot * c.objetivo / 100 - base(c.activo)[1]; if (sh > best) { best = sh; it = c; } });
+    model.items.filter(i => i.objetivo > 0 && !i.retirado && !i.hold).forEach(c => { const sh = tot * c.objetivo / 100 - base(c.activo)[1]; if (sh > best) { best = sh; it = c; } });
     amt = best;
   } else amt = tot * it.objetivo / 100 - base(it.activo)[1];
   if (!it) return { type: 'fundar', done: model.total > 0 };
@@ -645,6 +684,7 @@ function apply(d) {
   J = { ...JUEGO_DEF };
   Object.entries(d.juego || {}).forEach(([k, v]) => { if (v !== '' && v != null) J[k] = v; });
   model = buildModel(d);
+  applyStrategy(model);
   const nCrypto = model.classes.BITCOIN.items.length;
   CLS.BITCOIN.name = nCrypto > 1 ? 'Cripto' : 'Bitcoin';
   CLS.BITCOIN.how = nCrypto > 1
@@ -798,7 +838,7 @@ function renderStreak() {
     ['Misión del mes', MI.done],
     ['Capitán en la tormenta', ST.captain],
     ['Ceremonia completada', CE.done],
-    ['Ciudad completa', model.items.filter(i => i.objetivo > 0).every(i => i.valor > 0)]
+    ['Ciudad completa', model.items.filter(i => i.objetivo > 0 && !i.hold).every(i => i.valor > 0)]
   ];
   box.innerHTML = `<div class="phead"><h2>Racha de aportaciones</h2><span class="pill info">Mejor: ${ST.best} ${ST.best === 1 ? 'mes' : 'meses'}</span></div>
     <div class="streak"><span class="num">${ST.s}</span><span>${ST.s === 1 ? 'mes seguido' : 'meses seguidos'} construyendo</span></div>
@@ -822,15 +862,18 @@ function renderCeremony() {
     box.innerHTML = html; return;
   }
   const T0 = M.total, minMove = Math.max(200, T0 * 0.005);
-  const moves = M.items.map(it => ({ it, d: T0 * it.objetivo / 100 - it.valor })).filter(x => Math.abs(x.d) >= minMove).sort((a, b) => a.d - b.d);
-  const w = M.items.filter(i => i.objetivo > 0);
+  const moves = M.items.filter(it => !it.hold).map(it => ({ it, d: T0 * it.objetivo / 100 - it.valor })).filter(x => Math.abs(x.d) >= minMove).sort((a, b) => a.d - b.d);
+  const holds = M.items.filter(i => i.hold && i.valor > 0);
+  const w = M.items.filter(i => i.objetivo > 0 && !i.hold);
   const Tn = Math.max(T0, ...w.map(i => i.valor / (i.objetivo / 100)));
   const needNoSell = Math.max(0, Tn - T0);
   html += CE.done
     ? `<p class="mission-scene">Tu ciudad quedó en equilibrio. Todos los grupos están dentro de su banda.</p>`
-    : `<p class="muted" style="margin:0">Así quedaría tu ciudad en su forma ideal. Haz estos movimientos en tu casa de bolsa y luego captura tus nuevos saldos aquí; la ceremonia se completa cuando todos los barrios queden en rango.</p>`;
+    : `<p class="muted" style="margin:0">Así quedaría tu ciudad en su forma ideal. Haz estos movimientos en tu casa de bolsa y luego captura tus nuevos saldos aquí; la ceremonia se completa cuando todos los grupos queden dentro de su banda.</p>`;
   if (!CE.done && moves.length) {
-    html += `<div class="tbl"><table><thead><tr><th>Activo</th><th>Movimiento</th><th style="text-align:right">Monto</th></tr></thead><tbody>${moves.map(x => `<tr><td><span class="dot" style="--c:${CLS[x.it.key].color};margin-right:6px"></span>${esc(x.it.activo)}</td><td class="${x.d > 0 ? 'pos' : 'neg'}">${x.d > 0 ? 'Comprar' : 'Vender'}</td><td class="n">${mxn.format(Math.abs(x.d))}</td></tr>`).join('')}</tbody></table></div>`;
+    const unidades = x => { const p = +x.it.precio_mxn; if (x.it.key === 'RENTA_FIJA' || !p) return '—'; const u = Math.abs(x.d) / p; return x.it.key === 'BITCOIN' ? u.toFixed(5) : '≈ ' + Math.round(u); };
+    html += `<div class="tbl"><table><thead><tr><th>Activo</th><th>Movimiento</th><th style="text-align:right">Monto</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${moves.map(x => `<tr><td><span class="dot" style="--c:${CLS[x.it.key].color};margin-right:6px"></span>${esc(x.it.activo)}</td><td class="${x.d > 0 ? 'pos' : 'neg'}">${x.d > 0 ? 'Comprar' : 'Vender'}</td><td class="n">${mxn.format(Math.abs(x.d))}</td><td class="n muted">${unidades(x)}</td></tr>`).join('')}</tbody></table></div>`;
+    if (holds.length) html += `<p class="foot">${holds.map(i => esc(i.activo)).join(', ')} se mantienen como están: cuentan en su grupo, pero no se compran ni venden. El rebalanceo de cada grupo se hace con su vehículo (pestaña Bandas).</p>`;
     if (needNoSell > 0) html += `<p class="foot">Si prefieres no vender (y no pagar impuestos por ganancias), necesitarías aportar unos ${mxn.format(needNoSell)} repartidos con el simulador de al lado.</p>`;
   }
   html += `<ul class="tasks"><li class="on">Revisa los movimientos</li><li class="${ST.savedThisMonth ? 'on' : ''}">Captura tus nuevos saldos</li><li class="${CE.inRange ? 'on' : ''}">Deja todos los grupos dentro de su banda</li></ul>`;
@@ -860,7 +903,7 @@ function renderForm() {
                   : `<div class="frow"><span></span><span class="fhead">Títulos</span><span class="fhead">Precio promedio</span></div>`;
     its.forEach(it => {
       const p = it.pos || {}, id = idOf(it.activo);
-      const name = `<div class="fname"><b>${esc(it.activo)}${it.retirado ? ' <span class="empty-lot">ya no en el plan</span>' : ''}${it.privado ? ' <span class="empty-lot" style="color:var(--ren)">solo tú</span>' : ''}</b><span>${esc(it.descripcion || '')}</span></div>`;
+      const name = `<div class="fname"><b>${esc(it.activo)}${it.retirado ? ' <span class="empty-lot">ya no en el plan</span>' : ''}${it.privado ? ' <span class="empty-lot" style="color:var(--ren)">solo tú</span>' : ''}${it.hold ? ' <span class="empty-lot" style="color:var(--muted)">se mantiene</span>' : ''}</b><span>${esc(it.descripcion || '')}</span></div>`;
       html += renta
         ? `<div class="frow renta">${name}<input id="${id}_s" type="number" min="0" step="any" inputmode="decimal" placeholder="0" value="${p.saldo ?? ''}" aria-label="Saldo de ${esc(it.activo)}"></div>`
         : `<div class="frow">${name}<input id="${id}_t" type="number" min="0" step="any" inputmode="decimal" placeholder="0" value="${p.titulos ?? ''}" aria-label="Títulos de ${esc(it.activo)}"><input id="${id}_p" type="number" min="0" step="any" inputmode="decimal" placeholder="0.00" value="${p.precio_promedio ?? ''}" aria-label="Precio promedio de ${esc(it.activo)}"></div>`;
@@ -894,7 +937,7 @@ $('pfForm').addEventListener('submit', async e => {
 
 function renderSim() {
   const amt = Math.max(0, Number($('simAmt').value) || 0), M = model, out = $('simOut');
-  const cands = M.items.filter(i => i.objetivo > 0);
+  const cands = M.items.filter(i => i.objetivo > 0 && !i.hold);
   if (!amt || !cands.length) { out.innerHTML = ''; return; }
   const newTotal = M.total + amt;
   const need = cands.map(i => ({ i, need: Math.max(0, newTotal * i.objetivo / 100 - i.valor) }));
@@ -975,7 +1018,7 @@ function renderZoom() {
       return `<div class="zrow" tabindex="0" role="option" aria-selected="${selected === it.activo}" data-a="${esc(it.activo)}">
         <div style="min-width:0"><b>${esc(it.activo)}${it.key === 'RENTA_FIJA' ? ' · ' + OBRA[kindOf(k, it)] : ''}</b><span class="zd">${it.valor > 0 ? esc(it.descripcion || '') : '<span class="empty-lot">Lote por construir</span>'}</span></div>
         <div class="n ${chgCls}">${chg}${it.valor > 0 && it.key !== 'RENTA_FIJA' ? `<br><span class="${it.hoy >= 0 ? 'pos' : 'neg'}">${signed2(it.hoy)}</span>` : ''}</div>
-        <div class="n">${mxn.format(it.valor)}<br><span class="muted">${pct1(it.pct)} de ${pct1(it.objetivo)}</span></div>
+        <div class="n">${mxn.format(it.valor)}<br><span class="muted">${it.hold ? pct1(it.pct) + ' · se mantiene' : pct1(it.pct) + ' de ' + pct1(it.objetivo)}</span></div>
       </div>`;
     }).join('')}</div>`;
   box.querySelectorAll('.zrow').forEach(r => {
@@ -1208,7 +1251,7 @@ function torre(b, plaza) {
 const doorOf = b => b.kind === 'nave' ? b.x + b.w * .35 : b.x + b.w / 2;
 
 function obra(b) {
-  const periods = { calle: 6, puente: 10, escuela: 13, hospital: 16, tesoreria: 5 };
+  const periods = { calle: 6, carretera: 9, puente: 10, escuela: 13, hospital: 16, tesoreria: 5 };
   const per = periods[b.kind] || 12, tt = T + b.seed * 3.7, cyc = Math.floor(tt / per), p = (tt % per) / per;
   if (b.cyc !== cyc) {
     if (b.cyc >= 0 && b.owned) {
@@ -1218,7 +1261,7 @@ function obra(b) {
     b.cyc = cyc;
   }
   const done = p > .82, cx = b.x + b.w / 2;
-  if (b.kind === 'calle') {
+  if (b.kind === 'calle' || b.kind === 'carretera') {
     const len = b.w * Math.min(1, p / .82);
     ctx.fillStyle = '#4a4f6d'; ctx.fillRect(b.x, G - 4, b.w, 4);
     ctx.fillStyle = '#1b1f33'; ctx.fillRect(b.x, G - 4, len, 4);
@@ -1229,7 +1272,7 @@ function obra(b) {
     for (let i = 0; i < 3; i++) { ctx.fillStyle = '#ff9f43'; ctx.beginPath(); ctx.moveTo(b.x + b.w - 6 - i * 7, G - 8); ctx.lineTo(b.x + b.w - 3.5 - i * 7, G - 1); ctx.lineTo(b.x + b.w - 8.5 - i * 7, G - 1); ctx.fill(); }
     person(rx - 16, G + 8, '#ff9f43', T * 6, true);
     ctx.fillStyle = '#cfd6e6'; ctx.fillRect(b.x + 3, G - b.h, 1.5, b.h - 4);
-    ctx.fillStyle = '#4fc3b0'; rr(b.x + 1, G - b.h, Math.min(b.w - 2, 34), 10, 2); ctx.fill(); text('CALLES', b.x + 1 + Math.min(b.w - 2, 34) / 2, G - b.h + 7.5, 6, '#08201d');
+    ctx.fillStyle = '#4fc3b0'; rr(b.x + 1, G - b.h, Math.min(b.w - 2, 34), 10, 2); ctx.fill(); text(b.kind === 'carretera' ? 'CARRETERA' : 'CALLES', b.x + 1 + Math.min(b.w - 2, 34) / 2, G - b.h + 7.5, b.kind === 'carretera' ? 5 : 6, '#08201d');
     return;
   }
   if (b.kind === 'puente') {
