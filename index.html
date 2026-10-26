@@ -110,6 +110,12 @@ canvas{display:block;width:100%;cursor:pointer;touch-action:manipulation}
 /* Paneles */
 section.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .phead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
+.phead h2{margin-right:auto}
+.pbody{display:flex;flex-direction:column;gap:12px;min-width:0}
+.psum{display:none;margin:0;font-size:14px;color:var(--muted)}
+.psum b{color:var(--fg)}
+.panel.collapsed .psum{display:block}
+.panel.collapsed .pbody{display:none}
 .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
 @media (max-width:400px){.two{grid-template-columns:1fr}}
 .pill{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
@@ -228,17 +234,6 @@ td.n{font-family:var(--f-data);text-align:right;font-variant-numeric:tabular-num
 
     <section class="panel" id="bands"></section>
 
-    <section class="panel" id="tm">
-      <div class="phead"><h2>Máquina del tiempo</h2><span class="pill info" id="tmLvl"></span></div>
-      <div class="tmctl">
-        <label class="tmr" for="tmYears">Viajar al futuro: <b id="tmYearsOut">hoy</b><input type="range" id="tmYears" min="0" max="30" step="1" value="0"></label>
-        <label for="tmAport">Aportación mensual<input id="tmAport" type="number" min="0" step="500" inputmode="decimal"></label>
-        <button id="tmPlay" type="button">Ver crecer</button>
-        <button id="tmNow" type="button" class="ghost">Volver a hoy</button>
-      </div>
-      <div id="tmOut"></div>
-      <p class="foot" id="tmNote"></p>
-    </section>
 
     <div class="two">
       <section class="panel" id="mission"></section>
@@ -671,7 +666,6 @@ async function logout(expired) {
 function resetState() {
   raw = null; model = null; view = null; zones = {}; travelYears = 0; focus = null; selected = null;
   firstApply = true; MI = null; CE = null; ST = null; EV = null;
-  $('tmAport').value = ''; $('tmYears').value = 0;
   clearInterval(setTravel._p);
 }
 function showApp() { $('login').hidden = true; $('app').hidden = false; sessionStart = performance.now(); resize(); }
@@ -704,7 +698,6 @@ function apply(d) {
   firstApply = false;
   $('whoName').textContent = 'Hola, ' + (d.nombre || '');
   $('sampleTag').hidden = !DEMO;
-  if (!$('tmAport').value) $('tmAport').value = Math.round((ST.avg || 5000) / 500) * 500 || 5000;
   setTravel(travelYears, true);
   renderAll();
 }
@@ -751,6 +744,22 @@ function renderAll() {
   renderForm(); renderSim(); renderZoom(); renderTm(); renderCalc();
 }
 
+const colState = {};
+function collapsible(box, key, summary, defCollapsed) {
+  const head = box.querySelector('.phead');
+  if (!head) return;
+  const body = document.createElement('div'); body.className = 'pbody';
+  while (head.nextSibling) body.appendChild(head.nextSibling);
+  box.appendChild(body);
+  let col = colState[key];
+  if (col === undefined) { col = defCollapsed; try { const v = localStorage.getItem('cm_col_' + key); if (v !== null) col = v === '1'; } catch (_) {} }
+  const sum = document.createElement('p'); sum.className = 'psum'; sum.innerHTML = summary; head.after(sum);
+  const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'ghost small';
+  const set = c => { colState[key] = c; box.classList.toggle('collapsed', c); btn.textContent = c ? 'Mostrar' : 'Minimizar'; btn.setAttribute('aria-expanded', String(!c)); };
+  btn.onclick = () => { const c = !box.classList.contains('collapsed'); set(c); try { localStorage.setItem('cm_col_' + key, c ? '1' : '0'); } catch (_) {} };
+  head.appendChild(btn); set(col);
+}
+
 function bandColor(b) { const it = b.items[0]; return it ? CLS[it.key].color : 'var(--acc)'; }
 function renderBands() {
   const box = $('bands');
@@ -772,10 +781,17 @@ function renderBands() {
       </div>`;
     }).join('')}</div>
     <p class="foot">La franja verde es la tolerancia que definiste en la pestaña Bandas. Las bandas se miden en puntos del portafolio total.</p>`;
+  const al = BD.filter(b => b.state === 'over' || b.state === 'under');
+  collapsible(box, 'bands', al.length ? 'Fuera de su banda: <b>' + al.map(b => esc(b.name)).join(', ') + '</b>.' : 'Todos los grupos están dentro de su banda.', false);
 }
 
 function renderEvents() {
   const out = [];
+  if (!DEMO && raw) {
+    const okB = (raw.bandas || []).some(b => b.objetivo_pct != null && b.objetivo_pct !== '');
+    const okP = (raw.pesos || []).length > 0;
+    if (!okB || !okP) out.push(`<div class="ev" style="--c:var(--warn)"><span class="dot"></span><div><b>La página no está leyendo tu ${!okB && !okP ? 'pestaña Bandas ni Pesos internos' : !okB ? 'pestaña Bandas (objetivo_pct)' : 'pestaña Pesos internos'}</b><span>Está usando valores de ejemplo para el rebalanceo. Publica la versión más reciente del script: Implementar → Administrar implementaciones → editar (lápiz) → Versión: Nueva versión → Implementar.</span></div></div>`);
+  }
   BD.filter(b => b.state === 'over' || b.state === 'under').forEach(b => {
     const title = b.state === 'over' ? `¡${b.name}: sobrepoblado!` : `¡${b.name} se está quedando vacío!`;
     const msg = b.msg ? esc(b.msg) : b.state === 'over'
@@ -821,6 +837,7 @@ function renderMission() {
   <div><button type="button" class="small" id="goForm">Ir a capturar</button></div>`;
   box.innerHTML = html;
   $('goForm').onclick = () => $('portafolio').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  collapsible(box, 'mission', MI.type === 'fundar' ? 'Funda tu ciudad: captura tu portafolio.' : `${MI.done ? '<b>¡Cumplida!</b> ' : ''}Aporta alrededor de <b>${mxn.format(MI.amt)}</b> a <b>${esc(MI.it.activo)}</b>.`, true);
 }
 
 function renderStreak() {
@@ -847,6 +864,7 @@ function renderStreak() {
     <h2 style="font-size:15px;margin-top:4px">Logros</h2>
     <div class="ach">${ach.map(([t, on]) => `<div class="${on ? 'on' : ''}">${t}</div>`).join('')}</div>
     <p class="foot">La racha cuenta los meses en que aumentaste lo invertido. Captura tus saldos al menos una vez al mes.</p>`;
+  collapsible(box, 'streak', `<b>${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}</b> seguidos · mejor ${ST.best} · ${ST.thisMonth ? 'este mes ya cuenta' : 'falta tu aportación de este mes'}`, true);
 }
 
 function renderCeremony() {
@@ -859,14 +877,16 @@ function renderCeremony() {
     html += out.length
       ? '<p style="margin:0;font-weight:700">Mientras tanto, esto se salió de su banda:</p><ul class="list">' + out.map(b => `<li>${esc(b.name)}: tiene ${pct1(b.actual)} y lo ideal es ${pct1(b.target)} ± ${b.tol}.</li>`).join('') + '</ul><p class="foot">Lo más sencillo es dirigir tus aportaciones nuevas al barrio que falta, sin vender. La misión del mes ya te dice a dónde.</p>'
       : `<p style="margin:0">Todos los grupos están dentro de su banda.</p>`;
-    box.innerHTML = html; return;
+    box.innerHTML = html;
+    collapsible(box, 'ceremony', CE.next ? `Próxima ceremonia: <b>${fechaLarga(CE.next)}</b>.` : 'Sin fecha.', false); return;
   }
   const T0 = M.total, minMove = Math.max(200, T0 * 0.005);
   const moves = M.items.filter(it => !it.hold).map(it => ({ it, d: T0 * it.objetivo / 100 - it.valor })).filter(x => Math.abs(x.d) >= minMove).sort((a, b) => a.d - b.d);
   const holds = M.items.filter(i => i.hold && i.valor > 0);
-  const w = M.items.filter(i => i.objetivo > 0 && !i.hold);
-  const Tn = Math.max(T0, ...w.map(i => i.valor / (i.objetivo / 100)));
-  const needNoSell = Math.max(0, Tn - T0);
+  // sin vender: cuánto habría que aportar para que todos los grupos regresen a su banda
+  const overT = Math.max(T0, ...BD.filter(b => b.state === 'over').map(b => (b.actual / 100 * T0) / ((b.target + b.tol) / 100)));
+  const underSum = BD.filter(b => b.state === 'under').reduce((a, b) => a + b.toLimit, 0);
+  const needNoSell = Math.max(overT - T0, underSum);
   html += CE.done
     ? `<p class="mission-scene">Tu ciudad quedó en equilibrio. Todos los grupos están dentro de su banda.</p>`
     : `<p class="muted" style="margin:0">Así quedaría tu ciudad en su forma ideal. Haz estos movimientos en tu casa de bolsa y luego captura tus nuevos saldos aquí; la ceremonia se completa cuando todos los grupos queden dentro de su banda.</p>`;
@@ -874,10 +894,11 @@ function renderCeremony() {
     const unidades = x => { const p = +x.it.precio_mxn; if (x.it.key === 'RENTA_FIJA' || !p) return '—'; const u = Math.abs(x.d) / p; return x.it.key === 'BITCOIN' ? u.toFixed(5) : '≈ ' + Math.round(u); };
     html += `<div class="tbl"><table><thead><tr><th>Activo</th><th>Movimiento</th><th style="text-align:right">Monto</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${moves.map(x => `<tr><td><span class="dot" style="--c:${CLS[x.it.key].color};margin-right:6px"></span>${esc(x.it.activo)}</td><td class="${x.d > 0 ? 'pos' : 'neg'}">${x.d > 0 ? 'Comprar' : 'Vender'}</td><td class="n">${mxn.format(Math.abs(x.d))}</td><td class="n muted">${unidades(x)}</td></tr>`).join('')}</tbody></table></div>`;
     if (holds.length) html += `<p class="foot">${holds.map(i => esc(i.activo)).join(', ')} se mantienen como están: cuentan en su grupo, pero no se compran ni venden. El rebalanceo de cada grupo se hace con su vehículo (pestaña Bandas).</p>`;
-    if (needNoSell > 0) html += `<p class="foot">Si prefieres no vender (y no pagar impuestos por ganancias), necesitarías aportar unos ${mxn.format(needNoSell)} repartidos con el simulador de al lado.</p>`;
+    if (needNoSell > 0) html += `<p class="foot">Si prefieres no vender (y no pagar impuestos por ganancias): aportando unos ${mxn.format(needNoSell)} a lo que falta, todos los grupos regresan a su banda. El simulador de al lado te dice en qué orden.</p>`;
   }
   html += `<ul class="tasks"><li class="on">Revisa los movimientos</li><li class="${ST.savedThisMonth ? 'on' : ''}">Captura tus nuevos saldos</li><li class="${CE.inRange ? 'on' : ''}">Deja todos los grupos dentro de su banda</li></ul>`;
   box.innerHTML = html;
+  collapsible(box, 'ceremony', CE.done ? '<b>Completada.</b> Tu ciudad quedó en equilibrio.' : `<b>Este mes.</b> ${moves.length} movimientos sugeridos.`, false);
 }
 
 function renderCalc() {
@@ -939,64 +960,30 @@ function renderSim() {
   const amt = Math.max(0, Number($('simAmt').value) || 0), M = model, out = $('simOut');
   const cands = M.items.filter(i => i.objetivo > 0 && !i.hold);
   if (!amt || !cands.length) { out.innerHTML = ''; return; }
+  // Prioridad: primero lo que más le falta (en pesos) para llegar a su ideal con el nuevo total
   const newTotal = M.total + amt;
-  const need = cands.map(i => ({ i, need: Math.max(0, newTotal * i.objetivo / 100 - i.valor) }));
-  const sumNeed = need.reduce((a, x) => a + x.need, 0), sumObj = cands.reduce((a, i) => a + i.objetivo, 0);
-  need.forEach(x => { x.amt = sumNeed >= amt ? amt * x.need / sumNeed : x.need + (amt - sumNeed) * x.i.objetivo / sumObj; });
-  const rows = need.filter(x => x.amt >= 1).sort((a, b) => b.amt - a.amt);
-  out.innerHTML = `<div class="tbl"><table><thead><tr><th>Activo</th><th style="text-align:right">Monto</th><th style="text-align:right">Aprox.</th></tr></thead><tbody>` +
-    rows.map(x => {
-      const p = x.i.precio_mxn;
-      const aprox = x.i.key === 'RENTA_FIJA' ? 'saldo' : (p ? (x.i.key === 'BITCOIN' ? (x.amt / p).toFixed(5) + ' ' + (/eth/i.test(x.i.activo) ? 'ETH' : /sol/i.test(x.i.activo) ? 'SOL' : 'BTC') : Math.floor(x.amt / p) + ' títulos') : '—');
-      return `<tr><td><span class="dot" style="--c:${CLS[x.i.key].color};margin-right:6px"></span>${esc(x.i.activo)}</td><td class="n">${mxn.format(x.amt)}</td><td class="n muted">${aprox}</td></tr>`;
-    }).join('') + `</tbody></table></div><p class="foot" style="margin-top:6px">Reparto para acercar cada activo a su porcentaje ideal. Los títulos son aproximados con el precio de hoy.</p>`;
+  const ranked = cands.map(i => ({ i, gap: newTotal * i.objetivo / 100 - i.valor })).filter(x => x.gap > 1).sort((a, b) => b.gap - a.gap);
+  let left = amt;
+  ranked.forEach(x => { x.amt = Math.min(x.gap, left); left -= x.amt; });
+  if (left > 1) { const so = cands.reduce((a, i) => a + i.objetivo, 0) || 1; cands.forEach(i => { const r = ranked.find(x => x.i === i) || (ranked.push({ i, gap: 0, amt: 0 }), ranked[ranked.length - 1]); r.amt += left * i.objetivo / so; }); }
+  const units = x => {
+    const p = +x.i.precio_mxn;
+    if (x.i.key === 'RENTA_FIJA') return 'saldo';
+    if (!p) return '—';
+    if (x.i.key === 'BITCOIN') return (x.amt / p).toFixed(5) + ' ' + (/eth/i.test(x.i.activo) ? 'ETH' : /sol/i.test(x.i.activo) ? 'SOL' : 'BTC');
+    const n = Math.floor(x.amt / p);
+    return n ? n + (n === 1 ? ' título' : ' títulos') : `0 (cada uno cuesta ${mxn.format(p)})`;
+  };
+  out.innerHTML = `<div class="tbl"><table><thead><tr><th>#</th><th>Activo</th><th style="text-align:right">Le falta</th><th style="text-align:right">Invierte</th><th style="text-align:right">Aprox.</th></tr></thead><tbody>` +
+    ranked.map((x, n) => `<tr style="${x.amt < 1 ? 'opacity:.5' : ''}"><td class="n muted">${n + 1}</td><td><span class="dot" style="--c:${CLS[x.i.key].color};margin-right:6px"></span>${esc(x.i.activo)}</td><td class="n">${x.gap > 0 ? mxn.format(x.gap) : '—'}</td><td class="n ${x.amt >= 1 ? 'pos' : ''}">${x.amt >= 1 ? mxn.format(x.amt) : '—'}</td><td class="n muted">${x.amt >= 1 ? units(x) : ''}</td></tr>`).join('') +
+    `</tbody></table></div><p class="foot" style="margin-top:6px">Ordenado de lo que más hace falta a lo que menos. El dinero llena primero el #1, luego el #2 y así hasta acabarse. Los activos que solo se mantienen no aparecen. Títulos aproximados con el precio de hoy.</p>`;
 }
 $('btnSim').addEventListener('click', renderSim);
 $('simAmt').addEventListener('keydown', e => { if (e.key === 'Enter') renderSim(); });
 
-// ---------- máquina del tiempo ----------
-let tmProj = null;
-function setTravel(years, silent) {
-  travelYears = years;
-  $('tmYears').value = years;
-  if (years > 0) {
-    tmProj = project(years, Math.max(0, Number($('tmAport').value) || 0));
-    view = buildModel(raw, tmProj.out);
-  } else { tmProj = null; view = model; }
-  layout();
-  if (!silent) renderTm();
-}
-function renderTm() {
-  const y = travelYears, now = new Date(), lvNow = levelOf(model.total);
-  $('tmYearsOut').textContent = y ? `${y} ${y === 1 ? 'año' : 'años'} (${now.getFullYear() + y})` : 'hoy';
-  const lv = levelOf(view.total);
-  $('tmLvl').textContent = 'Nivel: ' + lv.name;
-  $('lvlTag').textContent = y ? `Año ${now.getFullYear() + y} · ${lv.name}` : `Nivel: ${lvNow.name}`;
-  const inf = num(J.inflacion_pct, 4);
-  if (!y) {
-    $('tmOut').innerHTML = `<p style="margin:0">Mueve la barra para ver cómo crece tu ciudad si sigues aportando cada mes. ${lvNow.next ? `Hoy eres nivel <b>${lvNow.name}</b>; para llegar a <b>${lvNow.next[1]}</b> te faltan ${mxn.format(lvNow.next[0] - model.total)}.` : `Ya llegaste al nivel más alto: <b>${lvNow.name}</b>.`}</p>`;
-  } else {
-    const real = view.total / Math.pow(1 + inf / 100, y), aport = tmProj.aport, puesto = model.total + aport, interes = view.total - puesto;
-    $('tmOut').innerHTML = `<div class="tmout">
-      <div class="stat"><div class="k">Tu ciudad valdría</div><div class="v pos">${mxn.format(view.total)}</div></div>
-      <div class="stat"><div class="k">En pesos de hoy</div><div class="v">${mxn.format(real)}</div></div>
-      <div class="stat"><div class="k">Lo que tú pusiste</div><div class="v">${mxn.format(puesto)}</div></div>
-      <div class="stat"><div class="k">Lo que puso el interés</div><div class="v" style="color:var(--acc)">${mxn.format(interes)}</div></div>
-    </div>`;
-  }
-  $('tmNote').textContent = `Supone rendimientos anuales constantes: acciones ${num(J.rend_acciones_pct, 8)}%, FIBRAs ${num(J.rend_fibras_pct, 8)}%, bitcoin ${num(J.rend_bitcoin_pct, 10)}% y renta fija a su tasa actual, con inflación de ${inf}%. Las aportaciones se reparten según los porcentajes ideales. Es un escenario, no una promesa.`;
-}
-$('tmYears').addEventListener('input', e => setTravel(+e.target.value));
-$('tmAport').addEventListener('input', () => { if (travelYears) setTravel(travelYears); });
-$('tmNow').addEventListener('click', () => setTravel(0));
-$('tmPlay').addEventListener('click', () => {
-  const target = travelYears || 20;
-  if (reduce) { setTravel(target); return; }
-  let y = 0; setTravel(0);
-  clearInterval(setTravel._p);
-  setTravel._p = setInterval(() => { y++; setTravel(y); if (y >= target) clearInterval(setTravel._p); }, Math.max(90, 2400 / target));
-  $('stage').scrollIntoView({ behavior: 'smooth', block: 'center' });
-});
+// ---------- nivel de la ciudad (la máquina del tiempo se quitó) ----------
+function setTravel(years, silent) { travelYears = 0; view = model; layout(); if (!silent) renderTm(); }
+function renderTm() { $('lvlTag').textContent = 'Nivel: ' + levelOf(model.total).name; }
 
 function renderZoom() {
   const box = $('zoominfo');
