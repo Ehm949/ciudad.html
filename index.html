@@ -241,6 +241,7 @@ td.n{font-family:var(--f-data);text-align:right;font-variant-numeric:tabular-num
     <section class="panel" id="portafolio">
       <h2>Mi portafolio</h2>
       <p class="muted" style="margin:0">Captura cuántos títulos tienes y a qué precio promedio compraste. En renta fija, solo tu saldo. Deja vacío lo que no tengas. Actualízalo al menos una vez al mes para mantener tu racha.</p>
+      <details id="calcBox"><summary style="cursor:pointer;font-weight:700">Así se calcula el valor de tu ciudad</summary><div id="calc" style="margin-top:10px"></div></details>
       <form id="pfForm" style="display:flex;flex-direction:column;gap:14px"></form>
     </section>
     <p class="foot">Ciudad Marea es una herramienta para visualizar tu portafolio. Las animaciones son representaciones y las proyecciones suponen rendimientos constantes; no son una promesa de resultados.</p>
@@ -648,11 +649,13 @@ function renderAll() {
   }).join('');
 
   renderMission(); renderStreak(); renderCeremony();
-  renderForm(); renderSim(); renderZoom(); renderTm();
+  renderForm(); renderSim(); renderZoom(); renderTm(); renderCalc();
 }
 
 function renderEvents() {
   const out = [];
+  const sinPrecio = model.items.filter(i => i.key !== 'RENTA_FIJA' && i.pos && (+i.pos.titulos > 0) && !(+i.precio_mxn > 0));
+  if (sinPrecio.length) out.push(`<div class="ev" style="--c:var(--warn)"><span class="dot"></span><div><b>Sin precio hoy: ${sinPrecio.map(i => esc(i.activo)).join(', ')}</b><span>No pude leer su precio, así que su valor cuenta como $0 en tu ciudad. Revisa su ticker en la pestaña Config de la hoja.</span></div></div>`);
   EV.storms.forEach(s => out.push(`<div class="ev" style="--c:var(--bad)"><span class="dot"></span><div><b>Tormenta en ${CLS[s.k].scene.toLowerCase()}</b><span>${s.pct != null ? `${CLS[s.k].name} baja ${pct1(Math.abs(s.pct))} hoy. ` : esc(s.msg || '') + ' '}Los capitanes no venden en tormenta: tu plan ya cuenta con días así. Si aguantas, ganas el logro "Capitán en la tormenta".</span></div></div>`));
   EV.rentas.forEach(e => {
     const name = e.it ? e.it.activo : CLS[classKey(e.objetivo || 'fibra')].name;
@@ -744,6 +747,17 @@ function renderCeremony() {
   }
   html += `<ul class="tasks"><li class="on">Revisa los movimientos</li><li class="${ST.savedThisMonth ? 'on' : ''}">Captura tus nuevos saldos</li><li class="${CE.inRange ? 'on' : ''}">Deja todos los barrios en rango</li></ul>`;
   box.innerHTML = html;
+}
+
+function renderCalc() {
+  const rows = model.items.filter(i => i.pos);
+  if (!rows.length) { $('calc').innerHTML = '<p class="muted" style="margin:0">Todavía no has capturado posiciones.</p>'; return; }
+  const f = v => v == null || v === '' ? '—' : mxn2.format(+v);
+  $('calc').innerHTML = `<div class="tbl"><table><thead><tr><th>Activo</th><th style="text-align:right">Títulos</th><th style="text-align:right">Precio hoy (MXN)</th><th style="text-align:right">Valor</th><th style="text-align:right">Tu precio promedio</th><th style="text-align:right">Costo</th></tr></thead><tbody>${rows.map(i => {
+    const renta = i.key === 'RENTA_FIJA', miss = !renta && !(+i.precio_mxn > 0);
+    return `<tr><td>${esc(i.activo)}</td><td class="n">${renta ? 'saldo' : (+i.pos.titulos).toLocaleString('es-MX', { maximumFractionDigits: 8 })}</td><td class="n ${miss ? 'neg' : ''}">${renta ? '—' : miss ? 'sin precio' : f(i.precio_mxn)}</td><td class="n">${f(i.valor)}</td><td class="n muted">${renta ? '—' : f(i.pos.precio_promedio)}</td><td class="n muted">${f(i.costo)}</td></tr>`;
+  }).join('')}<tr><td><b>Total</b></td><td></td><td></td><td class="n"><b>${mxn2.format(model.total)}</b></td><td></td><td class="n"><b>${mxn2.format(model.costo)}</b></td></tr></tbody></table></div>
+  <p class="foot" style="margin-top:6px">Valor = títulos × precio de hoy en pesos. Los ETFs en dólares se convierten con el tipo de cambio de tu hoja. Costo = títulos × tu precio promedio, que debe estar en pesos. No incluye efectivo sin invertir en tu casa de bolsa.</p>`;
 }
 
 function renderForm() {
