@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Casino del Pueblo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Figtree:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#071a15; --bg2:#0b2620; --panel:#0f3129; --panel2:#143d33; --line:#1f5243; --fg:#f4efe2; --muted:#a9c2b7;
+  --gold:#f2c14e; --gold2:#d99a1e; --ok:#5dd39e; --bad:#ff7a7a; --warn:#ffb454; --live:#ff5d73; --info:#7fb8ff;
+  --f-display:'Bungee','Arial Black',Impact,sans-serif; --f-body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif; --f-data:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+html{background:var(--bg)}
+body{background:radial-gradient(1200px 600px at 50% -200px,#145040 0%,var(--bg2) 45%,var(--bg) 100%) fixed;color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45;min-height:100vh}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:10px 16px;font-weight:700;background:var(--gold);color:#2a1a00}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+input{font:inherit;background:#06140f;color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+input:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+a{color:var(--gold)}
+.wrap{max-width:1000px;margin:0 auto;padding:16px 16px 140px;display:flex;flex-direction:column;gap:14px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.n{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+.pos{color:var(--ok)}.neg{color:var(--bad)}.muted{color:var(--muted)}
+/* encabezado */
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.chip{width:44px;height:44px;border-radius:50%;flex:none;background:repeating-conic-gradient(var(--gold) 0 30deg,#b7212f 30deg 60deg);display:grid;place-items:center;box-shadow:0 0 0 3px #071a15,0 0 0 5px var(--gold)}
+.chip::after{content:"";width:26px;height:26px;border-radius:50%;background:#0f3129;border:2px dashed var(--gold)}
+.brand h1{font-family:var(--f-display);font-weight:400;margin:0;font-size:24px;line-height:1;color:var(--gold);letter-spacing:.02em}
+.brand p{margin:2px 0 0;font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.who{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.who a{font-weight:800;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:10px;color:var(--fg)}
+/* saldo */
+.bal{background:linear-gradient(135deg,#1a4a3c,#0f3129 60%);border:1px solid #2c6a56;border-radius:16px;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 18px;align-items:end;position:relative;overflow:hidden}
+.bal::before{content:"";position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:repeating-conic-gradient(rgba(242,193,78,.12) 0 15deg,transparent 15deg 30deg)}
+.bal .k{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.bal .v{font-family:var(--f-display);font-size:40px;line-height:1;color:var(--gold)}
+.bal .v small{font-family:var(--f-body);font-size:15px;font-weight:700;color:var(--fg);margin-left:6px}
+.bal .src{grid-column:1/-1;margin:4px 0 0;font-size:13px;color:var(--fg)}
+.bal .lim{text-align:right;font-size:13px;color:var(--muted);position:relative}
+.bal .lim b{display:block;color:var(--fg);font-size:16px}
+.note{font-size:12px;color:var(--muted);margin:0}
+/* pestañas */
+.tabs{display:flex;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;position:sticky;top:8px;z-index:5}
+.tabs button{flex:1;background:transparent;color:var(--muted);padding:9px 10px;font-size:14px}
+.tabs button[aria-selected=true]{background:var(--panel2);color:var(--fg);box-shadow:inset 0 -2px 0 var(--gold)}
+.tabs .cnt{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:10px;background:var(--gold);color:#2a1a00;font-size:11px;line-height:18px}
+/* partidos */
+.day{font-family:var(--f-display);font-weight:400;font-size:15px;letter-spacing:.03em;color:var(--gold);margin:8px 0 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:12px}
+.mt{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.mt.mine{border-color:#3d7a63}
+.mt-h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);color:var(--muted)}
+.pill.live{color:#fff;background:var(--live);border-color:var(--live)}
+.pill.live::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1s infinite}
+.pill.fin{color:var(--fg)}.pill.cancel{color:var(--warn);border-color:var(--warn)}
+.pill.won{color:#06140f;background:var(--ok);border-color:var(--ok)}.pill.lost{color:var(--bad);border-color:var(--bad)}.pill.open{color:var(--gold);border-color:var(--gold)}.pill.void{color:var(--warn);border-color:var(--warn)}
+@keyframes blink{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.pill.live::before{animation:none}}
+.teams{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:center}
+.tm{display:flex;align-items:center;gap:10px;min-width:0}
+.tm.r{flex-direction:row-reverse;text-align:right}
+.tm .nm{min-width:0}
+.tm b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tm small{display:block;font-size:12px;color:var(--muted)}
+.logo{width:38px;height:38px;flex:none;border-radius:50%;object-fit:contain;background:#fff1;padding:3px}
+.badge{width:38px;height:38px;flex:none;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px;color:#fff;background:var(--c);border:2px solid #ffffff40}
+.sc{font-family:var(--f-display);font-size:26px;line-height:1;min-width:64px;text-align:center}
+.sc.vs{font-size:14px;color:var(--muted)}
+.odds{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.odd{display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--panel2);color:var(--fg);border:1px solid var(--line);padding:7px 6px;border-radius:10px;font-weight:600}
+.odd span{font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.odd b{font-family:var(--f-data);font-size:16px;color:var(--gold)}
+.odd[aria-pressed=true]{background:var(--gold);border-color:var(--gold)}.odd[aria-pressed=true] span,.odd[aria-pressed=true] b{color:#2a1a00}
+.odd.hit{border-color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok)}.odd.hit span::after{content:" ✓";color:var(--ok)}
+.odd:disabled{opacity:1;cursor:default}.odd:disabled:not(.hit){opacity:.55}
+.mine-l{font-size:12px;color:var(--gold);font-weight:700;margin:0}
+.more{background:transparent;color:var(--muted);padding:2px 0;font-size:13px;align-self:flex-start;border-radius:6px}
+.more[aria-expanded=true]{color:var(--fg)}
+.det{display:flex;flex-direction:column;gap:10px;border-top:1px dashed var(--line);padding-top:10px}
+.pbar{display:flex;height:22px;border-radius:7px;overflow:hidden;font-size:11px;font-weight:800}
+.pbar i{display:flex;align-items:center;justify-content:center;font-style:normal;color:#06140f;min-width:0;white-space:nowrap;overflow:hidden}
+.cmp{width:100%;border-collapse:collapse;font-size:13px}
+.cmp td{padding:3px 4px;text-align:center}.cmp td:first-child{text-align:left;font-weight:700}.cmp td:last-child{text-align:right;font-weight:700}
+.cmp tr+tr td{border-top:1px solid #ffffff10}
+.cmp .lab{color:var(--muted)}
+.form{display:inline-flex;gap:3px}
+.form i{width:16px;height:16px;border-radius:4px;display:grid;place-items:center;font-size:10px;font-style:normal;font-weight:800;color:#06140f}
+.form .w{background:var(--ok)}.form .d{background:#c9d4cf}.form .l{background:var(--bad)}
+.sbar{display:grid;grid-template-columns:3.2em minmax(0,1fr) 3.2em;gap:8px;align-items:center;font-size:13px}
+.sbar .bars{display:flex;flex-direction:column;gap:2px}
+.sbar .bars em{font-style:normal;font-size:11px;color:var(--muted);text-align:center}
+.sbar .bars div{display:flex;height:7px;border-radius:4px;overflow:hidden;background:#ffffff14}
+.sbar .bars div i{display:block;height:100%}
+.goals{margin:0;padding-left:18px;font-size:13px}
+/* boleto */
+.slip{position:fixed;left:0;right:0;bottom:0;z-index:20;background:linear-gradient(#14423a,#0d2f28);border-top:2px solid var(--gold);box-shadow:0 -10px 30px rgba(0,0,0,.5);padding:12px 16px 16px}
+.slip-in{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:center}
+.slip h3{margin:0;font-size:13px;color:var(--muted);font-weight:700}
+.slip .pick{font-size:16px;font-weight:800}
+.slip .pick b{font-family:var(--f-data);color:var(--gold);margin-left:6px}
+.slip .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.slip input{width:130px;font-family:var(--f-data);font-size:16px}
+.slip .q{background:var(--panel2);color:var(--fg);border:1px solid var(--line);padding:8px 10px;font-size:13px}
+.slip .win{font-size:13px;color:var(--muted)}.slip .win b{color:var(--ok);font-family:var(--f-data);font-size:15px}
+.slip .x{background:transparent;color:var(--muted);padding:6px 10px;font-size:20px;line-height:1}
+.slip .go{padding:12px 20px;font-size:15px}
+.step{display:inline-flex;align-items:center;gap:6px;background:#06140f;border:1px solid var(--line);border-radius:10px;padding:3px}
+.step button{width:32px;height:32px;padding:0;background:var(--panel2);color:var(--fg);font-size:18px}
+.step b{min-width:22px;text-align:center;font-family:var(--f-display);font-size:18px}
+/* apuestas / tabla */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.panel h2{font-family:var(--f-display);font-weight:400;font-size:17px;margin:0;color:var(--gold);letter-spacing:.02em}
+.stats4{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.stats4 div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.stats4 small{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stats4 b{font-family:var(--f-data);font-size:18px}
+.bets{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.bets li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.bets li b{display:block;font-size:14px}.bets li span{display:block;font-size:12px;color:var(--muted)}
+.bets li .r span{display:inline-flex}
+.bets li .r{text-align:right;font-family:var(--f-data)}
+.tbl{overflow-x:auto}
+table.st{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+table.st th{text-align:right;font-size:11px;color:var(--muted);font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:6px}
+table.st th:nth-child(2),table.st td:nth-child(2){text-align:left}
+table.st td{padding:6px;text-align:right;border-top:1px solid #ffffff10;font-family:var(--f-data)}
+table.st td:nth-child(2){font-family:var(--f-body);font-weight:700;display:flex;align-items:center;gap:8px}
+table.st td:nth-child(2) .logo,table.st td:nth-child(2) .badge{width:24px;height:24px;font-size:9px;padding:2px}
+table.st tr.top td:first-child{color:var(--gold)}
+.empty{color:var(--muted);text-align:center;padding:24px;margin:0}
+.toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:40;background:#06140f;border:1px solid var(--gold);color:var(--fg);padding:10px 16px;border-radius:12px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:calc(100% - 32px)}
+.toast.bad{border-color:var(--bad)}
+/* entrada */
+.login{min-height:100vh;display:grid;place-items:center;padding:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;width:min(400px,100%);display:flex;flex-direction:column;gap:12px}
+.card label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--muted)}
+.err{color:var(--bad);font-size:13px;min-height:1em}
+.loading{color:var(--muted);text-align:center;padding:40px}
+@media (max-width:640px){
+  .bal{grid-template-columns:1fr}.bal .lim{text-align:left}.bal .v{font-size:34px}
+  .slip-in{grid-template-columns:1fr}.slip .go{width:100%}
+  .sc{font-size:22px;min-width:52px}.logo,.badge{width:32px;height:32px}
+  .tm b{font-size:14px}
+}
+</style>
+</head>
+<body>
+<div class="login" id="login" hidden>
+  <form class="card" id="lgForm" autocomplete="on">
+    <div class="brand"><span class="chip" aria-hidden="true"></span><div><h1>Casino del Pueblo</h1><p>Liga MX · fichas virtuales</p></div></div>
+    <p class="muted" style="margin:0">Entra con tu mismo usuario de Ciudad Marea.</p>
+    <label>Usuario<input id="lgUser" name="username" autocomplete="username" required></label>
+    <label>PIN<input id="lgPin" name="password" type="password" inputmode="numeric" autocomplete="current-password" required></label>
+    <div class="err" id="lgErr"></div>
+    <button type="submit" id="lgBtn">Entrar al casino</button>
+    <p class="note" id="demoNote" hidden>Modo demostración: sin servidor. Escribe cualquier usuario y PIN.</p>
+    <a href="index.html" style="font-size:14px">← Volver a Ciudad Marea</a>
+  </form>
+</div>
+
+<div id="app" hidden>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><span class="chip" aria-hidden="true"></span><div><h1>Casino del Pueblo</h1><p>Liga MX · fichas virtuales</p></div></div>
+      <div class="who"><span id="who"></span><a href="index.html">← Volver al pueblo</a></div>
+    </header>
+    <section class="bal" id="bal" aria-live="polite"></section>
+    <p class="note">Las fichas son virtuales: salen de las ganancias de tu pueblo, no se compran ni se cambian por dinero, y apostar no toca tu portafolio real. Datos de los partidos: ESPN.</p>
+    <nav class="tabs" role="tablist" aria-label="Secciones del casino">
+      <button type="button" role="tab" id="tPartidos" aria-selected="true" data-t="partidos">Partidos</button>
+      <button type="button" role="tab" id="tApuestas" aria-selected="false" data-t="apuestas">Mis apuestas</button>
+      <button type="button" role="tab" id="tTabla" aria-selected="false" data-t="tabla">Tabla</button>
+    </nav>
+    <main id="main"><p class="loading">Cargando el casino…</p></main>
+  </div>
+</div>
+<div class="slip" id="slip" hidden role="region" aria-label="Boleto de apuesta"></div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+const CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbwQ27XpCTCNOmOPxSGCu7gB8UJx40QPaoAlyXx2rvORM31OER6X9GQABBMS88Do-wCGIw/exec' };   // la misma URL /exec de index.html. Vacío = modo demostración
+const DEMO = !CONFIG.API_URL;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fic = new Intl.NumberFormat('es-MX', { maximumFractionDigits: 0 });
+const F = v => fic.format(Math.round(v || 0));
+const fDay = new Intl.DateTimeFormat('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+const fTime = new Intl.DateTimeFormat('es-MX', { hour: 'numeric', minute: '2-digit' });
+const fShort = new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+
+// ---------- modelo de momios (mismo que Casino.gs) ----------
+function probs(ll, lv) {
+  const P = (k, l) => { let f = 1; for (let i = 2; i <= k; i++) f *= i; return Math.exp(-l) * Math.pow(l, k) / f; };
+  let L = 0, E = 0, V = 0, M = 0;
+  for (let i = 0; i <= 10; i++) for (let j = 0; j <= 10; j++) { const q = P(i, ll) * P(j, lv); if (i > j) L += q; else if (i === j) E += q; else V += q; if (i + j >= 3) M += q; }
+  const s = L + E + V;
+  return { L: L / s, E: E / s, V: V / s, mas: M / s, menos: 1 - M / s, exacto: (i, j) => P(i, ll) * P(j, lv) };
+}
+const momio = (p, m) => Math.max(1.01, Math.min(100, Math.round(100 / (Math.max(p, 1e-4) * (1 + m))) / 100));
+const momioExacto = (p, m) => Math.max(2, Math.min(250, Math.round(100 / (Math.max(p, 1e-5) * (1 + m * 2.5))) / 100));
+
+// ---------- servidor ----------
+let token = null;
+async function api(accion, data = {}) {
+  if (DEMO) { await new Promise(r => setTimeout(r, 200)); return DEMO_API(accion, data); }
+  const res = await fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ accion, token, ...data }) });
+  if (!res.ok) throw new Error('El servidor respondió ' + res.status + '. Inténtalo en un momento.');
+  const j = await res.json();
+  if (!j.ok) {
+    if (String(j.error).startsWith('SESION:')) { showLogin(j.error.slice(7).trim()); throw new Error('SESION'); }
+    throw new Error(j.error || 'Algo falló en el servidor.');
+  }
+  return j;
+}
+
+// ---------- estado ----------
+let S = null, tab = 'partidos', slip = null, openDet = new Set(), statsC = {}, busy = false, timer = null;
+function toast(msg, bad) { const t = $('toast'); t.textContent = msg; t.className = 'toast' + (bad ? ' bad' : ''); t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, 3800); }
+
+function showLogin(msg) {
+  $('app').hidden = true; $('slip').hidden = true; $('login').hidden = false; $('demoNote').hidden = !DEMO;
+  $('lgErr').textContent = msg || '';
+  clearInterval(timer);
+}
+$('lgForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const b = $('lgBtn'); b.disabled = true; $('lgErr').textContent = '';
+  try {
+    const r = await api('login', { usuario: $('lgUser').value, pin: $('lgPin').value });
+    token = r.token;
+    try { sessionStorage.setItem('cm_token', token); sessionStorage.setItem('cm_name', r.nombre || $('lgUser').value); } catch (_) {}
+    $('lgPin').value = '';
+    await load(true);
+  } catch (err) { if (err.message !== 'SESION') $('lgErr').textContent = err.message; }
+  b.disabled = false;
+});
+
+async function load(first) {
+  if (busy) return; busy = true;
+  try {
+    S = await api('casino_estado');
+    $('login').hidden = true; $('app').hidden = false;
+    render();
+    schedule();
+  } catch (err) { if (err.message !== 'SESION') { if (first) showLogin(err.message); else toast(err.message, true); } }
+  busy = false;
+}
+// se actualiza solo: cada 90 s si hay partidos en vivo, si no cada 10 min
+function schedule() {
+  clearInterval(timer);
+  const live = S && S.partidos.some(p => p.estado === 'in' || (p.estado === 'pre' && new Date(p.inicio) - Date.now() < 15 * 60e3 && new Date(p.inicio) - Date.now() > -3 * 3600e3));
+  timer = setInterval(() => { if (!document.hidden && !slip) load(false); }, live ? 90e3 : 600e3);
+}
+
+// ---------- utilidades de vista ----------
+const tablaPorId = () => { const m = {}; (S.tabla || []).forEach(t => { m[String(t.id)] = t; m['n:' + String(t.equipo).toLowerCase()] = t; }); return m; };
+const findTeam = (T, id, name) => T[String(id)] || T['n:' + String(name).toLowerCase()] || null;
+const hue = s => { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
+const crest = (logo, name, abbr) => logo ? `<img class="logo" src="${esc(logo)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'badge',textContent:${esc(JSON.stringify((abbr || name || '?').slice(0, 3).toUpperCase()))}}))">`
+  : `<span class="badge" style="--c:hsl(${hue(name)} 55% 38%)" aria-hidden="true">${esc((abbr || name || '?').slice(0, 3).toUpperCase())}</span>`;
+const formHtml = f => f ? `<span class="form" aria-label="Últimos partidos">${String(f).slice(-5).split('').map(c => { const k = c.toUpperCase() === 'W' ? 'w' : c.toUpperCase() === 'D' ? 'd' : 'l'; return `<i class="${k}" title="${k === 'w' ? 'Ganó' : k === 'd' ? 'Empató' : 'Perdió'}">${k === 'w' ? 'G' : k === 'd' ? 'E' : 'P'}</i>`; }).join('')}</span>` : '';
+const ord = n => n ? n + 'º' : '';
+const selLabel = (p, mercado, sel) => mercado === '1X2' ? (sel === 'L' ? 'Gana ' + p.local : sel === 'E' ? 'Empate' : 'Gana ' + p.visita)
+  : mercado === 'OU' ? (sel === 'MAS' ? 'Más de 2.5 goles' : 'Menos de 2.5 goles') : 'Marcador ' + p.local + ' ' + sel.replace('-', ' - ') + ' ' + p.visita;
+function resultOf(p) { if (p.estado !== 'post' || p.goles_l === '' || p.goles_v === '') return null; const l = +p.goles_l, v = +p.goles_v; return { x: l > v ? 'L' : l === v ? 'E' : 'V', ou: l + v >= 3 ? 'MAS' : 'MENOS', ex: l + '-' + v }; }
+const tope = () => Math.max(S.config.minimo, Math.floor(S.saldo * S.config.tope_pct / 100));
+
+// ---------- render ----------
+function render() {
+  $('who').textContent = S.nombre ? 'Jugador: ' + S.nombre : '';
+  const R = S.resumen || {};
+  $('bal').innerHTML = `<div><div class="k">Tus fichas</div><div class="v n">${F(S.saldo)}<small>fichas</small></div></div>
+    <div class="lim">Tope por apuesta<b class="n">${F(tope())}</b>${S.config.tope_pct}% de tu saldo</div>
+    <p class="src">Salen de la prosperidad de tu pueblo: <b>${F(R.credito)}</b> por tus ganancias${R.bono ? ` + <b>${F(R.bono)}</b> de bienvenida` : ''}. Cada peso nuevo de ganancia es una ficha más.</p>`;
+  const open = (S.apuestas || []).filter(a => a.estado === 'ABIERTA').length;
+  $('tApuestas').innerHTML = 'Mis apuestas' + (open ? `<span class="cnt">${open}</span>` : '');
+  document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.t === tab)));
+  if (tab === 'partidos') renderPartidos(); else if (tab === 'apuestas') renderApuestas(); else renderTabla();
+  renderSlip();
+}
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { tab = b.dataset.t; render(); });
+
+function renderPartidos() {
+  const ps = (S.partidos || []).slice().sort((a, b) => {
+    const rank = p => p.estado === 'in' ? 0 : p.estado === 'pre' ? 1 : 2;
+    return rank(a) - rank(b) || (rank(a) === 2 ? (a.inicio < b.inicio ? 1 : -1) : (a.inicio < b.inicio ? -1 : 1));
+  });
+  if (!ps.length) { $('main').innerHTML = '<p class="empty">No hay partidos en estas fechas. Puede ser fecha FIFA o fin de torneo: vuelve pronto.</p>'; return; }
+  const T = tablaPorId(), mine = {};
+  (S.apuestas || []).forEach(a => { (mine[a.partido] = mine[a.partido] || []).push(a); });
+  let html = '', lastKey = '';
+  ps.forEach(p => {
+    const d = new Date(p.inicio), key = p.estado === 'in' ? 'live' : p.estado === 'pre' ? 'pre' + d.toDateString() : 'post';
+    if (key !== lastKey) {
+      if (lastKey) html += '</div>';
+      const today = new Date().toDateString() === d.toDateString();
+      html += `<h2 class="day">${key === 'live' ? 'En vivo' : key === 'post' ? 'Resultados recientes' : (today ? 'Hoy, ' + fDay.format(d) : fDay.format(d).replace(/^./, c => c.toUpperCase()))}</h2><div class="grid">`;
+      lastKey = key;
+    }
+    html += matchCard(p, T, mine[p.id] || []);
+  });
+  $('main').innerHTML = html + '</div>';
+  wireMatches();
+}
+
+function matchCard(p, T, mb) {
+  const tl = findTeam(T, p.id_l, p.local), tv = findTeam(T, p.id_v, p.visita), pre = p.estado === 'pre', res = resultOf(p);
+  const closed = pre && new Date(p.inicio) - Date.now() < 60e3;
+  const head = p.estado === 'in' ? `<span class="pill live">En vivo ${esc(p.detalle)}</span>` : p.estado === 'post' ? `<span class="pill fin">Final</span>` : p.estado === 'cancel' ? `<span class="pill cancel">Pospuesto</span>` : `<span class="pill">${closed ? 'Cerrado' : 'Abierto'}</span>`;
+  const score = p.estado === 'pre' || p.estado === 'cancel' ? `<div class="sc vs">VS</div>` : `<div class="sc n" aria-label="Marcador">${esc(p.goles_l)} - ${esc(p.goles_v)}</div>`;
+  const on = (m, s) => slip && slip.p.id === p.id && slip.mercado === m && slip.sel === s;
+  const ob = (m, s, lab, mo, hit) => `<button type="button" class="odd${hit ? ' hit' : ''}" data-m="${m}" data-s="${s}" aria-pressed="${on(m, s)}" ${pre && !closed ? '' : 'disabled'}><span>${esc(lab)}</span><b>${(+mo || 0).toFixed(2)}</b></button>`;
+  const det = openDet.has(p.id);
+  return `<article class="mt${mb.length ? ' mine' : ''}" data-id="${esc(p.id)}">
+    <div class="mt-h"><span>${p.estado === 'pre' ? fTime.format(new Date(p.inicio)) : fShort.format(new Date(p.inicio))}</span>${head}</div>
+    <div class="teams">
+      <div class="tm">${crest(p.logo_l, p.local, p.abrev_l)}<div class="nm"><b>${esc(p.local)}</b><small>${tl ? ord(tl.pos) + ' · ' + tl.pts + ' pts' : 'Local'}</small></div></div>
+      ${score}
+      <div class="tm r">${crest(p.logo_v, p.visita, p.abrev_v)}<div class="nm"><b>${esc(p.visita)}</b><small>${tv ? ord(tv.pos) + ' · ' + tv.pts + ' pts' : 'Visita'}</small></div></div>
+    </div>
+    <div class="odds" role="group" aria-label="Resultado">${ob('1X2', 'L', '1 · ' + (p.abrev_l || 'Local'), p.m_1, res && res.x === 'L')}${ob('1X2', 'E', 'X · Empate', p.m_x, res && res.x === 'E')}${ob('1X2', 'V', '2 · ' + (p.abrev_v || 'Visita'), p.m_2, res && res.x === 'V')}</div>
+    <div class="odds" role="group" aria-label="Goles">${ob('OU', 'MAS', 'Más de 2.5', p.m_mas, res && res.ou === 'MAS')}${ob('OU', 'MENOS', 'Menos de 2.5', p.m_menos, res && res.ou === 'MENOS')}<button type="button" class="odd" data-m="EX" data-s="${slip && slip.p.id === p.id && slip.mercado === 'EX' ? slip.sel : '1-1'}" aria-pressed="${!!(slip && slip.p.id === p.id && slip.mercado === 'EX')}" ${pre && !closed ? '' : 'disabled'}><span>Marcador exacto</span><b>${res ? esc(res.ex) : '›'}</b></button></div>
+    ${mb.map(a => `<p class="mine-l">Tu apuesta: ${esc(selLabel(p, a.mercado, String(a.seleccion)))} · ${F(a.monto)} fichas · ${a.estado === 'ABIERTA' ? 'en juego' : a.estado === 'GANADA' ? 'ganaste ' + F(a.pago) : a.estado === 'ANULADA' ? 'reembolsada' : 'perdida'}</p>`).join('')}
+    <button type="button" class="more" aria-expanded="${det}">${det ? 'Ocultar estadísticas ▴' : 'Estadísticas ▾'}</button>
+    ${det ? `<div class="det">${detHtml(p, tl, tv)}</div>` : ''}
+  </article>`;
+}
+
+function detHtml(p, tl, tv) {
+  const pr = probs(+p.lam_l || 1.3, +p.lam_v || 1.1), pc = v => Math.round(v * 100) + '%';
+  let h = `<div><div class="pbar" role="img" aria-label="Probabilidad según la tabla: local ${pc(pr.L)}, empate ${pc(pr.E)}, visita ${pc(pr.V)}"><i style="width:${pr.L * 100}%;background:var(--ok)">${pc(pr.L)}</i><i style="width:${pr.E * 100}%;background:#c9d4cf">${pc(pr.E)}</i><i style="width:${pr.V * 100}%;background:var(--info)">${pc(pr.V)}</i></div>
+    <p class="note" style="margin-top:4px">Probabilidad según el rendimiento en la tabla. Goles esperados: ${(+p.lam_l || 0).toFixed(1)} – ${(+p.lam_v || 0).toFixed(1)}.</p></div>`;
+  if (tl || tv || p.forma_l || p.forma_v) {
+    const r = (lab, a, b) => `<tr><td>${a}</td><td class="lab">${lab}</td><td>${b}</td></tr>`;
+    const g = t => t ? `${t.g}-${t.e}-${t.p}` : '—';
+    h += `<table class="cmp"><tbody>${r('Posición', tl ? ord(tl.pos) : '—', tv ? ord(tv.pos) : '—')}${r('Puntos', tl ? tl.pts : '—', tv ? tv.pts : '—')}${r('Jugados', tl ? tl.pj : '—', tv ? tv.pj : '—')}${r('G-E-P', g(tl), g(tv))}${r('Goles a favor / en contra', tl ? tl.gf + ' / ' + tl.gc : '—', tv ? tv.gf + ' / ' + tv.gc : '—')}${p.forma_l || p.forma_v ? r('Últimos partidos', formHtml(p.forma_l) || '—', formHtml(p.forma_v) || '—') : ''}</tbody></table>`;
+  }
+  if (p.estado === 'in' || p.estado === 'post') {
+    const sc = statsC[p.id];
+    if (!sc) h += `<button type="button" class="ghost" data-stats="${esc(p.id)}">Ver estadísticas del partido</button>`;
+    else if (sc === 'loading') h += `<p class="note">Cargando estadísticas…</p>`;
+    else h += statsHtml(sc, p);
+  }
+  return h;
+}
+function statsHtml(sc, p) {
+  if (!sc.equipos || sc.equipos.length < 2) return '<p class="note">ESPN todavía no publica estadísticas de este partido.</p>';
+  const [a, b] = sc.equipos, mb = {};
+  b.stats.forEach(s => { mb[s.clave] = s; });
+  const rows = a.stats.filter(s => mb[s.clave]).map(s => {
+    const va = parseFloat(s.valor) || 0, vb = parseFloat(mb[s.clave].valor) || 0, t = va + vb || 1;
+    return `<div class="sbar"><b class="n">${esc(s.valor)}</b><div class="bars"><em>${esc(s.nombre)}</em><div><i style="width:${va / t * 100}%;background:var(--ok)"></i><i style="width:${vb / t * 100}%;background:var(--info)"></i></div></div><b class="n" style="text-align:right">${esc(mb[s.clave].valor)}</b></div>`;
+  }).join('');
+  const goals = (sc.goles || []).length ? `<ul class="goals">${sc.goles.map(g => `<li>${esc(g.minuto)} ${esc(g.texto || g.equipo)}</li>`).join('')}</ul>` : '';
+  return (rows || '<p class="note">Sin estadísticas comparables todavía.</p>') + goals;
+}
+function wireMatches() {
+  document.querySelectorAll('.mt').forEach(card => {
+    const p = S.partidos.find(x => String(x.id) === card.dataset.id);
+    card.querySelectorAll('.odd:not([disabled])').forEach(b => b.onclick = () => pick(p, b.dataset.m, b.dataset.s));
+    card.querySelector('.more').onclick = () => { openDet.has(p.id) ? openDet.delete(p.id) : openDet.add(p.id); renderPartidos(); };
+    const sb = card.querySelector('[data-stats]');
+    if (sb) sb.onclick = async () => {
+      statsC[p.id] = 'loading'; renderPartidos();
+      try { statsC[p.id] = await api('casino_partido', { id: p.id }); } catch (err) { delete statsC[p.id]; if (err.message !== 'SESION') toast(err.message, true); }
+      renderPartidos();
+    };
+  });
+}
+
+// ---------- boleto ----------
+function oddOf(p, m, s) {
+  if (m === '1X2') return +(s === 'L' ? p.m_1 : s === 'E' ? p.m_x : p.m_2);
+  if (m === 'OU') return +(s === 'MAS' ? p.m_mas : p.m_menos);
+  const g = s.split('-').map(Number); return momioExacto(probs(+p.lam_l || 1.3, +p.lam_v || 1.1).exacto(g[0], g[1]), S.config.margen || .06);
+}
+function pick(p, m, s) {
+  if (slip && slip.p.id === p.id && slip.mercado === m && slip.sel === s && m !== 'EX') slip = null;
+  else slip = { p, mercado: m, sel: s, monto: slip ? slip.monto : Math.min(100, tope()) };
+  render();
+}
+function renderSlip() {
+  const el = $('slip');
+  if (!slip) { el.hidden = true; return; }
+  const p = S.partidos.find(x => x.id === slip.p.id);
+  if (!p || p.estado !== 'pre') { slip = null; el.hidden = true; return; }
+  slip.p = p;
+  const mo = oddOf(p, slip.mercado, slip.sel), ex = slip.mercado === 'EX', g = slip.sel.split('-').map(Number);
+  el.hidden = false;
+  el.innerHTML = `<div class="slip-in">
+    <div style="min-width:0;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><h3>${esc(p.local)} vs ${esc(p.visita)} · ${fTime.format(new Date(p.inicio))}</h3><button type="button" class="x" id="slipX" aria-label="Quitar del boleto">×</button></div>
+      ${ex ? `<div class="row"><span class="muted" style="font-size:13px">${esc(p.abrev_l || p.local)}</span><span class="step"><button type="button" data-g="0" data-d="-1" aria-label="Un gol menos local">−</button><b>${g[0]}</b><button type="button" data-g="0" data-d="1" aria-label="Un gol más local">+</button></span><span class="muted">-</span><span class="step"><button type="button" data-g="1" data-d="-1" aria-label="Un gol menos visita">−</button><b>${g[1]}</b><button type="button" data-g="1" data-d="1" aria-label="Un gol más visita">+</button></span><span class="muted" style="font-size:13px">${esc(p.abrev_v || p.visita)}</span><span class="pick"><b>${mo.toFixed(2)}</b></span></div>`
+        : `<div class="pick">${esc(selLabel(p, slip.mercado, slip.sel))}<b>${mo.toFixed(2)}</b></div>`}
+      <div class="row"><label class="sr" for="slipAmt">Fichas a apostar</label><input id="slipAmt" type="number" inputmode="numeric" min="${S.config.minimo}" step="10" value="${slip.monto}">
+        <button type="button" class="q" data-q="100">+100</button><button type="button" class="q" data-q="500">+500</button><button type="button" class="q" data-q="tope">Tope ${F(tope())}</button></div>
+      <div class="win" id="slipWin"></div>
+    </div>
+    <button type="button" class="go" id="slipGo">Apostar</button>
+  </div>`;
+  const upd = () => {
+    const v = Math.floor(+$('slipAmt').value || 0); slip.monto = v;
+    const bad = v < S.config.minimo ? `Mínimo ${S.config.minimo} fichas` : v > S.saldo ? 'No te alcanzan las fichas' : v > tope() ? `Tope: ${F(tope())} fichas` : '';
+    $('slipWin').innerHTML = bad ? `<span class="neg">${bad}</span>` : `Si aciertas recibes <b>${F(Math.floor(v * mo))}</b> fichas (ganas ${F(Math.floor(v * mo) - v)}).`;
+    $('slipGo').disabled = !!bad; $('slipGo').textContent = bad ? 'Apostar' : `Apostar ${F(v)} fichas`;
+  };
+  $('slipAmt').oninput = upd; upd();
+  $('slipX').onclick = () => { slip = null; render(); };
+  el.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { const q = b.dataset.q; $('slipAmt').value = q === 'tope' ? tope() : Math.min(tope(), (+$('slipAmt').value || 0) + +q); upd(); });
+  el.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { const gg = slip.sel.split('-').map(Number); gg[+b.dataset.g] = Math.max(0, Math.min(9, gg[+b.dataset.g] + +b.dataset.d)); slip.sel = gg.join('-'); renderSlip(); });
+  $('slipGo').onclick = async () => {
+    const b = $('slipGo'); b.disabled = true; b.textContent = 'Apostando…';
+    try {
+      const desc = selLabel(p, slip.mercado, slip.sel), m = slip.monto;
+      S = await api('casino_apostar', { partido: p.id, mercado: slip.mercado, seleccion: slip.sel, monto: m });
+      slip = null; render(); toast(`Apuesta hecha: ${desc} · ${F(m)} fichas`);
+    } catch (err) { if (err.message !== 'SESION') toast(err.message, true); b.disabled = false; b.textContent = 'Apostar'; }
+  };
+}
+
+// ---------- mis apuestas ----------
+function renderApuestas() {
+  const R = S.resumen || {}, aps = S.apuestas || [];
+  const neto = (R.pagado || 0) + (R.reembolso || 0) - (R.apostado || 0);
+  const pill = e => ({ ABIERTA: ['open', 'En juego'], GANADA: ['won', 'Ganada'], PERDIDA: ['lost', 'Perdida'], ANULADA: ['void', 'Reembolsada'] }[e] || ['', e]);
+  const lab = { BONO: 'Bienvenida', CREDITO: 'Ganancias del pueblo', APUESTA: 'Apuesta', PAGO: 'Premio', REEMBOLSO: 'Reembolso' };
+  $('main').innerHTML = `<section class="panel"><h2>Resumen</h2>
+      <div class="stats4"><div><small>Apostado</small><b>${F(R.apostado)}</b></div><div><small>Premios</small><b class="pos">${F(R.pagado)}</b></div><div><small>Reembolsos</small><b>${F(R.reembolso)}</b></div><div><small>Resultado neto</small><b class="${neto >= 0 ? 'pos' : 'neg'}">${neto >= 0 ? '+' : '−'}${F(Math.abs(neto))}</b></div></div></section>
+    <section class="panel"><h2>Apuestas</h2>${aps.length ? `<ul class="bets">${aps.map(a => {
+      const [c, t] = pill(a.estado);
+      const ret = a.estado === 'GANADA' ? `<span class="pos">+${F(a.pago)}</span>` : a.estado === 'ABIERTA' ? `paga ${F(Math.floor(a.monto * a.momio))}` : a.estado === 'ANULADA' ? `+${F(a.pago)}` : `−${F(a.monto)}`;
+      return `<li><div><b>${esc(a.descripcion)}</b><span>${a.fecha ? fShort.format(new Date(a.fecha)) + ' · ' : ''}${F(a.monto)} fichas a ${(+a.momio).toFixed(2)}</span></div><div class="r"><span class="pill ${c}">${t}</span><br>${ret}</div></li>`;
+    }).join('')}</ul>` : '<p class="empty">Todavía no apuestas. Ve a Partidos y toca un momio.</p>'}</section>
+    <section class="panel"><h2>Movimientos de fichas</h2>${(S.movimientos || []).length ? `<ul class="bets">${S.movimientos.map(m => `<li><div><b>${esc(lab[m.tipo] || m.tipo)}</b><span>${esc(m.detalle || '')}${m.fecha ? ' · ' + fShort.format(new Date(m.fecha)) : ''}</span></div><div class="r ${+m.monto >= 0 ? 'pos' : 'neg'}">${+m.monto >= 0 ? '+' : '−'}${F(Math.abs(+m.monto))}</div></li>`).join('')}</ul>` : '<p class="empty">Sin movimientos.</p>'}</section>`;
+}
+
+// ---------- tabla ----------
+function renderTabla() {
+  const t = S.tabla || [];
+  $('main').innerHTML = `<section class="panel"><h2>Tabla general${t[0] && t[0].grupo ? ' · ' + esc(t[0].grupo) : ''}</h2>${t.length ? `<div class="tbl"><table class="st"><thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead><tbody>${t.map(r => `<tr class="${r.pos <= 8 ? 'top' : ''}"><td>${r.pos}</td><td>${crest(r.logo, r.equipo, r.abrev)}${esc(r.equipo)}</td><td>${r.pj}</td><td>${r.g}</td><td>${r.e}</td><td>${r.p}</td><td>${r.gf}</td><td>${r.gc}</td><td>${(r.gf - r.gc > 0 ? '+' : '') + (r.gf - r.gc)}</td><td><b>${r.pts}</b></td></tr>`).join('')}</tbody></table></div><p class="note">Los primeros 8 lugares van en dorado. Fuente: ESPN.</p>` : '<p class="empty">La tabla aún no está disponible.</p>'}</section>`;
+}
+
+// ---------- inicio ----------
+(async () => {
+  try { token = sessionStorage.getItem('cm_token'); } catch (_) {}
+  if (DEMO && !token) token = 'demo';
+  if (!token) { showLogin(); return; }
+  await load(true);
+})();
+document.addEventListener('visibilitychange', () => { if (!document.hidden && S && !slip) load(false); });
+</script>
+
+<script>
+// ---------- modo demostración: datos de ejemplo, sin servidor ----------
+let DEMO_STATE = null;
+function DEMO_API(accion, data) {
+  const D = DEMO_STATE || (DEMO_STATE = demoInit());
+  if (accion === 'login') return { ok: true, token: 'demo', nombre: 'Jugador de ejemplo' };
+  if (accion === 'casino_estado') return demoEstado(D);
+  if (accion === 'casino_apostar') {
+    const p = D.partidos.find(x => x.id === String(data.partido)), m = data.mercado, s = String(data.seleccion), monto = Math.floor(+data.monto || 0);
+    const saldo = D.movs.reduce((a, x) => a + x.monto, 0), tp = Math.max(10, Math.floor(saldo * .25));
+    if (!p || p.estado !== 'pre') throw new Error('Las apuestas de este partido ya cerraron.');
+    if (monto < 10) throw new Error('La apuesta mínima es de 10 fichas.');
+    if (monto > saldo) throw new Error('No te alcanzan las fichas.');
+    if (monto > tp) throw new Error('El tope por apuesta es 25% de tu saldo: ' + tp + ' fichas.');
+    const mo = m === 'EX' ? (() => { const g = s.split('-').map(Number); return momioExacto(probs(p.lam_l, p.lam_v).exacto(g[0], g[1]), .06); })() : m === '1X2' ? (s === 'L' ? p.m_1 : s === 'E' ? p.m_x : p.m_2) : (s === 'MAS' ? p.m_mas : p.m_menos);
+    const desc = p.local + ' vs ' + p.visita + ' · ' + (m === '1X2' ? (s === 'L' ? 'gana ' + p.local : s === 'E' ? 'empate' : 'gana ' + p.visita) : m === 'OU' ? (s === 'MAS' ? 'más' : 'menos') + ' de 2.5 goles' : 'marcador ' + s);
+    const id = 'A' + Date.now().toString(36);
+    D.apuestas.unshift({ id, fecha: new Date().toISOString(), partido: p.id, mercado: m, seleccion: s, monto, momio: mo, estado: 'ABIERTA', pago: '', descripcion: desc });
+    D.movs.push({ fecha: new Date().toISOString(), tipo: 'APUESTA', monto: -monto, detalle: desc });
+    return demoEstado(D);
+  }
+  if (accion === 'casino_partido') {
+    const p = D.partidos.find(x => x.id === String(data.id)), r = demoRng(+data.id), pos = Math.round(40 + r() * 20);
+    const st = (a, b) => [['possessionPct', 'Posesión %', a ? pos : 100 - pos], ['totalShots', 'Tiros', Math.round(6 + r() * 12)], ['shotsOnTarget', 'Tiros a gol', Math.round(2 + r() * 6)], ['wonCorners', 'Tiros de esquina', Math.round(2 + r() * 7)], ['foulsCommitted', 'Faltas', Math.round(8 + r() * 9)], ['yellowCards', 'Tarjetas amarillas', Math.round(r() * 4)]].map(([clave, nombre, v]) => ({ clave, nombre, valor: String(v) }));
+    return { ok: true, id: p.id, equipos: [{ equipo: p.local, stats: st(1) }, { equipo: p.visita, stats: st(0) }], goles: [] };
+  }
+  throw new Error('Acción desconocida.');
+}
+function demoRng(seed) { let a = (seed * 9301 + 49297) >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function demoInit() {
+  const R = demoRng(42);
+  const T = [['América', 'AME'], ['Toluca', 'TOL'], ['Tigres UANL', 'TIG'], ['Cruz Azul', 'CAZ'], ['Monterrey', 'MTY'], ['Pumas UNAM', 'PUM'], ['Guadalajara', 'GDL'], ['Pachuca', 'PAC'], ['León', 'LEO'],
+    ['Tijuana', 'TIJ'], ['Atlas', 'ATS'], ['Juárez', 'JUA'], ['Necaxa', 'NEC'], ['Atlético de San Luis', 'ASL'], ['Querétaro', 'QRO'], ['Mazatlán', 'MAZ'], ['Puebla', 'PUE'], ['Santos Laguna', 'SAN']];
+  const tabla = T.map(([equipo, abrev], i) => {
+    const q = 1 - i / 20, pj = 15, g = Math.round(pj * (.15 + .5 * q * (.8 + R() * .4))), e = Math.min(pj - g, Math.round(2 + R() * 4)), p = pj - g - e;
+    return { id: String(100 + i), equipo, abrev, logo: '', pj, g, e, p, gf: Math.round(g * 2.1 + e * .9 + p * .5 + R() * 3), gc: Math.round(p * 2 + e * .9 + g * .4 + R() * 3), pts: g * 3 + e, grupo: 'Liga MX Apertura' };
+  }).sort((a, b) => b.pts - a.pts || (b.gf - b.gc) - (a.gf - a.gc)).map((t, i) => ({ ...t, pos: i + 1 }));
+  // mismas fórmulas que Casino.gs
+  let gf = 0, pj = 0; tabla.forEach(t => { gf += t.gf; pj += t.pj; });
+  const mu = Math.max(.8, Math.min(2.2, gf / pj)), K = 5, Fz = {};
+  tabla.forEach(t => { Fz[t.id] = { att: (t.gf + mu * K) / (t.pj + K) / mu, def: (t.gc + mu * K) / (t.pj + K) / mu }; });
+  const cl = v => Math.max(.25, Math.min(3.5, v));
+  const form = () => Array.from({ length: 5 }, () => { const x = R(); return x < .45 ? 'W' : x < .7 ? 'D' : 'L'; }).join('');
+  const poi = l => { let L = Math.exp(-l), k = 0, p = 1; do { k++; p *= R(); } while (p > L); return k - 1; };
+  const order = tabla.map(t => t.id).sort(() => R() - .5);
+  const partidos = [], H = 3600e3, now = Date.now();
+  const mk = (i, a, b, t, estado, detalle) => {
+    const A = tabla.find(x => x.id === a), B = tabla.find(x => x.id === b);
+    const ll = cl(mu * Fz[a].att * Fz[b].def * 1.12), lv = cl(mu * Fz[b].att * Fz[a].def * .9), pr = probs(ll, lv);
+    const o = { id: String(5000 + i), inicio: new Date(t).toISOString(), estado, detalle: detalle || '', local: A.equipo, visita: B.equipo, abrev_l: A.abrev, abrev_v: B.abrev, logo_l: '', logo_v: '',
+      goles_l: '', goles_v: '', lam_l: ll, lam_v: lv, m_1: momio(pr.L, .06), m_x: momio(pr.E, .06), m_2: momio(pr.V, .06), m_mas: momio(pr.mas, .06), m_menos: momio(pr.menos, .06), id_l: a, id_v: b, forma_l: form(), forma_v: form() };
+    if (estado === 'post') { o.goles_l = poi(ll); o.goles_v = poi(lv); o.detalle = 'FT'; }
+    if (estado === 'in') { o.goles_l = 1; o.goles_v = 0; }
+    partidos.push(o);
+  };
+  // jornada pasada (resultados) y jornada actual
+  for (let i = 0; i < 9; i++) mk(i, order[i * 2], order[i * 2 + 1], now - 2 * 864e5 + (i % 3) * 2 * H, 'post');
+  const nxt = order.slice().reverse(), slots = [-.7 * H, 3 * H, 5 * H, 26 * H, 28 * H, 30 * H, 50 * H, 52 * H, 74 * H];
+  for (let i = 0; i < 9; i++) mk(9 + i, nxt[i * 2], nxt[i * 2 + 1], now + slots[i], i === 0 ? 'in' : i === 8 ? 'cancel' : 'pre', i === 0 ? "52'" : '');
+  const p0 = partidos[0], p1 = partidos[1];
+  const res = p => p.goles_l > p.goles_v ? 'L' : p.goles_l === p.goles_v ? 'E' : 'V';
+  const apuestas = [
+    { id: 'A1', fecha: new Date(now - 2.2 * 864e5).toISOString(), partido: p0.id, mercado: '1X2', seleccion: res(p0), monto: 800, momio: res(p0) === 'L' ? p0.m_1 : res(p0) === 'E' ? p0.m_x : p0.m_2, estado: 'GANADA', descripcion: p0.local + ' vs ' + p0.visita + ' · ' + (res(p0) === 'E' ? 'empate' : 'gana ' + (res(p0) === 'L' ? p0.local : p0.visita)) },
+    { id: 'A2', fecha: new Date(now - 2.1 * 864e5).toISOString(), partido: p1.id, mercado: 'EX', seleccion: '2-2', monto: 200, momio: 14.5, estado: (p1.goles_l + '-' + p1.goles_v) === '2-2' ? 'GANADA' : 'PERDIDA', descripcion: p1.local + ' vs ' + p1.visita + ' · marcador 2-2' }
+  ];
+  apuestas.forEach(a => { a.pago = a.estado === 'GANADA' ? Math.floor(a.monto * a.momio) : 0; });
+  const t0 = new Date(now - 6 * 864e5).toISOString();
+  const movs = [{ fecha: t0, tipo: 'BONO', monto: 500, detalle: 'Fichas de bienvenida al casino' }, { fecha: t0, tipo: 'CREDITO', monto: 20280, detalle: 'Prosperidad de tu pueblo: tu ganancia llegó a 20280 pesos' }];
+  apuestas.slice().reverse().forEach(a => { movs.push({ fecha: a.fecha, tipo: 'APUESTA', monto: -a.monto, detalle: a.descripcion }); if (a.pago) movs.push({ fecha: a.fecha, tipo: 'PAGO', monto: a.pago, detalle: 'Ganaste: ' + a.descripcion }); });
+  return { tabla, partidos, apuestas, movs };
+}
+function demoEstado(D) {
+  const sum = t => D.movs.filter(m => m.tipo === t).reduce((a, m) => a + m.monto, 0);
+  return { ok: true, nombre: 'Jugador de ejemplo', saldo: D.movs.reduce((a, m) => a + m.monto, 0),
+    resumen: { bono: sum('BONO'), credito: sum('CREDITO'), apostado: -sum('APUESTA'), pagado: sum('PAGO'), reembolso: sum('REEMBOLSO') },
+    config: { tope_pct: 25, minimo: 10, margen: .06 }, partidos: JSON.parse(JSON.stringify(D.partidos)), apuestas: JSON.parse(JSON.stringify(D.apuestas)),
+    tabla: D.tabla, movimientos: D.movs.slice().reverse(), ahora: new Date().toISOString() };
+}
+</script>
+
+</body>
+</html>
