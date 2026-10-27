@@ -184,51 +184,6 @@ td.n{font-family:var(--f-data);text-align:right;font-variant-numeric:tabular-num
 
 /* ---------- Mapa 3D ---------- */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.m3{position:relative;height:clamp(440px,72vh,780px);background:#151d3c;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;outline:none}
-.m3:focus-visible{box-shadow:inset 0 0 0 2px var(--acc)}
-.m3 canvas#m3gl{position:absolute;inset:0;width:100%;height:100%;cursor:grab;touch-action:none}
-.m3.dragging canvas#m3gl{cursor:grabbing}
-.m3.streeting canvas#m3gl{cursor:move}
-.m3lab{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
-.m3 .pin,.m3 .dlab,.m3 .mon,.m3 .pop{position:absolute;left:0;top:0;will-change:transform}
-.m3 .pin{pointer-events:auto;display:flex;align-items:center;gap:6px;padding:0 10px 0 7px;height:28px;border-radius:999px;background:rgba(14,20,38,.92);color:var(--fg);border:1px solid rgba(238,241,248,.16);font:700 12px/1 var(--f-body);white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.35);cursor:pointer}
-.m3 .pin::after{content:"";position:absolute;left:50%;bottom:-5px;width:8px;height:8px;margin-left:-4px;background:inherit;border-right:inherit;border-bottom:inherit;transform:rotate(45deg)}
-.m3 .pin b{font-weight:800}
-.m3 .pin .dot{width:9px;height:9px}
-.m3 .pin.empty{border-style:dashed;background:rgba(14,20,38,.8)}
-.m3 .pin.sel{background:var(--fg);color:#0e1426;border-color:var(--fg);z-index:2}
-.m3 .pin.sel span{color:inherit}
-.m3 .pos{color:var(--ok)} .m3 .neg{color:var(--bad)} .m3 .warn{color:var(--warn)} .m3 .ren{color:var(--ren)}
-.m3 i.al{font-style:normal;background:var(--bad);color:#2a0606;border-radius:50%;width:16px;height:16px;display:inline-grid;place-items:center;font-size:11px;font-weight:900;flex:none}
-.m3 .dlab{pointer-events:auto;background:none;border:0;border-radius:8px;padding:4px 8px;color:var(--fg);text-align:center;cursor:pointer;font:800 13px/1.15 var(--f-body);letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 10px rgba(0,0,0,.85)}
-.m3 .dlab .nm{color:var(--c);display:inline-flex;align-items:center;gap:6px}
-.m3 .dlab small{display:block;letter-spacing:.02em;text-transform:none;font:500 12px/1.3 var(--f-data);margin-top:3px;color:var(--fg)}
-.m3 .mon{display:flex;flex-direction:column;align-items:center;background:rgba(14,20,38,.88);border:1px solid var(--acc);border-radius:10px;padding:4px 10px;font-size:12px;white-space:nowrap;pointer-events:none}
-.m3 .mon b{color:var(--acc);font-weight:800}
-.m3 .mon span{font-family:var(--f-data);font-size:11px;color:var(--muted)}
-.m3 .pop{font:800 13px var(--f-body);white-space:nowrap;pointer-events:none;text-shadow:0 0 3px #0e1426,0 0 3px #0e1426,0 1px 2px #0e1426}
-.m3 .mbtn{width:44px;height:44px;padding:0;border-radius:10px;background:rgba(21,29,53,.95);color:var(--fg);border:1px solid var(--line);display:grid;place-items:center;box-shadow:0 2px 10px rgba(0,0,0,.35);font:800 13px var(--f-body);cursor:pointer}
-.m3 .mbtn svg{width:20px;height:20px}
-.m3 .mbtn:disabled{opacity:.4;cursor:default}
-.m3 .mbtn[aria-pressed=true]{border-color:var(--acc);color:var(--acc)}
-.m3zoom{display:flex;flex-direction:column;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.35)}
-.m3zoom .mbtn{border-radius:0;box-shadow:none}
-.m3zoom .mbtn+.mbtn{border-top:0}
-.m3ctl{position:absolute;right:12px;bottom:16px;z-index:3;display:flex;flex-direction:column;gap:8px;align-items:center}
-#m3needle{transition:none}
-.m3search{position:absolute;left:12px;top:12px;z-index:3;width:min(340px,calc(100% - 84px));display:flex;align-items:center;gap:8px;background:rgba(21,29,53,.96);border:1px solid var(--line);border-radius:999px;padding:0 14px;height:44px;box-shadow:0 2px 10px rgba(0,0,0,.35);box-sizing:border-box;margin:0}
-.m3search input{flex:1;border:0;background:transparent;padding:0;height:100%;color:inherit;min-width:0;border-radius:0}
-.m3search input:focus-visible{outline:none}
-.m3search:focus-within{border-color:var(--acc)}
-.m3search input.nf{color:var(--bad)}
-.m3search svg{flex:none;width:18px;height:18px;color:var(--muted)}
-.m3bl{position:absolute;left:12px;bottom:16px;z-index:3;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
-.m3 .m3tourbtn{display:flex;align-items:center;gap:8px;height:44px;padding:0 18px 0 14px;border-radius:999px;background:var(--acc);color:#2a1c00;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.4)}
-.m3 .m3tourbtn svg{width:16px;height:16px}
-.m3seg{display:flex;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:rgba(21,29,53,.95);box-shadow:0 2px 10px rgba(0,0,0,.35)}
-.m3seg button{background:transparent;color:var(--fg);padding:0 14px;height:36px;border-radius:0;font-weight:700;font-size:13px}
-.m3seg button[aria-pressed=true]{background:var(--fg);color:#0e1426}
-.m3demo{font-size:12px;font-weight:700;color:var(--warn);background:rgba(14,20,38,.85);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
 .m3card{position:absolute;left:12px;top:66px;z-index:4;width:min(330px,calc(100% - 84px));max-height:calc(100% - 150px);overflow:auto;background:rgba(21,29,53,.97);border:1px solid var(--line);border-radius:14px;padding:12px 16px 14px;box-sizing:border-box;box-shadow:0 10px 30px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:7px;user-select:text;-webkit-user-select:text}
 .m3card .mc-h{display:flex;align-items:center;gap:8px;justify-content:space-between}
 .m3card .mc-k{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
@@ -252,34 +207,7 @@ td.n{font-family:var(--f-data);text-align:right;font-variant-numeric:tabular-num
 .m3card .mc-b{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;font-size:13px;min-height:40px}
 .m3card .mc-b svg{width:16px;height:16px}
 .m3card .mc-b.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
-.m3hint{position:absolute;left:50%;top:66px;transform:translateX(-50%);z-index:3;background:rgba(14,20,38,.92);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:700;white-space:nowrap;pointer-events:none;max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis;box-sizing:border-box}
-.m3tour,.m3street{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:5;width:min(620px,calc(100% - 24px));background:rgba(14,20,38,.95);border:1px solid var(--line);border-radius:16px;box-sizing:border-box;box-shadow:0 10px 30px rgba(0,0,0,.5);display:none}
-.m3tour{padding:14px 16px 12px;flex-direction:column;gap:8px}
-.m3.touring .m3tour{display:flex}
-.m3tour .tk{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
-.m3tour h3{margin:0;font:400 19px/1.15 var(--f-display);display:flex;align-items:center;gap:10px}
-.m3tour p{margin:0;font-size:14px;line-height:1.45;max-height:7.4em;overflow:auto}
-.m3tour .tbar{height:4px;background:var(--panel2);border-radius:2px;overflow:hidden}
-.m3tour .tbar i{display:block;height:100%;width:0;background:var(--acc)}
-.m3tour .tctl{display:flex;gap:8px;align-items:center}
-.m3tour .tctl .sp{flex:1}
-.m3 .mbtn.wide{width:auto;padding:0 16px}
-.m3street{padding:8px;align-items:center;gap:10px;width:min(460px,calc(100% - 24px))}
-.m3.streeting .m3street{display:flex}
-.m3street .sn{flex:1;display:flex;align-items:center;gap:10px;min-width:0}
-.m3street .sn > span:last-child{display:flex;flex-direction:column;min-width:0}
-.m3street .sn b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.m3street .sn small{font-size:12px;color:var(--muted)}
-.m3 .m3exit{position:absolute;right:12px;top:12px;z-index:5;display:none;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:999px;background:rgba(14,20,38,.95);color:var(--fg);border:1px solid var(--line);font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.4)}
-.m3 .m3exit svg{width:16px;height:16px}
-.m3.streeting .m3exit{display:flex}
-.m3.touring .m3search,.m3.touring .m3card,.m3.touring .m3bl,.m3.touring .m3hint,.m3.touring .m3ctl > :not(#m3Full){display:none}
-.m3.streeting .m3search,.m3.streeting .m3bl,.m3.streeting .m3ctl{display:none}
-.m3.streeting .m3card{top:12px;max-height:calc(100% - 100px)}
-.m3fade{position:absolute;inset:0;background:#05070f;opacity:0;pointer-events:none;transition:opacity .22s;z-index:2}
-.m3load{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-weight:700;z-index:6;background:#151d3c;text-align:center;padding:16px}
 .stage.max{position:fixed;inset:0;z-index:40;border-radius:0;border:0}
-.stage.max .m3{height:100vh;height:100dvh}
 body.noscroll{overflow:hidden}
 .under{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}
 .viewsw{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
@@ -287,39 +215,10 @@ body.noscroll{overflow:hidden}
 .viewsw button[aria-pressed=true]{background:var(--panel2);color:var(--fg)}
 .classic{position:relative}
 /* tema de día, al estilo de un mapa en papel */
-.m3.day .pin{background:#fff;color:#202124;border-color:rgba(0,0,0,.12)}
-.m3.day .pin.empty{background:rgba(255,255,255,.92)}
-.m3.day .pin.sel{background:#202124;color:#fff;border-color:#202124}
-.m3.day .pos{color:#137333} .m3.day .neg{color:#c5221f} .m3.day .warn{color:#a35200} .m3.day .ren{color:#00695c}
-.m3.day .pin.sel .pos,.m3.day .pin.sel .neg,.m3.day .pin.sel .ren,.m3.day .pin.sel .warn{color:inherit}
-.m3.day .dlab{color:#202124;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 8px #fff}
-.m3.day .dlab .nm{color:color-mix(in srgb,var(--c) 55%,#000)}
-.m3.day .dlab small{color:#3c4043}
-.m3.day .pop{text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 2px #fff}
-.m3.day .mon{background:#fff;color:#202124}
-.m3.day .mon b{color:#8a5a00}
-.m3.day .mon span{color:#5f6368}
-.m3.day .mbtn,.m3.day .m3search,.m3.day .m3seg,.m3.day .m3exit{background:#fff;color:#3c4043;border-color:rgba(0,0,0,.12)}
-.m3.day .m3search input{color:#202124}
-.m3.day .m3search input::placeholder{color:#5f6368}
-.m3.day .m3seg button{color:#3c4043}
-.m3.day .m3seg button[aria-pressed=true]{background:#e8f0fe;color:#174ea6}
-.m3.day .mbtn[aria-pressed=true]{color:#174ea6;border-color:#174ea6}
 @media (max-width:640px){
-  .m3{height:clamp(440px,70vh,720px)}
-  .m3ctl{top:66px;bottom:auto;right:10px}
-  .m3zoom{display:none}
-  .m3search{left:10px;top:10px;width:calc(100% - 20px)}
-  .m3ctl{top:62px}
   .m3card{left:8px;right:8px;width:auto;top:auto;bottom:8px;max-height:52%;padding:10px 14px 12px}
-  .m3.streeting .m3card{top:8px;bottom:auto;max-height:38%;right:104px}
   .m3card .mc-big{font-size:22px}
   .m3card .mc-d{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-  .m3bl{left:10px;bottom:12px}
-  .m3hint{top:62px;white-space:normal;text-align:center;width:min(300px,calc(100% - 90px));border-radius:12px}
-  .m3tour{bottom:8px;padding:12px 12px 10px}
-  .m3tour p{font-size:13px;max-height:6.2em}
-  .m3street{bottom:8px}
 }
 
 /* ---------- Pueblo isométrico ---------- */
@@ -383,6 +282,53 @@ body.noscroll{overflow:hidden}
   .vcard{left:8px;right:8px;width:auto;top:auto;bottom:8px;max-height:48%}
   .vnote{white-space:normal;text-align:center;border-radius:12px;top:98px;width:max-content;max-width:calc(100% - 100px)}
 }
+
+/* ---------- Gaceta del pueblo ---------- */
+.gz-hd{margin:0;font-weight:800;font-size:15px}
+.gz-hd.up{color:var(--ok)}.gz-hd.down{color:var(--bad)}
+ul.gz{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+ul.gz li{display:flex;gap:10px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--c);border-radius:8px;padding:8px 12px}
+ul.gz li .dot{margin-top:6px;flex:none}
+ul.gz li b{display:block;font-size:14px;line-height:1.35}
+ul.gz li span{font-size:12px;color:var(--muted)}
+ul.gz li i{font-style:normal;font-weight:700}
+ul.gz li em{font-style:normal;font-weight:800;color:var(--acc)}
+.simact{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+p.mc-st{margin:0;font-size:13px;font-weight:700;line-height:1.35}
+p.mc-st.up{color:var(--ok)}p.mc-st.down{color:var(--bad)}p.mc-st.flat{color:var(--muted)}
+small.obj{color:var(--ok);font-size:11px;white-space:nowrap}
+/* ---------- carta para imprimir ---------- */
+#govPrint{display:none}
+@media print{
+  @page{size:A4;margin:0}
+  body.gp-printing{background:#fff!important}
+  body.gp-printing>*:not(#govPrint){display:none!important}
+  body.gp-printing #govPrint{display:block}
+  .gp-page{position:relative;width:210mm;height:296mm;overflow:hidden;color:#3e2812;font-family:Figtree,Helvetica,Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .gp-page>img{position:absolute;inset:0;width:210mm;height:297mm}
+  .gp-page>img.gp-seal{inset:auto;left:162.5mm;top:226.8mm;width:27mm;height:31mm}
+  .gp-in td,.gp-in th{font-family:Figtree,Helvetica,Arial,sans-serif}
+  .gp-in{position:absolute;left:20mm;right:20mm;top:43mm}
+  .gp-in h1{font:700 22pt Georgia,'Times New Roman',serif;color:#563a1c;text-align:center;margin:0}
+  .gp-sub{text-align:center;font-size:9pt;color:#80623e;margin:1.5mm 0 4mm}
+  .gp-st{font:italic 11pt Georgia,'Times New Roman',serif;margin:0 0 4mm;line-height:1.35}
+  .gp-bx{display:grid;grid-template-columns:repeat(3,1fr);gap:2.5mm;margin-bottom:5mm}
+  .gp-bx div{background:#fffbf1;border:.35mm solid #b08842;border-radius:2mm;padding:2.5mm 3.5mm;display:flex;flex-direction:column}
+  .gp-bx small{font-size:6.5pt;font-weight:800;color:#80623e}.gp-bx b{font-size:13pt}.gp-bx span{font-size:6.5pt;color:#80623e}
+  .gp-in table{width:100%;border-collapse:collapse;font-size:8pt}
+  .gp-in th{background:#563a1c;color:#fff4de;font-size:7pt;text-align:left;padding:1.8mm 2mm}
+  .gp-in td{padding:1.4mm 2mm;border-bottom:.15mm solid #e6d6ba;vertical-align:top}
+  .gp-in td small{display:block;font-size:6.3pt;color:#80623e}
+  .gp-in .n{text-align:right}.gp-in td.tp{color:#1a6e50;font-weight:700}
+  .gpg td{background:color-mix(in srgb,var(--c) 22%,#fff);font-weight:700}
+  .gpg i{display:inline-block;width:2.4mm;height:2.4mm;border-radius:50%;background:var(--c);margin-right:1.5mm}
+  .gpg small{display:inline!important;font-weight:400;margin-left:2mm}
+  .gpt td{font:700 11pt Georgia,serif;border-top:.5mm solid #563a1c}
+  .gp-n{font-size:7pt;color:#80623e;margin:3mm 0 0}
+  .gp-sign{position:absolute;left:22mm;top:236mm;width:56mm;text-align:center;border-top:.3mm solid #80623e;padding-top:1mm;font-size:7.5pt;color:#80623e}
+  .gp-sign b{position:absolute;left:0;right:0;top:-6mm;font:italic 12pt Georgia,serif;color:#3e2812}
+  .gp-sign span{display:block}
+}
 </style>
 </head>
 <body>
@@ -391,7 +337,7 @@ body.noscroll{overflow:hidden}
 <div id="login">
   <form class="card" id="loginForm" autocomplete="on">
     <h1>Ciudad <span>Marea</span></h1>
-    <p class="muted" style="margin:0">Entra para ver cómo trabaja tu dinero.</p>
+    <p class="muted" style="margin:0">Gobernador, tu pueblo te espera. Entra para ver cómo amaneció.</p>
     <div class="resume" id="resume" hidden>
       <p style="margin:0">Hay una sesión abierta como <b id="resumeName"></b>.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="btnResume">Continuar</button><button type="button" class="ghost" id="btnSwitch">Entrar con otro usuario</button></div>
@@ -399,7 +345,7 @@ body.noscroll{overflow:hidden}
     <label for="lgUser">Usuario<input id="lgUser" name="username" autocomplete="username" required></label>
     <label for="lgPin">PIN<input id="lgPin" name="password" type="password" inputmode="numeric" autocomplete="current-password" required></label>
     <div class="err" id="lgErr"></div>
-    <button type="submit" id="lgBtn">Entrar</button>
+    <button type="submit" id="lgBtn">Entrar al palacio</button>
     <div class="demo-note" id="demoNote" hidden>Modo demostración: no hay servidor configurado. Escribe cualquier usuario y PIN para entrar con datos de ejemplo.</div>
   </form>
 </div>
@@ -415,18 +361,20 @@ body.noscroll{overflow:hidden}
     <div class="events" id="events"></div>
 
     <div class="hud">
-      <div class="stat"><div class="k">Valor de tu ciudad</div><div class="v" id="hTotal">—</div></div>
-      <div class="stat"><div class="k">Ganancia total</div><div class="v" id="hGain">—</div></div>
-      <div class="stat"><div class="k">Hoy</div><div class="v" id="hToday">—</div></div>
-      <div class="stat"><div class="k">Equilibrio</div><div class="v" id="hBal">—</div></div>
-      <div class="stat"><div class="k">Racha</div><div class="v" id="hStreak">—</div></div>
+      <div class="stat"><div class="k">Tesoro del pueblo</div><div class="v" id="hTotal">—</div></div>
+      <div class="stat"><div class="k">Prosperidad</div><div class="v" id="hGain">—</div></div>
+      <div class="stat"><div class="k">Hoy en el pueblo</div><div class="v" id="hToday">—</div></div>
+      <div class="stat"><div class="k">Orden</div><div class="v" id="hBal">—</div></div>
+      <div class="stat"><div class="k">Racha de obras</div><div class="v" id="hStreak">—</div></div>
     </div>
 
     <div class="live">
-      <div class="lhead"><span class="k" id="liveLabel">Hoy tu ciudad ganó</span><span class="big" id="liveToday">$0.00</span><span class="pill" id="livePct"></span></div>
+      <div class="lhead"><span class="k" id="liveLabel">Hoy el pueblo prosperó</span><span class="big" id="liveToday">$0.00</span><span class="pill" id="livePct"></span></div>
       <div class="lbreak" id="liveBreak"></div>
       <p class="sub" id="liveFoot"></p>
     </div>
+
+    <section class="panel" id="gaceta" hidden></section>
 
     <div class="stage" id="stage">
       <div class="vl" id="vl" tabindex="0" role="region" aria-label="Tu pueblo en vista isométrica">
@@ -447,63 +395,17 @@ body.noscroll{overflow:hidden}
           <div class="vtrack" id="vtrack"></div>
         </div>
       </div>
-      <div class="m3" id="m3" tabindex="0" role="region" aria-label="Mapa 3D de tu ciudad. Arrastra para moverte, usa la rueda para acercarte y el clic derecho para girar.">
-        <canvas id="m3gl" aria-hidden="true"></canvas>
-        <div class="m3lab" id="m3lab"></div>
-        <div class="m3fade" id="m3fade"></div>
-        <form class="m3search" id="m3sform" role="search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
-          <label class="sr" for="m3q">Buscar en Ciudad Marea</label>
-          <input id="m3q" list="m3list" placeholder="Busca un activo o un barrio" autocomplete="off" enterkeyhint="search">
-          <datalist id="m3list"></datalist>
-        </form>
-        <aside class="m3card" id="m3card" hidden aria-live="polite"></aside>
-        <div class="m3hint" id="m3hint" hidden></div>
-        <div class="m3ctl">
-          <button class="mbtn" id="m3Full" type="button" aria-label="Pantalla completa" aria-pressed="false" title="Pantalla completa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-          <button class="mbtn" id="m3Peg" type="button" aria-label="Vista de calle" title="Vista de calle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="2.5"/><path d="M9 21v-6l-2-1v-4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4l-2 1v6"/></svg></button>
-          <button class="mbtn" id="m3Home" type="button" aria-label="Ver toda la ciudad" title="Toda la ciudad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></button>
-          <button class="mbtn" id="m3Comp" type="button" aria-label="Apuntar al norte" title="Norte"><svg id="m3needle" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l4 9.5h-8z" fill="#ef5350"/><path d="M12 21.5l-4-9.5h8z" fill="currentColor" opacity=".55"/></svg></button>
-          <button class="mbtn" id="m3Tilt" type="button" aria-label="Ver el mapa plano desde arriba" title="2D / 3D">2D</button>
-          <div class="m3zoom"><button class="mbtn" id="m3Zin" type="button" aria-label="Acercar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><button class="mbtn" id="m3Zout" type="button" aria-label="Alejar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button></div>
-        </div>
-        <div class="m3bl">
-          <button class="m3tourbtn" id="m3Tour" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>Recorrido guiado</button>
-          <div class="m3seg" role="group" aria-label="Estilo del mapa"><button type="button" id="m3Day" aria-pressed="false">Día</button><button type="button" id="m3Night" aria-pressed="true">Noche</button></div>
-          <span class="m3demo" id="m3demo" hidden>Datos de ejemplo</span>
-        </div>
-        <div class="m3tour" id="m3tour" role="region" aria-label="Recorrido guiado" aria-live="polite">
-          <div class="tk" id="m3tk"></div>
-          <h3 id="m3tt"></h3>
-          <p id="m3tx"></p>
-          <div class="tbar"><i id="m3tbar"></i></div>
-          <div class="tctl">
-            <button class="mbtn" id="m3tprev" type="button" aria-label="Parada anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
-            <button class="mbtn" id="m3tplay" type="button" aria-label="Pausar recorrido"></button>
-            <button class="mbtn" id="m3tnext" type="button" aria-label="Siguiente parada"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
-            <span class="sp"></span>
-            <button class="mbtn wide" id="m3tstop" type="button">Salir del recorrido</button>
-          </div>
-        </div>
-        <div class="m3street" id="m3street" role="region" aria-label="Vista de calle">
-          <button class="mbtn" id="m3sprev" type="button" aria-label="Edificio anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
-          <div class="sn" id="m3sn" aria-live="polite"></div>
-          <button class="mbtn" id="m3snext" type="button" aria-label="Siguiente edificio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
-        </div>
-        <button class="m3exit" id="m3sexit" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Salir</button>
-        <div class="m3load" id="m3load">Cargando mapa 3D…</div>
-      </div>
       <div class="classic" id="classic" hidden>
         <canvas id="city" role="img" aria-label="Ciudad animada con cuatro barrios: acciones, FIBRAs, renta fija y bitcoin"></canvas>
         <div class="badge" id="lvlTag"></div>
         <div class="badge" id="sampleTag" hidden>Datos de ejemplo</div>
-        <button class="ghost small back" id="btnBack" type="button" hidden>← Toda la ciudad</button>
-        <div class="badge hint" id="hint">Toca un barrio para entrar</div>
+        <button class="ghost small back" id="btnBack" type="button" hidden>← Todo el pueblo</button>
+        <div class="badge hint" id="hint">Toca un barrio para recorrerlo</div>
       </div>
     </div>
     <div class="under">
       <div class="chips" id="chips"></div>
-      <div class="viewsw" role="group" aria-label="Tipo de vista"><button type="button" id="vwVillage" aria-pressed="true">Pueblo</button><button type="button" id="vw3d" aria-pressed="false">Mapa 3D</button><button type="button" id="vwClassic" aria-pressed="false">Vista clásica</button></div>
+      <div class="viewsw" role="group" aria-label="Tipo de vista"><button type="button" id="vwVillage" aria-pressed="true">Pueblo</button><button type="button" id="vwClassic" aria-pressed="false">Vista clásica</button></div>
     </div>
     <div class="zoominfo" id="zoominfo" hidden></div>
 
@@ -517,21 +419,21 @@ body.noscroll{overflow:hidden}
 
     <section class="panel" id="ceremony"></section>
       <section class="panel">
-        <h2>¿Cuánto vas a invertir?</h2>
-        <p class="muted" style="margin:0">Escribe tu aportación y te digo dónde ponerla para acercarte a la ciudad ideal.</p>
-        <div class="sim"><input id="simAmt" type="number" min="0" step="500" value="10000" aria-label="Monto a invertir en pesos"><button id="btnSim" type="button">Repartir</button></div>
+        <h2>Presupuesto del mes</h2>
+        <p class="muted" style="margin:0">¿Cuánto vas a destinar a obras este mes? El consejo te dice dónde construir para acercar el pueblo a su forma ideal, y te prepara la carta con los precios objetivo de compra.</p>
+        <div class="sim"><input id="simAmt" type="number" min="0" step="500" value="10000" aria-label="Presupuesto del mes en pesos"><button id="btnSim" type="button">Repartir presupuesto</button></div>
         <div id="simOut"></div>
       </section>
 
     <div class="grid" id="districts"></div>
 
     <section class="panel" id="portafolio">
-      <h2>Mi portafolio</h2>
-      <p class="muted" style="margin:0">Captura cuántos títulos tienes y a qué precio promedio compraste. En renta fija, solo tu saldo. Deja vacío lo que no tengas. Actualízalo al menos una vez al mes para mantener tu racha.</p>
-      <details id="calcBox"><summary style="cursor:pointer;font-weight:700">Así se calcula el valor de tu ciudad</summary><div id="calc" style="margin-top:10px"></div></details>
+      <h2>Catastro del pueblo</h2>
+      <p class="muted" style="margin:0">Registra cuántos títulos tienes de cada edificio y a qué precio promedio los compraste. En las obras públicas (renta fija), solo el saldo. Deja vacío lo que no tengas. Actualízalo al menos una vez al mes para mantener tu racha de obras.</p>
+      <details id="calcBox"><summary style="cursor:pointer;font-weight:700">Así se calcula el tesoro del pueblo</summary><div id="calc" style="margin-top:10px"></div></details>
       <form id="pfForm" style="display:flex;flex-direction:column;gap:14px"></form>
     </section>
-    <p class="foot">Ciudad Marea es una herramienta para visualizar tu portafolio. Las animaciones son representaciones y las proyecciones suponen rendimientos constantes; no son una promesa de resultados.</p>
+    <p class="foot">Ciudad Marea convierte tu portafolio en un pueblo. Los sucesos de la gaceta son narrativa inspirada en cómo se movió cada activo, no noticias reales. Las animaciones son representaciones y las proyecciones suponen rendimientos constantes: nada de esto es una promesa de resultados ni asesoría financiera.</p>
   </div>
 </div>
 <div class="celebrate" id="celebrate" hidden></div>
@@ -547,20 +449,20 @@ const DEMO = !CONFIG.API_URL;
 const JUEGO_DEF = {
   rend_acciones_pct: 8, rend_fibras_pct: 8, rend_bitcoin_pct: 10, inflacion_pct: 4,
   dist_fibras_pct: 7, div_acciones_pct: 1.8, meses_rebalanceo: '3,9', banda_pct: 3,
-  umbral_tormenta_pct: 2, mision_activo: '', mision_texto: '', ceremonia_prueba: 'NO'
+  umbral_tormenta_pct: 2, desc_acciones_pct: 0.5, desc_fibras_pct: 1, desc_cripto_pct: 2, mision_activo: '', mision_texto: '', ceremonia_prueba: 'NO'
 };
 let J = { ...JUEGO_DEF };
 
 const ORDER = ['ACCIONES', 'FIBRAS', 'RENTA_FIJA', 'BITCOIN'];
 const CLS = {
   ACCIONES: { name: 'Acciones', color: '#f2b544', scene: 'Fábricas',
-    how: 'Eres dueño de un pedacito de miles de empresas. Cuando venden más y ganan más, sus acciones suben de precio, y muchas te pagan dividendos. Si la fábrica echa humo, tu dinero está produciendo.' },
+    how: 'Aquí el pueblo es socio de miles de fábricas. Cuando venden más y ganan más, valen más, y muchas reparten parte de sus ganancias al tesoro (dividendos). Si la fábrica echa humo, está produciendo para el pueblo.' },
   FIBRAS: { name: 'FIBRAs', color: '#ef7b6c', scene: 'Inmuebles',
-    how: 'Cada persona o camión que entra es un inquilino que paga renta. Las FIBRAs reparten la mayor parte de esas rentas entre sus dueños, normalmente cada trimestre. Si los inmuebles valen más, también sube el precio.' },
+    how: 'Estos edificios se rentan: cada persona o camión que entra es un inquilino que paga. La mayor parte de las rentas llega al tesoro, normalmente cada trimestre. Si los inmuebles valen más, también sube su precio.' },
   RENTA_FIJA: { name: 'Renta fija', color: '#4fc3b0', scene: 'Obras públicas',
-    how: 'Le prestas dinero al gobierno y te paga intereses todos los días. Con ese dinero se financian calles, puentes, escuelas y hospitales. Cada obra que se termina es un pago de intereses que llega a ti.' },
+    how: 'El pueblo le presta al gobierno central y cobra intereses todos los días. Con ese dinero se construyen calles, puentes, escuelas y hospitales: cada obra que avanza es un pago de intereses para el tesoro.' },
   BITCOIN: { name: 'Bitcoin', color: '#f7931a', scene: 'La bóveda',
-    how: 'Bitcoin no cobra rentas ni intereses: su valor depende de cuánto esté dispuesta a pagar la gente. Puede subir o bajar mucho en un día, por eso es la parte más chica de la ciudad.' }
+    how: 'La bóveda guarda monedas raras: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico del pueblo.' }
 };
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 const LEVELS = [[0, 'Campamento'], [50000, 'Pueblo'], [250000, 'Villa'], [1000000, 'Ciudad'], [5000000, 'Metrópoli'], [20000000, 'Megalópolis']];
@@ -942,26 +844,24 @@ function resetState() {
   raw = null; model = null; view = null; zones = {}; travelYears = 0; focus = null; selected = null;
   firstApply = true; liveShown = 0; MI = null; CE = null; ST = null; EV = null;
   clearInterval(setTravel._p);
-  M3.clear(); VL.clear();
+  VL.clear();
 }
 function showApp() { $('login').hidden = true; $('app').hidden = false; sessionStart = performance.now(); setView(viewMode, false); }
 
 // ---------- mapa 3D o vista clásica ----------
 let viewMode = 'village';
-try { const sv = localStorage.getItem('cm_view2'); if (sv === 'classic' || sv === '3d' || sv === 'village') viewMode = sv; } catch (_) {}
+try { const sv = localStorage.getItem('cm_view2'); if (sv === 'classic' || sv === 'village') viewMode = sv; } catch (_) {}
 function setView(v, save) {
-  if (v === '3d' && M3.failed()) v = 'classic';
+  if (v !== 'classic') v = 'village';
   viewMode = v;
-  $('vl').hidden = v !== 'village'; $('m3').hidden = v !== '3d'; $('classic').hidden = v !== 'classic';
-  $('vwVillage').setAttribute('aria-pressed', String(v === 'village')); $('vw3d').setAttribute('aria-pressed', String(v === '3d')); $('vwClassic').setAttribute('aria-pressed', String(v === 'classic'));
+  $('vl').hidden = v !== 'village'; $('classic').hidden = v !== 'classic';
+  $('vwVillage').setAttribute('aria-pressed', String(v === 'village')); $('vwClassic').setAttribute('aria-pressed', String(v === 'classic'));
   if (save) { try { localStorage.setItem('cm_view2', v); } catch (_) {} }
   if (v !== 'village' && $('stage').classList.contains('max')) { $('stage').classList.remove('max'); document.body.classList.remove('noscroll'); $('vFull').setAttribute('aria-pressed', 'false'); }
   if (v === 'village') VL.resize();
-  else if (v === '3d') M3.resize();
   else { $('stage').classList.remove('max'); document.body.classList.remove('noscroll'); resize(); }
 }
 $('vwVillage').addEventListener('click', () => setView('village', true));
-$('vw3d').addEventListener('click', () => setView('3d', true));
 $('vwClassic').addEventListener('click', () => setView('classic', true));
 async function loadData() { apply(await api('datos')); }
 
@@ -976,8 +876,8 @@ function apply(d) {
   const nCrypto = model.classes.BITCOIN.items.length;
   CLS.BITCOIN.name = nCrypto > 1 ? 'Cripto' : 'Bitcoin';
   CLS.BITCOIN.how = nCrypto > 1
-    ? 'Las criptomonedas no cobran rentas ni intereses: su valor depende de cuánto esté dispuesta a pagar la gente. Pueden subir o bajar mucho en un día, por eso son la parte más chica de la ciudad. Cada moneda que gira es una de tus criptos.'
-    : 'Bitcoin no cobra rentas ni intereses: su valor depende de cuánto esté dispuesta a pagar la gente. Puede subir o bajar mucho en un día, por eso es la parte más chica de la ciudad.';
+    ? 'La bóveda guarda monedas raras: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico del pueblo. Cada moneda que gira es una de tus criptos.'
+    : 'La bóveda guarda monedas raras: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico del pueblo.';
   // altura de referencia por barrio: el edificio más grande de hoy
   const gmax = Math.max(1, ...model.items.map(i => i.valor));
   ORDER.forEach(k => { const m = Math.max(0, ...model.classes[k].items.map(i => i.valor)); refMax[k] = m || gmax; });
@@ -987,14 +887,13 @@ function apply(d) {
   ST = streakInfo(); MI = missionInfo(); CE = ceremonyInfo(ST); EV = eventsInfo();
   const nAlerts = BD.filter(b => b.state === 'over' || b.state === 'under').length;
   if (!firstApply && prevAlerts > 0 && nAlerts === 0) celebrateT = 3;
-  if (!firstApply && MI.done && prevMission === false) celebrate('¡Misión cumplida! Tu ciudad estrena ' + (MI.it ? obraName(MI.it).replace(/^(una|un) /, '') : 'barrio') + '.');
-  else if (!firstApply && CE.done && prevCer === false) celebrate('¡Ceremonia completada! Tu ciudad quedó en equilibrio.');
+  if (!firstApply && MI.done && prevMission === false) celebrate('¡Misión cumplida! Tu pueblo estrena ' + (MI.it ? obraName(MI.it).replace(/^(una|un) /, '') : 'barrio') + '.');
+  else if (!firstApply && CE.done && prevCer === false) celebrate('¡Ceremonia completada! Tu pueblo quedó en equilibrio.');
   firstApply = false;
-  $('whoName').textContent = 'Hola, ' + (d.nombre || '');
+  $('whoName').textContent = 'Gobierno de ' + (d.nombre || '');
   $('sampleTag').hidden = !DEMO;
   setTravel(travelYears, true);
   renderAll();
-  M3.build();
   VL.build();
 }
 
@@ -1028,15 +927,15 @@ function renderAll() {
     const scale = Math.max(60, c.objetivo * 1.6);
     return `<article class="d" style="--c:${col}">
       <div class="dh"><span class="dot"></span><span class="dn">${CLS[k].name}</span><span class="pill ${st[0]}">${st[1]}</span></div>
-      <div class="row"><span>Valor</span><b>${mxn.format(c.valor)}</b></div>
+      <div class="row"><span>Tesoro</span><b>${mxn.format(c.valor)}</b></div>
       <div class="row"><span>Hoy</span><b class="${c.hoy >= 0 ? 'pos' : 'neg'}">${signed2(c.hoy)}</b></div>
-      <div class="row"><span>Ganancia</span><b class="${c.ganancia >= 0 ? 'pos' : 'neg'}">${signed(c.ganancia)}</b></div>
-      <div class="row"><span>Tienes / ideal</span><b>${pct1(c.pct)} / ${pct1(c.objetivo)}</b></div>
+      <div class="row"><span>Prosperidad</span><b class="${c.ganancia >= 0 ? 'pos' : 'neg'}">${signed(c.ganancia)}</b></div>
+      <div class="row"><span>Ocupa / ideal</span><b>${pct1(c.pct)} / ${pct1(c.objetivo)}</b></div>
       <div class="bar" title="La línea blanca es el porcentaje ideal"><i style="width:${Math.min(100, c.pct / scale * 100)}%"></i><u style="left:${Math.min(100, c.objetivo / scale * 100)}%"></u></div>
     </article>`;
   }).join('');
 
-  renderLive(); renderBands(); renderMission(); renderStreak(); renderCeremony();
+  renderLive(); GOV.renderGaceta(); renderBands(); renderMission(); renderStreak(); renderCeremony();
   renderForm(); renderSim(); renderZoom(); renderTm(); renderCalc();
 }
 
@@ -1062,12 +961,12 @@ function renderBands() {
   if (!BD.length) { box.hidden = true; return; }
   box.hidden = false;
   const lab = { ok: ['ok', 'En rango'], near: ['hi', 'Cerca del límite'], over: ['lo', 'Sobrepoblado'], under: ['lo', 'Le falta'] };
-  box.innerHTML = `<div class="phead"><h2>Semáforo de la ciudad</h2><span class="pill ${balanced() ? 'ok' : 'lo'}">${balanced() ? 'Todo en orden' : 'Revisa las alertas'}</span></div>
+  box.innerHTML = `<div class="phead"><h2>Semáforo del pueblo</h2><span class="pill ${balanced() ? 'ok' : 'lo'}">${balanced() ? 'Todo en orden' : 'Revisa las alertas'}</span></div>
     <div class="bands">${BD.map(b => {
       const lo = Math.max(0, b.target - b.tol * 2.2), hi = b.target + b.tol * 2.2, span = hi - lo || 1;
       const pos = v => Math.max(0, Math.min(100, (v - lo) / span * 100));
-      const act = b.state === 'over' ? `Pausa sus aportaciones: le sobran ${mxn.format(b.toLimit)} para volver a su banda.`
-        : b.state === 'under' ? `Mándale tu próxima aportación: le faltan ${mxn.format(b.toLimit)} para volver a su banda (${mxn.format(b.need)} para su ideal).`
+      const act = b.state === 'over' ? `Congela su presupuesto: le sobran ${mxn.format(b.toLimit)} para volver a su banda.`
+        : b.state === 'under' ? `Mándale el próximo presupuesto: le faltan ${mxn.format(b.toLimit)} para volver a su banda (${mxn.format(b.need)} para su ideal).`
         : b.state === 'near' ? (b.dev > 0 ? 'Se acerca a su límite de arriba.' : 'Se acerca a su límite de abajo.') : '';
       return `<div class="band ${b.state}" style="--c:${bandColor(b)}">
         <div style="min-width:0"><b>${esc(b.name)}</b><span class="bsub">${pct1(b.actual)} · ideal ${pct1(b.target)} ± ${b.tol}</span></div>
@@ -1076,7 +975,7 @@ function renderBands() {
         ${act ? `<span class="bact">${act}</span>` : ''}
       </div>`;
     }).join('')}</div>
-    <p class="foot">La franja verde es la tolerancia que definiste en la pestaña Bandas. Las bandas se miden en puntos del portafolio total.</p>`;
+    <p class="foot">La franja verde es la tolerancia que definiste en la pestaña Bandas. Los límites se miden en puntos del tesoro total.</p>`;
   const al = BD.filter(b => b.state === 'over' || b.state === 'under');
   collapsible(box, 'bands', al.length ? 'Fuera de su banda: <b>' + al.map(b => esc(b.name)).join(', ') + '</b>.' : 'Todos los grupos están dentro de su banda.', false);
 }
@@ -1091,20 +990,20 @@ function renderEvents() {
   BD.filter(b => b.state === 'over' || b.state === 'under').forEach(b => {
     const title = b.state === 'over' ? `¡${b.name}: sobrepoblado!` : `¡${b.name} se está quedando vacío!`;
     const msg = b.msg ? esc(b.msg) : b.state === 'over'
-      ? `Tiene ${pct1(b.actual)} de tu ciudad y su límite es ${pct1(b.target + b.tol)}. Ya no caben más vecinos: deja de mandarle aportaciones y dirígelas a lo que falta.`
-      : `Tiene ${pct1(b.actual)} de tu ciudad y lo mínimo es ${pct1(Math.max(0, b.target - b.tol))}. Hay obras detenidas: mándale unos ${mxn.format(b.toLimit)} para que vuelvan a trabajar.`;
+      ? `Tiene ${pct1(b.actual)} del pueblo y su límite es ${pct1(b.target + b.tol)}. Ya no caben más vecinos: deja de mandarle presupuesto y dirígelo a lo que falta.`
+      : `Tiene ${pct1(b.actual)} del pueblo y lo mínimo es ${pct1(Math.max(0, b.target - b.tol))}. Hay obras detenidas: mándale unos ${mxn.format(b.toLimit)} para que vuelvan a trabajar.`;
     out.push(`<div class="ev alert" style="--c:var(--bad)"><span class="dot"></span><div><b>${esc(title)}</b><span>${msg}</span></div></div>`);
   });
   const sinPrecio = model.items.filter(i => i.key !== 'RENTA_FIJA' && i.pos && (+i.pos.titulos > 0) && !(+i.precio_mxn > 0));
   if (sinPrecio.length) out.push(`<div class="ev" style="--c:var(--warn)"><span class="dot"></span><div><b>Sin precio hoy: ${sinPrecio.map(i => esc(i.activo)).join(', ')}</b><span>No pude leer su precio, así que su valor cuenta como $0 en tu ciudad. Revisa su ticker en la pestaña Config de la hoja.</span></div></div>`);
-  EV.storms.forEach(s => out.push(`<div class="ev" style="--c:var(--bad)"><span class="dot"></span><div><b>Tormenta en ${CLS[s.k].scene.toLowerCase()}</b><span>${s.pct != null ? `${CLS[s.k].name} baja ${pct1(Math.abs(s.pct))} hoy. ` : esc(s.msg || '') + ' '}Los capitanes no venden en tormenta: tu plan ya cuenta con días así. Si aguantas, ganas el logro "Capitán en la tormenta".</span></div></div>`));
+  EV.storms.forEach(s => out.push(`<div class="ev" style="--c:var(--bad)"><span class="dot"></span><div><b>Tormenta en ${CLS[s.k].scene.toLowerCase()}</b><span>${s.pct != null ? `${CLS[s.k].name} baja ${pct1(Math.abs(s.pct))} hoy. ` : esc(s.msg || '') + ' '}Un buen gobernador no abandona un barrio en tormenta: tu plan ya cuenta con días así. Si aguantas, ganas el logro "Capitán en la tormenta".</span></div></div>`));
   EV.rentas.forEach(e => {
     const name = e.it ? e.it.activo : CLS[classKey(e.objetivo || 'fibra')].name;
     const own = e.it ? e.it.valor > 0 : true;
     out.push(`<div class="ev" style="--c:var(--fib)"><span class="dot"></span><div><b>Día de rentas: ${esc(name)}</b><span>${esc(e.mensaje || name + ' está repartiendo rentas a sus dueños.')}${own ? '' : ' Tú todavía no tienes este inmueble.'}</span></div></div>`);
   });
-  if (CE.active) out.push(`<div class="ev" style="--c:var(--acc)"><span class="dot"></span><div><b>${CE.done ? 'Ceremonia completada' : 'Ceremonia de rebalanceo'}</b><span>${CE.done ? 'Tu ciudad quedó en equilibrio. Hasta la próxima ceremonia.' : `Este mes toca equilibrar la ciudad. ${CE.test ? 'Modo de prueba activado.' : `Te quedan ${CE.daysLeft} días.`}`}</span></div></div>`);
-  else if (CE.daysTo != null && CE.daysTo <= 14) out.push(`<div class="ev" style="--c:var(--acc)"><span class="dot"></span><div><b>Se acerca la ceremonia de rebalanceo</b><span>Empieza el ${fechaLarga(CE.next)}, en ${CE.daysTo} días.</span></div></div>`);
+  if (CE.active) out.push(`<div class="ev" style="--c:var(--acc)"><span class="dot"></span><div><b>${CE.done ? 'Ceremonia completada' : 'Cabildo de reordenamiento'}</b><span>${CE.done ? 'Tu pueblo quedó en equilibrio. Hasta la próxima ceremonia.' : `Este mes toca equilibrar la ciudad. ${CE.test ? 'Modo de prueba activado.' : `Te quedan ${CE.daysLeft} días.`}`}</span></div></div>`);
+  else if (CE.daysTo != null && CE.daysTo <= 14) out.push(`<div class="ev" style="--c:var(--acc)"><span class="dot"></span><div><b>Se acerca el cabildo de reordenamiento</b><span>Empieza el ${fechaLarga(CE.next)}, en ${CE.daysTo} días.</span></div></div>`);
   EV.avisos.forEach(e => out.push(`<div class="ev" style="--c:var(--ren)"><span class="dot"></span><div><b>Aviso</b><span>${esc(e.mensaje)}</span></div></div>`));
   EV.upcoming.forEach(e => {
     const what = e.tipo === 'RENTAS' ? 'Día de rentas de ' + (e.objetivo || 'FIBRAs') : e.tipo === 'AVISO' ? esc(e.mensaje) : 'Evento';
@@ -1117,32 +1016,32 @@ function renderMission() {
   const box = $('mission'), mes = MESES[new Date().getMonth()];
   let html = `<div class="phead"><h2>Misión de ${mes}</h2><span class="pill ${MI.done ? 'ok' : 'info'}">${MI.done ? '¡Cumplida!' : 'En curso'}</span></div>`;
   if (MI.type === 'fundar') {
-    html += `<p class="mission-scene">Funda tu ciudad.</p><p class="muted" style="margin:0">Captura tu portafolio completo para que aparezcan tus primeros edificios. La próxima misión llega el mes que entra.</p>`;
+    html += `<p class="mission-scene">Funda tu pueblo.</p><p class="muted" style="margin:0">Registra tu tesoro en el catastro para que aparezcan tus primeros edificios. La próxima misión llega el mes que entra.</p>`;
   } else {
     const it = MI.it, col = CLS[it.key].color;
-    const scene = J.mision_texto ? esc(J.mision_texto) : `La ciudad necesita ${obraName(it)}.`;
+    const scene = J.mision_texto ? esc(J.mision_texto) : `El pueblo necesita ${obraName(it)}.`;
     html += `<p class="mission-scene" style="--c:${col}"><span class="dot"></span> ${scene}</p>
-      <p class="muted" style="margin:0">Aporta alrededor de <b style="color:var(--fg)">${mxn.format(MI.amt)}</b> a <b style="color:var(--fg)">${esc(it.activo)}</b> este mes${MI.custom ? '' : ': es lo que más le falta a tu ciudad para llegar a su forma ideal'}.</p>
+      <p class="muted" style="margin:0">Destina alrededor de <b style="color:var(--fg)">${mxn.format(MI.amt)}</b> a <b style="color:var(--fg)">${esc(it.activo)}</b> este mes${MI.custom ? '' : ': es lo que más le falta a tu pueblo para llegar a su forma ideal'}.</p>
       <div class="pbar" style="--c:${col}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(MI.progress * 100)}"><i style="width:${MI.done ? 100 : Math.round(MI.progress * 100)}%"></i></div>`;
   }
   html += `<ul class="tasks">
-    <li class="${MI.done ? 'on' : ''}">${MI.type === 'fundar' ? 'Captura tu portafolio' : 'Cumple la misión principal'}</li>
-    <li class="${ST.savedThisMonth ? 'on' : ''}">Actualiza tus saldos de ${mes}</li>
-    <li class="${ST.thisMonth ? 'on' : ''}">Haz tu aportación del mes y mantén tu racha</li>
+    <li class="${MI.done ? 'on' : ''}">${MI.type === 'fundar' ? 'Registra tu tesoro' : 'Cumple la misión principal'}</li>
+    <li class="${ST.savedThisMonth ? 'on' : ''}">Actualiza el catastro de ${mes}</li>
+    <li class="${ST.thisMonth ? 'on' : ''}">Destina el presupuesto del mes y mantén tu racha</li>
   </ul>
-  <div><button type="button" class="small" id="goForm">Ir a capturar</button></div>`;
+  <div><button type="button" class="small" id="goForm">Ir al catastro</button></div>`;
   box.innerHTML = html;
   $('goForm').onclick = () => $('portafolio').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-  collapsible(box, 'mission', MI.type === 'fundar' ? 'Funda tu ciudad: captura tu portafolio.' : `${MI.done ? '<b>¡Cumplida!</b> ' : ''}Aporta alrededor de <b>${mxn.format(MI.amt)}</b> a <b>${esc(MI.it.activo)}</b>.`, true);
+  collapsible(box, 'mission', MI.type === 'fundar' ? 'Funda tu pueblo: registra tu tesoro.' : `${MI.done ? '<b>¡Cumplida!</b> ' : ''}Destina alrededor de <b>${mxn.format(MI.amt)}</b> a <b>${esc(MI.it.activo)}</b>.`, true);
 }
 
 function renderStreak() {
   const box = $('streak'), cm = ym(new Date());
   const months = []; let m = cm;
   for (let i = 0; i < 12; i++) { months.unshift(m); m = prevYm(m); }
-  const msg = ST.thisMonth ? 'Ya aportaste este mes. Tu racha está a salvo.'
-    : ST.s > 0 ? `Aporta y captura antes de que termine ${MESES[new Date().getMonth()]} para llegar a ${ST.s + 1} meses.`
-    : 'Aporta este mes y captura tus saldos para empezar tu racha.';
+  const msg = ST.thisMonth ? 'Ya destinaste presupuesto este mes. Tu racha está a salvo.'
+    : ST.s > 0 ? `Destina presupuesto y actualiza el catastro antes de que termine ${MESES[new Date().getMonth()]} para llegar a ${ST.s + 1} meses.`
+    : 'Destina presupuesto este mes y actualiza el catastro para empezar tu racha.';
   const ach = [
     ['Cuatro barrios', ORDER.every(k => model.classes[k].valor > 0)],
     ['Ciudad en equilibrio', balanced()],
@@ -1153,25 +1052,25 @@ function renderStreak() {
     ['Ceremonia completada', CE.done],
     ['Ciudad completa', model.items.filter(i => i.objetivo > 0 && !i.hold).every(i => i.valor > 0)]
   ];
-  box.innerHTML = `<div class="phead"><h2>Racha de aportaciones</h2><span class="pill info">Mejor: ${ST.best} ${ST.best === 1 ? 'mes' : 'meses'}</span></div>
+  box.innerHTML = `<div class="phead"><h2>Racha de obras</h2><span class="pill info">Mejor: ${ST.best} ${ST.best === 1 ? 'mes' : 'meses'}</span></div>
     <div class="streak"><span class="num">${ST.s}</span><span>${ST.s === 1 ? 'mes seguido' : 'meses seguidos'} construyendo</span></div>
     <p class="muted" style="margin:0">${msg}</p>
     <div class="months" aria-label="Últimos 12 meses">${months.map(x => `<div><i class="${ST.contribMonths.has(x) ? 'on' : ''} ${x === cm && !ST.contribMonths.has(x) ? 'now' : ''}" title="${MESES[+x.slice(5) - 1]} ${x.slice(0, 4)}"></i>${MESES[+x.slice(5) - 1].slice(0, 1).toUpperCase()}</div>`).join('')}</div>
     <h2 style="font-size:15px;margin-top:4px">Logros</h2>
     <div class="ach">${ach.map(([t, on]) => `<div class="${on ? 'on' : ''}">${t}</div>`).join('')}</div>
-    <p class="foot">La racha cuenta los meses en que aumentaste lo invertido. Captura tus saldos al menos una vez al mes.</p>`;
-  collapsible(box, 'streak', `<b>${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}</b> seguidos · mejor ${ST.best} · ${ST.thisMonth ? 'este mes ya cuenta' : 'falta tu aportación de este mes'}`, true);
+    <p class="foot">La racha cuenta los meses en que el pueblo recibió presupuesto nuevo. Actualiza el catastro al menos una vez al mes.</p>`;
+  collapsible(box, 'streak', `<b>${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}</b> seguidos · mejor ${ST.best} · ${ST.thisMonth ? 'este mes ya cuenta' : 'falta el presupuesto de este mes'}`, true);
 }
 
 function renderCeremony() {
   const box = $('ceremony'), M = model, band = BAND();
   const calendario = CE.months.map(m => MESES[m - 1]).join(' y ') || 'sin fechas';
-  let html = `<div class="phead"><h2>Ceremonia de rebalanceo</h2><span class="pill ${CE.done ? 'ok' : CE.active ? 'hi' : 'info'}">${CE.done ? 'Completada' : CE.active ? 'Este mes' : CE.next ? 'En ' + CE.daysTo + ' días' : 'Sin fecha'}</span></div>`;
+  let html = `<div class="phead"><h2>Cabildo de reordenamiento</h2><span class="pill ${CE.done ? 'ok' : CE.active ? 'hi' : 'info'}">${CE.done ? 'Completada' : CE.active ? 'Este mes' : CE.next ? 'En ' + CE.daysTo + ' días' : 'Sin fecha'}</span></div>`;
   if (!CE.active) {
     const out = BD.filter(b => b.state === 'over' || b.state === 'under');
-    html += `<p class="muted" style="margin:0">Dos veces al año (${calendario}) el alcalde revisa la ciudad y la regresa a su forma ideal.${CE.next ? ` La próxima empieza el <b style="color:var(--fg)">${fechaLarga(CE.next)}</b>.` : ''}</p>`;
+    html += `<p class="muted" style="margin:0">Dos veces al año (${calendario}) el gobernador revisa el pueblo y lo regresa a su forma ideal.${CE.next ? ` La próxima empieza el <b style="color:var(--fg)">${fechaLarga(CE.next)}</b>.` : ''}</p>`;
     html += out.length
-      ? '<p style="margin:0;font-weight:700">Mientras tanto, esto se salió de su banda:</p><ul class="list">' + out.map(b => `<li>${esc(b.name)}: tiene ${pct1(b.actual)} y lo ideal es ${pct1(b.target)} ± ${b.tol}.</li>`).join('') + '</ul><p class="foot">Lo más sencillo es dirigir tus aportaciones nuevas al barrio que falta, sin vender. La misión del mes ya te dice a dónde.</p>'
+      ? '<p style="margin:0;font-weight:700">Mientras tanto, esto se salió de su banda:</p><ul class="list">' + out.map(b => `<li>${esc(b.name)}: tiene ${pct1(b.actual)} y lo ideal es ${pct1(b.target)} ± ${b.tol}.</li>`).join('') + '</ul><p class="foot">Lo más sencillo es mandar el presupuesto nuevo al barrio que falta, sin vender. La misión del mes ya te dice a dónde.</p>'
       : `<p style="margin:0">Todos los grupos están dentro de su banda.</p>`;
     box.innerHTML = html;
     collapsible(box, 'ceremony', CE.next ? `Próxima ceremonia: <b>${fechaLarga(CE.next)}</b>.` : 'Sin fecha.', false); return;
@@ -1184,17 +1083,17 @@ function renderCeremony() {
   const underSum = BD.filter(b => b.state === 'under').reduce((a, b) => a + b.toLimit, 0);
   const needNoSell = Math.max(overT - T0, underSum);
   html += CE.done
-    ? `<p class="mission-scene">Tu ciudad quedó en equilibrio. Todos los grupos están dentro de su banda.</p>`
-    : `<p class="muted" style="margin:0">Así quedaría tu ciudad en su forma ideal. Haz estos movimientos en tu casa de bolsa y luego captura tus nuevos saldos aquí; la ceremonia se completa cuando todos los grupos queden dentro de su banda.</p>`;
+    ? `<p class="mission-scene">Tu pueblo quedó en equilibrio. Todos los grupos están dentro de su banda.</p>`
+    : `<p class="muted" style="margin:0">Así quedaría tu pueblo en su forma ideal. Haz estos movimientos en tu casa de bolsa y luego actualiza el catastro; la ceremonia se completa cuando todos los grupos queden dentro de su banda.</p>`;
   if (!CE.done && moves.length) {
     const unidades = x => { const p = +x.it.precio_mxn; if (x.it.key === 'RENTA_FIJA' || !p) return '—'; const u = Math.abs(x.d) / p; return x.it.key === 'BITCOIN' ? u.toFixed(5) : '≈ ' + Math.round(u); };
     html += `<div class="tbl"><table><thead><tr><th>Activo</th><th>Movimiento</th><th style="text-align:right">Monto</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${moves.map(x => `<tr><td><span class="dot" style="--c:${CLS[x.it.key].color};margin-right:6px"></span>${esc(x.it.activo)}</td><td class="${x.d > 0 ? 'pos' : 'neg'}">${x.d > 0 ? 'Comprar' : 'Vender'}</td><td class="n">${mxn.format(Math.abs(x.d))}</td><td class="n muted">${unidades(x)}</td></tr>`).join('')}</tbody></table></div>`;
     if (holds.length) html += `<p class="foot">${holds.map(i => esc(i.activo)).join(', ')} se mantienen como están: cuentan en su grupo, pero no se compran ni venden. El rebalanceo de cada grupo se hace con su vehículo (pestaña Bandas).</p>`;
-    if (needNoSell > 0) html += `<p class="foot">Si prefieres no vender (y no pagar impuestos por ganancias): aportando unos ${mxn.format(needNoSell)} a lo que falta, todos los grupos regresan a su banda. El simulador de abajo te dice cómo repartirlo.</p>`;
+    if (needNoSell > 0) html += `<p class="foot">Si prefieres no vender (y no pagar impuestos por ganancias): destinando unos ${mxn.format(needNoSell)} a lo que falta, todos los grupos regresan a su banda. El simulador de abajo te dice cómo repartirlo.</p>`;
   }
-  html += `<ul class="tasks"><li class="on">Revisa los movimientos</li><li class="${ST.savedThisMonth ? 'on' : ''}">Captura tus nuevos saldos</li><li class="${CE.inRange ? 'on' : ''}">Deja todos los grupos dentro de su banda</li></ul>`;
+  html += `<ul class="tasks"><li class="on">Revisa los movimientos</li><li class="${ST.savedThisMonth ? 'on' : ''}">Actualiza el catastro</li><li class="${CE.inRange ? 'on' : ''}">Deja todos los grupos dentro de su banda</li></ul>`;
   box.innerHTML = html;
-  collapsible(box, 'ceremony', CE.done ? '<b>Completada.</b> Tu ciudad quedó en equilibrio.' : `<b>Este mes.</b> ${moves.length} movimientos sugeridos.`, false);
+  collapsible(box, 'ceremony', CE.done ? '<b>Completada.</b> Tu pueblo quedó en equilibrio.' : `<b>Este mes.</b> ${moves.length} movimientos sugeridos.`, false);
 }
 
 function renderCalc() {
@@ -1227,7 +1126,7 @@ function renderForm() {
     });
     html += '</div>';
   });
-  html += `<div class="save"><button type="submit" id="btnSave">Guardar y actualizar mi ciudad</button><span class="toast" id="toast"></span></div>`;
+  html += `<div class="save"><button type="submit" id="btnSave">Registrar en el catastro</button><span class="toast" id="toast"></span></div>`;
   f.innerHTML = html;
 }
 $('pfForm').addEventListener('submit', async e => {
@@ -1246,7 +1145,7 @@ $('pfForm').addEventListener('submit', async e => {
   btn.disabled = true; toast.className = 'toast muted'; toast.textContent = 'Guardando…';
   try {
     apply(await api('guardar', { posiciones }));
-    $('toast').className = 'toast pos'; $('toast').textContent = 'Guardado. Tu ciudad ya se actualizó.';
+    $('toast').className = 'toast pos'; $('toast').textContent = 'Registrado. El pueblo ya se actualizó.';
     $('stage').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
   } catch (err) { $('toast').className = 'toast neg'; $('toast').textContent = err.message; }
   if ($('btnSave')) $('btnSave').disabled = false;
@@ -1267,7 +1166,7 @@ const isUnit = i => i.key !== 'RENTA_FIJA' && i.key !== 'BITCOIN' && +i.precio_m
 function renderSim() {
   const amt = Math.max(0, Number($('simAmt').value) || 0), M = model, out = $('simOut');
   const groups = (M.groups || []).filter(g => g.traders.length);
-  if (!amt || !groups.length) { out.innerHTML = ''; return; }
+  if (!amt || !groups.length) { out.innerHTML = ''; SIM = null; return; }
   const NT = M.total + amt;
   // 1) entre grupos, con los objetivos de Bandas
   const gAlloc = levelFill(groups.map(g => ({ t: g.tG / 100, v: g.valor })), NT, amt);
@@ -1313,13 +1212,15 @@ function renderSim() {
     rows += `<tr style="background:var(--panel2);${on ? '' : 'opacity:.6'}"><td class="n"><b>${n + 1}</b></td><td><span class="dot" style="--c:${col};margin-right:6px"></span><b>${esc(r.g.name)}</b></td><td class="n">${pc(r.now)}</td><td class="n muted">${pc(r.g.tG)}</td><td class="n ${tone(r.after, r.g.tG, tol)}">${pc(r.after)}</td><td class="n ${on ? 'pos' : ''}"><b>${on ? mxn.format(r.inv) : '—'}</b></td><td></td></tr>`;
     if (!on) return;
     r.items.filter(x => x.amt >= 1).sort((a, b) => b.amt - a.amt).forEach(x => {
-      rows += `<tr><td></td><td style="padding-left:26px">${esc(x.i.activo)}</td><td class="n muted">${pc(pctNow(x.i.valor))}</td><td class="n muted">${pc(x.i.objetivo)}</td><td class="n muted">${pc(pctAfter(after(x)))}</td><td class="n pos">${mxn.format(x.amt)}</td><td class="n muted">${u(x)}</td></tr>`;
+      rows += `<tr><td></td><td style="padding-left:26px">${esc(x.i.activo)}</td><td class="n muted">${pc(pctNow(x.i.valor))}</td><td class="n muted">${pc(x.i.objetivo)}</td><td class="n muted">${pc(pctAfter(after(x)))}</td><td class="n pos">${mxn.format(x.amt)}</td><td class="n muted">${u(x)}${GOV.objTxt(x.i)}</td></tr>`;
     });
   });
   const spent = plan.reduce((a, x) => a + x.amt, 0), rest = amt - spent;
-  out.innerHTML = `<div class="tbl"><table><thead><tr><th>#</th><th>Grupo / activo</th><th style="text-align:right">Hoy</th><th style="text-align:right">Ideal</th><th style="text-align:right">Después</th><th style="text-align:right">Invierte</th><th style="text-align:right">Aprox.</th></tr></thead><tbody>${rows}</tbody></table></div>
+  SIM = { amt, plan, rowsG, rest, NT, spent };
+  out.innerHTML = `<div class="tbl"><table><thead><tr><th>#</th><th>Barrio / obra</th><th style="text-align:right">Hoy</th><th style="text-align:right">Ideal</th><th style="text-align:right">Después</th><th style="text-align:right">Destina</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${rows}</tbody></table></div>
     ${rest > 1 ? `<p class="foot" style="margin-top:6px">Sobran ${mxn.format(rest)} que no alcanzan para un título completo.</p>` : ''}
-    <p class="foot" style="margin-top:6px">El dinero se reparte para que todos los grupos queden igual de cerca de su objetivo de Bandas; dentro de cada grupo, igual con Pesos internos (o todo al vehículo). Se redondea a títulos completos y lo que sobra va a renta fija. Si un grupo está pasado (como Cripto hoy), no recibe nada y los demás quedan un poco abajo de su ideal en la misma proporción. Precios de hoy.</p>`;
+    <p class="foot" style="margin-top:6px">El dinero se reparte para que todos los grupos queden igual de cerca de su objetivo de Bandas; dentro de cada grupo, igual con Pesos internos (o todo al vehículo). Se redondea a títulos completos y lo que sobra va a renta fija. Si un barrio está sobrepoblado, no recibe nada y los demás quedan un poco abajo de su ideal en la misma proporción. Precios de hoy; el precio objetivo es una orden límite sugerida un poco abajo del precio de hoy.</p>${GOV.simButtons()}`;
+  GOV.wire();
 }
 $('btnSim').addEventListener('click', renderSim);
 $('simAmt').addEventListener('keydown', e => { if (e.key === 'Enter') renderSim(); });
@@ -1339,7 +1240,7 @@ function renderZoom() {
   box.style.setProperty('--c', col);
   box.innerHTML = `<div>
       <h2><span class="dot"></span>${CLS[k].scene}: ${CLS[k].name}</h2>
-      <p><b>Cómo se gana dinero aquí.</b> ${CLS[k].how}</p>
+      <p><b>Cómo prospera este barrio.</b> ${CLS[k].how}</p>
       <p class="muted">Hoy este barrio ${c.hoy >= 0 ? 'ganó' : 'perdió'} <b class="${c.hoy >= 0 ? 'pos' : 'neg'}">${mxn2.format(Math.abs(c.hoy))}</b>${k === 'RENTA_FIJA' ? ' en intereses estimados' : ''}. Los edificios con brillo verde subieron hoy; los que tienen nube bajaron.</p>
     </div>
     <div class="zlist">${c.items.map(it => {
@@ -1352,7 +1253,7 @@ function renderZoom() {
       </div>`;
     }).join('')}</div>`;
   box.querySelectorAll('.zrow').forEach(r => {
-    const pick = () => { selected = selected === r.dataset.a ? null : r.dataset.a; renderZoom(); M3.onSelect(selected); VL.onSelect(selected); };
+    const pick = () => { selected = selected === r.dataset.a ? null : r.dataset.a; renderZoom(); VL.onSelect(selected); };
     r.onclick = pick; r.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } };
   });
 }
@@ -1362,7 +1263,7 @@ let sessionStart = performance.now(), liveLast = 0, liveTarget = 0, liveShown = 
 function renderLive() {
   const M = model, hoy = M.hoy, ayer = M.total - hoy, pct = ayer > 0 ? hoy / ayer * 100 : 0;
   liveTarget = hoy;
-  $('liveLabel').textContent = hoy >= 0 ? 'Hoy tu ciudad ganó' : 'Hoy tu ciudad perdió';
+  $('liveLabel').textContent = hoy >= 0 ? 'Hoy el pueblo prosperó' : 'Hoy el pueblo tuvo pérdidas';
   $('livePct').className = 'pill ' + (hoy >= 0 ? 'ok' : 'lo');
   $('livePct').textContent = (pct >= 0 ? '+' : '−') + Math.abs(pct).toFixed(2) + '% contra ayer';
   const groups = (M.groups && M.groups.length)
@@ -1372,10 +1273,10 @@ function renderLive() {
     .map(g => `<span class="lchip"><span class="dot" style="--c:${g.col}"></span>${esc(g.name)} <b class="${g.v >= 0 ? 'pos' : 'neg'}">${signed2(g.v)}</b></span>`).join('');
   const mov = M.items.filter(i => i.valor > 0 && i.key !== 'RENTA_FIJA').sort((a, b) => b.hoy - a.hoy);
   const top = mov[0], worst = mov[mov.length - 1];
-  $('liveFoot').innerHTML = `Ayer al cierre tu ciudad valía <b>${mxn.format(ayer)}</b>; ahora vale <b>${mxn.format(M.total)}</b>.`
-    + (top && top.hoy > 0 ? ` Lo que más subió: <b>${esc(top.activo)}</b> (${signed2(top.hoy)}).` : '')
-    + (worst && worst.hoy < 0 ? ` Lo que más bajó: <b>${esc(worst.activo)}</b> (${signed2(worst.hoy)}).` : '')
-    + `<br>Acciones y FIBRAs se comparan contra el cierre anterior, incluyendo el tipo de cambio; cripto contra las 7:00 de hoy; renta fija suma el interés de un día. Aparte, tu ciudad genera unos <b>${mxn2.format(incomePerDay(M))}</b> al día en intereses, rentas y dividendos.`;
+  $('liveFoot').innerHTML = `Ayer al cierre el tesoro del pueblo valía <b>${mxn.format(ayer)}</b>; ahora vale <b>${mxn.format(M.total)}</b>.`
+    + (top && top.hoy > 0 ? ` Lo mejor del día: ${esc(GOV.story(top).text)} (<b>${esc(top.activo)}</b> ${signed2(top.hoy)}).` : '')
+    + (worst && worst.hoy < 0 ? ` Lo peor: ${esc(GOV.story(worst).text)} (<b>${esc(worst.activo)}</b> ${signed2(worst.hoy)}).` : '')
+    + `<br>Fábricas e inmuebles se comparan contra el cierre anterior, con tipo de cambio; la bóveda contra las 7:00 de hoy; las obras públicas suman un día de intereses. Aparte, el pueblo cobra unos <b>${mxn2.format(incomePerDay(M))}</b> al día en intereses, rentas y dividendos.`;
 }
 function tickLive(now) {
   if (!model || now - liveLast < 40) return;
@@ -1460,7 +1361,7 @@ function aimCamera(k, snap) {
   }
   if (snap || reduce) cam = { ...camT };
 }
-function setFocus(k, fromMap) { focus = k; selected = null; aimCamera(k, false); renderZoom(); if (!fromMap) { M3.onFocus(k); VL.onFocus(k); } }
+function setFocus(k, fromMap) { focus = k; selected = null; aimCamera(k, false); renderZoom(); if (!fromMap) VL.onFocus(k); }
 $('btnBack').addEventListener('click', () => setFocus(null));
 
 cv.addEventListener('click', e => {
@@ -1721,7 +1622,7 @@ function warnSign(b) {
   ctx.fillStyle = Math.sin(T * 4) > -.3 ? '#ffd23f' : '#ffb454';
   ctx.beginPath(); ctx.moveTo(cx, y - 8); ctx.lineTo(cx + 8, y + 6); ctx.lineTo(cx - 8, y + 6); ctx.closePath(); ctx.fill();
   text('!', cx, y + 4.5, 10, '#1a1a1a', 'center', 800);
-  if (b.w > 34) { ctx.fillStyle = 'rgba(14,20,38,.85)'; rr(cx - 26, y + 8, 52, 10, 3); ctx.fill(); text('SE BUSCA INVERSIÓN', cx, y + 15.5, 5.2, '#ffd23f', 'center', 800); }
+  if (b.w > 34) { ctx.fillStyle = 'rgba(14,20,38,.85)'; rr(cx - 26, y + 8, 52, 10, 3); ctx.fill(); text('SE BUSCA PRESUPUESTO', cx, y + 15.5, 5.2, '#ffd23f', 'center', 800); }
 }
 
 function garland(x0, x1, y) {
@@ -1914,7 +1815,7 @@ function draw() {
     if (zx > W || zx + zw < 0) return;
     if (k !== 'BITCOIN') { ctx.fillStyle = 'rgba(238,241,248,.12)'; ctx.fillRect(zx + zw - 1, 44, 1, G - 44); }
     ctx.font = '800 12px Figtree, system-ui, sans-serif';
-    let label = `${CLS[k].name} ${Math.round(c.pct)}%`;
+    let label = `${CLS[k].scene} ${Math.round(c.pct)}%`;
     if (ctx.measureText(label).width + 30 > zw) label = `${Math.round(c.pct)}%`;
     const tw = ctx.measureText(label).width + 22;
     const lx = Math.max(zx + 4, Math.min(zx + zw - tw - 4, zx + 6));
@@ -1964,1179 +1865,6 @@ requestAnimationFrame(frame);
 
 // ================= Mapa 3D estilo Google Maps =================
 // Vista desde arriba o inclinada, pines, ficha de lugar, recorrido guiado y vista de calle.
-const M3 = (() => {
-  const SRC = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js';
-  const $m = id => document.getElementById(id);
-  let THREE = null, ok = false, bad = false, built = false, first = true;
-  let R, S, C, hemi, sun, ray, ndc, V3;
-  let world = null, disp = [], winMats = [];
-  let blds = [], byA = new Map(), dists = {}, pickables = [], labels = [], pops = [], ticks = [], cars = [];
-  let theme = 'night', mode = 'map', selA = null, selK = null, visible = true, tNow = 0, flash = 0;
-  let selRing = null, hintTimer = null, lastTiltLbl = '';
-  const cam = { x: 0, y: 0, z: 0, d: 260, b: .5, t: .86 }, goal = { ...cam };
-  let fly = null;
-  const sv = { x: 0, z: 0, yaw: 0, pitch: 0, i: 0, walk: null, stops: [] };
-  const tour = { on: false, steps: [], i: 0, t: 0, paused: false, only: null };
-  const TH = {
-    night: { sky: 0x151d3c, fog: 0x151d3c, grass: 0x1c3241, base: 0x2a3152, ave: 0x36406a, line: 0xe8c66a, side: 0x3a4468, blockTo: 0x1c2646, blockMix: .7,
-      water: 0x1f4f78, hs: 0xa6b6ff, hg: 0x1b1b30, hi: .9, sc: 0xc4d0ff, si: 1.05, sp: [100, 150, 120], win: 1.15, lamp: 1, out: 0x262f50, trunk: 0x3a2f2a, leaf: 0x21604c },
-    day: { sky: 0xcde7ff, fog: 0xdcefff, grass: 0xc4e4ae, base: 0xfbfbfb, ave: 0xfde293, line: 0xffffff, side: 0xffffff, blockTo: 0xeceff3, blockMix: .78,
-      water: 0x9fd0f2, hs: 0xffffff, hg: 0xc2cfa8, hi: 1.05, sc: 0xfff4e0, si: 1.9, sp: [120, 200, 90], win: .12, lamp: 0, out: 0xdde2ea, trunk: 0x7a5a3a, leaf: 0x7cc06a }
-  };
-  const th = () => TH[theme];
-  const TX = {}, TM = {};
-  const RECT = {
-    ACCIONES: { x0: -124, x1: -10, z0: -106, z1: -10 },
-    FIBRAS: { x0: 10, x1: 124, z0: -106, z1: -10 },
-    RENTA_FIJA: { x0: -124, x1: -10, z0: 10, z1: 106 },
-    BITCOIN: { x0: 10, x1: 124, z0: 10, z1: 106 }
-  };
-  const ISLE = { x: 68, z: 58, r: 18 };
-  const KIND = { fabrica: 'Fábrica', nave: 'Nave industrial', torre: 'Torre de oficinas', plaza: 'Plaza comercial', boveda: 'Bóveda', calle: 'Calles', carretera: 'Carretera', puente: 'Puente', escuela: 'Escuela', hospital: 'Hospital', tesoreria: 'Tesorería' };
-  const ICON = {
-    peg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="2.5"/><path d="M9 21v-6l-2-1v-4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4l-2 1v6"/></svg>',
-    x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
-    play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>',
-    pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h4.5v16H6zM13.5 4H18v16h-4.5z" fill="currentColor"/></svg>',
-    route: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h7"/></svg>'
-  };
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  const angD = (a, b) => { let d = (b - a) % (Math.PI * 2); if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2; return d; };
-  const rnd = (a, b) => a + Math.random() * (b - a);
-
-  // ---------- arranque ----------
-  async function init() {
-    try {
-      const t = document.createElement('canvas');
-      if (!(t.getContext('webgl2') || t.getContext('webgl'))) throw new Error('Sin WebGL');
-      THREE = await import(SRC);
-      setup();
-      ok = true;
-      $m('m3load').textContent = 'Construyendo tu ciudad…';
-      if (model) build();
-    } catch (err) {
-      bad = true;
-      $m('m3load').textContent = 'No se pudo cargar el mapa 3D en este navegador.';
-      if (typeof setView === 'function' && viewMode === '3d') setView('classic', false);
-      const b = $('vw3d'); if (b) { b.disabled = true; b.title = 'Tu navegador no pudo abrir el mapa 3D'; }
-    }
-  }
-
-  function setup() {
-    R = new THREE.WebGLRenderer({ canvas: $m('m3gl'), antialias: true, powerPreference: 'high-performance' });
-    R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
-    R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap;
-    R.toneMapping = THREE.ACESFilmicToneMapping;
-    S = new THREE.Scene();
-    S.fog = new THREE.Fog(0x000000, 300, 900);
-    C = new THREE.PerspectiveCamera(40, 1, 1, 2400);
-    hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1); S.add(hemi);
-    sun = new THREE.DirectionalLight(0xffffff, 1);
-    sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
-    const sc = sun.shadow.camera; sc.left = -175; sc.right = 175; sc.top = 160; sc.bottom = -160; sc.near = 10; sc.far = 700;
-    sun.shadow.bias = -.0005; sun.shadow.normalBias = .5;
-    S.add(sun); S.add(sun.target);
-    ray = new THREE.Raycaster(); ndc = new THREE.Vector2(); V3 = new THREE.Vector3();
-    makeShared();
-    try { if (localStorage.getItem('cm_theme') === 'day') theme = 'day'; } catch (_) {}
-    applyTheme();
-    bind();
-    new ResizeObserver(resize).observe($m('m3'));
-    if ('IntersectionObserver' in window) new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe($m('m3'));
-    resize();
-    let last = performance.now();
-    const loop = now => {
-      const dt = Math.min(.05, (now - last) / 1000); last = now;
-      if (built && visible && !document.hidden && !$m('m3').hidden && !$('app').hidden) { step(dt); R.render(S, C); }
-      requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
-  }
-
-  function resize() {
-    if (!R) return;
-    const el = $m('m3'), w = el.clientWidth, h = el.clientHeight;
-    if (!w || !h) return;
-    R.setSize(w, h, false); C.aspect = w / h; C.updateProjectionMatrix();
-  }
-
-  // ---------- texturas y materiales compartidos ----------
-  function ctex(w, h, draw, keep) {
-    const c = document.createElement('canvas'); c.width = w; c.height = h;
-    draw(c.getContext('2d'), w, h);
-    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
-    if (!keep) disp.push(t);
-    return t;
-  }
-  const circ = (g, x, y, r) => { g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); };
-  function signTex(txt, bg, fg, w, h) {
-    return ctex(w, h, g => {
-      g.fillStyle = bg; g.fillRect(0, 0, w, h); g.fillStyle = fg;
-      let fs = Math.round(h * .58);
-      const f = () => { g.font = `800 ${fs}px Figtree, system-ui, sans-serif`; };
-      f(); while (g.measureText(txt).width > w * .88 && fs > 10) { fs -= 2; f(); }
-      g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(txt, w / 2, h / 2 + 2);
-    });
-  }
-  function makeShared() {
-    TX.coin = ctex(64, 64, g => { g.fillStyle = '#b8780f'; circ(g, 32, 32, 30); g.fillStyle = '#f2b544'; circ(g, 32, 32, 25); g.fillStyle = '#5a3d00'; g.font = '800 34px Figtree, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('$', 32, 34); }, true);
-    TX.soft = ctex(64, 64, g => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.45, 'rgba(255,255,255,.6)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); }, true);
-    TX.sq = ctex(8, 8, g => { g.fillStyle = '#fff'; g.fillRect(0, 0, 8, 8); }, true);
-    TX.tape = ctex(128, 16, g => { g.fillStyle = '#ffd23f'; g.fillRect(0, 0, 128, 16); g.fillStyle = '#1a1a1a'; for (let x = -16; x < 144; x += 16) { g.beginPath(); g.moveTo(x, 16); g.lineTo(x + 8, 0); g.lineTo(x + 14, 0); g.lineTo(x + 6, 16); g.fill(); } }, true);
-    TX.tape.wrapS = THREE.RepeatWrapping;
-    TX.awning = ctex(64, 8, g => { for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#ef7b6c' : '#f6e7d8'; g.fillRect(i * 8, 0, 8, 8); } }, true);
-    TX.awning.wrapS = THREE.RepeatWrapping;
-    const S_ = o => new THREE.MeshStandardMaterial(o);
-    TM.grass = S_({ roughness: 1 }); TM.base = S_({ roughness: .95 }); TM.ave = S_({ roughness: .9 });
-    TM.water = S_({ roughness: .22, metalness: .25 }); TM.out = S_({ roughness: .9 }); TM.line = new THREE.MeshBasicMaterial();
-    TM.leaf = S_({ roughness: .9, flatShading: true }); TM.trunk = S_({ roughness: 1 }); TM.side = S_({ roughness: .9 });
-    TM.lamp = S_({ color: 0x2a2f45, emissive: 0xffd99a, emissiveIntensity: 1 });
-    TM.head = S_({ color: 0xffffff, emissive: 0xfff1b8, emissiveIntensity: 1 });
-    TM.sand = S_({ color: 0xd8c9a0, roughness: 1 });
-    TM.blocks = {}; ORDER.forEach(k => { TM.blocks[k] = S_({ roughness: .9 }); });
-  }
-  function applyTheme() {
-    const t = th();
-    S.background = new THREE.Color(t.sky); S.fog.color.set(t.fog);
-    hemi.color.set(t.hs); hemi.groundColor.set(t.hg); hemi.intensity = t.hi;
-    sun.color.set(t.sc); sun.intensity = t.si; sun.position.set(t.sp[0], t.sp[1], t.sp[2]);
-    ['grass', 'base', 'ave', 'water', 'out', 'line', 'leaf', 'trunk', 'side'].forEach(k => TM[k].color.set(t[k]));
-    TM.lamp.emissiveIntensity = t.lamp; TM.head.emissiveIntensity = t.lamp * 1.4;
-    const to = new THREE.Color(t.blockTo);
-    ORDER.forEach(k => TM.blocks[k].color.set(CLS[k].color).lerp(to, t.blockMix));
-    winMats.forEach(m => { m.emissiveIntensity = t.win * (m.userData.k ?? 1); });
-    $m('m3').classList.toggle('day', theme === 'day');
-    $m('m3Day').setAttribute('aria-pressed', String(theme === 'day'));
-    $m('m3Night').setAttribute('aria-pressed', String(theme === 'night'));
-  }
-  function setTheme(t) { theme = t; try { localStorage.setItem('cm_theme', t); } catch (_) {} if (ok) applyTheme(); }
-
-  // ---------- ayudantes de geometría ----------
-  const Gm = g => (disp.push(g), g);
-  const U = m => (disp.push(m), m);
-  const mcache = new Map();
-  function M(color, o) {
-    o = o || {};
-    const key = [color, o.e || 0, o.ei ?? 1, o.m || 0, o.r ?? .8].join('|');
-    let m = mcache.get(key);
-    if (!m) { m = new THREE.MeshStandardMaterial({ color, emissive: o.e || 0, emissiveIntensity: o.ei ?? 1, metalness: o.m || 0, roughness: o.r ?? .8 }); mcache.set(key, m); }
-    return m;
-  }
-  function mesh(geo, mat, x, y, z, par, sh = true) {
-    const m = new THREE.Mesh(geo, mat); m.position.set(x || 0, y || 0, z || 0);
-    if (sh) { m.castShadow = true; m.receiveShadow = true; }
-    (par || world).add(m); return m;
-  }
-  const box = (w, h, d, mat, x, y, z, par, sh) => mesh(Gm(new THREE.BoxGeometry(w, h, d)), mat, x, (y || 0) + h / 2, z, par, sh);
-  const cyl = (rt, rb, h, mat, x, y, z, par, seg = 12, sh) => mesh(Gm(new THREE.CylinderGeometry(rt, rb, h, seg)), mat, x, (y || 0) + h / 2, z, par, sh);
-  function flat(w, d, mat, x, y, z, par) { const m = mesh(Gm(new THREE.PlaneGeometry(w, d)), mat, x, y, z, par, false); m.rotation.x = -Math.PI / 2; m.receiveShadow = true; return m; }
-  function prism(pts, depth, mat, par) {
-    const s = new THREE.Shape(); s.moveTo(pts[0][0], pts[0][1]); pts.slice(1).forEach(p => s.lineTo(p[0], p[1])); s.closePath();
-    const m = new THREE.Mesh(Gm(new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: false })), mat);
-    m.castShadow = m.receiveShadow = true; par.add(m); return m;
-  }
-  function sign(txt, bg, fg, w, h, par, x, y, z, ry) {
-    const t = signTex(txt, bg, fg, 256, Math.max(32, Math.round(256 * h / w)));
-    const m = mesh(Gm(new THREE.PlaneGeometry(w, h)), U(new THREE.MeshBasicMaterial({ map: t, side: THREE.DoubleSide })), x, y, z, par, false);
-    m.rotation.y = ry || 0; return m;
-  }
-  function glowMat(color, emissive, k) {
-    const m = U(new THREE.MeshStandardMaterial({ color, emissive, emissiveIntensity: th().win * k, roughness: .5 }));
-    m.userData.k = k; winMats.push(m); return m;
-  }
-  function winMat(seed, color, act, w, d, h) {
-    const r = rng(seed), lit = act > 1 ? .72 : act < 1 ? .3 : .52, cells = [];
-    for (let i = 0; i < 32; i++) cells.push(r() < lit ? (r() > .86 ? 2 : 1) : 0);
-    const draw = em => (g, W, H) => {
-      g.fillStyle = em ? '#000' : '#fff'; g.fillRect(0, 0, W, H);
-      cells.forEach((v, i) => { const cx = i % 4, cy = i >> 2; g.fillStyle = em ? (v === 2 ? '#8fdcff' : v ? '#ffd27a' : '#000') : (v === 2 ? '#d6f3ff' : v ? '#fff0c8' : '#39415f'); g.fillRect(cx * 16 + 3, cy * 16 + 4, 10, 9); });
-    };
-    const base = ctex(64, 128, draw(false)), emi = ctex(64, 128, draw(true));
-    const one = (rx, ry) => {
-      const a = base.clone(), e = emi.clone();
-      [a, e].forEach(t => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry); t.needsUpdate = true; disp.push(t); });
-      const m = U(new THREE.MeshStandardMaterial({ color, map: a, emissive: 0xffffff, emissiveMap: e, emissiveIntensity: th().win, roughness: .55, metalness: .1 }));
-      winMats.push(m); return m;
-    };
-    const ry = Math.max(1, Math.round(h / 12));
-    return { x: one(Math.max(1, Math.round(d / 7)), ry), z: one(Math.max(1, Math.round(w / 7)), ry) };
-  }
-  function tower(w, h, d, color, roof, seed, act, par, x, z, y0) {
-    const wm = winMat(seed, color, act, w, d, h);
-    return mesh(Gm(new THREE.BoxGeometry(w, h, d)), [wm.x, wm.x, roof, roof, wm.z, wm.z], x, (y0 || 0) + h / 2, z, par);
-  }
-
-  // ---------- efectos ----------
-  const fxPool = [], fxOn = [];
-  function fx(tex, color, x, y, z, o) {
-    if (reduce || fxOn.length > 260) return;
-    let sp = fxPool.pop();
-    if (!sp) { sp = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, depthWrite: false })); S.add(sp); }
-    sp.material.map = tex; sp.material.color.set(color); sp.material.opacity = o.op ?? 1;
-    sp.visible = true; sp.position.set(x, y, z); sp.scale.setScalar(o.s0);
-    fxOn.push({ sp, vx: o.vx || 0, vy: o.vy || 0, vz: o.vz || 0, gr: o.gr || 0, drag: o.drag || 0, life: 0, max: o.max, s0: o.s0, s1: o.s1 ?? o.s0, op: o.op ?? 1, soft: !!o.soft });
-  }
-  function updFx(dt) {
-    for (let i = fxOn.length - 1; i >= 0; i--) {
-      const f = fxOn[i]; f.life += dt;
-      const p = f.life / f.max;
-      if (p >= 1) { f.sp.visible = false; fxPool.push(f.sp); fxOn.splice(i, 1); continue; }
-      f.vy -= f.gr * dt;
-      if (f.drag) { const k = 1 - f.drag * dt; f.vx *= k; f.vy *= k; f.vz *= k; }
-      f.sp.position.x += f.vx * dt; f.sp.position.y += f.vy * dt; f.sp.position.z += f.vz * dt;
-      f.sp.scale.setScalar(f.s0 + (f.s1 - f.s0) * p);
-      f.sp.material.opacity = f.op * (f.soft ? 1 - p : p > .6 ? (1 - p) / .4 : 1);
-    }
-  }
-  const fxCoin = (x, y, z) => fx(TX.coin, 0xffffff, x, y, z, { vy: 3.4, max: 2.2, s0: 1.9 });
-  const fxSmoke = (v, dark) => fx(TX.soft, dark ? 0x8a8aa0 : theme === 'day' ? 0xffffff : 0xdedff0, v.x + rnd(-.2, .2), v.y, v.z, { vx: rnd(.7, 1.3), vy: 2.3, vz: rnd(-.3, .3), max: 3.4, s0: 1.4, s1: 6, op: dark ? .5 : .62, soft: true });
-  const CONF = [0xef7b6c, 0xf2b544, 0x4fc3b0, 0x8fa2ff, 0xff9fd1];
-  const fxConf = (x, y, z) => fx(TX.sq, CONF[Math.floor(Math.random() * 5)], x, y, z, { vx: rnd(-2, 2), vy: rnd(-4, -2), vz: rnd(-2, 2), max: 2.4, s0: .45 });
-  function firework() {
-    const x = rnd(-100, 100), z = rnd(-90, 90), y = rnd(48, 78), col = CONF[Math.floor(Math.random() * 5)];
-    for (let i = 0; i < 42; i++) {
-      const u = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, s = Math.sqrt(1 - u * u), v = rnd(14, 20);
-      fx(TX.soft, col, x, y, z, { vx: Math.cos(a) * s * v, vy: u * v, vz: Math.sin(a) * s * v, gr: 6, drag: .9, max: 1.7, s0: 2.4, s1: .8, soft: true });
-    }
-  }
-  function pop(txt, x, y, z, cls) {
-    if (reduce || pops.length > 10 || (mode !== 'street' && cam.d > 175) || (mode === 'street' && Math.hypot(x - sv.x, z - sv.z) > 55)) return;
-    const el = document.createElement('span'); el.className = 'pop ' + (cls || ''); el.textContent = txt;
-    $m('m3lab').appendChild(el);
-    pops.push({ el, p: new THREE.Vector3(x, y, z), t: 0, max: 2.6 });
-  }
-  function updPops(dt) {
-    const W = R.domElement.clientWidth, H = R.domElement.clientHeight;
-    for (let i = pops.length - 1; i >= 0; i--) {
-      const p = pops[i]; p.t += dt;
-      if (p.t >= p.max) { p.el.remove(); pops.splice(i, 1); continue; }
-      V3.copy(p.p); V3.y += p.t * 1.8; V3.project(C);
-      if (V3.z > 1) { p.el.style.opacity = 0; continue; }
-      p.el.style.transform = `translate(${(V3.x * .5 + .5) * W}px,${(-V3.y * .5 + .5) * H}px) translate(-50%,-50%)`;
-      p.el.style.opacity = String(1 - Math.max(0, (p.t - p.max * .6) / (p.max * .4)));
-    }
-  }
-
-  // ---------- construir la ciudad ----------
-  function teardown() {
-    if (world) S.remove(world);
-    disp.forEach(d => d.dispose && d.dispose()); disp = []; winMats = [];
-    labels.forEach(L => L.el.remove()); pops.forEach(p => p.el.remove());
-    blds = []; byA = new Map(); dists = {}; pickables = []; labels = []; pops = []; ticks = []; cars = [];
-    fxOn.forEach(f => { f.sp.visible = false; fxPool.push(f.sp); }); fxOn.length = 0;
-    selRing = null; world = null; built = false;
-  }
-  const HOME = () => {
-    const a = C ? C.aspect : 1.6;
-    return { x: 0, y: 0, z: 6, d: clamp(118 / (Math.tan(20 * Math.PI / 180) * a), 185, 520), b: .5, t: .82 };
-  };
-
-  function build() {
-    if (!ok || !model) return;
-    teardown();
-    world = new THREE.Group(); S.add(world);
-    const lv = levelOf(model.total).i;
-    makeGround(lv);
-    ORDER.forEach(k => makeDistrict(k));
-    makeMonument(lv);
-    makeTraffic(lv);
-    makePeople();
-    ticks.push(dt => {
-      let rate = 0;
-      if (celebrateT > 0) { if ($('classic').hidden) celebrateT -= dt; rate = 3; }
-      else if (CE && CE.active) rate = CE.done ? .6 : .12;
-      if (Math.random() < dt * rate) firework();
-    });
-    selRing = mesh(Gm(new THREE.RingGeometry(1, 1.9, 48)), U(new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .9, depthWrite: false })), 0, .5, 0, null, false);
-    selRing.rotation.x = -Math.PI / 2; selRing.visible = false;
-    labels.sort((a, b) => b.pri - a.pri);
-    $m('m3list').innerHTML = ORDER.map(k => `<option value="${esc(CLS[k].scene)}">${esc(CLS[k].name)}</option>`).join('') + blds.map(b => `<option value="${esc(b.it.activo)}">${esc(CLS[b.k].scene)}</option>`).join('');
-    $m('m3demo').hidden = !DEMO;
-    $m('m3load').hidden = true;
-    built = true;
-    if (first) {
-      first = false;
-      Object.assign(cam, { x: 0, y: 0, z: 0, d: HOME().d * 1.6, b: 0, t: .02 }); Object.assign(goal, cam);
-      flyTo(HOME(), reduce ? 0 : 2.8);
-      hint();
-    }
-    if (mode === 'street') { buildStops(); const i = sv.stops.findIndex(s => s.a === selA); goStop(i < 0 ? 0 : i, true); }
-    else if (tour.on) stopTour();
-    else if (selA && byA.has(selA)) select(selA, false);
-    else if (selK) selectK(selK, false);
-    else closeCard(false);
-  }
-
-  function makeGround(lv) {
-    flat(1800, 1800, TM.grass, 0, -.06, 0);
-    flat(262, 226, TM.base, 0, 0, 0);
-    flat(640, 20, TM.ave, 0, .02, 0);
-    flat(20, 640, TM.ave, 0, .02, 0);
-    const rg = mesh(Gm(new THREE.CircleGeometry(19.5, 56)), TM.ave, 0, .03, 0, null, false); rg.rotation.x = -Math.PI / 2; rg.receiveShadow = true;
-    cyl(11.6, 11.6, .3, TM.side, 0, 0, 0, null, 48);
-    cyl(10.8, 10.8, .36, TM.grass, 0, 0, 0, null, 48);
-    // líneas de carril
-    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), one = new THREE.Vector3(1, 1, 1), P = new THREE.Vector3();
-    const dashes = [];
-    for (let s = -310; s <= 310; s += 7) { if (Math.abs(s) < 22) continue; dashes.push([s, 0, 0]); dashes.push([0, s, 1]); }
-    const dm = new THREE.InstancedMesh(Gm(new THREE.BoxGeometry(3.2, .03, .32)), TM.line, dashes.length);
-    const qz = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
-    dashes.forEach(([x, z, r], i) => { m4.compose(P.set(x, .05, z), r ? qz : q, one); dm.setMatrixAt(i, m4); });
-    world.add(dm);
-    // lago de la bóveda
-    const L = RECT.BITCOIN;
-    flat(L.x1 - L.x0 - 3, L.z1 - L.z0 - 3, TM.water, (L.x0 + L.x1) / 2, .04, (L.z0 + L.z1) / 2);
-    // afueras: crecen con el nivel de la ciudad
-    const r = rng(7 + lv), n = 70 + 40 * lv;
-    const im = new THREE.InstancedMesh(Gm(new THREE.BoxGeometry(1, 1, 1)), TM.out, n);
-    let c = 0;
-    for (let tries = 0; c < n && tries < n * 8; tries++) {
-      const x = (r() * 2 - 1) * 300, z = (r() * 2 - 1) * 280;
-      if ((Math.abs(x) < 142 && Math.abs(z) < 124) || Math.abs(x) < 14 || Math.abs(z) < 14) continue;
-      const w = 6 + r() * 12, d = 6 + r() * 12, h = 1.5 + r() * (3 + 5 * lv) * Math.max(.15, 1 - Math.hypot(x, z) / 430);
-      m4.compose(P.set(x, h / 2, z), q, new THREE.Vector3(w, h, d)); im.setMatrixAt(c++, m4);
-    }
-    im.count = c; im.receiveShadow = true; world.add(im);
-    // árboles y faroles
-    const tl = [], lamps = [];
-    for (let s = -126; s <= 126; s += 9) {
-      if (Math.abs(s) < 24) continue;
-      [-12, 12].forEach(o => { if (!(s > 10 && o > 0)) tl.push([s, o, .9 + Math.random() * .3]); if (!(s > 10 && o > 0)) tl.push([o, s, .9 + Math.random() * .3]); });
-    }
-    for (let a = 0; a < 8; a++) tl.push([Math.cos(a / 8 * Math.PI * 2) * 8.4, Math.sin(a / 8 * Math.PI * 2) * 8.4, .8]);
-    const tr2 = rng(3);
-    for (let i = 0; i < 170; i++) { const x = (tr2() * 2 - 1) * 320, z = (tr2() * 2 - 1) * 300; if ((Math.abs(x) < 140 && Math.abs(z) < 122) || Math.abs(x) < 14 || Math.abs(z) < 14) continue; tl.push([x, z, 1 + tr2() * .8]); }
-    for (let s = -120; s <= 120; s += 18) { if (Math.abs(s) < 26) continue; [-9.6, 9.6].forEach(o => { lamps.push([s, o]); lamps.push([o, s]); }); }
-    trees(tl);
-    const pl = new THREE.InstancedMesh(Gm(new THREE.CylinderGeometry(.12, .16, 4.2, 6)), M(0x50597a), lamps.length);
-    const bl = new THREE.InstancedMesh(Gm(new THREE.SphereGeometry(.45, 8, 6)), TM.lamp, lamps.length);
-    lamps.forEach(([x, z], i) => { m4.compose(P.set(x, 2.1, z), q, one); pl.setMatrixAt(i, m4); m4.compose(P.set(x, 4.3, z), q, one); bl.setMatrixAt(i, m4); });
-    world.add(pl, bl);
-  }
-  function trees(list) {
-    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), P = new THREE.Vector3(), Sc = new THREE.Vector3();
-    const tr = new THREE.InstancedMesh(Gm(new THREE.CylinderGeometry(.22, .3, 1.6, 6)), TM.trunk, list.length);
-    const lf = new THREE.InstancedMesh(Gm(new THREE.IcosahedronGeometry(1.5, 0)), TM.leaf, list.length);
-    list.forEach(([x, z, s], i) => {
-      m4.compose(P.set(x, .8 * s, z), q, Sc.set(s, s, s)); tr.setMatrixAt(i, m4);
-      m4.compose(P.set(x, 2.5 * s, z), q, Sc.set(s, s * 1.15, s)); lf.setMatrixAt(i, m4);
-    });
-    tr.castShadow = lf.castShadow = true; lf.receiveShadow = true;
-    world.add(tr, lf);
-  }
-
-  function addLabel(el, kind, pos, pri, b) {
-    $m('m3lab').appendChild(el);
-    const L = { el, kind, pos, pri, b, w: el.offsetWidth, h: el.offsetHeight, hid: false };
-    el.hidden = true; L.hid = true;
-    labels.push(L); return L;
-  }
-
-  function makeDistrict(k) {
-    const c = model.classes[k], items = c.items, col = CLS[k].color, r = RECT[k];
-    const D = dists[k] = { k, items: [], cx: (r.x0 + r.x1) / 2, cz: (r.z0 + r.z1) / 2, span: Math.max(r.x1 - r.x0, r.z1 - r.z0) };
-    if (k === 'BITCOIN') {
-      const n = Math.max(1, items.length);
-      const IR = ISLE.r = Math.min(34, 17 + 6 * (n - 1));
-      const isl = cyl(IR, IR + 1.5, 1.2, TM.blocks.BITCOIN, ISLE.x, 0, ISLE.z, null, 40);
-      isl.userData.k = k; pickables.push(isl);
-      cyl(IR + 2.4, IR + 2.6, .5, TM.sand, ISLE.x, 0, ISLE.z, null, 40).receiveShadow = true;
-      // puente a la isla
-      const x0 = 9, x1 = ISLE.x - IR + 1, bl = x1 - x0;
-      box(bl, .6, 7, M(0x6b7897), (x0 + x1) / 2, 1, ISLE.z);
-      box(bl, .7, .3, M(0xcfd6e6), (x0 + x1) / 2, 1.6, ISLE.z - 3.4); box(bl, .7, .3, M(0xcfd6e6), (x0 + x1) / 2, 1.6, ISLE.z + 3.4);
-      for (let x = x0 + 4; x < x1 - 2; x += 8) cyl(.6, .6, 1.1, M(0x50597a), x, 0, ISLE.z);
-      const car = carMesh(0xf7931a); const cc = { s: 0, v: 9 };
-      ticks.push(dt => { cc.s += cc.v * dt; const p = (Math.sin(cc.s / bl * Math.PI) + 1) / 2, x = x0 + 3 + (bl - 6) * p; car.position.set(x, 1.6, ISLE.z + (Math.cos(cc.s / bl * Math.PI) > 0 ? 1.7 : -1.7)); car.rotation.y = Math.cos(cc.s / bl * Math.PI) > 0 ? Math.PI / 2 : -Math.PI / 2; });
-      items.forEach((it, i) => {
-        const a = -Math.PI / 2 + i / n * Math.PI * 2, rr = n === 1 ? 0 : IR * .5;
-        makeBuilding(k, it, ISLE.x + Math.cos(a) * rr, ISLE.z + Math.sin(a) * rr, n === 1 ? 20 : 15, n === 1 ? 20 : 15, i, 1.2);
-      });
-      D.cx = ISLE.x; D.cz = ISLE.z; D.span = IR * 2 + 30;
-      D.lab = new THREE.Vector3(ISLE.x, 2, ISLE.z - IR - 6);
-    } else {
-      const pad = 5, st = 5, W = r.x1 - r.x0 - pad * 2, Dp = r.z1 - r.z0 - pad * 2, n = Math.max(1, items.length);
-      let cols = clamp(Math.round(Math.sqrt(n * W / Dp)), 1, n);
-      const rows = Math.ceil(n / cols), lw = (W - st * (cols - 1)) / cols, ld = (Dp - st * (rows - 1)) / rows;
-      items.forEach((it, i) => {
-        const row = Math.floor(i / cols), inRow = row === rows - 1 ? n - row * cols : cols, cl = i % cols, off = (cols - inRow) * (lw + st) / 2;
-        const x = r.x0 + pad + off + cl * (lw + st) + lw / 2, z = r.z0 + pad + row * (ld + st) + ld / 2;
-        const slab = box(lw, .4, ld, TM.blocks[k], x, 0, z); slab.castShadow = false; slab.userData.k = k; pickables.push(slab);
-        makeBuilding(k, it, x, z, lw, ld, i, .4);
-      });
-      D.lab = new THREE.Vector3(D.cx, 2, D.cz);
-    }
-    // tormenta sobre el barrio
-    if (EV.storms.find(s => s.k === k)) {
-      const sw = k === 'BITCOIN' ? ISLE.r * 2 + 10 : r.x1 - r.x0, sd = k === 'BITCOIN' ? ISLE.r * 2 + 10 : r.z1 - r.z0;
-      flat(sw, sd, U(new THREE.MeshBasicMaterial({ color: 0x0a0d20, transparent: true, opacity: .35, depthWrite: false })), D.cx, 64, D.cz);
-      const n = 260, pos = new Float32Array(n * 6), drops = [];
-      for (let i = 0; i < n; i++) drops.push([D.cx + rnd(-sw / 2, sw / 2), rnd(0, 62), D.cz + rnd(-sd / 2, sd / 2)]);
-      const g = Gm(new THREE.BufferGeometry()); g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-      const ls = new THREE.LineSegments(g, U(new THREE.LineBasicMaterial({ color: 0x9bc8ff, transparent: true, opacity: .5 }))); world.add(ls);
-      ticks.push(dt => {
-        drops.forEach((d, i) => { d[1] -= dt * 42; if (d[1] < 0) d[1] += 62; pos.set([d[0], d[1], d[2], d[0] - .2, d[1] - 1.6, d[2]], i * 6); });
-        g.attributes.position.needsUpdate = true;
-        if (Math.random() < dt * .25) flash = .16;
-      });
-    }
-    const el = document.createElement('button'); el.type = 'button'; el.className = 'dlab'; el.style.setProperty('--c', col);
-    const alert = c.items.some(i => ALERT.has(i.activo));
-    el.innerHTML = `<span class="nm">${alert ? '<i class="al" aria-hidden="true">!</i>' : ''}${esc(CLS[k].scene)}</span><small>${esc(CLS[k].name)} · ${pct1(c.pct)}${c.valor ? ` · <span class="${c.hoy >= 0 ? 'pos' : 'neg'}">${signed2(c.hoy)}</span>` : ''}</small>`;
-    el.setAttribute('aria-label', `${CLS[k].scene}, ${CLS[k].name}: ${pct1(c.pct)} de tu ciudad${alert ? ', con alerta' : ''}`);
-    el.onclick = () => { if (tour.on) stopTour(); if (mode === 'map') selectK(k, true); };
-    addLabel(el, 'dist', D.lab, 40);
-  }
-
-  function makeBuilding(k, it, x, z, lw, ld, idx, y0) {
-    const owned = it.valor > 0, kind = kindOf(k, it), ref = refMax[k] || 1;
-    const g = new THREE.Group(); g.position.set(x, y0, z); world.add(g);
-    const b = {
-      it, k, kind, owned, g, x, z, lw: Math.min(lw, 30), ld: Math.min(ld, 30), slw: lw, sld: ld, anims: [],
-      r: owned ? Math.min(1.25, Math.sqrt(it.valor / ref)) : 0,
-      act: k === 'RENTA_FIJA' ? 1 : it.cambio_dia > 0 ? 1.4 : it.cambio_dia < 0 ? .55 : 1,
-      seed: idx * 7 + ORDER.indexOf(k) * 31 + 1, foot: 6, top: 4, door: null
-    };
-    let top;
-    if (!owned) top = bLot(b);
-    else if (kind === 'fabrica') top = bFabrica(b);
-    else if (kind === 'nave') top = bNave(b);
-    else if (kind === 'torre') top = bTorre(b);
-    else if (kind === 'plaza') top = bPlaza(b);
-    else if (kind === 'boveda') top = bBoveda(b);
-    else top = bObra(b);
-    b.top = top + y0;
-    g.traverse(o => { if (o.isMesh) { o.userData.a = it.activo; pickables.push(o); } });
-    status(b);
-    pin(b);
-    blds.push(b); byA.set(it.activo, b); dists[k].items.push(b);
-  }
-
-  // ---------- edificios ----------
-  function bLot(b) {
-    const g = b.g, w = b.lw * .8, d = b.ld * .8;
-    flat(w, d, M(0x7a6a4a, { r: 1 }), 0, .03, 0, g);
-    const pts = [[-w / 2, -d / 2], [w / 2, -d / 2], [w / 2, d / 2], [-w / 2, d / 2], [-w / 2, -d / 2]].map(p => new THREE.Vector3(p[0], .1, p[1]));
-    const ln = new THREE.Line(Gm(new THREE.BufferGeometry().setFromPoints(pts)), U(new THREE.LineDashedMaterial({ color: 0xffb454, dashSize: 1.2, gapSize: .8 })));
-    ln.computeLineDistances(); g.add(ln);
-    for (let x = -w / 2; x <= w / 2 + .01; x += Math.max(2, w / 8)) cyl(.08, .08, 1, M(0x8a7a5a), x, 0, d / 2, g, 5, false);
-    cyl(.12, .12, 2.6, M(0x5a4a2a), 0, 0, d * .15, g, 6);
-    sign('?', '#f2b544', '#1a1a1a', 1.8, 1.3, g, 0, 2.9, d * .15 + .14);
-    b.foot = Math.max(w, d) * .7; b.door = { x: b.x, z: b.z + d / 2 };
-    return 3.8;
-  }
-  function bFabrica(b) {
-    const g = b.g, w = b.lw * (.55 + .32 * b.r), d = b.ld * (.45 + .28 * b.r), h = 4 + 7 * b.r;
-    const glass = glowMat(0x8a7a50, 0xffd27a, b.act >= 1 ? 1 : .25);
-    box(w, h, d, M(0x4a4268), 0, 0, 0, g);
-    box(w + .3, h * .3, d + .3, M(0x3a3458), 0, 0, 0, g);
-    const teeth = Math.max(2, Math.round(w / 5)), tw = w / teeth, rh = 2.4;
-    for (let i = 0; i < teeth; i++) {
-      const p = prism([[0, 0], [tw, 0], [tw, rh]], d * .92, M(0x5c5384), g); p.position.set(-w / 2 + i * tw, h, -d * .46);
-      box(.16, rh * .8, d * .86, glass, -w / 2 + (i + 1) * tw + .04, h + .1, 0, g, false);
-    }
-    const nw = Math.max(2, Math.floor(w / 2.8));
-    for (let i = 0; i < nw; i++) box(1.5, 1, .12, glass, -w / 2 + (i + .5) * w / nw, h * .42, d / 2 + .08, g, false);
-    sign(b.it.subclase || b.it.activo, '#0e1426', '#f2b544', Math.min(w * .8, 11), 1.6, g, 0, h * .8, d / 2 + .09);
-    const nc = w > 13 ? 2 : 1; let topMax = h + rh;
-    for (let c = 0; c < nc; c++) {
-      const cx = nc === 2 ? (c ? w * .32 : -w * .06) : w * .25, cz = -d * .22, ch = h + 5 + 7 * b.r + c * 2;
-      cyl(.9, 1.15, ch, M(0x353050), cx, 0, cz, g);
-      cyl(1.02, 1.02, .6, M(0xef7b6c), cx, ch - 1.6, cz, g);
-      topMax = Math.max(topMax, ch);
-      const tp = { x: b.x + cx, y: g.position.y + ch + .3, z: b.z + cz };
-      let acc = Math.random();
-      b.anims.push(dt => { acc += dt * (b.act > 1 ? 2.6 : b.act < 1 ? .8 : 1.6); while (acc > 1) { acc -= 1; fxSmoke(tp, b.act < 1); } });
-    }
-    // cajas en la banda transportadora
-    const bxs = [];
-    for (let i = 0; i < 3; i++) bxs.push(box(.9, .8, .9, M(0xc99a4a), 0, 0, d / 2 + 1.2, g));
-    b.anims.push((dt, t) => bxs.forEach((m, i) => { m.position.x = -w / 2 + ((t * 1.6 * b.act + i * w / 3) % w); }));
-    b.foot = Math.max(w, d); b.door = { x: b.x, z: b.z + d / 2 + .5 };
-    return topMax;
-  }
-  function bNave(b) {
-    const g = b.g, w = b.lw * (.66 + .25 * b.r), d = b.ld * (.42 + .2 * b.r), h = 3.5 + 4 * b.r;
-    box(w, h, d, M(0x5b4b72), 0, 0, 0, g);
-    const p = prism([[-d / 2 - .3, 0], [d / 2 + .3, 0], [0, 2.2]], w + .4, M(0x7a6890), g); p.rotation.y = Math.PI / 2; p.position.set(-w / 2 - .2, h, 0);
-    const nd = clamp(Math.floor(w / 6), 1, 4), door = glowMat(0xffd9a0, 0xffb860, .4);
-    for (let i = 0; i < nd; i++) box(2.4, Math.min(2.8, h * .75), .2, door, -w / 2 + (i + .5) * w / nd, 0, d / 2 + .05, g, false);
-    sign(b.it.activo.replace(/\d+$/, ''), '#2a2040', '#ffe7c2', Math.min(w * .5, 8), 1.2, g, 0, h - .8, d / 2 + .12);
-    const tr = new THREE.Group(); g.add(tr);
-    box(2, 1.7, 4.2, M(0xe9ecf5), 0, .2, -.8, tr); box(2, 1.4, 1.5, M(0xef7b6c), 0, .2, 2.2, tr);
-    const tz = Math.min(d / 2 + 3, b.sld / 2 - .5); tr.position.set(0, 0, tz);
-    let ph = Math.random();
-    b.anims.push(dt => { ph += dt * .1 * b.act; const a = ph * Math.PI * 2; tr.position.x = Math.sin(a) * w * .38; tr.rotation.y = Math.cos(a) >= 0 ? Math.PI / 2 : -Math.PI / 2; });
-    b.foot = Math.max(w, d); b.door = { x: b.x, z: b.z + d / 2 + .5 };
-    return h + 2.4;
-  }
-  function bTorre(b) {
-    const g = b.g, s = .3 + .26 * b.r, w = Math.min(b.lw, b.ld) * s * 1.1, d = w * .85, h = 10 + 36 * b.r;
-    tower(w, h, d, [0x4f5a7c, 0x5f5578, 0x56607f][b.seed % 3], M(0x3d3352), b.seed, b.act, g, 0, 0);
-    box(w * .78, 1.4, d * .78, M(0x3d3352), 0, h, 0, g);
-    cyl(.15, .15, 5, M(0x9ba6c6), w * .2, h + 1.4, 0, g, 6);
-    const lm = U(new THREE.MeshStandardMaterial({ color: 0x5a2a3a, emissive: 0xff4040, emissiveIntensity: 1 }));
-    mesh(Gm(new THREE.SphereGeometry(.38, 8, 6)), lm, w * .2, h + 6.6, 0, g, false);
-    b.anims.push((dt, t) => { lm.emissiveIntensity = Math.sin(t * 3 + b.seed) > 0 ? 2.2 : .05; });
-    box(w * .42, 2.4, .3, glowMat(0xffd9a0, 0xffc070, .5), 0, 0, d / 2 + .1, g, false);
-    b.foot = Math.max(w, d); b.door = { x: b.x, z: b.z + d / 2 + .6 };
-    return h + 7;
-  }
-  function bPlaza(b) {
-    const g = b.g, w = b.lw * (.62 + .25 * b.r), d = b.ld * (.42 + .2 * b.r), h = 4 + 6 * b.r;
-    tower(w, h, d, 0x6d4f66, M(0x4a3a50), b.seed, b.act, g, 0, 0);
-    const at = TX.awning.clone(); at.repeat.set(Math.max(2, Math.round(w / 2.5)), 1); at.needsUpdate = true; disp.push(at);
-    box(w, .35, 2.2, U(new THREE.MeshStandardMaterial({ map: at, roughness: .8 })), 0, 2.9, d / 2 + 1.1, g);
-    sign(b.it.activo.replace(/\d+$/, ''), '#4a2a40', '#ffe7c2', Math.min(w * .5, 8), 1.2, g, 0, h - .9, d / 2 + .12);
-    box(w * .3, 2.4, .2, glowMat(0xffd9a0, 0xffc070, .5), 0, 0, d / 2 + .08, g, false);
-    b.foot = Math.max(w, d); b.door = { x: b.x, z: b.z + d / 2 + .6 };
-    return h + 1;
-  }
-  function crane(g, h, x, z, seed) {
-    const yel = M(0xf2c14e), mast = h + 6;
-    box(.7, mast, .7, yel, x, 0, z, g);
-    const jib = new THREE.Group(); jib.position.set(x, mast, z); g.add(jib);
-    box(12, .5, .5, yel, 3.5, 0, 0, jib); box(3, 1, 1, M(0x6b7897), -3.6, -.25, 0, jib);
-    const cable = box(.06, 4, .06, M(0xcfd6e6), 7.5, -4, 0, jib, false);
-    const hook = box(1.6, .5, 1.6, M(0x9fb0cc), 7.5, -4.5, 0, jib);
-    return (dt, t) => { jib.rotation.y = Math.sin(t * .25 + seed) * 1.3; const L = 3 + Math.abs(Math.sin(t * .6 + seed)) * 3; cable.scale.y = L / 4; cable.position.y = -L / 2 - .25; hook.position.y = -L - .5; };
-  }
-  function bObra(b) {
-    const g = b.g, k = b.kind, L = b.lw, Ld = b.ld, r = b.r; let top = 5;
-    if (k === 'calle' || k === 'carretera') {
-      const wide = k === 'carretera', len = L * .9, rw = wide ? 7.5 : 5;
-      box(len, .14, rw, M(0x2f3446), 0, 0, 0, g).castShadow = false;
-      const dash = M(wide ? 0xf2c14e : 0xeef1f8);
-      for (let x = -len / 2 + 1; x < len / 2 - 2; x += 3) box(1.4, .03, .22, dash, x + .7, .14, 0, g, false);
-      if (wide) { box(len, .3, .7, M(0x5dbb7a), 0, 0, -rw / 2 - .5, g); box(len, .3, .7, M(0x5dbb7a), 0, 0, rw / 2 + .5, g); }
-      const ro = new THREE.Group(); g.add(ro);
-      box(2.4, 1.3, 1.8, M(0xf2c14e), 0, .5, 0, ro); box(1.1, 1, 1.3, M(0x2a2f45), -.4, 1.8, 0, ro);
-      const dr = cyl(.75, .75, 2.2, M(0x9ba6c6), 1.7, -.35, 0, ro, 14); dr.rotation.x = Math.PI / 2;
-      for (let i = 0; i < 3; i++) mesh(Gm(new THREE.ConeGeometry(.4, 1.1, 8)), M(0xff9f43), len / 2 - 1 - i * 1.6, .7, rw / 2 - .8, g);
-      let ph = Math.random();
-      b.anims.push(dt => { ph += dt / (wide ? 9 : 6); const p = ph % 1; ro.position.x = -len / 2 + 2 + (len - 5) * (p < .5 ? p * 2 : 2 - p * 2); ro.rotation.y = p < .5 ? 0 : Math.PI; });
-      cyl(.1, .1, 2.6, M(0xcfd6e6), -len / 2 + 2.5, 0, rw / 2 + 1.2, g, 6);
-      sign(wide ? 'CARRETERA' : 'CALLES', '#4fc3b0', '#08201d', 4.6, 1.2, g, -len / 2 + 2.5, 3, rw / 2 + 1.25);
-      b.foot = len * .55; top = 4.6;
-    } else if (k === 'puente') {
-      const cw = 7, len = L * .95, dy = 2.6 + 2.2 * r, dl = Math.min(Ld * .95, cw + 9);
-      flat(len, cw, TM.water, 0, .06, 0, g);
-      box(len, .5, .6, M(0x6b7897), 0, 0, -cw / 2 - .3, g); box(len, .5, .6, M(0x6b7897), 0, 0, cw / 2 + .3, g);
-      box(5, .6, dl, M(0x4fc3b0), 0, dy, 0, g);
-      box(.2, .8, dl, M(0xcfd6e6), -2.4, dy + .6, 0, g); box(.2, .8, dl, M(0xcfd6e6), 2.4, dy + .6, 0, g);
-      [-2.6, 2.6].forEach(x => { const a = mesh(Gm(new THREE.TorusGeometry(cw / 2 + 1, .3, 8, 28, Math.PI)), M(0xcfd6e6), x, dy + .6, 0, g); a.rotation.y = Math.PI / 2; });
-      [-1, 1].forEach(s => cyl(.7, .7, dy, M(0x6b7897), 0, 0, s * (cw / 2 + 1.6), g));
-      const wl = U(new THREE.MeshStandardMaterial({ color: 0x9be7ff, transparent: true, opacity: .5 }));
-      const ripples = [0, 1, 2].map(i => flat(.6, cw * .6, wl, -len / 2 + i * len / 3, .1, 0, g));
-      b.anims.push((dt, t) => ripples.forEach((m, i) => { m.position.x = -len / 2 + ((t * 2 + i * len / 3) % len); }));
-      b.anims.push(crane(g, dy + 2, len / 2 - 2, -Ld / 2 + 2, b.seed));
-      b.foot = dl * .6; top = dy + cw / 2 + 2;
-    } else {
-      const w = L * (.5 + .2 * r), d = Ld * (.42 + .15 * r);
-      if (k === 'escuela') {
-        const h = 5 + 5 * r;
-        tower(w, h, d, 0xc96f5b, M(0x8f3f3a), b.seed, 1, g, 0, 0);
-        const p = prism([[-d / 2 - .5, 0], [d / 2 + .5, 0], [0, 2.6]], w + .8, M(0x8f3f3a), g); p.rotation.y = Math.PI / 2; p.position.set(-w / 2 - .4, h, 0);
-        cyl(.1, .1, h + 4.5, M(0xcfd6e6), w / 2 + 1.2, 0, d / 2 + 1, g, 6);
-        const fl = mesh(Gm(new THREE.PlaneGeometry(2.2, 1.3)), U(new THREE.MeshStandardMaterial({ color: 0x4fc3b0, side: THREE.DoubleSide })), w / 2 + 2.3, h + 3.8, d / 2 + 1, g, false);
-        b.anims.push((dt, t) => { fl.rotation.y = Math.sin(t * 3) * .3; });
-        top = h + 4.5;
-      } else if (k === 'hospital') {
-        const h = 7 + 11 * r;
-        tower(w, h, d, 0xdfe6f2, M(0xc7cfdc), b.seed, 1, g, 0, 0);
-        const red = M(0xff5a5a, { e: 0xff3030, ei: .35 });
-        box(3.6, .35, 1.1, red, 0, h, 0, g); box(1.1, .35, 3.6, red, 0, h, 0, g);
-        top = h + 2;
-      } else {
-        const h = 4 + 5 * r, dr = Math.min(w, d) * .32;
-        box(w + 1.5, .8, d + 1.5, M(0xb9b3c9), 0, 0, 0, g);
-        box(w, h, d, M(0x8a7aa8), 0, .8, 0, g);
-        const nc = Math.max(4, Math.floor(w / 2));
-        for (let i = 0; i < nc; i++) cyl(.32, .32, h, M(0xe9e4f2), -w / 2 + .5 + i * (w - 1) / (nc - 1), .8, d / 2 + .6, g, 10);
-        box(w + 1, .6, d + 1.6, M(0xe9e4f2), 0, h + .8, .3, g);
-        mesh(Gm(new THREE.SphereGeometry(dr, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2)), M(0xf2b544, { m: .5, r: .35 }), 0, h + 1.4, 0, g);
-        top = h + 1.4 + dr + 1;
-      }
-      if (L > 11) b.anims.push(crane(g, top - 2, Math.min(w / 2 + 1.8, b.slw / 2 - 1), -Math.min(d / 2 + 1.8, b.sld / 2 - 1), b.seed));
-      b.foot = Math.max(w, d); b.door = { x: b.x, z: b.z + d / 2 + .5 };
-    }
-    // cada vuelta de obra = un pago de intereses
-    const per = { calle: 6, carretera: 9, puente: 10, escuela: 13, hospital: 16, tesoreria: 5 }[k] || 12;
-    let cyc = -1;
-    b.anims.push((dt, t) => { const c = Math.floor((t + b.seed * 3.7) / per); if (c !== cyc) { if (cyc >= 0) { fxCoin(b.x, b.top + .5, b.z); pop('+ interés', b.x, b.top + 1.5, b.z, 'pos'); } cyc = c; } });
-    return top;
-  }
-  function bBoveda(b) {
-    const g = b.g, s = 1 + .55 * b.r, vw = 8 * s, vh = 4 * s;
-    box(vw, vh, vw, M(0x2b2436, { m: .3, r: .5 }), 0, 0, 0, g);
-    box(vw + .6, .6, vw + .6, M(0x4a3d5c), 0, vh, 0, g);
-    mesh(Gm(new THREE.CircleGeometry(vh * .32, 28)), M(0x4a3d5c), 0, vh * .5, vw / 2 + .05, g, false);
-    const ring = mesh(Gm(new THREE.TorusGeometry(vh * .34, .22, 8, 28, Math.PI * 1.5)), M(0xf7931a, { e: 0xf7931a, ei: .6 }), 0, vh * .5, vw / 2 + .12, g, false);
-    const leds = [0, 1, 2].map(i => { const m = U(new THREE.MeshStandardMaterial({ color: 0x1e3a2a, emissive: 0x5dd39e, emissiveIntensity: 1 })); box(.8, .5, .1, m, -vw / 3 + i * vw / 3, .4, vw / 2 + .06, g, false); return m; });
-    const nm = b.it.activo.toLowerCase();
-    const cn = nm.includes('eth') ? ['#4b56a8', '#8fa2ff', 'Ξ'] : nm.includes('sol') ? ['#6b3fb0', '#b48cff', '◎'] : nm.includes('bit') || nm.includes('btc') ? ['#c66f0c', '#f7931a', '₿'] : ['#2f6b5e', '#4fc3b0', b.it.activo.slice(0, 1).toUpperCase()];
-    const ft = ctex(128, 128, gg => { gg.fillStyle = cn[0]; circ(gg, 64, 64, 64); gg.fillStyle = cn[1]; circ(gg, 64, 64, 54); gg.strokeStyle = cn[0]; gg.lineWidth = 3; gg.beginPath(); gg.arc(64, 64, 45, 0, 7); gg.stroke(); gg.fillStyle = '#fff4e0'; gg.font = '800 66px Figtree, system-ui, sans-serif'; gg.textAlign = 'center'; gg.textBaseline = 'middle'; gg.fillText(cn[2], 64, 69); });
-    const rc = 2.6 + 2.2 * b.r, face = U(new THREE.MeshStandardMaterial({ map: ft, metalness: .3, roughness: .4 }));
-    const coin = new THREE.Mesh(Gm(new THREE.CylinderGeometry(rc, rc, .8, 44)), [U(new THREE.MeshStandardMaterial({ color: cn[0], metalness: .6, roughness: .35 })), face, face]);
-    coin.rotation.x = Math.PI / 2; coin.castShadow = true;
-    const cg = new THREE.Group(); cg.add(coin); const cy = vh + 3 + rc; cg.position.set(0, cy, 0); g.add(cg);
-    b.anims.push((dt, t) => { cg.rotation.y += dt * 1.5 * b.act; cg.position.y = cy + Math.sin(t * 1.6) * .5; ring.rotation.z += dt * b.act; leds.forEach((m, i) => { m.emissiveIntensity = Math.sin(t * 6 * b.act + i * 2) > 0 ? 1.6 : .1; }); });
-    b.foot = vw; b.door = { x: b.x, z: b.z + vw / 2 + .5 };
-    return vh + 3 + rc * 2 + .5;
-  }
-
-  // ---------- señales de estado ----------
-  function status(b) {
-    const it = b.it, k = b.k, al = ALERT.get(it.activo), top = b.top, gy = b.g.position.y;
-    const up = b.owned && k !== 'RENTA_FIJA' && it.cambio_dia > 0, down = b.owned && k !== 'RENTA_FIJA' && it.cambio_dia < 0;
-    if (up) {
-      const rm = U(new THREE.MeshBasicMaterial({ color: 0x5dd39e, transparent: true, opacity: .5, depthWrite: false }));
-      const ring = mesh(Gm(new THREE.RingGeometry(b.foot * .62, b.foot * .62 + 1.1, 44)), rm, b.x, gy + .1, b.z, null, false); ring.rotation.x = -Math.PI / 2;
-      const ar = mesh(Gm(new THREE.ConeGeometry(1.1, 2.2, 4)), M(0x5dd39e, { e: 0x2a9a6a, ei: .8 }), b.x, top + 3, b.z, null, false);
-      b.anims.push((dt, t) => { const s = 1 + Math.sin(t * 2.2 + b.seed) * .06; ring.scale.set(s, s, 1); rm.opacity = .35 + .2 * Math.sin(t * 2.2 + b.seed); ar.position.y = top + 3 + Math.sin(t * 2 + b.seed) * .5; ar.rotation.y += dt * 1.2; });
-    }
-    if (down) {
-      const cg = new THREE.Group(); cg.position.set(b.x + b.foot * .15, top + 3.6, b.z); world.add(cg);
-      const cm = M(0x8c93b0, { r: 1 });
-      [[-1.3, 0, 0, 1.3], [0, .5, 0, 1.7], [1.4, 0, .2, 1.3], [0, -.2, .7, 1.4]].forEach(([x, y, z, s]) => mesh(Gm(new THREE.SphereGeometry(s, 10, 8)), cm, x, y, z, cg, false));
-      const n = 14, pos = new Float32Array(n * 6), drops = [];
-      for (let i = 0; i < n; i++) drops.push([rnd(-1.8, 1.8), rnd(-3.4, -.8), rnd(-1, 1)]);
-      const lg = Gm(new THREE.BufferGeometry()); lg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-      cg.add(new THREE.LineSegments(lg, U(new THREE.LineBasicMaterial({ color: 0x9bc8ff, transparent: true, opacity: .75 }))));
-      b.anims.push((dt, t) => {
-        drops.forEach((d, i) => { d[1] -= dt * 7; if (d[1] < -3.4) d[1] = -.8; pos.set([d[0], d[1], d[2], d[0] - .08, d[1] - .55, d[2]], i * 6); });
-        lg.attributes.position.needsUpdate = true; cg.position.y = top + 3.6 + Math.sin(t * .8 + b.seed) * .25;
-      });
-    }
-    if (al === 'over' && b.owned) {
-      const sg = new THREE.Group(); sg.position.set(b.x, top + .6, b.z); world.add(sg);
-      cyl(.6, .7, .4, M(0x3a3f60), 0, 0, 0, sg);
-      const bm = U(new THREE.MeshStandardMaterial({ color: 0x5a1a1a, emissive: 0xff3030, emissiveIntensity: 2 }));
-      mesh(Gm(new THREE.SphereGeometry(.55, 12, 8)), bm, 0, .7, 0, sg, false);
-      const beam = new THREE.Group(); beam.position.y = .7; sg.add(beam);
-      const cm = U(new THREE.MeshBasicMaterial({ color: 0xff4a4a, transparent: true, opacity: .2, depthWrite: false, side: THREE.DoubleSide }));
-      [1, -1].forEach(s => { const c = mesh(Gm(new THREE.ConeGeometry(2.2, 9, 14, 1, true)), cm, s * 4.5, 0, 0, beam, false); c.rotation.z = s * Math.PI / 2; });
-      b.anims.push((dt, t) => { beam.rotation.y += dt * 4; bm.emissiveIntensity = Math.sin(t * 10) > 0 ? 2.4 : .4; b.g.position.x = b.x + Math.sin(t * 38 + b.seed) * .1; });
-    }
-    if (al === 'under') {
-      if (b.owned) {
-        const rr = b.foot * .66, tt = TX.tape.clone(); tt.repeat.set(Math.round(rr * 2 * Math.PI / 3), 1); tt.needsUpdate = true; disp.push(tt);
-        mesh(Gm(new THREE.CylinderGeometry(rr, rr, .7, 40, 1, true)), U(new THREE.MeshBasicMaterial({ map: tt, side: THREE.DoubleSide })), b.x, gy + 1.3, b.z, null, false);
-        b.anims.push(dt => { tt.offset.x += dt * .3; });
-      }
-      const sz = b.z + Math.min(b.foot * .5 + 2, b.sld / 2 - .3);
-      [-1.6, 1.6].forEach(o => cyl(.1, .1, 3, M(0x5a4a2a), b.x + o, gy, sz, null, 6));
-      sign('SE BUSCA INVERSIÓN', '#ffd23f', '#1a1a1a', 4.4, 1.1, null, b.x, gy + 2.6, sz + .12);
-    }
-    if (b.owned && (EV.rentAct.has(it.activo) || EV.rentCls.has(k))) {
-      b.anims.push(dt => { if (Math.random() < dt * 1.4) fxCoin(b.x + rnd(-1, 1) * b.foot * .4, top, b.z); if (Math.random() < dt * 6) fxConf(b.x + rnd(-1, 1) * b.foot * .5, top + 3, b.z + rnd(-1, 1) * b.foot * .4); });
-    }
-    if (b.owned && (k === 'ACCIONES' || k === 'BITCOIN')) {
-      b.anims.push(dt => { if (it.cambio_dia >= 0 && Math.random() < dt * .45) fxCoin(b.x + rnd(-.3, .3) * b.foot, top, b.z); });
-    }
-    if (b.owned && k !== 'RENTA_FIJA' && Math.abs(it.hoy) >= .01) {
-      let ft = 1 + b.seed % 5;
-      b.anims.push(dt => { ft -= dt; if (ft <= 0) { ft = 5 + Math.random() * 2; pop(signed2(it.hoy) + ' hoy', b.x, top * .75, b.z, it.hoy >= 0 ? 'pos' : 'neg'); } });
-    }
-  }
-
-  function pin(b) {
-    const it = b.it, al = ALERT.get(it.activo), el = document.createElement('button');
-    el.type = 'button'; el.className = 'pin' + (b.owned ? '' : ' empty'); el.style.setProperty('--c', CLS[b.k].color);
-    const tk = it.activo.length > 12 ? it.activo.replace('Cetes ', 'C') : it.activo;
-    const ch = !b.owned ? 'por construir' : b.k === 'RENTA_FIJA' ? (it.tasa != null && it.tasa !== '' ? it.tasa + '%' : KIND[b.kind]) : (it.cambio_dia >= 0 ? '▲' : '▼') + Math.abs(it.cambio_dia).toFixed(1) + '%';
-    const cls = !b.owned ? 'warn' : b.k === 'RENTA_FIJA' ? 'ren' : it.cambio_dia >= 0 ? 'pos' : 'neg';
-    el.innerHTML = `${al ? '<i class="al" aria-hidden="true">!</i>' : '<span class="dot"></span>'}<b>${esc(tk)}</b><span class="${cls}">${ch}</span>`;
-    el.setAttribute('aria-label', `${it.activo}: ${b.owned ? mxn.format(it.valor) : 'lote por construir'}`);
-    el.onclick = () => { if (mode === 'street') goStopA(it.activo); else { if (tour.on) stopTour(); select(it.activo, true); } };
-    addLabel(el, 'pin', new THREE.Vector3(b.x, b.top + 1.2, b.z), b.owned ? 10 + Math.sqrt(it.valor) / 100 : 1, b);
-  }
-
-  function makeMonument(lv) {
-    cyl(4.5, 5, 1.2, M(0xcfd6e6), 0, .3, 0);
-    const h = 10 + 4 * lv;
-    const ob = cyl(.8, 1.7, h, M(0xe9e4f2, { r: .5 }), 0, 1.5, 0, null, 4); ob.rotation.y = Math.PI / 4;
-    const tip = mesh(Gm(new THREE.ConeGeometry(.95, 2.2, 4)), M(0xf2b544, { m: .6, r: .3, e: 0xf2b544, ei: .3 }), 0, 1.5 + h + 1.1, 0); tip.rotation.y = Math.PI / 4;
-    const fw = mesh(Gm(new THREE.RingGeometry(6, 8.6, 44)), TM.water, 0, .42, 0, null, false); fw.rotation.x = -Math.PI / 2;
-    const el = document.createElement('div'); el.className = 'mon';
-    el.innerHTML = `<b>Nivel: ${esc(levelOf(model.total).name)}</b><span>${mxn.format(model.total)}</span>`;
-    addLabel(el, 'mon', new THREE.Vector3(0, h + 6, 0), 60);
-  }
-
-  function carMesh(col) {
-    const car = new THREE.Group();
-    box(2, .9, 4.2, M(col, { m: .2, r: .45 }), 0, .25, 0, car);
-    box(1.8, .75, 2.2, M(0x1c2236, { r: .3, m: .4 }), 0, 1.15, -.2, car);
-    box(.45, .25, .1, TM.head, -.6, .6, 2.12, car, false); box(.45, .25, .1, TM.head, .6, .6, 2.12, car, false);
-    world.add(car); return car;
-  }
-  function makeTraffic(lv) {
-    const cols = [0xe9ecf5, 0xf2b544, 0x4fc3b0, 0xef7b6c, 0x8fa2ff, 0xc4b5fd, 0x3a4468];
-    const Rr = 14.6, ring = v => Math.abs(v) < Rr ? Math.sqrt(Rr * Rr - v * v) : 0;
-    const lanes = [['x', 4.5, 1], ['x', -4.5, -1], ['z', -4.5, 1], ['z', 4.5, -1]];
-    const lp = (ln, s) => { const o = ln[1], q = o > 0 ? Math.max(o, ring(s)) : -Math.max(-o, ring(s)); return ln[0] === 'x' ? [s, q] : [q, s]; };
-    const n = Math.min(24, 10 + 2 * lv);
-    for (let i = 0; i < n; i++) cars.push({ g: carMesh(cols[i % cols.length]), ln: lanes[i % 4], s: rnd(-300, 300), v: rnd(12, 21) * lanes[i % 4][2] });
-    const place = c => { const p = lp(c.ln, c.s), q = lp(c.ln, c.s + Math.sign(c.v) * .6); c.g.position.set(p[0], .02, p[1]); c.g.rotation.y = Math.atan2(q[0] - p[0], q[1] - p[1]); };
-    cars.forEach(place);
-    ticks.push(dt => cars.forEach(c => { c.s += c.v * dt; if (c.s > 300) c.s = -300; if (c.s < -300) c.s = 300; place(c); }));
-  }
-  function makePeople() {
-    const doors = (dists.FIBRAS ? dists.FIBRAS.items : []).filter(b => b.owned && b.door);
-    if (!doors.length) return;
-    const n = clamp(Math.round(5 + model.classes.FIBRAS.pct * .8), 5, 26);
-    const body = Gm(new THREE.CylinderGeometry(.32, .32, 1.1, 6)), head = Gm(new THREE.SphereGeometry(.3, 8, 6));
-    const cols = [0xffd6a5, 0xcaffbf, 0x9bf6ff, 0xffadad, 0xfdffb6, 0xbdb2ff];
-    const ps = [];
-    for (let i = 0; i < n; i++) {
-      const g = new THREE.Group(); mesh(body, M(cols[i % 6]), 0, .95, 0, g); mesh(head, M(0xf1d3b3), 0, 1.75, 0, g); world.add(g);
-      const p = { g, st: 0, t: 0, d: null, x: 0, z: 0, sz: 0 }; spawnP(p, doors); ps.push(p);
-    }
-    ticks.push((dt, t) => ps.forEach(p => {
-      const sp = 3 * p.d.act * dt;
-      if (p.st === 0) { const dx = p.d.door.x - p.x; if (Math.abs(dx) < .2) p.st = 1; else p.x += Math.sign(dx) * Math.min(Math.abs(dx), sp); }
-      else if (p.st === 1) { const dz = p.d.door.z - p.z; if (Math.abs(dz) < .2) { p.st = 2; p.t = rnd(.8, 3); p.g.visible = false; const rent = EV.rentAct.has(p.d.it.activo) || EV.rentCls.has('FIBRAS'); if (Math.random() < (rent ? .85 : .35 * p.d.act)) fxCoin(p.d.door.x, p.d.g.position.y + 2.4, p.d.door.z); } else p.z += Math.sign(dz) * Math.min(Math.abs(dz), sp); }
-      else { p.t -= dt; if (p.t <= 0) spawnP(p, doors); }
-      p.g.position.set(p.x, .4 + Math.abs(Math.sin(t * 9 + p.sz)) * .12, p.z);
-    }));
-  }
-  function spawnP(p, doors) {
-    const d = doors[Math.floor(Math.random() * doors.length)];
-    p.d = d; p.st = 0; p.g.visible = true; p.sz = Math.random() * 6;
-    p.z = d.z + d.sld / 2 + 1.5 + Math.random() * 2; p.x = d.x + rnd(-.5, .5) * d.slw;
-  }
-
-  // ---------- cámara ----------
-  function flyTo(to, dur) {
-    const tgt = { ...goal, ...to };
-    if (!dur) { Object.assign(cam, tgt); Object.assign(goal, tgt); fly = null; return; }
-    fly = { from: { ...cam }, to: tgt, t: 0, dur, hop: Math.min(110, Math.hypot(tgt.x - cam.x, tgt.z - cam.z) * .35) };
-    Object.assign(goal, tgt);
-  }
-  function stopFly() { if (fly) { fly = null; Object.assign(goal, cam); } }
-  function updMap(dt) {
-    if (fly) {
-      fly.t += dt / fly.dur;
-      const e = ease(Math.min(1, fly.t)), f = fly.from, to = fly.to;
-      cam.x = f.x + (to.x - f.x) * e; cam.z = f.z + (to.z - f.z) * e; cam.y = f.y + (to.y - f.y) * e;
-      cam.t = f.t + (to.t - f.t) * e; cam.b = f.b + angD(f.b, to.b) * e;
-      cam.d = f.d + (to.d - f.d) * e + fly.hop * Math.sin(Math.PI * e);
-      if (fly.t >= 1) { Object.assign(cam, to); fly = null; }
-    } else {
-      const k = 1 - Math.exp(-dt * 7);
-      cam.x += (goal.x - cam.x) * k; cam.z += (goal.z - cam.z) * k; cam.y += (goal.y - cam.y) * k;
-      cam.d += (goal.d - cam.d) * k; cam.t += (goal.t - cam.t) * k; cam.b += angD(cam.b, goal.b) * k;
-    }
-    const st = Math.sin(cam.t), ct = Math.cos(cam.t);
-    C.position.set(cam.x + Math.sin(cam.b) * st * cam.d, cam.y + ct * cam.d, cam.z + Math.cos(cam.b) * st * cam.d);
-    C.lookAt(cam.x, cam.y, cam.z);
-  }
-  const itemView = b => ({ x: b.x, z: b.z, y: Math.min(b.top * .35, 10), d: Math.max(32, b.top * 1.6 + 20), t: 1.0, b: goal.b });
-  const distView = k => { const D = dists[k]; return { x: D.cx, z: D.cz + 4, y: 0, d: k === 'BITCOIN' ? 115 : 160, t: .92, b: goal.b }; };
-  function pan(dx, dy) {
-    const s = 2 * cam.d * Math.tan(C.fov * Math.PI / 360) / R.domElement.clientHeight;
-    const cb = Math.cos(cam.b), sb = Math.sin(cam.b), f = dy * s / Math.max(.4, Math.cos(cam.t));
-    const mx = -cb * dx * s - sb * f, mz = sb * dx * s - cb * f;
-    goal.x = clamp(goal.x + mx, -210, 210); goal.z = clamp(goal.z + mz, -190, 190);
-    cam.x = clamp(cam.x + mx, -210, 210); cam.z = clamp(cam.z + mz, -190, 190);
-  }
-  function zoomAt(factor, cx, cy) {
-    const nd = clamp(goal.d * factor, 14, 620);
-    const p = cx != null ? groundAt(cx, cy) : null;
-    if (p) { const k = 1 - nd / goal.d; goal.x = clamp(goal.x + (p.x - goal.x) * k, -210, 210); goal.z = clamp(goal.z + (p.z - goal.z) * k, -190, 190); }
-    goal.d = nd;
-  }
-  function setRay(cx, cy) { const rc = R.domElement.getBoundingClientRect(); ndc.set((cx - rc.left) / rc.width * 2 - 1, -(cy - rc.top) / rc.height * 2 + 1); ray.setFromCamera(ndc, C); }
-  function groundAt(cx, cy) { setRay(cx, cy); const o = ray.ray.origin, d = ray.ray.direction; if (d.y > -1e-4) return null; const t = -o.y / d.y; return { x: o.x + d.x * t, z: o.z + d.z * t }; }
-  function pick(cx, cy) { setRay(cx, cy); const h = ray.intersectObjects(pickables, false)[0]; return h ? h.object.userData : null; }
-
-  // ---------- controles ----------
-  function bind() {
-    const el = $m('m3'), cv = $m('m3gl'), ptr = new Map();
-    let drag = null, g2 = null;
-    const two = () => { const [a, b] = [...ptr.values()]; return { d: Math.hypot(a.x - b.x, a.y - b.y), a: Math.atan2(b.y - a.y, b.x - a.x), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 }; };
-    cv.addEventListener('pointerdown', e => {
-      cv.setPointerCapture(e.pointerId); ptr.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      hideHint(); stopFly();
-      if (tour.on && !tour.paused) pauseTour(true);
-      if (ptr.size === 1) drag = { x: e.clientX, y: e.clientY, t0: performance.now(), moved: 0, rot: e.button === 2 || e.ctrlKey || e.shiftKey || e.altKey || e.metaKey };
-      else if (ptr.size === 2) { g2 = two(); if (drag) drag.moved = 99; }
-      el.classList.add('dragging');
-    });
-    cv.addEventListener('pointermove', e => {
-      if (!ptr.has(e.pointerId)) return;
-      const pv = ptr.get(e.pointerId), dx = e.clientX - pv.x, dy = e.clientY - pv.y;
-      pv.x = e.clientX; pv.y = e.clientY;
-      if (ptr.size === 1 && drag) {
-        drag.moved += Math.abs(dx) + Math.abs(dy);
-        if (mode === 'street') { if (!sv.walk) { sv.yaw += dx * .0045; sv.pitch = clamp(sv.pitch + dy * .0035, -.6, .85); } }
-        else if (drag.rot) { goal.b -= dx * .006; goal.t = clamp(goal.t - dy * .004, .01, 1.25); }
-        else pan(dx, dy);
-      } else if (ptr.size === 2 && g2) {
-        const n = two();
-        if (mode === 'street') C.fov = clamp(C.fov * g2.d / n.d, 35, 80), C.updateProjectionMatrix();
-        else {
-          zoomAt(g2.d / n.d, n.mx, n.my);
-          goal.b -= angD(g2.a, n.a);
-          if (Math.abs(n.d - g2.d) < 4) goal.t = clamp(goal.t - (n.my - g2.my) * .005, .01, 1.25);
-        }
-        g2 = n;
-      }
-    });
-    const up = e => {
-      if (!ptr.has(e.pointerId)) return;
-      ptr.delete(e.pointerId);
-      if (drag && ptr.size === 0 && drag.moved < 7 && performance.now() - drag.t0 < 600 && e.type === 'pointerup') clickAt(e.clientX, e.clientY);
-      if (ptr.size === 0) { drag = null; g2 = null; el.classList.remove('dragging'); }
-      else if (ptr.size === 1) g2 = null;
-    };
-    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
-    cv.addEventListener('contextmenu', e => e.preventDefault());
-    cv.addEventListener('wheel', e => {
-      e.preventDefault(); hideHint();
-      if (mode === 'street') { C.fov = clamp(C.fov + e.deltaY * .03, 35, 80); C.updateProjectionMatrix(); return; }
-      stopFly();
-      const dy = e.deltaMode ? e.deltaY * 33 : e.deltaY;
-      zoomAt(Math.exp(clamp(dy, -120, 120) * (e.ctrlKey ? .01 : .0018)), e.clientX, e.clientY);
-    }, { passive: false });
-    cv.addEventListener('dblclick', e => { if (mode !== 'map') return; stopFly(); zoomAt(.5, e.clientX, e.clientY); });
-    el.addEventListener('keydown', e => {
-      if (e.target.tagName === 'INPUT') { if (e.key === 'Escape') e.target.blur(); return; }
-      if (e.key === 'Escape') { if (mode === 'street') exitStreet(); else if (tour.on) stopTour(); else if ($('stage').classList.contains('max')) toggleMax(); else closeCard(true); return; }
-      if (e.target !== el) return;
-      if (mode === 'street') { if (e.key === 'ArrowRight') goStop(sv.i + 1); else if (e.key === 'ArrowLeft') goStop(sv.i - 1); else return; e.preventDefault(); return; }
-      const st = 60;
-      if (e.key === 'ArrowLeft') pan(st, 0); else if (e.key === 'ArrowRight') pan(-st, 0);
-      else if (e.key === 'ArrowUp') pan(0, st); else if (e.key === 'ArrowDown') pan(0, -st);
-      else if (e.key === '+' || e.key === '=') zoomAt(.7); else if (e.key === '-' || e.key === '_') zoomAt(1.4);
-      else return;
-      e.preventDefault();
-    });
-    $m('m3Zin').onclick = () => { stopFly(); zoomAt(.65); };
-    $m('m3Zout').onclick = () => { stopFly(); zoomAt(1.5); };
-    $m('m3Comp').onclick = () => { if (mode === 'street') return; stopFly(); goal.b = 0; };
-    $m('m3Tilt').onclick = () => { stopFly(); goal.t = goal.t > .3 ? .01 : .9; };
-    $m('m3Home').onclick = () => { if (tour.on) stopTour(); closeCard(true); flyTo(HOME(), reduce ? 0 : 1.4); };
-    $m('m3Peg').onclick = () => enterStreet(selA);
-    $m('m3Full').onclick = toggleMax;
-    $m('m3Tour').onclick = () => startTour(null);
-    $m('m3Day').onclick = () => setTheme('day');
-    $m('m3Night').onclick = () => setTheme('night');
-    $m('m3tprev').onclick = () => goStep(tour.i - 1);
-    $m('m3tnext').onclick = () => { if (tour.i >= tour.steps.length - 1) stopTour(); else goStep(tour.i + 1); };
-    $m('m3tplay').onclick = () => pauseTour(!tour.paused);
-    $m('m3tstop').onclick = () => stopTour();
-    $m('m3sprev').onclick = () => goStop(sv.i - 1);
-    $m('m3snext').onclick = () => goStop(sv.i + 1);
-    $m('m3sexit').onclick = () => exitStreet();
-    $m('m3sform').addEventListener('submit', e => { e.preventDefault(); search(); });
-    $m('m3q').addEventListener('change', search);
-    $m('m3card').addEventListener('click', e => {
-      const t = e.target.closest('[data-act]'); if (!t) return;
-      const a = t.dataset.act;
-      if (a === 'close') closeCard(true);
-      else if (a === 'street') enterStreet(selA);
-      else if (a === 'dist') selectK(t.dataset.k, true);
-      else if (a === 'item') select(t.dataset.a, true);
-      else if (a === 'tourk') startTour(t.dataset.k);
-      else if (a === 'streetk') { const its = dists[t.dataset.k].items, f = its.find(b => b.owned) || its[0]; if (f) enterStreet(f.it.activo); }
-    });
-  }
-  function clickAt(cx, cy) {
-    const u = pick(cx, cy);
-    if (mode === 'street') { if (u && u.a) goStopA(u.a); return; }
-    if (tour.on) return;
-    if (u && u.a) select(u.a, true);
-    else if (u && u.k) selectK(u.k, true);
-    else closeCard(true);
-  }
-  function search() {
-    const inp = $m('m3q'), q = inp.value.trim().toLowerCase();
-    if (!q || !built) return;
-    const k = ORDER.find(k => CLS[k].scene.toLowerCase() === q || CLS[k].name.toLowerCase() === q);
-    const b = blds.find(x => x.it.activo.toLowerCase() === q) || blds.find(x => x.it.activo.toLowerCase().includes(q)) || blds.find(x => (x.it.descripcion || '').toLowerCase().includes(q) || (x.it.subclase || '').toLowerCase().includes(q));
-    if (tour.on) stopTour();
-    if (k && mode !== 'street') { selectK(k, true); inp.value = ''; inp.blur(); }
-    else if (b) { if (mode === 'street') goStopA(b.it.activo); else select(b.it.activo, true); inp.value = ''; inp.blur(); }
-    else { inp.classList.add('nf'); setTimeout(() => inp.classList.remove('nf'), 900); }
-  }
-  function toggleMax() {
-    const st = $('stage'), on = !st.classList.contains('max');
-    st.classList.toggle('max', on); document.body.classList.toggle('noscroll', on);
-    $m('m3Full').setAttribute('aria-pressed', String(on));
-    $m('m3Full').setAttribute('aria-label', on ? 'Salir de pantalla completa' : 'Pantalla completa');
-    setTimeout(resize, 30);
-  }
-  function hint() {
-    const h = $m('m3hint');
-    h.textContent = matchMedia('(pointer: coarse)').matches ? 'Un dedo para moverte · dos dedos para zoom, girar e inclinar' : 'Arrastra para moverte · rueda para zoom · clic derecho para girar e inclinar';
-    h.hidden = false; clearTimeout(hintTimer); hintTimer = setTimeout(hideHint, 7000);
-  }
-  function hideHint() { $m('m3hint').hidden = true; }
-
-  // ---------- selección y ficha ----------
-  function placeSelRing(b) {
-    if (!selRing) return;
-    if (!b) { selRing.visible = false; return; }
-    const r0 = b.foot * .7 + .6;
-    selRing.geometry.dispose(); selRing.geometry = new THREE.RingGeometry(r0, r0 + .9, 56);
-    selRing.position.set(b.x, b.g.position.y + .14, b.z);
-    selRing.material.color.set(CLS[b.k].color); selRing.visible = true;
-  }
-  function markPins() { labels.forEach(L => { if (L.b) L.el.classList.toggle('sel', L.b.it.activo === selA); }); }
-  function syncPage(k, a) { if (focus !== k) setFocus(k, true); selected = a; renderZoom(); }
-  function select(a, go) {
-    const b = byA.get(a); if (!b) return;
-    selA = a; selK = b.k; showCard(); placeSelRing(b); markPins();
-    if (go) { flyTo(itemView(b), reduce ? 0 : 1.1); syncPage(b.k, a); }
-  }
-  function selectK(k, go) {
-    if (!dists[k]) return;
-    selA = null; selK = k; showCard(); placeSelRing(null); markPins();
-    if (go) { flyTo(distView(k), reduce ? 0 : 1.2); syncPage(k, null); }
-  }
-  function closeCard(user) {
-    selA = null; selK = null; $m('m3card').hidden = true; placeSelRing(null); markPins();
-    if (user && focus) setFocus(null, true);
-  }
-  const row = (l, v, c) => `<div class="mc-row"><span>${l}</span><b class="${c || ''}">${v}</b></div>`;
-  function showCard() {
-    const card = $m('m3card');
-    if (mode === 'tour' || (!selA && !selK)) { card.hidden = true; return; }
-    card.innerHTML = selA ? itemCard(byA.get(selA)) : distCard(selK);
-    card.hidden = false; card.scrollTop = 0;
-  }
-  function itemCard(b) {
-    const it = b.it, k = b.k, al = ALERT.get(it.activo), rf = k === 'RENTA_FIJA';
-    let h = `<div class="mc-h"><span class="mc-k" style="--c:${CLS[k].color}"><span class="dot"></span>${esc(CLS[k].scene)} · ${esc(KIND[b.kind] || '')}</span><button type="button" class="mc-x" data-act="close" aria-label="Cerrar ficha">${ICON.x}</button></div>
-      <h3>${esc(it.activo)}</h3>${it.descripcion ? `<p class="mc-d">${esc(it.descripcion)}</p>` : ''}`;
-    if (!b.owned) h += `<p class="mc-empty">Lote por construir. Todavía no tienes ${esc(it.activo)}${it.objetivo > 0 && !it.hold ? `; su lugar ideal en tu ciudad es el ${pct1(it.objetivo)}` : ''}.</p>`;
-    else {
-      h += `<div class="mc-big">${mxn.format(it.valor)}</div>`;
-      if (rf) h += row('Tasa', it.tasa != null && it.tasa !== '' ? it.tasa + '% anual' : '—') + row('Intereses al día', '≈ ' + mxn2.format(it.valor * rateOf(it) / 100 / 365), 'pos');
-      else h += row('Hoy', `${signed2(it.hoy)} (${it.cambio_dia >= 0 ? '▲' : '▼'} ${Math.abs(it.cambio_dia).toFixed(2)}%)`, it.hoy >= 0 ? 'pos' : 'neg');
-      h += row('Ganancia', signed(it.ganancia), it.ganancia >= 0 ? 'pos' : 'neg');
-      h += row('De tu ciudad', it.hold ? pct1(it.pct) + ' · se mantiene' : `${pct1(it.pct)} · ideal ${pct1(it.objetivo)}`);
-    }
-    if (al) h += `<p class="mc-al">${al === 'over' ? 'Su grupo está sobrepoblado: pausa sus aportaciones y mándalas a lo que falta.' : 'A su grupo le falta inversión: mándale tu próxima aportación.'}</p>`;
-    if (EV.rentAct.has(it.activo)) h += `<p class="mc-ev">Día de rentas: está repartiendo rentas a sus dueños.</p>`;
-    h += `<div class="mc-btns"><button type="button" class="mc-b" data-act="street">${ICON.peg}Vista de calle</button><button type="button" class="mc-b ghost" data-act="dist" data-k="${k}">Ver barrio</button></div>`;
-    return h;
-  }
-  function distCard(k) {
-    const c = model.classes[k], bs = BD.filter(x => x.items.some(i => i.key === k));
-    const bb = bs.find(x => x.state === 'over' || x.state === 'under'), nr = bs.find(x => x.state === 'near');
-    const st = bb ? ['lo', bb.state === 'over' ? 'Sobrepoblado' : 'Le falta'] : nr ? ['hi', 'Cerca del límite'] : ['ok', 'En rango'];
-    return `<div class="mc-h"><span class="mc-k" style="--c:${CLS[k].color}"><span class="dot"></span>Barrio · ${esc(CLS[k].scene)}</span><button type="button" class="mc-x" data-act="close" aria-label="Cerrar ficha">${ICON.x}</button></div>
-      <h3>${esc(CLS[k].name)} <span class="pill ${st[0]}">${st[1]}</span></h3>
-      <div class="mc-big">${mxn.format(c.valor)}</div>
-      ${row(k === 'RENTA_FIJA' ? 'Intereses de hoy' : 'Hoy', signed2(c.hoy), c.hoy >= 0 ? 'pos' : 'neg')}
-      ${row('De tu ciudad', `${pct1(c.pct)} · ideal ${pct1(c.objetivo)}`)}
-      <p class="mc-d">${esc(CLS[k].how)}</p>
-      <div class="mc-list">${dists[k].items.map(b => `<button type="button" data-act="item" data-a="${esc(b.it.activo)}"><span><span class="dot" style="--c:${b.owned ? CLS[k].color : 'var(--warn)'}"></span>${esc(b.it.activo)}</span><b class="${b.owned ? '' : 'warn'}">${b.owned ? mxn.format(b.it.valor) : 'por construir'}</b></button>`).join('')}</div>
-      <div class="mc-btns"><button type="button" class="mc-b" data-act="tourk" data-k="${k}">${ICON.route}Recorrer el barrio</button><button type="button" class="mc-b ghost" data-act="streetk" data-k="${k}">${ICON.peg}Vista de calle</button></div>`;
-  }
-
-  // ---------- recorrido guiado ----------
-  const DUR = { intro: 8, dist: 10, item: 7.5, end: 9 };
-  function startTour(only) {
-    if (!built) return;
-    if (mode === 'street') exitStreet(true);
-    const steps = [];
-    if (!only) steps.push({ ty: 'intro' });
-    ORDER.forEach(k => {
-      if ((only && k !== only) || !dists[k] || !dists[k].items.length) return;
-      steps.push({ ty: 'dist', k });
-      dists[k].items.filter(b => b.owned).sort((a, b) => b.it.valor - a.it.valor).slice(0, only ? 10 : 3).forEach(b => steps.push({ ty: 'item', a: b.it.activo }));
-    });
-    if (!only) steps.push({ ty: 'end' });
-    Object.assign(tour, { on: true, steps, i: 0, t: 0, paused: false, only });
-    mode = 'tour'; $m('m3').classList.add('touring'); $m('m3card').hidden = true; hideHint();
-    pauseTour(false); goStep(0);
-    $m('m3tnext').focus({ preventScroll: true });
-  }
-  function goStep(i) {
-    tour.i = clamp(i, 0, tour.steps.length - 1); tour.t = 0;
-    const s = tour.steps[tour.i], Mo = model;
-    let view, title, text, col = 'var(--acc)';
-    if (s.ty === 'intro') {
-      view = { ...HOME(), t: .95, b: goal.b + .45 }; title = 'Bienvenido a Ciudad Marea';
-      text = `Tu ciudad vale <b>${mxn.format(Mo.total)}</b> y hoy ${Mo.hoy >= 0 ? 'ganó' : 'perdió'} <b class="${Mo.hoy >= 0 ? 'pos' : 'neg'}">${mxn2.format(Math.abs(Mo.hoy))}</b>. Cada barrio es un tipo de inversión y la altura de cada edificio es cuánto dinero tienes ahí. Nivel actual: <b>${esc(levelOf(Mo.total).name)}</b>.`;
-      selA = null; placeSelRing(null);
-    } else if (s.ty === 'dist') {
-      const c = Mo.classes[s.k], bs = BD.filter(x => x.items.some(i => i.key === s.k)), bb = bs.find(x => x.state === 'over' || x.state === 'under');
-      view = { ...distView(s.k), b: goal.b + .7 }; title = `${CLS[s.k].scene}: ${CLS[s.k].name}`; col = CLS[s.k].color;
-      text = `${esc(CLS[s.k].how)} Aquí tienes <b>${mxn.format(c.valor)}</b>, el ${pct1(c.pct)} de tu ciudad (ideal ${pct1(c.objetivo)}).` + (bb ? ` <b class="neg">${bb.state === 'over' ? 'Está sobrepoblado.' : 'Le falta inversión.'}</b>` : '');
-      selA = null; placeSelRing(null);
-    } else if (s.ty === 'item') {
-      const b = byA.get(s.a);
-      view = { ...itemView(b), b: goal.b + .55, t: 1.08 }; title = b.it.activo; col = CLS[b.k].color; text = story(b);
-      selA = s.a; placeSelRing(b);
-    } else {
-      view = { ...HOME(), t: .8 }; title = 'Tu ciudad trabaja todos los días';
-      text = `Entre intereses, rentas y dividendos, tu ciudad genera unos <b class="pos">${mxn2.format(incomePerDay(Mo))}</b> al día.` + (MI && MI.type === 'obra' ? ` Misión de ${MESES[new Date().getMonth()]}: aporta alrededor de <b>${mxn.format(MI.amt)}</b> a <b>${esc(MI.it.activo)}</b>.` : '');
-      selA = null; placeSelRing(null);
-    }
-    markPins();
-    flyTo(view, reduce ? 0 : tour.i === 0 ? 2.6 : 2.2);
-    $m('m3tk').textContent = `Recorrido${tour.only ? ' · ' + CLS[tour.only].scene : ''} · ${tour.i + 1} de ${tour.steps.length}`;
-    $m('m3tt').innerHTML = `<span class="dot" style="--c:${col}"></span>${esc(title)}`;
-    $m('m3tx').innerHTML = text;
-    $m('m3tprev').disabled = tour.i === 0;
-    $m('m3tnext').setAttribute('aria-label', tour.i === tour.steps.length - 1 ? 'Terminar recorrido' : 'Siguiente parada');
-  }
-  function story(b) {
-    const it = b.it, k = b.k, al = ALERT.get(it.activo);
-    let s = esc(it.descripcion || KIND[b.kind]); if (!/[.!?]$/.test(s)) s += '.';
-    s += ` Vale <b>${mxn.format(it.valor)}</b> (${pct1(it.pct)} de tu ciudad).`;
-    if (k === 'RENTA_FIJA') s += ` Cada vez que la obra completa una vuelta cae un pago de intereses: unos <b class="pos">${mxn2.format(it.valor * rateOf(it) / 100 / 365)}</b> al día.`;
-    else if (it.cambio_dia > 0) s += ` Hoy subió ${it.cambio_dia.toFixed(2)}% (<b class="pos">${signed2(it.hoy)}</b>): por eso el anillo verde y la flecha.`;
-    else if (it.cambio_dia < 0) s += ` Hoy bajó ${Math.abs(it.cambio_dia).toFixed(2)}% (<b class="neg">${signed2(it.hoy)}</b>): por eso la nube con lluvia.`;
-    if (k === 'FIBRAS') s += ' Cada persona que entra es un inquilino que paga renta.';
-    if (k === 'ACCIONES') s += ' Mientras más humo, más está produciendo.';
-    if (al === 'over') s += ' La sirena avisa que su grupo se pasó de su banda.';
-    if (al === 'under') s += ' La cinta amarilla avisa que a su grupo le falta inversión.';
-    return s;
-  }
-  function updTour(dt) {
-    if (tour.paused) return;
-    const s = tour.steps[tour.i], dur = DUR[s.ty];
-    if (!fly) { tour.t += dt; if (!reduce) goal.b += dt * .1; }
-    $m('m3tbar').style.width = Math.min(100, tour.t / dur * 100) + '%';
-    if (tour.t >= dur) { if (tour.i < tour.steps.length - 1) goStep(tour.i + 1); else stopTour(); }
-  }
-  function pauseTour(p) {
-    tour.paused = p;
-    const b = $m('m3tplay'); b.innerHTML = p ? ICON.play : ICON.pause; b.setAttribute('aria-label', p ? 'Continuar recorrido' : 'Pausar recorrido');
-  }
-  function stopTour() {
-    if (!tour.on) return;
-    tour.on = false; mode = 'map'; $m('m3').classList.remove('touring');
-    if (selA && byA.has(selA)) select(selA, false); else closeCard(false);
-  }
-
-  // ---------- vista de calle ----------
-  function buildStops() {
-    sv.stops = blds.map(b => {
-      let x, z;
-      if (b.k === 'BITCOIN') {
-        const dx = b.x - ISLE.x, dz = b.z - ISLE.z, dd = Math.hypot(dx, dz);
-        if (dd < 1) { x = b.x - 7; z = b.z + Math.min(13, ISLE.r - 3); } else { x = b.x - dx / dd * (b.foot * .5 + 7); z = b.z - dz / dd * (b.foot * .5 + 7); }
-      } else { x = b.x - b.slw / 2 - 2.5; z = b.z + b.sld / 2 + 2.5; }
-      const dx = b.x - x, dz = b.z - z, dist = Math.hypot(dx, dz);
-      return { a: b.it.activo, k: b.k, x, z, y: b.g.position.y, yaw: Math.atan2(-dx, -dz), pitch: clamp(Math.atan2(b.top * .45 - 1.6, dist), 0, .45) };
-    });
-  }
-  function enterStreet(a) {
-    if (!built) return;
-    if (tour.on) stopTour();
-    buildStops(); if (!sv.stops.length) return;
-    let i = sv.stops.findIndex(s => s.a === a);
-    if (i < 0) i = Math.max(0, sv.stops.findIndex(s => byA.get(s.a).owned));
-    sv.i = i;
-    fade(() => {
-      mode = 'street'; fly = null; C.fov = 62; C.near = .3; C.updateProjectionMatrix();
-      $m('m3').classList.add('streeting'); hideHint();
-      goStop(i, true);
-    });
-  }
-  function exitStreet(silent) {
-    mode = 'map'; C.fov = 40; C.near = 1; C.updateProjectionMatrix();
-    $m('m3').classList.remove('streeting');
-    const s = sv.stops[sv.i], b = s && byA.get(s.a);
-    Object.assign(cam, { x: sv.x - Math.sin(sv.yaw) * 7.8, y: 1, z: sv.z - Math.cos(sv.yaw) * 7.8, d: 8, t: 1.35, b: sv.yaw });
-    Object.assign(goal, cam);
-    if (!silent && b) flyTo({ ...itemView(b), b: sv.yaw }, reduce ? 0 : 1.6);
-    else if (!silent) flyTo(HOME(), 1.6);
-    showCard();
-  }
-  function goStopA(a) { const i = sv.stops.findIndex(s => s.a === a); if (i >= 0) goStop(i); }
-  function goStop(i, instant) {
-    const n = sv.stops.length; if (!n) return;
-    i = ((i % n) + n) % n;
-    const s = sv.stops[i], prev = sv.stops[sv.i];
-    const far = instant || !prev || prev.k !== s.k || Math.abs(prev.z - s.z) > .5 || Math.hypot(prev.x - s.x, prev.z - s.z) > 45;
-    sv.i = i;
-    const jump = () => { Object.assign(sv, { x: s.x, z: s.z, y: s.y, yaw: s.yaw, pitch: s.pitch }); sv.walk = null; };
-    if (instant || reduce) jump();
-    else if (far) fade(jump);
-    else sv.walk = { fx: sv.x, fz: sv.z, fy: sv.yaw, fp: sv.pitch, s, t: 0, dur: clamp(Math.hypot(s.x - sv.x, s.z - sv.z) / 14, .8, 2.2) };
-    selA = s.a; selK = s.k; showCard(); markPins(); placeSelRing(byA.get(s.a));
-    $m('m3sn').innerHTML = `<span class="dot" style="--c:${CLS[s.k].color}"></span><span><b>${esc(s.a)}</b><small>${esc(CLS[s.k].scene)} · ${i + 1} de ${n}</small></span>`;
-    syncPage(s.k, s.a);
-  }
-  function fade(fn) { const f = $m('m3fade'); if (reduce) { fn(); return; } f.style.opacity = 1; setTimeout(() => { fn(); f.style.opacity = 0; }, 240); }
-  function updStreet(dt) {
-    if (sv.walk) {
-      const w = sv.walk; w.t += dt / w.dur; const e = ease(Math.min(1, w.t));
-      sv.x = w.fx + (w.s.x - w.fx) * e; sv.z = w.fz + (w.s.z - w.fz) * e;
-      sv.yaw = w.fy + angD(w.fy, w.s.yaw) * e; sv.pitch = w.fp + (w.s.pitch - w.fp) * e;
-      if (w.t >= 1) sv.walk = null;
-    }
-    C.rotation.order = 'YXZ';
-    C.position.set(sv.x, 1.6 + (sv.y || 0) + (sv.walk ? Math.sin(sv.walk.t * 20) * .04 : 0), sv.z);
-    C.rotation.set(sv.pitch, sv.yaw, 0);
-  }
-
-  // ---------- cuadro por cuadro ----------
-  function updLabels() {
-    const W = R.domElement.clientWidth, H = R.domElement.clientHeight, placed = [];
-    const showD = mode !== 'street' && cam.d > 115, showP = mode === 'street' || cam.d < 240;
-    for (const L of labels) {
-      const sel = L.b && L.b.it.activo === selA;
-      let vis = L.kind === 'dist' ? showD : L.kind === 'mon' ? mode !== 'street' && cam.d > 45 : showP || sel;
-      let x = 0, y = 0;
-      if (vis && mode === 'street' && L.b && Math.hypot(L.b.x - sv.x, L.b.z - sv.z) > 95) vis = false;
-      if (vis) {
-        V3.copy(L.pos).project(C);
-        if (V3.z > 1 || V3.z < -1) vis = false;
-        else { x = (V3.x * .5 + .5) * W; y = (-V3.y * .5 + .5) * H; if (x < -60 || x > W + 60 || y < -30 || y > H + 50) vis = false; }
-      }
-      if (vis) {
-        if (!L.w) { L.el.hidden = false; L.w = L.el.offsetWidth; L.h = L.el.offsetHeight; L.el.hidden = L.hid; }
-        const rx = x - L.w / 2, ry = L.kind === 'dist' ? y - L.h / 2 : y - L.h - 6;
-        if (!sel && placed.some(p => rx < p[0] + p[2] + 4 && rx + L.w + 4 > p[0] && ry < p[1] + p[3] + 3 && ry + L.h + 3 > p[1])) vis = false;
-        else placed.push([rx, ry, L.w, L.h]);
-        if (vis) L.el.style.transform = `translate(${Math.round(rx)}px,${Math.round(ry)}px)`;
-      }
-      if (vis && L.hid) { L.el.hidden = false; L.hid = false; }
-      else if (!vis && !L.hid) { L.el.hidden = true; L.hid = true; }
-    }
-  }
-  function step(dt) {
-    tNow += dt;
-    if (mode === 'street') updStreet(dt); else updMap(dt);
-    if (tour.on) updTour(dt);
-    if (!reduce) { for (const b of blds) for (const f of b.anims) f(dt, tNow); for (const f of ticks) f(dt, tNow); }
-    updFx(dt); updPops(dt);
-    if (selRing && selRing.visible) { const s = 1 + Math.sin(tNow * 4) * .04; selRing.scale.set(s, s, 1); }
-    flash = Math.max(0, flash - dt); hemi.intensity = th().hi + flash * 5;
-    if (mode === 'street') { S.fog.near = 70; S.fog.far = 460; } else { S.fog.near = cam.d * .9 + 80; S.fog.far = cam.d * 2.5 + 520; }
-    updLabels();
-    $m('m3needle').style.transform = `rotate(${mode === 'street' ? sv.yaw : cam.b}rad)`;
-    const tl = cam.t > .3 ? '2D' : '3D';
-    if (tl !== lastTiltLbl) { lastTiltLbl = tl; $m('m3Tilt').textContent = tl; $m('m3Tilt').setAttribute('aria-label', tl === '2D' ? 'Ver el mapa plano desde arriba' : 'Inclinar el mapa en 3D'); }
-  }
-
-  return {
-    init, resize,
-    failed: () => bad,
-    build() { if (ok && model) build(); },
-    clear() { if (tour.on) stopTour(); if (mode === 'street') { mode = 'map'; $m('m3').classList.remove('streeting'); if (C) { C.fov = 40; C.near = 1; C.updateProjectionMatrix(); } } if (ok) teardown(); selA = selK = null; first = true; $m('m3card').hidden = true; $m('m3load').hidden = false; $m('m3load').textContent = ok ? 'Construyendo tu ciudad…' : 'Cargando mapa 3D…'; },
-    onFocus(k) {
-      if (!built) return;
-      if (tour.on) stopTour();
-      if (mode === 'street') { const f = k && dists[k] && (dists[k].items.find(b => b.owned) || dists[k].items[0]); if (f) goStopA(f.it.activo); return; }
-      if (!k) { closeCard(false); flyTo(HOME(), reduce ? 0 : 1.3); } else selectK(k, true);
-    },
-    onSelect(a) {
-      if (!built) return;
-      if (!a) { if (selK && mode !== 'street') selectK(selK, false); return; }
-      if (mode === 'street') goStopA(a); else { if (tour.on) stopTour(); select(a, true); }
-    }
-  };
-})();
 
 // ================= Pueblo isométrico (aldea de caricatura) =================
 // Cada activo es un edificio sobre una cuadrícula. El pueblo crece con tu dinero, se puede editar
@@ -4336,25 +3064,26 @@ const VL = (() => {
     if (e.kind === 'hall') {
       const lv = levelOf(model.total), nx = lv.next;
       return `<div class="mc-h"><span class="mc-k"><span class="dot" style="--c:var(--acc)"></span>Centro del pueblo</span>${X1}</div><h3>${esc(lv.name)}</h3>
-        <p class="mc-d">Tu pueblo crece cuando crece tu dinero: los edificios suben de nivel y el terreno se expande.</p><div class="mc-big">${mxn.format(model.total)}</div>
-        ${row('Ganancia total', signed(model.ganancia), model.ganancia >= 0 ? 'pos' : 'neg')}${row('Hoy', signed2(model.hoy), model.hoy >= 0 ? 'pos' : 'neg')}${row('Racha', ST.s + (ST.s === 1 ? ' mes' : ' meses'))}
+        <p class="mc-d">Desde aquí gobiernas. El pueblo crece cuando crece su tesoro: los edificios suben de nivel y el terreno se expande.</p><p class="mc-st ${GOV.headline().tone}">${esc(GOV.headline().text)}</p><div class="mc-big">${mxn.format(model.total)}</div>
+        ${row('Prosperidad', signed(model.ganancia), model.ganancia >= 0 ? 'pos' : 'neg')}${row('Hoy', signed2(model.hoy), model.hoy >= 0 ? 'pos' : 'neg')}${row('Racha', ST.s + (ST.s === 1 ? ' mes' : ' meses'))}
         ${nx ? row('Siguiente nivel', esc(nx[1]) + ' · ' + short(nx[0])) : ''}${row('Logros', ACH.filter(a => unlocked(a.k)).length + ' de ' + ACH.length)}`;
     }
     const it = e.it, k = e.k, rf = k === 'RENTA_FIJA', al = ALERT.get(it.activo);
     let h = `<div class="mc-h"><span class="mc-k" style="--c:${CLS[k].color}"><span class="dot"></span>${esc(CLS[k].scene)} · ${esc(KINDN[e.kd] || '')}</span>${X1}</div>
       <h3>${esc(it.activo)}${e.lot ? '' : ` <span class="pill info">Nivel ${e.t}</span>`}</h3><p class="mc-d">${esc(it.descripcion || '')}</p>`;
-    if (e.lot) h += `<p class="mc-empty">Lote por construir. Captura tus títulos en "Mi portafolio" y aquí se levanta el edificio.</p>`;
+    if (e.lot) h += `<p class="mc-empty">Lote por construir. Registra tus títulos en el Catastro del pueblo y aquí se levanta el edificio.</p>`;
     else {
       h += `<div class="mc-big">${mxn.format(it.valor)}</div>`;
       h += row('Hoy', rf ? signed2(it.hoy) + ' en intereses' : signed2(it.hoy) + ' (' + (it.cambio_dia >= 0 ? '+' : '−') + Math.abs(it.cambio_dia).toFixed(2) + '%)', it.hoy >= 0 ? 'pos' : 'neg');
-      h += row('Ganancia', signed(it.ganancia), it.ganancia >= 0 ? 'pos' : 'neg');
-      h += row('Tienes / ideal', it.hold ? pct1(it.pct) + ' · se mantiene' : pct1(it.pct) + ' de ' + pct1(it.objetivo));
+      { const st = GOV.story(it); h += `<p class="mc-st ${st.tone}">${esc(st.text)}</p>`; }
+      h += row('Prosperidad', signed(it.ganancia), it.ganancia >= 0 ? 'pos' : 'neg');
+      h += row('Ocupa / ideal', it.hold ? pct1(it.pct) + ' · se mantiene' : pct1(it.pct) + ' de ' + pct1(it.objetivo));
       if (rf && it.tasa != null && it.tasa !== '') h += row('Tasa', it.tasa + '% anual');
     }
-    if (al) h += `<p class="mc-al">${al === 'over' ? 'Este grupo está sobrepoblado: se pasó de su banda.' : 'A este grupo le falta: está por debajo de su banda.'}</p>`;
+    if (al) h += `<p class="mc-al">${al === 'over' ? 'Este barrio está sobrepoblado: se pasó de su límite.' : 'A este barrio le faltan edificios: está por debajo de su límite.'}</p>`;
     if (rentOn(e)) h += `<p class="mc-ev">Hoy es día de rentas: hay fiesta en el edificio.</p>`;
-    if (MI && MI.it === it && !MI.done) h += `<p class="mc-ev">Es tu misión de este mes: aporta alrededor de ${mxn.format(MI.amt)}.</p>`;
-    if (!e.lot) h += `<p class="mc-d">${esc(CLS[k].how)}</p><p class="mc-d">El edificio sube de nivel (1 a 6) cuando crece el dinero que tienes aquí.</p>`;
+    if (MI && MI.it === it && !MI.done) h += `<p class="mc-ev">Es tu misión de este mes: destina alrededor de ${mxn.format(MI.amt)}.</p>`;
+    if (!e.lot) h += `<p class="mc-d">${esc(CLS[k].how)}</p><p class="mc-d">El edificio sube de nivel (1 a 6) cuando crece el tesoro que tienes aquí.</p>`;
     return h;
   }
   function showCard(e) {
@@ -4541,7 +3270,443 @@ const VL = (() => {
   };
 })();
 
-M3.init();
+
+// ================= Gobierno del pueblo: crónica del día, decretos y carta del gobernador =================
+// Los sucesos son narrativa: se eligen según cuánto subió o bajó cada activo hoy (estable durante el día).
+let SIM = null;
+const GOV = (() => {
+  const hs = s => { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+  const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+  const ART = { fabrica: 'la fábrica', nave: 'la nave', torre: 'la torre', plaza: 'la plaza', boveda: 'la bóveda de', calle: 'las calles', carretera: 'la carretera', puente: 'el puente', escuela: 'la escuela', hospital: 'el hospital', tesoreria: 'la tesorería' };
+  const KIND = { fabrica: 'Fábrica', nave: 'Nave industrial', torre: 'Torre de oficinas', plaza: 'Plaza comercial', boveda: 'Bóveda', calle: 'Calles', carretera: 'Carretera', puente: 'Puente', escuela: 'Escuela', hospital: 'Hospital', tesoreria: 'Tesorería' };
+  const labelOf = it => (ART[kindOf(it.key, it)] || 'el edificio') + ' ' + it.activo;
+  const kindName = it => KIND[kindOf(it.key, it)] || '';
+
+  // ---------- sucesos por tipo de barrio ----------
+  const P = {
+    fabrica: {
+      up: ['{L} recibió un pedido nuevo y sus obreros sacaron turno extra.', 'Llegó maquinaria nueva a {L}: hoy produjo más que ayer.', 'Los comerciantes del reino compraron más productos de {L}.', '{L} cerró un buen trato con un pueblo vecino.', 'Los ingenieros de {L} mejoraron la línea de producción.'],
+      upBig: ['¡Contrato récord! {L} venderá su producción a todo el reino.', '{L} inauguró una línea nueva y el pueblo salió a celebrar.', 'Un invento de los ingenieros de {L} se volvió la sensación del mercado.', 'Caravanas de compradores hicieron fila frente a {L}.'],
+      down: ['Se descompuso una máquina en {L} y la producción se frenó un poco.', 'Los proveedores de {L} llegaron tarde por la lluvia.', 'Un pedido de {L} se canceló a última hora.', 'Faltó materia prima en {L} y trabajaron a medio turno.'],
+      downBig: ['Huelga en {L}: los obreros pararon y la producción se detuvo.', 'Un apagón dejó a oscuras a {L} durante horas.', 'Se inundó la bodega de {L}; nadie salió herido, pero hubo pérdidas.', 'Un pueblo vecino dejó de comprarle a {L}.']
+    },
+    inmueble: {
+      up: ['Nuevos inquilinos firmaron contrato en {L}.', 'Las rentas de {L} se cobraron completas y a tiempo.', '{L} se llenó de visitantes.', 'Remodelaron la entrada de {L} y ahora todos quieren estar ahí.'],
+      upBig: ['Una empresa grande rentó varios pisos de {L}.', 'Anunciaron una carretera nueva junto a {L} y su valor se disparó.', 'Hay lista de espera para rentar en {L}.'],
+      down: ['Un inquilino se mudó de {L}.', 'Hubo goteras en {L} y cerraron un piso para repararlo.', 'Pocos visitantes hoy en {L}.', 'Un local de {L} se quedó vacío esta semana.'],
+      downBig: ['Un inquilino importante dejó {L} de golpe.', 'Una inundación cerró {L} por unos días.', 'Abrieron un edificio rival frente a {L} y se llevó clientes.']
+    },
+    boveda: {
+      up: ['Mercaderes extranjeros pagaron más por las monedas de {L}.', 'Se corrió la voz de que las monedas de {L} son escasas.', 'Un viajero cambió su oro por monedas de {L}.'],
+      upBig: ['¡Fiebre del oro! Todo el reino quiere monedas de {L}.', 'Un rey lejano compró monedas de {L} y el precio se disparó.', 'Los mercaderes hicieron fila toda la noche frente a {L}.'],
+      down: ['Algunos vecinos cambiaron sus monedas de {L} por pan.', 'Rumores en la plaza hicieron dudar de {L}.', 'Los mercaderes pagaron menos por las monedas de {L}.'],
+      downBig: ['Pánico en la plaza: corrió el rumor de monedas falsas en {L}.', 'Una tormenta de miedo sacudió {L} y muchos vendieron.', 'Un mercader grande vació su cofre de {L} de un golpe.']
+    },
+    obra: ['La tesorería cobró los intereses del día de {L}: la obra avanzó un poco más.', '{L} sumó un día más de intereses; los albañiles no paran.', 'Otro ladrillo para {L}: los intereses del día ya llegaron.'],
+    calm: ['Día tranquilo en {L}: todo siguió igual.', 'Sin novedades en {L}.']
+  };
+  // decisiones del gobernador: el activo recibió presupuesto nuevo este mes
+  const DEC = {
+    up: ['Tu decreto dio frutos: el presupuesto que mandaste a {L} ya trabaja y hoy rindió.', 'Buena decisión, gobernador: {L}, donde construiste este mes, tuvo un buen día.'],
+    upBig: ['¡Gran decisión, gobernador! Mandaste presupuesto a {L} y hoy fue de lo que más creció.', 'El pueblo celebra tu decreto: {L} se disparó justo después de que invertiste ahí.'],
+    down: ['{L} tuvo un mal día, pero tu decreto es de largo plazo: las obras siguen.', 'Bajó {L}, donde construiste este mes; los buenos gobernadores no deshacen sus obras por un mal día.']
+  };
+  const fam = it => it.key === 'FIBRAS' ? 'inmueble' : it.key === 'BITCOIN' ? 'boveda' : 'fabrica';
+  const isBig = it => Math.abs(it.cambio_dia) >= (it.key === 'BITCOIN' ? 4 : 1.5);
+  function decreed(it) {
+    if (!raw || !it.valor) return false;
+    const cm = ym(new Date()), prev = hist().filter(r => r.mes < cm).pop();
+    if (!prev || !prev.detalle) return false;
+    const before = prev.detalle[it.activo] ? +prev.detalle[it.activo][0] || 0 : 0;
+    return it.costo - before > Math.max(100, before * 0.01);
+  }
+  // solo los 2 movimientos más grandes con presupuesto nuevo cuentan como decreto (igual en gaceta y fichas)
+  let decM = null, decS = new Set();
+  function decSet() {
+    if (decM !== model) { decM = model; decS = new Set(model.items.filter(i => i.valor > 0 && i.key !== 'RENTA_FIJA' && Math.abs(+i.cambio_dia || 0) >= .05 && decreed(i)).sort((a, b) => Math.abs(b.hoy) - Math.abs(a.hoy)).slice(0, 2).map(i => i.activo)); }
+    return decS;
+  }
+  function story(it) {
+    const L = labelOf(it), day = ymd(new Date()), h = hs(day + '|' + it.activo);
+    const fill = t => cap(t.replace('{L}', L));
+    if (it.key === 'RENTA_FIJA') return { text: fill(P.obra[h % P.obra.length]), tone: 'up', decree: false };
+    const c = +it.cambio_dia || 0;
+    if (Math.abs(c) < 0.05) return { text: fill(P.calm[h % P.calm.length]), tone: 'flat', decree: false };
+    const up = c > 0, big = isBig(it), dec = decSet().has(it.activo);
+    if (dec) { const pool = up ? (big ? DEC.upBig : DEC.up) : DEC.down; return { text: fill(pool[h % pool.length]), tone: up ? 'up' : 'down', decree: true }; }
+    const pool = P[fam(it)][up ? (big ? 'upBig' : 'up') : (big ? 'downBig' : 'down')];
+    return { text: fill(pool[h % pool.length]), tone: up ? 'up' : 'down', decree: false };
+  }
+  function headline() {
+    const M = model, ayer = M.total - M.hoy, pct = ayer > 0 ? M.hoy / ayer * 100 : 0, amt = mxn.format(Math.abs(M.hoy));
+    if (pct >= 1) return { text: `¡Día de fiesta en el pueblo! El tesoro creció ${amt}.`, tone: 'up' };
+    if (M.hoy >= 0) return { text: `Día próspero en el pueblo: el tesoro creció ${amt}.`, tone: 'up' };
+    if (pct > -1) return { text: `Día gris en el pueblo: el tesoro bajó ${amt}.`, tone: 'down' };
+    return { text: `Día de tormenta en el pueblo: el tesoro bajó ${amt}.`, tone: 'down' };
+  }
+  // lo más importante del día: los edificios que más se movieron, más un resumen de las obras públicas
+  function feed() {
+    const own = model.items.filter(i => i.valor > 0 && i.key !== 'RENTA_FIJA').sort((a, b) => Math.abs(b.hoy) - Math.abs(a.hoy)).slice(0, 6);
+    const out = own.map(it => ({ it, ...story(it) }));
+    const rf = model.classes.RENTA_FIJA;
+    if (rf && rf.valor > 0) {
+      const it = rf.items.filter(i => i.valor > 0).sort((a, b) => b.hoy - a.hoy)[0];
+      if (it) out.push({ it, text: cap(`las obras públicas cobraron ${mxn2.format(rf.hoy)} de intereses hoy. ${story(it).text}`), tone: 'up', decree: false, rf: true });
+    }
+    return out;
+  }
+  const chgTxt = it => it.key === 'RENTA_FIJA' ? (it.tasa != null && it.tasa !== '' ? it.tasa + '% anual' : 'intereses') : (it.cambio_dia >= 0 ? '▲ ' : '▼ ') + Math.abs(it.cambio_dia).toFixed(2) + '%';
+  function renderGaceta() {
+    const box = $('gaceta'); if (!box || !model) return;
+    if (!model.total) { box.hidden = true; return; }
+    box.hidden = false;
+    const hd = headline(), f = feed();
+    box.innerHTML = `<div class="phead"><h2>Gaceta del pueblo</h2><span class="pill info">${fechaLarga(new Date())}</span></div>
+      <p class="gz-hd ${hd.tone}">${esc(hd.text)}</p>
+      <ul class="gz">${f.map(x => `<li class="${x.tone}" style="--c:${CLS[x.it.key].color}"><span class="dot"></span><div><b>${esc(x.text)}</b><span>${x.rf ? 'Obras públicas' : esc(x.it.activo) + ' · ' + chgTxt(x.it)} · <i class="${x.it.hoy >= 0 ? 'pos' : 'neg'}">${signed2(x.rf ? model.classes.RENTA_FIJA.hoy : x.it.hoy)}</i>${x.decree ? ' · <em>tu decreto</em>' : ''}</span></div></li>`).join('')}</ul>
+      <p class="foot">Crónica inspirada en cómo se movió hoy cada activo: los sucesos son narrativa del pueblo, no noticias reales. "Tu decreto" marca lo que recibió presupuesto este mes.</p>`;
+    collapsible(box, 'gaceta', `<b>${esc(hd.text)}</b>`, false);
+  }
+
+  // ---------- precio objetivo de compra ----------
+  const DESC = it => it.key === 'FIBRAS' ? num(J.desc_fibras_pct, 1) : it.key === 'BITCOIN' ? num(J.desc_cripto_pct, 2) : num(J.desc_acciones_pct, 0.5);
+  const targetPrice = it => { const p = +it.precio_mxn; if (it.key === 'RENTA_FIJA' || !(p > 0)) return null; const t = p * (1 - DESC(it) / 100); return p >= 1 ? Math.round(t * 100) / 100 : Math.round(t * 1e6) / 1e6; };
+  const objTxt = it => { const t = targetPrice(it); return t ? `<br><small class="obj">objetivo ${t >= 1000 ? mxn.format(t) : mxn2.format(t)}</small>` : ''; };
+
+  // ---------- carta del gobernador: datos ----------
+  const pf = v => v == null ? '—' : v >= 1000 ? mxn.format(v) : mxn2.format(v);
+  const unitSym = it => /eth/i.test(it.activo) ? 'ETH' : /sol/i.test(it.activo) ? 'SOL' : /btc|bitcoin/i.test(it.activo) ? 'BTC' : '';
+  const clean = s => String(s || '').replace(/\s*\(.*?\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+  function placeOf(key, name) {
+    const n = clean(name);
+    if (key === 'ACCIONES') return !n || /^acciones$/i.test(n) ? 'el barrio de las Fábricas' : 'las fábricas de ' + n;
+    if (key === 'FIBRAS') return 'el barrio de Inmuebles';
+    if (key === 'RENTA_FIJA') return 'las Obras públicas';
+    return 'la Bóveda';
+  }
+  const groupTitle = g => { const k = g.members[0].key, n = clean(g.name), lo = n.toLowerCase(); return CLS[k].scene + (n && lo !== CLS[k].name.toLowerCase() && lo !== CLS[k].scene.toLowerCase() ? ' · ' + n : ''); };
+  function needNoSell() {
+    const T0 = model.total; if (!T0) return 0;
+    const overT = Math.max(T0, ...BD.filter(b => b.state === 'over').map(b => (b.actual / 100 * T0) / ((b.target + b.tol) / 100)));
+    const underSum = BD.filter(b => b.state === 'under').reduce((a, b) => a + b.toLimit, 0);
+    return Math.max(overT - T0, underSum);
+  }
+  function letterStory(S, groups) {
+    const s = [], nm = clean((raw && raw.nombre) || '').split(' ')[0];
+    s.push(`${nm ? 'Gobernador ' + nm : 'Gobernador'}: este mes el tesoro destina ${mxn.format(S.amt)} a nuevas obras.`);
+    const top = groups[0];
+    if (top) {
+      const b = BD.find(x => x.name === top.g.name), where = placeOf(top.key, top.g.name);
+      const NEED = { ACCIONES: 'faltan obreros y maquinaria', FIBRAS: 'faltan edificios para tantos inquilinos', RENTA_FIJA: 'hay obras detenidas por falta de fondos', BITCOIN: 'hay menos monedas de las que debería' };
+      s.push(b && b.state === 'under' ? `En ${where} ${NEED[top.key]}; por eso ahí va la mayor parte (${mxn.format(top.inv)}).`
+        : `Lo que más lejos está de su forma ideal es ${where}; por eso ahí va la mayor parte (${mxn.format(top.inv)}).`);
+    }
+    const over = BD.find(b => b.state === 'over'), stormK = EV && EV.storms[0] ? EV.storms[0].k : null;
+    const FULL = { ACCIONES: 'ya no caben más obreros', FIBRAS: 'ya no caben más inquilinos', RENTA_FIJA: 'las obras ya tienen fondos de sobra', BITCOIN: 'la bóveda ya está llena' };
+    if (over) { const ok = over.items[0].key; s.push(`En ${placeOf(ok, over.name)} ${FULL[ok]}: este mes no recibe fondos.`); }
+    else if (stormK) s.push(`Hoy hubo tormenta en ${placeOf(stormK, '')}, pero el consejo mantiene el plan.`);
+    else s.push('Así el pueblo se acerca a su forma ideal sin vender nada.');
+    return s.join(' ');
+  }
+  function letterData() {
+    const S = SIM, M = model, now = new Date();
+    const groups = S.rowsG.filter(r => r.inv >= 1).map(r => ({
+      g: r.g, title: groupTitle(r.g), key: r.g.members[0].key, inv: r.inv, now: r.now, after: r.after, ideal: r.g.tG,
+      items: r.items.filter(x => x.amt >= 1).sort((a, b) => b.amt - a.amt).map(x => {
+        const it = x.i, tp = targetPrice(it);
+        let units = '', amtT = x.amt;
+        if (it.key === 'RENTA_FIJA') units = 'monto libre';
+        else if (isUnit(it)) { units = String(x.units); amtT = x.units * tp; }
+        else if (tp) units = (x.amt / tp).toFixed(6) + (unitSym(it) ? ' ' + unitSym(it) : '');
+        return { name: it.activo, kind: kindName(it), desc: it.descripcion || '', key: it.key, units, price: +it.precio_mxn > 0 ? +it.precio_mxn : null, tp, amt: x.amt, amtT, tasa: it.tasa, dp: DESC(it) };
+      })
+    }));
+    const spentT = groups.reduce((a, g) => a + g.items.reduce((b, x) => b + x.amtT, 0), 0);
+    const need = needNoSell();
+    let sug = 0, sugWhy = '';
+    if (need > 1) { sug = need; sugWhy = 'para que todos los barrios vuelvan a su límite sin vender'; }
+    else if (ST && ST.avg > 0) { sug = ST.avg; sugWhy = 'tu presupuesto promedio de los últimos meses'; }
+    else if (MI && MI.amt) { sug = MI.amt; sugWhy = 'lo que pide la misión del mes'; }
+    sug = Math.round(sug / 100) * 100;
+    const lv = levelOf(M.total);
+    return { now, amt: S.amt, spent: S.spent, spentT, rest: S.rest, sug, sugWhy, groups, total: M.total, lvl: lv.name, next: lv.next,
+      name: (raw && raw.nombre) || '', story: letterStory(S, groups), hora: pad2(now.getHours()) + ':' + pad2(now.getMinutes()),
+      d: [num(J.desc_acciones_pct, 0.5), num(J.desc_fibras_pct, 1), num(J.desc_cripto_pct, 2)],
+      file: 'Carta-del-gobernador-' + ymd(now) + '.pdf' };
+  }
+
+  // ---------- papel del pueblo (fondo de todas las cartas), dibujado en canvas ----------
+  let paperURL = null;
+  function paper() {
+    if (paperURL) return paperURL;
+    const K = 1240 / 210, cv2 = document.createElement('canvas'); cv2.width = 1240; cv2.height = 1754;
+    const c = cv2.getContext('2d'); c.scale(K, K);
+    const R = rng(7);
+    // papel
+    let g = c.createLinearGradient(0, 0, 0, 297); g.addColorStop(0, '#fcf7ea'); g.addColorStop(1, '#f4e9cf'); c.fillStyle = g; c.fillRect(0, 0, 210, 297.1);
+    g = c.createRadialGradient(105, 150, 90, 105, 150, 190); g.addColorStop(0, 'rgba(214,190,140,0)'); g.addColorStop(1, 'rgba(214,190,140,.45)'); c.fillStyle = g; c.fillRect(0, 0, 210, 297.1);
+    for (let i = 0; i < 2200; i++) { c.fillStyle = `rgba(120,90,40,${.03 + R() * .05})`; c.fillRect(R() * 210, R() * 297, .25 + R() * .35, .25 + R() * .35); }
+    // marca de agua: rosa de los vientos con olas
+    c.save(); c.globalAlpha = .05; c.strokeStyle = '#2f5d73'; c.fillStyle = '#2f5d73'; c.lineWidth = 1.2;
+    [46, 40, 22].forEach(r => { c.beginPath(); c.arc(105, 162, r, 0, 7); c.stroke(); });
+    for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, r = i % 2 ? 30 : 44; c.beginPath(); c.moveTo(105 + Math.cos(a) * r, 162 + Math.sin(a) * r); c.lineTo(105 + Math.cos(a + .2) * 8, 162 + Math.sin(a + .2) * 8); c.lineTo(105 + Math.cos(a - .2) * 8, 162 + Math.sin(a - .2) * 8); c.closePath(); c.fill(); }
+    for (let j = 0; j < 3; j++) { c.beginPath(); for (let x = -18; x <= 18; x += 1) { const y = 158 + j * 5 + Math.sin(x / 3) * 1.4; x === -18 ? c.moveTo(105 + x, y) : c.lineTo(105 + x, y); } c.stroke(); }
+    c.restore();
+    // marcos
+    c.strokeStyle = '#8b6a3c'; c.lineWidth = .9; c.strokeRect(7, 7, 196, 283);
+    c.strokeStyle = '#b8955c'; c.lineWidth = .35; c.strokeRect(10, 10, 190, 277);
+    const cols = ['#f2b544', '#ef7b6c', '#4fc3b0', '#f7931a'];
+    [[10, 10], [200, 10], [200, 287], [10, 287]].forEach(([x, y], i) => {
+      c.save(); c.translate(x, y); c.rotate(Math.PI / 4);
+      c.fillStyle = '#fcf7ea'; c.fillRect(-3.2, -3.2, 6.4, 6.4); c.strokeStyle = '#8b6a3c'; c.lineWidth = .4; c.strokeRect(-3.2, -3.2, 6.4, 6.4);
+      c.fillStyle = cols[i]; c.fillRect(-1.8, -1.8, 3.6, 3.6); c.restore();
+    });
+    // escudo del pueblo con laureles
+    const ex = 105, ey = 26;
+    [-1, 1].forEach(sd => {
+      const pt = a => [ex + sd * 14.5 * Math.cos(a), ey + 2 + 13 * Math.sin(a)];
+      for (let i = 0; i < 8; i++) {
+        const a = 1.15 - i * .3, [px, py] = pt(a), [qx, qy] = pt(a - .05);
+        c.save(); c.translate(px, py); c.rotate(Math.atan2(qy - py, qx - px) + sd * .35);
+        c.fillStyle = i % 2 ? '#7c9a57' : '#6a8a4a'; c.beginPath(); c.ellipse(0, 0, 2.6, 1.1, 0, 0, 7); c.fill(); c.restore();
+      }
+    });
+    c.save(); c.translate(ex, ey);
+    c.beginPath(); c.moveTo(-9, -10); c.lineTo(9, -10); c.lineTo(9, 1); c.quadraticCurveTo(9, 8, 0, 12.5); c.quadraticCurveTo(-9, 8, -9, 1); c.closePath();
+    g = c.createLinearGradient(0, -10, 0, 12); g.addColorStop(0, '#3a86a3'); g.addColorStop(1, '#1d4a66'); c.fillStyle = g; c.fill();
+    c.strokeStyle = '#c9a14a'; c.lineWidth = .9; c.stroke();
+    c.strokeStyle = '#fff6df'; c.lineWidth = .8; c.lineCap = 'round';
+    for (let j = 0; j < 3; j++) { c.beginPath(); for (let x = -6.5; x <= 6.5; x += .5) { const y = -2.5 + j * 3.6 + Math.sin(x * 1.1 + j) * .9; x === -6.5 ? c.moveTo(x, y) : c.lineTo(x, y); } c.stroke(); }
+    c.fillStyle = '#d9b25a'; c.beginPath(); c.moveTo(-5, -11.2); c.lineTo(-5, -15); c.lineTo(-2.5, -12.8); c.lineTo(0, -16); c.lineTo(2.5, -12.8); c.lineTo(5, -15); c.lineTo(5, -11.2); c.closePath(); c.fill();
+    c.strokeStyle = '#8b6a2a'; c.lineWidth = .3; c.stroke();
+    c.restore();
+    // pueblo al pie de la carta
+    const gy = 284, x0 = 12, W2 = 186;
+    g = c.createLinearGradient(0, 252, 0, gy); g.addColorStop(0, 'rgba(79,195,176,0)'); g.addColorStop(1, 'rgba(79,195,176,.16)'); c.fillStyle = g; c.fillRect(10.2, 252, 189.6, gy - 252);
+    c.fillStyle = 'rgba(150,190,120,.28)'; c.beginPath(); c.ellipse(55, gy + 4, 60, 12, 0, 0, 7); c.fill(); c.beginPath(); c.ellipse(160, gy + 5, 55, 11, 0, 0, 7); c.fill();
+    c.fillStyle = 'rgba(255,214,120,.55)'; c.beginPath(); c.arc(188, 262, 3.2, 0, 7); c.fill();
+    const rect = (x, y, w, h, f) => { c.fillStyle = f; c.fillRect(x, y, w, h); };
+    const wins = (x, y, w, h, col, sx, sy) => { c.fillStyle = col; for (let yy = y + 1.4; yy < y + h - 1.6; yy += sy) for (let xx = x + 1.1; xx < x + w - 1.3; xx += sx) c.fillRect(xx, yy, .8, 1.1); };
+    const z = [.43, .19, .30, .08].reduce((a, p) => { a.push((a.length ? a[a.length - 1] : x0) + p * W2); return a; }, []);
+    // fábricas
+    let x = x0 + 1;
+    while (x < z[0] - 9) {
+      const w = 9 + R() * 6, h = 7 + R() * 7, top = gy - h;
+      rect(x + w * .62, top - 7 - R() * 4, 1.5, h + 9, '#b98a5e');
+      for (let k = 0; k < 3; k++) { c.fillStyle = `rgba(150,150,160,${.28 - k * .07})`; c.beginPath(); c.arc(x + w * .62 + .75 + k * 1.6, top - 11 - k * 2.6, 1.2 + k * .5, 0, 7); c.fill(); }
+      rect(x, top, w, h, '#e7c37a');
+      c.fillStyle = '#cfa35a'; c.beginPath(); for (let s = 0; s < 3; s++) { const sx = x + s * w / 3; c.moveTo(sx, top); c.lineTo(sx + w / 3, top - 2.2); c.lineTo(sx + w / 3, top); } c.fill();
+      wins(x, top + 1.5, w, h - 2, '#fff1c8', 2.2, 2.6);
+      x += w + 1.5 + R() * 1.5;
+    }
+    // inmuebles
+    x = z[0] + 1.5;
+    while (x < z[1] - 5) { const w = 5 + R() * 3.5, h = 13 + R() * 11; rect(x, gy - h, w, h, '#ec9a8d'); wins(x, gy - h, w, h, '#fff3e8', 1.8, 2.2); rect(x + w / 2 - .2, gy - h - 2, .4, 2, '#b06a5e'); x += w + 1 + R(); }
+    // obras públicas: escuela, hospital, banco y una grúa
+    x = z[1] + 2;
+    const pubW = (z[2] - z[1] - 6) / 3;
+    // escuela
+    rect(x, gy - 9, pubW * .9, 9, '#86d3c5'); c.fillStyle = '#d0705c'; c.beginPath(); c.moveTo(x - .8, gy - 9); c.lineTo(x + pubW * .45, gy - 14); c.lineTo(x + pubW * .9 + .8, gy - 9); c.fill();
+    rect(x + pubW * .45 - .2, gy - 18, .4, 4, '#7a5a3a'); c.fillStyle = '#ef7b6c'; c.beginPath(); c.moveTo(x + pubW * .45 + .2, gy - 18); c.lineTo(x + pubW * .45 + 3, gy - 17); c.lineTo(x + pubW * .45 + .2, gy - 16); c.fill();
+    wins(x, gy - 8, pubW * .9, 7, '#ffffff', 2.4, 3);
+    x += pubW + 1;
+    // hospital
+    rect(x, gy - 15, pubW * .85, 15, '#e9f6f3'); c.strokeStyle = '#9fcfc6'; c.lineWidth = .3; c.strokeRect(x, gy - 15, pubW * .85, 15);
+    rect(x + pubW * .425 - .7, gy - 13.5, 1.4, 4.2, '#e5483c'); rect(x + pubW * .425 - 2.1, gy - 12.1, 4.2, 1.4, '#e5483c');
+    wins(x, gy - 8.5, pubW * .85, 7.5, '#7cc8bb', 2.2, 2.6);
+    x += pubW + 1;
+    // banco
+    rect(x, gy - 10, pubW * .95, 10, '#9ad9cd'); c.fillStyle = '#6fb8aa'; c.beginPath(); c.moveTo(x - .8, gy - 10); c.lineTo(x + pubW * .475, gy - 14); c.lineTo(x + pubW * .95 + .8, gy - 10); c.fill();
+    for (let k = 0; k < 4; k++) rect(x + 1.2 + k * (pubW * .95 - 2.4) / 3 - .4, gy - 9, .8, 8, '#e9f6f3');
+    // grúa
+    const cx2 = z[2] - 4; rect(cx2, gy - 22, .7, 22, '#e2b340'); rect(cx2 - 7, gy - 22, 11, .7, '#e2b340'); c.strokeStyle = '#8a6a2a'; c.lineWidth = .2; c.beginPath(); c.moveTo(cx2 - 5, gy - 21.3); c.lineTo(cx2 - 5, gy - 16); c.stroke(); rect(cx2 - 6, gy - 16, 2, 1.3, '#c98d2a');
+    // bóveda: montaña de monedas
+    const mx = (z[2] + z[3]) / 2;
+    for (let row = 0; row < 5; row++) for (let k = 0; k <= 4 - row; k++) {
+      const px = mx - (4 - row) * 1.6 + k * 3.2, py = gy - 1.2 - row * 1.9;
+      c.fillStyle = '#c97d1c'; c.beginPath(); c.ellipse(px, py + .4, 1.9, 1, 0, 0, 7); c.fill(); c.fillStyle = '#f5b04a'; c.beginPath(); c.ellipse(px, py, 1.9, 1, 0, 0, 7); c.fill();
+    }
+    c.fillStyle = '#f7c766'; c.strokeStyle = '#c97d1c'; c.lineWidth = .35; c.beginPath(); c.arc(mx, gy - 13, 3, 0, 7); c.fill(); c.stroke();
+    c.fillStyle = '#b06a10'; c.font = 'bold 3.6px Georgia, serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('$', mx, gy - 12.8);
+    // árboles y suelo
+    for (let i = 0; i < 9; i++) { const tx = x0 + 3 + R() * (W2 - 6), r = 1.4 + R(); rect(tx - .2, gy - r - 1.2, .4, 1.4, '#7a5a3a'); c.fillStyle = R() < .5 ? '#77a35a' : '#5f8f4a'; c.beginPath(); c.arc(tx, gy - r - 1.2, r, 0, 7); c.fill(); }
+    rect(10.2, gy, 189.6, 2.8, '#a9c98c'); c.fillStyle = '#93b678'; c.fillRect(10.2, gy + 2.2, 189.6, .6);
+    paperURL = cv2.toDataURL('image/jpeg', .9);
+    return paperURL;
+  }
+  let sealURL = null;
+  function seal() {
+    if (sealURL) return sealURL;
+    const K = 6, cv2 = document.createElement('canvas'); cv2.width = 27 * K; cv2.height = 31 * K;
+    const c = cv2.getContext('2d'); c.scale(K, K); c.textAlign = 'center'; c.textBaseline = 'middle';
+    // sello de cera
+    const sx = 13.5, sy = 12.2;
+    c.fillStyle = '#9c2621'; c.beginPath(); c.moveTo(sx - 4, sy + 9); c.lineTo(sx - 6.5, sy + 17); c.lineTo(sx - 3.5, sy + 15.5); c.lineTo(sx - 1.5, sy + 18); c.lineTo(sx, sy + 9); c.fill();
+    c.beginPath(); c.moveTo(sx + 4, sy + 9); c.lineTo(sx + 6.5, sy + 17); c.lineTo(sx + 3.5, sy + 15.5); c.lineTo(sx + 1.5, sy + 18); c.lineTo(sx, sy + 9); c.fill();
+    c.fillStyle = '#b5302a'; c.beginPath(); for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, r = 11 + (i % 2 ? .9 : 0) + Math.sin(i * 1.7) * .4; i ? c.lineTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r) : c.moveTo(sx + r, sy); } c.closePath(); c.fill();
+    c.fillStyle = '#a3291f'; c.beginPath(); c.arc(sx, sy, 8.2, 0, 7); c.fill(); c.strokeStyle = '#d65a4e'; c.lineWidth = .45; c.beginPath(); c.arc(sx, sy, 7.4, 0, 7); c.stroke();
+    c.fillStyle = '#f2d2a0'; c.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 2.2 : 5; c.lineTo(sx + Math.cos(a) * r, sy - 1 + Math.sin(a) * r); } c.closePath(); c.fill();
+    c.fillStyle = '#f2d2a0'; c.font = 'bold 2.6px Georgia, serif'; c.fillText('MAREA', sx, sy + 5.2);
+    sealURL = cv2.toDataURL('image/png');
+    return sealURL;
+  }
+
+  // ---------- carta del gobernador: PDF ----------
+  const PDF_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  let pdfP = null;
+  function loadJsPDF() {
+    if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+    if (!pdfP) pdfP = new Promise((res, rej) => {
+      const s = document.createElement('script'); s.src = PDF_URL; s.async = true;
+      s.onload = () => window.jspdf && window.jspdf.jsPDF ? res(window.jspdf.jsPDF) : rej(new Error('pdf'));
+      s.onerror = () => { pdfP = null; rej(new Error('No pude cargar el generador de PDF.')); };
+      document.head.appendChild(s);
+    });
+    return pdfP;
+  }
+  // el PDF usa fuentes estándar: solo caracteres que esas fuentes conocen
+  const T = s => String(s).replace(/−/g, '-').replace(/≈/g, '~').replace(/→/g, 'a').replace(/[▲▼]/g, '').replace(/[^\x09\x0A\x20-\x7E\xA0-\xFF–—‘’“”•…]/g, '');
+  const trunc = (s, n) => s.length > n ? s.slice(0, n - 1).trim() + '…' : s;
+  function drawLetter(doc, L, bg) {
+    const C = { ink: [62, 40, 18], soft: [128, 98, 62], gold: [176, 136, 66], green: [26, 110, 80], head: [86, 58, 28], cream: [255, 251, 241] };
+    const rgb = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+    const mix = (col, f) => col.map(v => Math.round(v + (255 - v) * f));
+    const font = (f, st, sz, col) => { doc.setFont(f, st); doc.setFontSize(sz); doc.setTextColor(...(col || C.ink)); };
+    const txt = (s, x, y, o) => doc.text(T(s), x, y, o);
+    const page = () => doc.addImage(bg, 'JPEG', 0, 0, 210, 297);
+    page();
+    font('times', 'bold', 22, C.head); txt('Carta del Gobernador', 105, 50, { align: 'center' });
+    font('helvetica', 'normal', 9.5, C.soft);
+    txt(`Decreto de presupuesto · ${fechaLarga(L.now)} de ${L.now.getFullYear()}`, 105, 56.5, { align: 'center' });
+    txt(`${L.name ? 'Gobierno de ' + L.name + ' · ' : ''}Pueblo nivel ${L.lvl}`, 105, 61.5, { align: 'center' });
+    doc.setDrawColor(...C.gold); doc.setLineWidth(.35); doc.line(48, 65.5, 99, 65.5); doc.line(111, 65.5, 162, 65.5);
+    doc.setFillColor(...C.gold); doc.triangle(105, 63.6, 107, 65.5, 105, 67.4, 'F'); doc.triangle(105, 63.6, 103, 65.5, 105, 67.4, 'F');
+    // la historia del gobernador (corta)
+    font('times', 'italic', 11.5, C.ink);
+    const lines = doc.splitTextToSize(T(L.story), 168);
+    doc.text(lines, 21, 74.5, { lineHeightFactor: 1.35 });
+    let y = 74.5 + (lines.length - 1) * 5.48 + 6;
+    // tres datos clave
+    const bw = 55, gap = 2.5;
+    [['LO QUE DESTINAS', mxn.format(L.amt), 'tu presupuesto de este mes'],
+     ['SUGERENCIA DEL CONSEJO', L.sug ? mxn.format(L.sug) : '—', L.sug ? L.sugWhy : 'sin sugerencia por ahora'],
+     ['TESORO DEL PUEBLO', mxn.format(L.total), L.next ? `faltan ${short(L.next[0] - L.total)} para ${L.next[1]}` : 'nivel máximo']]
+      .forEach(([k, v, cap2], i) => {
+        const x = 20 + i * (bw + gap);
+        doc.setFillColor(...C.cream); doc.setDrawColor(...C.gold); doc.setLineWidth(.35); doc.roundedRect(x, y, bw, 21, 2, 2, 'FD');
+        font('helvetica', 'bold', 7, C.soft); txt(k, x + 4, y + 5.3);
+        font('helvetica', 'bold', 14, i === 0 ? C.green : C.ink); txt(v, x + 4, y + 12.2);
+        font('helvetica', 'normal', 7, C.soft); doc.text(doc.splitTextToSize(T(cap2), bw - 8).slice(0, 2), x + 4, y + 16.4, { lineHeightFactor: 1.2 });
+      });
+    y += 27;
+    // tabla de compras
+    const X = { name: 20, units: 113, price: 139, tp: 166, amt: 189 }, LIMIT = 250;
+    const head = () => {
+      doc.setFillColor(...C.head); doc.rect(20, y, 170, 7, 'F');
+      font('helvetica', 'bold', 7.3, [255, 244, 222]);
+      txt('OBRA / ACTIVO', X.name + 3, y + 4.7); txt('TÍTULOS', X.units, y + 4.7, { align: 'right' }); txt('PRECIO HOY', X.price, y + 4.7, { align: 'right' });
+      txt('PRECIO OBJETIVO', X.tp, y + 4.7, { align: 'right' }); txt('MONTO', X.amt, y + 4.7, { align: 'right' });
+      y += 7;
+    };
+    const ensure = h => { if (y + h > LIMIT) { doc.addPage(); page(); y = 46; head(); } };
+    head();
+    L.groups.forEach(g => {
+      ensure(6.5 + 9);
+      const col = rgb(CLS[g.key].color);
+      doc.setFillColor(...mix(col, .8)); doc.rect(20, y, 170, 6.5, 'F');
+      doc.setFillColor(...col); doc.circle(23.5, y + 3.25, 1.3, 'F');
+      font('helvetica', 'bold', 8.5, C.ink); txt(trunc(g.title, 44), 26.5, y + 4.4);
+      font('helvetica', 'normal', 6.8, C.soft); txt(`hoy ${pct1(g.now)} · después ${pct1(g.after)} · ideal ${pct1(g.ideal)}`, X.tp, y + 4.3, { align: 'right' });
+      font('helvetica', 'bold', 8.5, C.ink); txt(mxn.format(g.inv), X.amt, y + 4.4, { align: 'right' });
+      y += 6.5;
+      g.items.forEach((x, n) => {
+        ensure(9);
+        if (n % 2) { doc.setFillColor(255, 252, 244); doc.rect(20, y, 170, 9, 'F'); }
+        font('helvetica', 'bold', 9, C.ink); txt(trunc(x.name, 30), X.name + 6.5, y + 4);
+        font('helvetica', 'normal', 6.6, C.soft); txt(trunc([x.kind, x.desc].filter(Boolean).join(' · '), 50), X.name + 6.5, y + 7.3);
+        font('helvetica', 'normal', 8.4, C.ink); txt(x.units, X.units, y + 5.4, { align: 'right' });
+        txt(x.price ? pf(x.price) : '—', X.price, y + 5.4, { align: 'right' });
+        if (x.key === 'RENTA_FIJA') { font('helvetica', 'normal', 8, C.soft); txt(x.tasa != null && x.tasa !== '' ? 'tasa ' + x.tasa + '%' : 'tasa vigente', X.tp, y + 5.4, { align: 'right' }); }
+        else { font('helvetica', 'bold', 8.8, C.green); txt(x.tp ? pf(x.tp) : '—', X.tp, y + 4.5, { align: 'right' }); font('helvetica', 'normal', 6.2, C.soft); txt(`${x.dp}% abajo de hoy`, X.tp, y + 7.5, { align: 'right' }); }
+        font('helvetica', 'bold', 8.8, C.ink); txt(mxn.format(x.amtT), X.amt, y + 5.4, { align: 'right' });
+        doc.setDrawColor(230, 214, 186); doc.setLineWidth(.15); doc.line(20, y + 9, 190, y + 9);
+        y += 9;
+      });
+    });
+    ensure(12);
+    doc.setDrawColor(...C.head); doc.setLineWidth(.5); doc.line(20, y + 1, 190, y + 1);
+    font('times', 'bold', 12, C.ink); txt('Total del decreto', X.name + 3, y + 7); txt(mxn.format(L.spentT), X.amt, y + 7, { align: 'right' });
+    y += 12;
+    const notes = [];
+    if (L.spent - L.spentT >= 1) notes.push(`A precio de hoy serían ${mxn.format(L.spent)}; si las órdenes se llenan al precio objetivo te ahorras unos ${mxn.format(L.spent - L.spentT)}.`);
+    if (L.rest >= 1) notes.push(`Sobran ${mxn.format(L.rest)} que no alcanzan para un título completo.`);
+    notes.push(`Precio objetivo: es una orden límite sugerida, ${L.d[0]}% abajo del precio de hoy en las fábricas, ${L.d[1]}% en los inmuebles y ${L.d[2]}% en la bóveda. Si el precio no llega, la orden no se ejecuta: espera unos días o súbela hasta el precio de hoy. Las obras públicas (Cetes, Udibonos y similares) se compran por monto, a la tasa vigente.`);
+    notes.push(`Precios consultados el ${fechaLarga(L.now)} a las ${L.hora}.`);
+    font('helvetica', 'normal', 7.4, C.soft);
+    notes.forEach(n => { const ls = doc.splitTextToSize(T(n), 170); ensure(ls.length * 3.4 + 1); doc.text(ls, 20, y, { lineHeightFactor: 1.3 }); y += ls.length * 3.4 + 1.2; });
+    // firma y sello (el sello viene dibujado en el papel)
+    if (y > 228) { doc.addPage(); page(); }
+    doc.addImage(seal(), 'PNG', 162.5, 226.8, 27, 31);
+    font('times', 'italic', 13, C.ink); txt(L.name || 'El Gobernador', 50, 241, { align: 'center' });
+    doc.setDrawColor(...C.soft); doc.setLineWidth(.3); doc.line(22, 243, 78, 243);
+    font('helvetica', 'normal', 7.5, C.soft); txt('Firma del Gobernador', 50, 247, { align: 'center' });
+    font('helvetica', 'normal', 6.6, C.soft); txt('Sello del Consejo', 176, 257.2, { align: 'center' });
+    font('helvetica', 'normal', 6.2, C.soft); txt('Ciudad Marea · herramienta personal. Los sucesos del pueblo son narrativa; esto no es asesoría financiera.', 20, 256.8);
+    const np = doc.internal.getNumberOfPages();
+    if (np > 1) for (let p = 1; p <= np; p++) { doc.setPage(p); font('helvetica', 'normal', 7, C.soft); txt(`Página ${p} de ${np}`, 190, 15, { align: 'right' }); }
+  }
+
+  // ---------- versión para imprimir (también sirve si no carga el generador de PDF) ----------
+  function printLetter(L) {
+    const bg = paper();
+    let el = $('govPrint'); if (el) el.remove();
+    el = document.createElement('div'); el.id = 'govPrint';
+    const rows = L.groups.map(g => `<tr class="gpg" style="--c:${CLS[g.key].color}"><td colspan="4"><i></i>${esc(g.title)} <small>hoy ${pct1(g.now)} · después ${pct1(g.after)} · ideal ${pct1(g.ideal)}</small></td><td class="n">${mxn.format(g.inv)}</td></tr>`
+      + g.items.map(x => `<tr><td><b>${esc(x.name)}</b><small>${esc([x.kind, x.desc].filter(Boolean).join(' · '))}</small></td><td class="n">${esc(x.units)}</td><td class="n">${x.price ? pf(x.price) : '—'}</td><td class="n tp">${x.key === 'RENTA_FIJA' ? (x.tasa != null && x.tasa !== '' ? 'tasa ' + x.tasa + '%' : 'tasa vigente') : (x.tp ? pf(x.tp) + `<small>${x.dp}% abajo de hoy</small>` : '—')}</td><td class="n"><b>${mxn.format(x.amtT)}</b></td></tr>`).join('')).join('');
+    el.innerHTML = `<div class="gp-page"><img src="${bg}" alt=""><img class="gp-seal" src="${seal()}" alt=""><div class="gp-in">
+      <h1>Carta del Gobernador</h1><p class="gp-sub">Decreto de presupuesto · ${fechaLarga(L.now)} de ${L.now.getFullYear()}<br>${L.name ? 'Gobierno de ' + esc(L.name) + ' · ' : ''}Pueblo nivel ${esc(L.lvl)}</p>
+      <p class="gp-st">${esc(L.story)}</p>
+      <div class="gp-bx"><div><small>LO QUE DESTINAS</small><b>${mxn.format(L.amt)}</b><span>tu presupuesto de este mes</span></div><div><small>SUGERENCIA DEL CONSEJO</small><b>${L.sug ? mxn.format(L.sug) : '—'}</b><span>${esc(L.sug ? L.sugWhy : 'sin sugerencia por ahora')}</span></div><div><small>TESORO DEL PUEBLO</small><b>${mxn.format(L.total)}</b><span>${L.next ? 'faltan ' + short(L.next[0] - L.total) + ' para ' + esc(L.next[1]) : 'nivel máximo'}</span></div></div>
+      <table><thead><tr><th>Obra / activo</th><th class="n">Títulos</th><th class="n">Precio hoy</th><th class="n">Precio objetivo</th><th class="n">Monto</th></tr></thead><tbody>${rows}<tr class="gpt"><td colspan="4">Total del decreto</td><td class="n">${mxn.format(L.spentT)}</td></tr></tbody></table>
+      <p class="gp-n">Precio objetivo: orden límite sugerida, ${L.d[0]}% abajo del precio de hoy en las fábricas, ${L.d[1]}% en los inmuebles y ${L.d[2]}% en la bóveda. Si el precio no llega, la orden no se ejecuta. Las obras públicas se compran por monto. Precios del ${fechaLarga(L.now)} a las ${L.hora}.</p>
+      </div><div class="gp-sign"><b>${esc(L.name || 'El Gobernador')}</b><span>Firma del Gobernador</span></div></div>`;
+    document.body.appendChild(el);
+    document.body.classList.add('gp-printing');
+    const done = () => { document.body.classList.remove('gp-printing'); el.remove(); window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done);
+    const img = el.querySelector('img');
+    const go = () => setTimeout(() => window.print(), 60);
+    if (img.complete) go(); else img.onload = go;
+  }
+
+  async function downloadLetter() {
+    if (!SIM || !SIM.amt) { celebrate('Escribe tu presupuesto y toca Repartir para preparar la carta.'); return; }
+    const btn = $('btnPdf'), old = btn.textContent; btn.disabled = true; btn.textContent = 'Preparando la carta…';
+    const L = letterData();
+    try {
+      const JsPDF = await loadJsPDF();
+      const doc = new JsPDF({ unit: 'mm', format: 'a4', compress: true });
+      doc.setProperties({ title: 'Carta del Gobernador', subject: 'Decreto de presupuesto', creator: 'Ciudad Marea' });
+      drawLetter(doc, L, paper());
+      doc.save(L.file);
+    } catch (err) {
+      console.warn(err);
+      celebrate('No pude generar el PDF directo; abro la versión para imprimir. Elige "Guardar como PDF".');
+      printLetter(L);
+    }
+    btn.disabled = false; btn.textContent = old;
+  }
+  const simButtons = () => `<div class="simact"><button type="button" id="btnPdf">Descargar carta del gobernador (PDF)</button><button type="button" class="ghost" id="btnPrint">Imprimir carta</button></div>`;
+  function wire() {
+    const a = $('btnPdf'), b = $('btnPrint');
+    if (a) a.onclick = downloadLetter;
+    if (b) b.onclick = () => { if (SIM && SIM.amt) printLetter(letterData()); };
+  }
+
+  return { story, headline, feed, renderGaceta, objTxt, simButtons, wire, targetPrice, paper, letterData, drawLetter, loadJsPDF };
+})();
+
+// [módulos del pueblo]
 
 // Si hay una sesión abierta en esta pestaña, pregunta antes de entrar con ella
 (() => {
