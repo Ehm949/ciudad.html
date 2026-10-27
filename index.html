@@ -324,7 +324,7 @@ a.casino-lk::before{content:"";width:12px;height:12px;border-radius:50%;backgrou
   .gp-in .n{text-align:right}.gp-in td.tp{color:#1a6e50;font-weight:700}
   .gpg td{background:color-mix(in srgb,var(--c) 22%,#fff);font-weight:700}
   .gpg i{display:inline-block;width:2.4mm;height:2.4mm;border-radius:50%;background:var(--c);margin-right:1.5mm}
-  .gpg small{display:inline!important;font-weight:400;margin-left:2mm}
+  .gpg small{display:block!important;font-weight:400;margin:.6mm 0 0 3.9mm;font-size:6.6pt}
   .gpt td{font:700 11pt Georgia,serif;border-top:.5mm solid #563a1c}
   .gp-n{font-size:7pt;color:#80623e;margin:3mm 0 0}
   .gp-sign{position:absolute;left:22mm;top:236mm;width:56mm;text-align:center;border-top:.3mm solid #80623e;padding-top:1mm;font-size:7.5pt;color:#80623e}
@@ -426,11 +426,17 @@ a.casino-lk::before{content:"";width:12px;height:12px;border-radius:50%;backgrou
         <div class="sim"><input id="simAmt" type="number" min="0" step="500" value="10000" aria-label="Presupuesto del mes en pesos"><button id="btnSim" type="button">Repartir presupuesto</button></div>
         <div id="simOut"></div>
       </section>
+      <section class="panel" id="sellPanel">
+        <h2>Venta para reordenar</h2>
+        <p class="muted" style="margin:0">Cuando un barrio crece de más, el consejo puede decretar una venta para regresarlo a su forma ideal. El dinero vuelve a la tesorería y se usa en los barrios que se quedaron cortos. Te preparo la carta con los precios objetivo de venta.</p>
+        <div class="sim"><input id="sellAmt" type="number" min="0" step="500" aria-label="Monto a vender en pesos"><button id="btnSell" type="button">Calcular venta</button></div>
+        <div id="sellOut"></div>
+      </section>
 
     <div class="grid" id="districts"></div>
 
     <section class="panel" id="portafolio">
-      <h2>Catastro del pueblo</h2>
+      <div class="phead"><h2>Tesorería del pueblo</h2></div>
       <p class="muted" style="margin:0">Registra cuántos títulos tienes de cada edificio y a qué precio promedio los compraste. En las obras públicas (renta fija), solo el saldo. Deja vacío lo que no tengas. Actualízalo al menos una vez al mes para mantener tu racha de obras.</p>
       <details id="calcBox"><summary style="cursor:pointer;font-weight:700">Así se calcula el tesoro del pueblo</summary><div id="calc" style="margin-top:10px"></div></details>
       <form id="pfForm" style="display:flex;flex-direction:column;gap:14px"></form>
@@ -463,8 +469,8 @@ const CLS = {
     how: 'Estos edificios se rentan: cada persona o camión que entra es un inquilino que paga. La mayor parte de las rentas llega al tesoro, normalmente cada trimestre. Si los inmuebles valen más, también sube su precio.' },
   RENTA_FIJA: { name: 'Renta fija', color: '#4fc3b0', scene: 'Obras públicas',
     how: 'El pueblo le presta al gobierno central y cobra intereses todos los días. Con ese dinero se construyen calles, puentes, escuelas y hospitales: cada obra que avanza es un pago de intereses para el tesoro.' },
-  BITCOIN: { name: 'Bitcoin', color: '#f7931a', scene: 'La bóveda',
-    how: 'La bóveda guarda monedas raras: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico del pueblo.' }
+  BITCOIN: { name: 'Bitcoin', color: '#f7931a', scene: 'Oro virtual',
+    how: 'El oro virtual son monedas digitales: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico del pueblo.' }
 };
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 const LEVELS = [[0, 'Campamento'], [50000, 'Pueblo'], [250000, 'Villa'], [1000000, 'Ciudad'], [5000000, 'Metrópoli'], [20000000, 'Megalópolis']];
@@ -515,7 +521,7 @@ function obraName(it) {
   return {
     fabrica: 'una fábrica nueva de ' + (it.subclase || it.activo), nave: 'una nave industrial nueva', torre: 'una torre de oficinas',
     plaza: 'una plaza comercial', calle: 'repavimentar sus calles', carretera: 'una carretera nueva', puente: 'un puente nuevo', escuela: 'una escuela nueva',
-    hospital: 'un hospital', tesoreria: 'reforzar la tesorería', boveda: 'reforzar la bóveda'
+    hospital: 'un hospital', tesoreria: 'reforzar la tesorería', boveda: 'más oro virtual'
   }[kindOf(it.key, it)];
 }
 function levelOf(v) { let i = 0; LEVELS.forEach((l, j) => { if (v >= l[0]) i = j; }); return { i, name: LEVELS[i][1], next: LEVELS[i + 1] || null }; }
@@ -878,8 +884,8 @@ function apply(d) {
   const nCrypto = model.classes.BITCOIN.items.length;
   CLS.BITCOIN.name = nCrypto > 1 ? 'Cripto' : 'Bitcoin';
   CLS.BITCOIN.how = nCrypto > 1
-    ? 'La bóveda guarda monedas raras: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico del pueblo. Cada moneda que gira es una de tus criptos.'
-    : 'La bóveda guarda monedas raras: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico del pueblo.';
+    ? 'El oro virtual son monedas digitales: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico del pueblo. Cada moneda que gira es una de tus criptos.'
+    : 'El oro virtual son monedas digitales: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico del pueblo.';
   // altura de referencia por barrio: el edificio más grande de hoy
   const gmax = Math.max(1, ...model.items.map(i => i.valor));
   ORDER.forEach(k => { const m = Math.max(0, ...model.classes[k].items.map(i => i.valor)); refMax[k] = m || gmax; });
@@ -937,7 +943,7 @@ function renderAll() {
     </article>`;
   }).join('');
 
-  renderLive(); GOV.renderGaceta(); renderBands(); renderMission(); renderStreak(); renderCeremony();
+  renderLive(); GOV.renderGaceta(); GOV.sellHint(); renderBands(); renderMission(); renderStreak(); renderCeremony();
   renderForm(); renderSim(); renderZoom(); renderTm(); renderCalc();
 }
 
@@ -1018,7 +1024,7 @@ function renderMission() {
   const box = $('mission'), mes = MESES[new Date().getMonth()];
   let html = `<div class="phead"><h2>Misión de ${mes}</h2><span class="pill ${MI.done ? 'ok' : 'info'}">${MI.done ? '¡Cumplida!' : 'En curso'}</span></div>`;
   if (MI.type === 'fundar') {
-    html += `<p class="mission-scene">Funda tu pueblo.</p><p class="muted" style="margin:0">Registra tu tesoro en el catastro para que aparezcan tus primeros edificios. La próxima misión llega el mes que entra.</p>`;
+    html += `<p class="mission-scene">Funda tu pueblo.</p><p class="muted" style="margin:0">Registra tu tesoro en la tesorería para que aparezcan tus primeros edificios. La próxima misión llega el mes que entra.</p>`;
   } else {
     const it = MI.it, col = CLS[it.key].color;
     const scene = J.mision_texto ? esc(J.mision_texto) : `El pueblo necesita ${obraName(it)}.`;
@@ -1028,12 +1034,12 @@ function renderMission() {
   }
   html += `<ul class="tasks">
     <li class="${MI.done ? 'on' : ''}">${MI.type === 'fundar' ? 'Registra tu tesoro' : 'Cumple la misión principal'}</li>
-    <li class="${ST.savedThisMonth ? 'on' : ''}">Actualiza el catastro de ${mes}</li>
+    <li class="${ST.savedThisMonth ? 'on' : ''}">Actualiza la tesorería de ${mes}</li>
     <li class="${ST.thisMonth ? 'on' : ''}">Destina el presupuesto del mes y mantén tu racha</li>
   </ul>
-  <div><button type="button" class="small" id="goForm">Ir al catastro</button></div>`;
+  <div><button type="button" class="small" id="goForm">Ir a la tesorería</button></div>`;
   box.innerHTML = html;
-  $('goForm').onclick = () => $('portafolio').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  $('goForm').onclick = () => GOV.openTesoreria();
   collapsible(box, 'mission', MI.type === 'fundar' ? 'Funda tu pueblo: registra tu tesoro.' : `${MI.done ? '<b>¡Cumplida!</b> ' : ''}Destina alrededor de <b>${mxn.format(MI.amt)}</b> a <b>${esc(MI.it.activo)}</b>.`, true);
 }
 
@@ -1042,8 +1048,8 @@ function renderStreak() {
   const months = []; let m = cm;
   for (let i = 0; i < 12; i++) { months.unshift(m); m = prevYm(m); }
   const msg = ST.thisMonth ? 'Ya destinaste presupuesto este mes. Tu racha está a salvo.'
-    : ST.s > 0 ? `Destina presupuesto y actualiza el catastro antes de que termine ${MESES[new Date().getMonth()]} para llegar a ${ST.s + 1} meses.`
-    : 'Destina presupuesto este mes y actualiza el catastro para empezar tu racha.';
+    : ST.s > 0 ? `Destina presupuesto y actualiza la tesorería antes de que termine ${MESES[new Date().getMonth()]} para llegar a ${ST.s + 1} meses.`
+    : 'Destina presupuesto este mes y actualiza la tesorería para empezar tu racha.';
   const ach = [
     ['Cuatro barrios', ORDER.every(k => model.classes[k].valor > 0)],
     ['Ciudad en equilibrio', balanced()],
@@ -1060,7 +1066,7 @@ function renderStreak() {
     <div class="months" aria-label="Últimos 12 meses">${months.map(x => `<div><i class="${ST.contribMonths.has(x) ? 'on' : ''} ${x === cm && !ST.contribMonths.has(x) ? 'now' : ''}" title="${MESES[+x.slice(5) - 1]} ${x.slice(0, 4)}"></i>${MESES[+x.slice(5) - 1].slice(0, 1).toUpperCase()}</div>`).join('')}</div>
     <h2 style="font-size:15px;margin-top:4px">Logros</h2>
     <div class="ach">${ach.map(([t, on]) => `<div class="${on ? 'on' : ''}">${t}</div>`).join('')}</div>
-    <p class="foot">La racha cuenta los meses en que el pueblo recibió presupuesto nuevo. Actualiza el catastro al menos una vez al mes.</p>`;
+    <p class="foot">La racha cuenta los meses en que el pueblo recibió presupuesto nuevo. Actualiza la tesorería al menos una vez al mes.</p>`;
   collapsible(box, 'streak', `<b>${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}</b> seguidos · mejor ${ST.best} · ${ST.thisMonth ? 'este mes ya cuenta' : 'falta el presupuesto de este mes'}`, true);
 }
 
@@ -1086,14 +1092,14 @@ function renderCeremony() {
   const needNoSell = Math.max(overT - T0, underSum);
   html += CE.done
     ? `<p class="mission-scene">Tu pueblo quedó en equilibrio. Todos los grupos están dentro de su banda.</p>`
-    : `<p class="muted" style="margin:0">Así quedaría tu pueblo en su forma ideal. Haz estos movimientos en tu casa de bolsa y luego actualiza el catastro; la ceremonia se completa cuando todos los grupos queden dentro de su banda.</p>`;
+    : `<p class="muted" style="margin:0">Así quedaría tu pueblo en su forma ideal. Haz estos movimientos en tu casa de bolsa y luego actualiza la tesorería; la ceremonia se completa cuando todos los grupos queden dentro de su banda.</p>`;
   if (!CE.done && moves.length) {
     const unidades = x => { const p = +x.it.precio_mxn; if (x.it.key === 'RENTA_FIJA' || !p) return '—'; const u = Math.abs(x.d) / p; return x.it.key === 'BITCOIN' ? u.toFixed(5) : '≈ ' + Math.round(u); };
     html += `<div class="tbl"><table><thead><tr><th>Activo</th><th>Movimiento</th><th style="text-align:right">Monto</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${moves.map(x => `<tr><td><span class="dot" style="--c:${CLS[x.it.key].color};margin-right:6px"></span>${esc(x.it.activo)}</td><td class="${x.d > 0 ? 'pos' : 'neg'}">${x.d > 0 ? 'Comprar' : 'Vender'}</td><td class="n">${mxn.format(Math.abs(x.d))}</td><td class="n muted">${unidades(x)}</td></tr>`).join('')}</tbody></table></div>`;
     if (holds.length) html += `<p class="foot">${holds.map(i => esc(i.activo)).join(', ')} se mantienen como están: cuentan en su grupo, pero no se compran ni venden. El rebalanceo de cada grupo se hace con su vehículo (pestaña Bandas).</p>`;
     if (needNoSell > 0) html += `<p class="foot">Si prefieres no vender (y no pagar impuestos por ganancias): destinando unos ${mxn.format(needNoSell)} a lo que falta, todos los grupos regresan a su banda. El simulador de abajo te dice cómo repartirlo.</p>`;
   }
-  html += `<ul class="tasks"><li class="on">Revisa los movimientos</li><li class="${ST.savedThisMonth ? 'on' : ''}">Actualiza el catastro</li><li class="${CE.inRange ? 'on' : ''}">Deja todos los grupos dentro de su banda</li></ul>`;
+  html += `<ul class="tasks"><li class="on">Revisa los movimientos</li><li class="${ST.savedThisMonth ? 'on' : ''}">Actualiza la tesorería</li><li class="${CE.inRange ? 'on' : ''}">Deja todos los grupos dentro de su banda</li></ul>`;
   box.innerHTML = html;
   collapsible(box, 'ceremony', CE.done ? '<b>Completada.</b> Tu pueblo quedó en equilibrio.' : `<b>Este mes.</b> ${moves.length} movimientos sugeridos.`, false);
 }
@@ -1128,7 +1134,7 @@ function renderForm() {
     });
     html += '</div>';
   });
-  html += `<div class="save"><button type="submit" id="btnSave">Registrar en el catastro</button><span class="toast" id="toast"></span></div>`;
+  html += `<div class="save"><button type="submit" id="btnSave">Registrar en la tesorería</button><span class="toast" id="toast"></span></div>`;
   f.innerHTML = html;
 }
 $('pfForm').addEventListener('submit', async e => {
@@ -1278,7 +1284,7 @@ function renderLive() {
   $('liveFoot').innerHTML = `Ayer al cierre el tesoro del pueblo valía <b>${mxn.format(ayer)}</b>; ahora vale <b>${mxn.format(M.total)}</b>.`
     + (top && top.hoy > 0 ? ` Lo mejor del día: ${esc(GOV.story(top).text)} (<b>${esc(top.activo)}</b> ${signed2(top.hoy)}).` : '')
     + (worst && worst.hoy < 0 ? ` Lo peor: ${esc(GOV.story(worst).text)} (<b>${esc(worst.activo)}</b> ${signed2(worst.hoy)}).` : '')
-    + `<br>Fábricas e inmuebles se comparan contra el cierre anterior, con tipo de cambio; la bóveda contra las 7:00 de hoy; las obras públicas suman un día de intereses. Aparte, el pueblo cobra unos <b>${mxn2.format(incomePerDay(M))}</b> al día en intereses, rentas y dividendos.`;
+    + `<br>Fábricas e inmuebles se comparan contra el cierre anterior, con tipo de cambio; el oro virtual contra las 7:00 de hoy; las obras públicas suman un día de intereses. Aparte, el pueblo cobra unos <b>${mxn2.format(incomePerDay(M))}</b> al día en intereses, rentas y dividendos.`;
 }
 function tickLive(now) {
   if (!model || now - liveLast < 40) return;
@@ -3073,7 +3079,7 @@ const VL = (() => {
     const it = e.it, k = e.k, rf = k === 'RENTA_FIJA', al = ALERT.get(it.activo);
     let h = `<div class="mc-h"><span class="mc-k" style="--c:${CLS[k].color}"><span class="dot"></span>${esc(CLS[k].scene)} · ${esc(KINDN[e.kd] || '')}</span>${X1}</div>
       <h3>${esc(it.activo)}${e.lot ? '' : ` <span class="pill info">Nivel ${e.t}</span>`}</h3><p class="mc-d">${esc(it.descripcion || '')}</p>`;
-    if (e.lot) h += `<p class="mc-empty">Lote por construir. Registra tus títulos en el Catastro del pueblo y aquí se levanta el edificio.</p>`;
+    if (e.lot) h += `<p class="mc-empty">Lote por construir. Registra tus títulos en la Tesorería del pueblo y aquí se levanta el edificio.</p>`;
     else {
       h += `<div class="mc-big">${mxn.format(it.valor)}</div>`;
       h += row('Hoy', rf ? signed2(it.hoy) + ' en intereses' : signed2(it.hoy) + ' (' + (it.cambio_dia >= 0 ? '+' : '−') + Math.abs(it.cambio_dia).toFixed(2) + '%)', it.hoy >= 0 ? 'pos' : 'neg');
@@ -3279,8 +3285,8 @@ let SIM = null;
 const GOV = (() => {
   const hs = s => { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
   const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
-  const ART = { fabrica: 'la fábrica', nave: 'la nave', torre: 'la torre', plaza: 'la plaza', boveda: 'la bóveda de', calle: 'las calles', carretera: 'la carretera', puente: 'el puente', escuela: 'la escuela', hospital: 'el hospital', tesoreria: 'la tesorería' };
-  const KIND = { fabrica: 'Fábrica', nave: 'Nave industrial', torre: 'Torre de oficinas', plaza: 'Plaza comercial', boveda: 'Bóveda', calle: 'Calles', carretera: 'Carretera', puente: 'Puente', escuela: 'Escuela', hospital: 'Hospital', tesoreria: 'Tesorería' };
+  const ART = { fabrica: 'la fábrica', nave: 'la nave', torre: 'la torre', plaza: 'la plaza', boveda: 'la mina de', calle: 'las calles', carretera: 'la carretera', puente: 'el puente', escuela: 'la escuela', hospital: 'el hospital', tesoreria: 'la tesorería' };
+  const KIND = { fabrica: 'Fábrica', nave: 'Nave industrial', torre: 'Torre de oficinas', plaza: 'Plaza comercial', boveda: 'Mina de oro virtual', calle: 'Calles', carretera: 'Carretera', puente: 'Puente', escuela: 'Escuela', hospital: 'Hospital', tesoreria: 'Tesorería' };
   const labelOf = it => (ART[kindOf(it.key, it)] || 'el edificio') + ' ' + it.activo;
   const kindName = it => KIND[kindOf(it.key, it)] || '';
 
@@ -3384,7 +3390,7 @@ const GOV = (() => {
     if (key === 'ACCIONES') return !n || /^acciones$/i.test(n) ? 'el barrio de las Fábricas' : 'las fábricas de ' + n;
     if (key === 'FIBRAS') return 'el barrio de Inmuebles';
     if (key === 'RENTA_FIJA') return 'las Obras públicas';
-    return 'la Bóveda';
+    return 'el barrio del Oro virtual';
   }
   const groupTitle = g => { const k = g.members[0].key, n = clean(g.name), lo = n.toLowerCase(); return CLS[k].scene + (n && lo !== CLS[k].name.toLowerCase() && lo !== CLS[k].scene.toLowerCase() ? ' · ' + n : ''); };
   function needNoSell() {
@@ -3399,12 +3405,12 @@ const GOV = (() => {
     const top = groups[0];
     if (top) {
       const b = BD.find(x => x.name === top.g.name), where = placeOf(top.key, top.g.name);
-      const NEED = { ACCIONES: 'faltan obreros y maquinaria', FIBRAS: 'faltan edificios para tantos inquilinos', RENTA_FIJA: 'hay obras detenidas por falta de fondos', BITCOIN: 'hay menos monedas de las que debería' };
+      const NEED = { ACCIONES: 'faltan obreros y maquinaria', FIBRAS: 'faltan edificios para tantos inquilinos', RENTA_FIJA: 'hay obras detenidas por falta de fondos', BITCOIN: 'hay menos oro del que debería' };
       s.push(b && b.state === 'under' ? `En ${where} ${NEED[top.key]}; por eso ahí va la mayor parte (${mxn.format(top.inv)}).`
         : `Lo que más lejos está de su forma ideal es ${where}; por eso ahí va la mayor parte (${mxn.format(top.inv)}).`);
     }
     const over = BD.find(b => b.state === 'over'), stormK = EV && EV.storms[0] ? EV.storms[0].k : null;
-    const FULL = { ACCIONES: 'ya no caben más obreros', FIBRAS: 'ya no caben más inquilinos', RENTA_FIJA: 'las obras ya tienen fondos de sobra', BITCOIN: 'la bóveda ya está llena' };
+    const FULL = { ACCIONES: 'ya no caben más obreros', FIBRAS: 'ya no caben más inquilinos', RENTA_FIJA: 'las obras ya tienen fondos de sobra', BITCOIN: 'ya hay oro de sobra' };
     if (over) { const ok = over.items[0].key; s.push(`En ${placeOf(ok, over.name)} ${FULL[ok]}: este mes no recibe fondos.`); }
     else if (stormK) s.push(`Hoy hubo tormenta en ${placeOf(stormK, '')}, pero el consejo mantiene el plan.`);
     else s.push('Así el pueblo se acerca a su forma ideal sin vender nada.');
@@ -3430,10 +3436,21 @@ const GOV = (() => {
     else if (ST && ST.avg > 0) { sug = ST.avg; sugWhy = 'tu presupuesto promedio de los últimos meses'; }
     else if (MI && MI.amt) { sug = MI.amt; sugWhy = 'lo que pide la misión del mes'; }
     sug = Math.round(sug / 100) * 100;
-    const lv = levelOf(M.total);
+    const lv = levelOf(M.total), hora = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
+    const d = [num(J.desc_acciones_pct, 0.5), num(J.desc_fibras_pct, 1), num(J.desc_cripto_pct, 2)];
+    const notes = [];
+    if (S.spent - spentT >= 1) notes.push(`A precio de hoy serían ${mxn.format(S.spent)}; si las órdenes se llenan al precio objetivo te ahorras unos ${mxn.format(S.spent - spentT)}.`);
+    if (S.rest >= 1) notes.push(`Sobran ${mxn.format(S.rest)} que no alcanzan para un título completo.`);
+    notes.push(`Precio objetivo: es una orden límite de compra sugerida, ${d[0]}% abajo del precio de hoy en las fábricas, ${d[1]}% en los inmuebles y ${d[2]}% en el oro virtual. Si el precio no llega, la orden no se ejecuta: espera unos días o súbela hasta el precio de hoy. Las obras públicas (Cetes, Udibonos y similares) se compran por monto, a la tasa vigente.`);
+    notes.push(`Precios consultados el ${fechaLarga(now)} a las ${hora}.`);
     return { now, amt: S.amt, spent: S.spent, spentT, rest: S.rest, sug, sugWhy, groups, total: M.total, lvl: lv.name, next: lv.next,
-      name: (raw && raw.nombre) || '', story: letterStory(S, groups), hora: pad2(now.getHours()) + ':' + pad2(now.getMinutes()),
-      d: [num(J.desc_acciones_pct, 0.5), num(J.desc_fibras_pct, 1), num(J.desc_cripto_pct, 2)],
+      name: (raw && raw.nombre) || '', story: letterStory(S, groups), hora, d, notes,
+      sub: 'Decreto de presupuesto', dir: 'abajo', totalLbl: 'Total del decreto',
+      cols: ['OBRA / ACTIVO', 'TÍTULOS', 'PRECIO HOY', 'PRECIO OBJETIVO', 'MONTO'],
+      boxes: [['LO QUE DESTINAS', mxn.format(S.amt), 'tu presupuesto de este mes'],
+        ['SUGERENCIA DEL CONSEJO', sug ? mxn.format(sug) : '—', sug ? sugWhy : 'sin sugerencia por ahora'],
+        ['TESORO DEL PUEBLO', mxn.format(M.total), lv.next ? `faltan ${short(lv.next[0] - M.total)} para ${lv.next[1]}` : 'nivel máximo']],
+      gline: g => `Hoy ocupa ${pct1(g.now)} del pueblo  ·  con esta compra ${pct1(g.after)}  ·  ideal ${pct1(g.ideal)}`,
       file: 'Carta-del-gobernador-' + ymd(now) + '.pdf' };
   }
 
@@ -3522,7 +3539,7 @@ const GOV = (() => {
     for (let k = 0; k < 4; k++) rect(x + 1.2 + k * (pubW * .95 - 2.4) / 3 - .4, gy - 9, .8, 8, '#e9f6f3');
     // grúa
     const cx2 = z[2] - 4; rect(cx2, gy - 22, .7, 22, '#e2b340'); rect(cx2 - 7, gy - 22, 11, .7, '#e2b340'); c.strokeStyle = '#8a6a2a'; c.lineWidth = .2; c.beginPath(); c.moveTo(cx2 - 5, gy - 21.3); c.lineTo(cx2 - 5, gy - 16); c.stroke(); rect(cx2 - 6, gy - 16, 2, 1.3, '#c98d2a');
-    // bóveda: montaña de monedas
+    // oro virtual: montaña de monedas
     const mx = (z[2] + z[3]) / 2;
     for (let row = 0; row < 5; row++) for (let k = 0; k <= 4 - row; k++) {
       const px = mx - (4 - row) * 1.6 + k * 3.2, py = gy - 1.2 - row * 1.9;
@@ -3553,6 +3570,195 @@ const GOV = (() => {
     return sealURL;
   }
 
+  // ---------- venta para reordenar ----------
+  // El consejo solo vende de los barrios que están arriba de su forma ideal, y nunca los deja abajo de ella.
+  // El dinero vuelve a la tesorería y se sugiere usarlo en los barrios que se quedaron cortos (el tesoro no cambia).
+  let SELL = null, sellTouched = false, tesInit = false;
+  const sellPrice = it => { const p = +it.precio_mxn; if (it.key === 'RENTA_FIJA' || !(p > 0)) return null; const t = p * (1 + DESC(it) / 100); return p >= 1 ? Math.round(t * 100) / 100 : Math.round(t * 1e6) / 1e6; };
+  const sellObjTxt = it => { const t = sellPrice(it); return t ? `<br><small class="obj">objetivo de venta ${t >= 1000 ? mxn.format(t) : mxn2.format(t)}</small>` : ''; };
+  // Recorte "nivelado": quita A repartido para que lo más pasado de su objetivo baje primero, hasta quedar parejo.
+  // t es la proporción objetivo; si t = 0 (algo que no debería tener), se vende primero.
+  function levelCut(list, A) {
+    const tot = list.reduce((a, x) => a + x.v, 0);
+    if (A <= 0 || !tot) return list.map(() => 0);
+    if (A >= tot) return list.map(x => x.v);
+    const hold = list.filter(x => !(x.t > 0)).reduce((a, x) => a + x.v, 0);
+    if (A <= hold) return list.map(x => x.t > 0 ? 0 : x.v * A / hold);
+    const f = L => list.reduce((a, x) => a + (x.t > 0 ? Math.max(0, x.v - L * x.t) : x.v), 0);
+    let lo = 0, hi = Math.max(...list.filter(x => x.t > 0).map(x => x.v / x.t));
+    for (let k = 0; k < 90; k++) { const m = (lo + hi) / 2; if (f(m) > A) lo = m; else hi = m; }
+    return list.map(x => x.t > 0 ? Math.max(0, x.v - hi * x.t) : x.v);
+  }
+  // sugerencia: regresar a su ideal cada barrio que rebasó su límite
+  function sellSuggest() {
+    const M = model, T = M && M.total; if (!T) return { amt: 0, groups: [] };
+    const gs = [];
+    let amt = 0;
+    BD.filter(b => b.state === 'over').forEach(b => {
+      const g = (M.groups || []).find(x => x.name === b.name); if (!g) return;
+      const e = g.valor - g.tG / 100 * T; if (e > 1) { amt += e; gs.push(g); }
+    });
+    return { amt: amt >= 1000 ? Math.round(amt / 100) * 100 : Math.round(amt), groups: gs };
+  }
+  function sellPlan(req) {
+    const M = model, T = M.total, groups = (M.groups || []).filter(g => g.valor > 0);
+    const maxA = groups.reduce((a, g) => a + Math.max(0, g.valor - g.tG / 100 * T), 0);
+    const A = Math.min(req, maxA);
+    // primero los barrios que rebasaron su límite (lo que sugiere el consejo); si se pide más, los demás que están arriba de su ideal
+    const isOver = g => BD.some(b => b.name === g.name && b.state === 'over');
+    const exc = g => Math.max(0, g.valor - g.tG / 100 * T);
+    const overMax = groups.reduce((a, g) => a + (isOver(g) ? exc(g) : 0), 0);
+    const A1 = Math.min(A, overMax);
+    const c1 = levelCut(groups.map(g => ({ t: g.tG / 100, v: isOver(g) ? g.valor : 0 })), A1);
+    const c2 = levelCut(groups.map((g, gi) => ({ t: g.tG / 100, v: isOver(g) ? 0 : g.valor })), A - A1);
+    const gc = groups.map((g, gi) => Math.min(exc(g), c1[gi] + c2[gi]));
+    const plan = [];
+    groups.forEach((g, gi) => {
+      if (gc[gi] < 1) return;
+      const sh = new Map(g.traders.map(t => [t.i, t.sh])), mem = g.members.filter(i => i.valor > 0);
+      const c = levelCut(mem.map(i => ({ t: sh.get(i) || 0, v: i.valor })), gc[gi]);
+      mem.forEach((i, k) => { if (c[k] >= 1) plan.push({ g, gi, i, ideal: c[k], amt: 0, units: null }); });
+    });
+    // títulos completos (y nunca más de los que tienes); cripto en fracciones; renta fija por monto
+    plan.forEach(x => {
+      const p = +x.i.precio_mxn, held = x.i.pos ? +x.i.pos.titulos || 0 : 0;
+      if (x.i.key === 'RENTA_FIJA' || !(p > 0)) { x.amt = Math.min(x.i.valor, x.ideal); return; }
+      x.units = isUnit(x.i) ? Math.min(held, Math.round(x.ideal / p)) : Math.min(held, x.ideal / p);
+      x.amt = x.units * p;
+    });
+    // al redondear a títulos completos, ningún barrio puede quedar abajo de su ideal: se quita un título donde más se pasó
+    groups.forEach((g, gi) => {
+      const its = plan.filter(x => x.gi === gi), lim = exc(g) + 0.5;
+      for (let k = 0; k < 200 && its.reduce((a, x) => a + x.amt, 0) > lim; k++) {
+        const c = its.filter(x => x.units > 0 && isUnit(x.i)).sort((a, b) => (b.amt - b.ideal) - (a.amt - a.ideal))[0];
+        if (!c) break;
+        c.units--; c.amt = c.units * +c.i.precio_mxn;
+      }
+    });
+    const items = plan.filter(x => x.amt >= 1), total = items.reduce((a, x) => a + x.amt, 0);
+    const soldIn = gi => items.filter(x => x.gi === gi).reduce((a, x) => a + x.amt, 0);
+    const rowsG = groups.map((g, gi) => ({ g, gi, inv: soldIn(gi), items: items.filter(x => x.gi === gi), now: g.valor / T * 100, after: (g.valor - soldIn(gi)) / T * 100 }))
+      .filter(r => r.inv >= 1).sort((a, b) => b.inv - a.inv);
+    // destino: los barrios que quedan abajo de su ideal, igual que el presupuesto del mes
+    const vAfter = groups.map((g, gi) => g.valor - soldIn(gi));
+    const fill = total > 0 ? levelFill(groups.map((g, gi) => ({ t: g.tG / 100, v: vAfter[gi] })), T, total) : groups.map(() => 0);
+    const dest = groups.map((g, gi) => ({ g, key: g.members[0].key, amt: fill[gi], now: vAfter[gi] / T * 100, after: (vAfter[gi] + fill[gi]) / T * 100 }))
+      .filter(d => d.amt >= 1 && !rowsG.some(r => r.gi === groups.indexOf(d.g))).sort((a, b) => b.amt - a.amt);
+    const gain = items.reduce((a, x) => { const pp = x.i.pos && +x.i.pos.precio_promedio; return a + (x.units != null && pp > 0 ? x.units * (+x.i.precio_mxn - pp) : 0); }, 0);
+    return { req, A, maxA, total, rowsG, items, dest, gain, T };
+  }
+  const unitTxt = x => {
+    if (x.i.key === 'RENTA_FIJA' || x.units == null) return 'monto';
+    if (!isUnit(x.i)) return x.units.toFixed(5) + (unitSym(x.i) ? ' ' + unitSym(x.i) : '');
+    return x.units + (x.units === 1 ? ' título' : ' títulos');
+  };
+  function sellHintHtml() {
+    const sg = sellSuggest();
+    if (sg.amt >= 1) return `<p class="foot" style="margin-top:6px">El consejo sugiere vender <b>${mxn.format(sg.amt)}</b>: ${sg.groups.map(g => esc(groupTitle(g))).join(' y ')} rebasó su límite. Toca <b>Calcular venta</b> para ver qué títulos y a qué precio.</p>`;
+    return `<p class="foot" style="margin-top:6px">Hoy ningún barrio rebasa su límite: no hace falta vender. Si quieres reordenar de todas formas, escribe un monto; el consejo solo vende de los barrios que están arriba de su forma ideal.</p>`;
+  }
+  function renderSell() {
+    const out = $('sellOut'); if (!out || !model || !model.total) return;
+    const amt = Math.max(0, Number($('sellAmt').value) || 0);
+    if (!amt) { SELL = null; out.innerHTML = sellHintHtml(); return; }
+    const P = sellPlan(amt);
+    if (P.maxA < 1 || P.total < 1) {
+      SELL = null;
+      out.innerHTML = `<p class="foot" style="margin-top:6px">${P.maxA < 1 ? 'Ningún barrio está arriba de su forma ideal: el consejo no ve nada que vender. Usa el presupuesto del mes para seguir construyendo.' : 'Con ese monto no alcanza para vender ni un título completo. Prueba con una cantidad mayor.'}</p>`;
+      return;
+    }
+    SELL = P;
+    const T = P.T, pc = v => (Math.round(v * 10) / 10).toFixed(1) + '%';
+    let rows = '';
+    P.rowsG.forEach((r, n) => {
+      const col = CLS[r.g.members[0].key].color;
+      rows += `<tr style="background:var(--panel2)"><td class="n"><b>${n + 1}</b></td><td><span class="dot" style="--c:${col};margin-right:6px"></span><b>${esc(r.g.name)}</b></td><td class="n">${pc(r.now)}</td><td class="n muted">${pc(r.g.tG)}</td><td class="n">${pc(r.after)}</td><td class="n neg"><b>${mxn.format(r.inv)}</b></td><td></td></tr>`;
+      r.items.slice().sort((a, b) => b.amt - a.amt).forEach(x => {
+        rows += `<tr><td></td><td style="padding-left:26px">${esc(x.i.activo)}</td><td class="n muted">${pc(x.i.valor / T * 100)}</td><td class="n muted">${pc(x.i.objetivo)}</td><td class="n muted">${pc((x.i.valor - x.amt) / T * 100)}</td><td class="n neg">${mxn.format(x.amt)}</td><td class="n muted">${unitTxt(x)}${sellObjTxt(x.i)}</td></tr>`;
+      });
+    });
+    const dest = P.dest.length ? `<p style="margin:12px 0 4px;font-weight:700">Destino del dinero</p>
+      <div class="tbl"><table><thead><tr><th>Barrio que se quedó corto</th><th style="text-align:right">Hoy</th><th style="text-align:right">Ideal</th><th style="text-align:right">Después</th><th style="text-align:right">Recibe</th></tr></thead><tbody>
+      ${P.dest.map(d => `<tr><td><span class="dot" style="--c:${CLS[d.key].color};margin-right:6px"></span>${esc(d.g.name)}</td><td class="n">${pc(d.now)}</td><td class="n muted">${pc(d.g.tG)}</td><td class="n pos">${pc(d.after)}</td><td class="n pos"><b>${mxn.format(d.amt)}</b></td></tr>`).join('')}</tbody></table></div>
+      <p class="foot" style="margin-top:6px">Cuando se venda, escribe ${mxn.format(P.total)} en el Presupuesto del mes para elegir los títulos de compra.</p>` : '';
+    const notes = [];
+    if (P.req > P.maxA + 1) notes.push(`Para reordenar no hace falta vender más de ${mxn.format(P.maxA)}; el consejo ajustó la venta a esa cantidad.`);
+    if (Math.abs(P.total - P.A) >= 1) notes.push(`Se redondea a títulos completos: la venta queda en ${mxn.format(P.total)}.`);
+    if (P.gain >= 1) notes.push(`Ganancia estimada sobre tu precio promedio: ${mxn.format(P.gain)}. Vender con ganancia puede causar impuestos.`);
+    else if (P.gain <= -1) notes.push(`Esta venta realiza una pérdida estimada de ${mxn.format(-P.gain)} sobre tu precio promedio.`);
+    out.innerHTML = `<div class="tbl"><table><thead><tr><th scope="col">#</th><th>Barrio / obra</th><th style="text-align:right">Hoy</th><th style="text-align:right">Ideal</th><th style="text-align:right">Después</th><th style="text-align:right">Vende</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${rows}</tbody></table></div>
+      ${notes.map(n => `<p class="foot" style="margin-top:6px">${esc(n)}</p>`).join('')}
+      ${dest}
+      <p class="foot" style="margin-top:6px">El consejo vende primero lo que más se pasó de su ideal y nunca deja un barrio abajo de su forma ideal. El precio objetivo de venta es una orden límite sugerida un poco arriba del precio de hoy. Precios de hoy.</p>
+      <div class="simact"><button type="button" id="btnSellPdf">Descargar carta de venta (PDF)</button><button type="button" class="ghost" id="btnSellPrint">Imprimir carta</button></div>`;
+    $('btnSellPdf').onclick = () => savePdf(sellLetterData(), $('btnSellPdf'));
+    $('btnSellPrint').onclick = () => { if (SELL) printLetter(sellLetterData()); };
+  }
+  function sellStory(P) {
+    const s = [], nm = clean((raw && raw.nombre) || '').split(' ')[0], top = P.rowsG[0];
+    s.push(`${nm ? 'Gobernador ' + nm : 'Gobernador'}: en ${placeOf(top.g.members[0].key, top.g.name)} sobra tesoro (${pct1(top.now)} del pueblo, cuando su forma ideal es ${pct1(top.g.tG)}).`);
+    const others = P.rowsG.slice(1).map(r => placeOf(r.g.members[0].key, r.g.name));
+    s.push(`El consejo decreta vender ${mxn.format(P.total)} para reordenarlo${others.length ? ', junto con ' + others.join(' y ') : ''}.`);
+    if (P.dest[0]) s.push(`El dinero vuelve a la tesorería y se usará en ${placeOf(P.dest[0].key, P.dest[0].g.name)}${P.dest[1] ? ' y ' + placeOf(P.dest[1].key, P.dest[1].g.name) : ''}, que se quedaron cortos.`);
+    s.push('Un buen gobernador no vende por miedo: vende para mantener el orden del pueblo.');
+    return s.join(' ');
+  }
+  function sellLetterData() {
+    const P = SELL, M = model, now = new Date(), lv = levelOf(M.total), hora = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
+    const d = [num(J.desc_acciones_pct, 0.5), num(J.desc_fibras_pct, 1), num(J.desc_cripto_pct, 2)];
+    const groups = P.rowsG.map(r => ({
+      title: groupTitle(r.g), key: r.g.members[0].key, inv: r.inv, now: r.now, after: r.after, ideal: r.g.tG,
+      items: r.items.slice().sort((a, b) => b.amt - a.amt).map(x => {
+        const it = x.i, tp = sellPrice(it);
+        let units = '', amtT = x.amt;
+        if (it.key === 'RENTA_FIJA' || x.units == null) units = 'monto libre';
+        else if (isUnit(it)) { units = String(x.units); amtT = x.units * tp; }
+        else { units = x.units.toFixed(6) + (unitSym(it) ? ' ' + unitSym(it) : ''); if (tp) amtT = x.units * tp; }
+        return { name: it.activo, kind: kindName(it), desc: it.descripcion || '', key: it.key, units, price: +it.precio_mxn > 0 ? +it.precio_mxn : null, tp, amt: x.amt, amtT, tasa: it.tasa, dp: DESC(it) };
+      })
+    }));
+    const spentT = groups.reduce((a, g) => a + g.items.reduce((b, x) => b + x.amtT, 0), 0), sg = sellSuggest();
+    const notes = [];
+    if (spentT - P.total >= 1) notes.push(`A precio de hoy la venta deja ${mxn.format(P.total)}; si las órdenes se llenan al precio objetivo, la tesorería recibe unos ${mxn.format(spentT - P.total)} más.`);
+    if (P.dest.length) notes.push(`Destino del dinero: ${P.dest.map(x => groupTitle(x.g) + ' ' + mxn.format(x.amt)).join(', ')}. Cuando se venda, escribe esa cantidad en el Presupuesto del mes para elegir los títulos de compra.`);
+    if (P.gain >= 1) notes.push(`Ganancia estimada sobre tu precio promedio: ${mxn.format(P.gain)}. Vender con ganancia puede causar impuestos; revisa la constancia fiscal de tu casa de bolsa.`);
+    else if (P.gain <= -1) notes.push(`Esta venta realiza una pérdida estimada de ${mxn.format(-P.gain)} sobre tu precio promedio.`);
+    notes.push(`Precio objetivo de venta: es una orden límite sugerida, ${d[0]}% arriba del precio de hoy en las fábricas, ${d[1]}% en los inmuebles y ${d[2]}% en el oro virtual. Si el precio no llega, la orden no se ejecuta: espera unos días o bájala hasta el precio de hoy. Las obras públicas se retiran por monto.`);
+    notes.push(`Precios consultados el ${fechaLarga(now)} a las ${hora}.`);
+    return { now, groups, spentT, total: M.total, lvl: lv.name, next: lv.next, name: (raw && raw.nombre) || '', story: sellStory(P), hora, d, notes,
+      sub: 'Decreto de venta para reordenar', dir: 'arriba', totalLbl: 'Total de la venta',
+      cols: ['OBRA / ACTIVO', 'TÍTULOS A VENDER', 'PRECIO HOY', 'PRECIO OBJETIVO', 'MONTO'],
+      boxes: [['LO QUE VENDES', mxn.format(P.total), 'para reordenar el pueblo'],
+        ['SUGERENCIA DEL CONSEJO', sg.amt ? mxn.format(sg.amt) : '—', sg.amt ? 'para regresar a su ideal los barrios que rebasaron su límite' : 'ningún barrio rebasa su límite'],
+        ['TESORO DEL PUEBLO', mxn.format(M.total), 'no cambia: el dinero se reinvierte en el pueblo']],
+      gline: g => `Hoy ocupa ${pct1(g.now)} del pueblo  ·  después de vender ${pct1(g.after)}  ·  ideal ${pct1(g.ideal)}`,
+      file: 'Carta-de-venta-del-gobernador-' + ymd(now) + '.pdf' };
+  }
+  // se llama en cada actualización del pueblo
+  function sellHint() {
+    if (!tesInit) {
+      tesInit = true;
+      const box = $('portafolio');
+      if (box && box.querySelector('.phead')) collapsible(box, 'tesoreria', 'Títulos y saldos de cada edificio. Toca <b>Mostrar</b> para actualizarlos.', false);
+      const inp = $('sellAmt');
+      if (inp) {
+        inp.addEventListener('input', () => { sellTouched = true; });
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') { sellTouched = true; renderSell(); } });
+        $('btnSell').addEventListener('click', () => { sellTouched = true; renderSell(); });
+      }
+    }
+    const inp = $('sellAmt'), out = $('sellOut'); if (!inp || !out || !model || !model.total) return;
+    const sg = sellSuggest();
+    inp.placeholder = String(sg.amt || 0);
+    if (!sellTouched) inp.value = sg.amt ? sg.amt : '';
+    if (SELL) renderSell(); else out.innerHTML = sellHintHtml();
+  }
+  function openTesoreria() {
+    const box = $('portafolio'); if (!box) return;
+    if (box.classList.contains('collapsed')) { const b = box.querySelector('.phead button'); if (b) b.click(); }
+    box.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  }
+
   // ---------- carta del gobernador: PDF ----------
   const PDF_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
   let pdfP = null;
@@ -3579,7 +3785,7 @@ const GOV = (() => {
     page();
     font('times', 'bold', 22, C.head); txt('Carta del Gobernador', 105, 50, { align: 'center' });
     font('helvetica', 'normal', 9.5, C.soft);
-    txt(`Decreto de presupuesto · ${fechaLarga(L.now)} de ${L.now.getFullYear()}`, 105, 56.5, { align: 'center' });
+    txt(`${L.sub} · ${fechaLarga(L.now)} de ${L.now.getFullYear()}`, 105, 56.5, { align: 'center' });
     txt(`${L.name ? 'Gobierno de ' + L.name + ' · ' : ''}Pueblo nivel ${L.lvl}`, 105, 61.5, { align: 'center' });
     doc.setDrawColor(...C.gold); doc.setLineWidth(.35); doc.line(48, 65.5, 99, 65.5); doc.line(111, 65.5, 162, 65.5);
     doc.setFillColor(...C.gold); doc.triangle(105, 63.6, 107, 65.5, 105, 67.4, 'F'); doc.triangle(105, 63.6, 103, 65.5, 105, 67.4, 'F');
@@ -3590,10 +3796,7 @@ const GOV = (() => {
     let y = 74.5 + (lines.length - 1) * 5.48 + 6;
     // tres datos clave
     const bw = 55, gap = 2.5;
-    [['LO QUE DESTINAS', mxn.format(L.amt), 'tu presupuesto de este mes'],
-     ['SUGERENCIA DEL CONSEJO', L.sug ? mxn.format(L.sug) : '—', L.sug ? L.sugWhy : 'sin sugerencia por ahora'],
-     ['TESORO DEL PUEBLO', mxn.format(L.total), L.next ? `faltan ${short(L.next[0] - L.total)} para ${L.next[1]}` : 'nivel máximo']]
-      .forEach(([k, v, cap2], i) => {
+    L.boxes.forEach(([k, v, cap2], i) => {
         const x = 20 + i * (bw + gap);
         doc.setFillColor(...C.cream); doc.setDrawColor(...C.gold); doc.setLineWidth(.35); doc.roundedRect(x, y, bw, 21, 2, 2, 'FD');
         font('helvetica', 'bold', 7, C.soft); txt(k, x + 4, y + 5.3);
@@ -3606,21 +3809,21 @@ const GOV = (() => {
     const head = () => {
       doc.setFillColor(...C.head); doc.rect(20, y, 170, 7, 'F');
       font('helvetica', 'bold', 7.3, [255, 244, 222]);
-      txt('OBRA / ACTIVO', X.name + 3, y + 4.7); txt('TÍTULOS', X.units, y + 4.7, { align: 'right' }); txt('PRECIO HOY', X.price, y + 4.7, { align: 'right' });
-      txt('PRECIO OBJETIVO', X.tp, y + 4.7, { align: 'right' }); txt('MONTO', X.amt, y + 4.7, { align: 'right' });
+      txt(L.cols[0], X.name + 3, y + 4.7); txt(L.cols[1], X.units, y + 4.7, { align: 'right' }); txt(L.cols[2], X.price, y + 4.7, { align: 'right' });
+      txt(L.cols[3], X.tp, y + 4.7, { align: 'right' }); txt(L.cols[4], X.amt, y + 4.7, { align: 'right' });
       y += 7;
     };
     const ensure = h => { if (y + h > LIMIT) { doc.addPage(); page(); y = 46; head(); } };
     head();
     L.groups.forEach(g => {
-      ensure(6.5 + 9);
+      ensure(10.5 + 9);
       const col = rgb(CLS[g.key].color);
-      doc.setFillColor(...mix(col, .8)); doc.rect(20, y, 170, 6.5, 'F');
-      doc.setFillColor(...col); doc.circle(23.5, y + 3.25, 1.3, 'F');
-      font('helvetica', 'bold', 8.5, C.ink); txt(trunc(g.title, 44), 26.5, y + 4.4);
-      font('helvetica', 'normal', 6.8, C.soft); txt(`hoy ${pct1(g.now)} · después ${pct1(g.after)} · ideal ${pct1(g.ideal)}`, X.tp, y + 4.3, { align: 'right' });
-      font('helvetica', 'bold', 8.5, C.ink); txt(mxn.format(g.inv), X.amt, y + 4.4, { align: 'right' });
-      y += 6.5;
+      doc.setFillColor(...mix(col, .8)); doc.rect(20, y, 170, 10.5, 'F');
+      doc.setFillColor(...col); doc.circle(23.5, y + 3.9, 1.3, 'F');
+      font('helvetica', 'bold', 9, C.ink); txt(trunc(g.title, 60), 26.5, y + 4.9);
+      font('helvetica', 'normal', 7, C.soft); txt(L.gline(g), 26.5, y + 8.6);
+      font('helvetica', 'bold', 9, C.ink); txt(mxn.format(g.inv), X.amt, y + 4.9, { align: 'right' });
+      y += 10.5;
       g.items.forEach((x, n) => {
         ensure(9);
         if (n % 2) { doc.setFillColor(255, 252, 244); doc.rect(20, y, 170, 9, 'F'); }
@@ -3629,7 +3832,7 @@ const GOV = (() => {
         font('helvetica', 'normal', 8.4, C.ink); txt(x.units, X.units, y + 5.4, { align: 'right' });
         txt(x.price ? pf(x.price) : '—', X.price, y + 5.4, { align: 'right' });
         if (x.key === 'RENTA_FIJA') { font('helvetica', 'normal', 8, C.soft); txt(x.tasa != null && x.tasa !== '' ? 'tasa ' + x.tasa + '%' : 'tasa vigente', X.tp, y + 5.4, { align: 'right' }); }
-        else { font('helvetica', 'bold', 8.8, C.green); txt(x.tp ? pf(x.tp) : '—', X.tp, y + 4.5, { align: 'right' }); font('helvetica', 'normal', 6.2, C.soft); txt(`${x.dp}% abajo de hoy`, X.tp, y + 7.5, { align: 'right' }); }
+        else { font('helvetica', 'bold', 8.8, C.green); txt(x.tp ? pf(x.tp) : '—', X.tp, y + 4.5, { align: 'right' }); font('helvetica', 'normal', 6.2, C.soft); txt(`${x.dp}% ${L.dir} de hoy`, X.tp, y + 7.5, { align: 'right' }); }
         font('helvetica', 'bold', 8.8, C.ink); txt(mxn.format(x.amtT), X.amt, y + 5.4, { align: 'right' });
         doc.setDrawColor(230, 214, 186); doc.setLineWidth(.15); doc.line(20, y + 9, 190, y + 9);
         y += 9;
@@ -3637,15 +3840,10 @@ const GOV = (() => {
     });
     ensure(12);
     doc.setDrawColor(...C.head); doc.setLineWidth(.5); doc.line(20, y + 1, 190, y + 1);
-    font('times', 'bold', 12, C.ink); txt('Total del decreto', X.name + 3, y + 7); txt(mxn.format(L.spentT), X.amt, y + 7, { align: 'right' });
+    font('times', 'bold', 12, C.ink); txt(L.totalLbl, X.name + 3, y + 7); txt(mxn.format(L.spentT), X.amt, y + 7, { align: 'right' });
     y += 12;
-    const notes = [];
-    if (L.spent - L.spentT >= 1) notes.push(`A precio de hoy serían ${mxn.format(L.spent)}; si las órdenes se llenan al precio objetivo te ahorras unos ${mxn.format(L.spent - L.spentT)}.`);
-    if (L.rest >= 1) notes.push(`Sobran ${mxn.format(L.rest)} que no alcanzan para un título completo.`);
-    notes.push(`Precio objetivo: es una orden límite sugerida, ${L.d[0]}% abajo del precio de hoy en las fábricas, ${L.d[1]}% en los inmuebles y ${L.d[2]}% en la bóveda. Si el precio no llega, la orden no se ejecuta: espera unos días o súbela hasta el precio de hoy. Las obras públicas (Cetes, Udibonos y similares) se compran por monto, a la tasa vigente.`);
-    notes.push(`Precios consultados el ${fechaLarga(L.now)} a las ${L.hora}.`);
     font('helvetica', 'normal', 7.4, C.soft);
-    notes.forEach(n => { const ls = doc.splitTextToSize(T(n), 170); ensure(ls.length * 3.4 + 1); doc.text(ls, 20, y, { lineHeightFactor: 1.3 }); y += ls.length * 3.4 + 1.2; });
+    L.notes.forEach(n => { const ls = doc.splitTextToSize(T(n), 170); ensure(ls.length * 3.4 + 1); doc.text(ls, 20, y, { lineHeightFactor: 1.3 }); y += ls.length * 3.4 + 1.2; });
     // firma y sello (el sello viene dibujado en el papel)
     if (y > 228) { doc.addPage(); page(); }
     doc.addImage(seal(), 'PNG', 162.5, 226.8, 27, 31);
@@ -3663,14 +3861,14 @@ const GOV = (() => {
     const bg = paper();
     let el = $('govPrint'); if (el) el.remove();
     el = document.createElement('div'); el.id = 'govPrint';
-    const rows = L.groups.map(g => `<tr class="gpg" style="--c:${CLS[g.key].color}"><td colspan="4"><i></i>${esc(g.title)} <small>hoy ${pct1(g.now)} · después ${pct1(g.after)} · ideal ${pct1(g.ideal)}</small></td><td class="n">${mxn.format(g.inv)}</td></tr>`
-      + g.items.map(x => `<tr><td><b>${esc(x.name)}</b><small>${esc([x.kind, x.desc].filter(Boolean).join(' · '))}</small></td><td class="n">${esc(x.units)}</td><td class="n">${x.price ? pf(x.price) : '—'}</td><td class="n tp">${x.key === 'RENTA_FIJA' ? (x.tasa != null && x.tasa !== '' ? 'tasa ' + x.tasa + '%' : 'tasa vigente') : (x.tp ? pf(x.tp) + `<small>${x.dp}% abajo de hoy</small>` : '—')}</td><td class="n"><b>${mxn.format(x.amtT)}</b></td></tr>`).join('')).join('');
+    const rows = L.groups.map(g => `<tr class="gpg" style="--c:${CLS[g.key].color}"><td colspan="4"><i></i>${esc(g.title)}<small>${esc(L.gline(g))}</small></td><td class="n">${mxn.format(g.inv)}</td></tr>`
+      + g.items.map(x => `<tr><td><b>${esc(x.name)}</b><small>${esc([x.kind, x.desc].filter(Boolean).join(' · '))}</small></td><td class="n">${esc(x.units)}</td><td class="n">${x.price ? pf(x.price) : '—'}</td><td class="n tp">${x.key === 'RENTA_FIJA' ? (x.tasa != null && x.tasa !== '' ? 'tasa ' + x.tasa + '%' : 'tasa vigente') : (x.tp ? pf(x.tp) + `<small>${x.dp}% ${L.dir} de hoy</small>` : '—')}</td><td class="n"><b>${mxn.format(x.amtT)}</b></td></tr>`).join('')).join('');
     el.innerHTML = `<div class="gp-page"><img src="${bg}" alt=""><img class="gp-seal" src="${seal()}" alt=""><div class="gp-in">
-      <h1>Carta del Gobernador</h1><p class="gp-sub">Decreto de presupuesto · ${fechaLarga(L.now)} de ${L.now.getFullYear()}<br>${L.name ? 'Gobierno de ' + esc(L.name) + ' · ' : ''}Pueblo nivel ${esc(L.lvl)}</p>
+      <h1>Carta del Gobernador</h1><p class="gp-sub">${esc(L.sub)} · ${fechaLarga(L.now)} de ${L.now.getFullYear()}<br>${L.name ? 'Gobierno de ' + esc(L.name) + ' · ' : ''}Pueblo nivel ${esc(L.lvl)}</p>
       <p class="gp-st">${esc(L.story)}</p>
-      <div class="gp-bx"><div><small>LO QUE DESTINAS</small><b>${mxn.format(L.amt)}</b><span>tu presupuesto de este mes</span></div><div><small>SUGERENCIA DEL CONSEJO</small><b>${L.sug ? mxn.format(L.sug) : '—'}</b><span>${esc(L.sug ? L.sugWhy : 'sin sugerencia por ahora')}</span></div><div><small>TESORO DEL PUEBLO</small><b>${mxn.format(L.total)}</b><span>${L.next ? 'faltan ' + short(L.next[0] - L.total) + ' para ' + esc(L.next[1]) : 'nivel máximo'}</span></div></div>
-      <table><thead><tr><th>Obra / activo</th><th class="n">Títulos</th><th class="n">Precio hoy</th><th class="n">Precio objetivo</th><th class="n">Monto</th></tr></thead><tbody>${rows}<tr class="gpt"><td colspan="4">Total del decreto</td><td class="n">${mxn.format(L.spentT)}</td></tr></tbody></table>
-      <p class="gp-n">Precio objetivo: orden límite sugerida, ${L.d[0]}% abajo del precio de hoy en las fábricas, ${L.d[1]}% en los inmuebles y ${L.d[2]}% en la bóveda. Si el precio no llega, la orden no se ejecuta. Las obras públicas se compran por monto. Precios del ${fechaLarga(L.now)} a las ${L.hora}.</p>
+      <div class="gp-bx">${L.boxes.map(([k, v, c2]) => `<div><small>${esc(k)}</small><b>${esc(v)}</b><span>${esc(c2)}</span></div>`).join('')}</div>
+      <table><thead><tr>${L.cols.map((c2, i) => `<th${i ? ' class="n"' : ''}>${esc(c2.charAt(0) + c2.slice(1).toLowerCase())}</th>`).join('')}</tr></thead><tbody>${rows}<tr class="gpt"><td colspan="4">${esc(L.totalLbl)}</td><td class="n">${mxn.format(L.spentT)}</td></tr></tbody></table>
+      ${L.notes.map(n => `<p class="gp-n">${esc(n)}</p>`).join('')}
       </div><div class="gp-sign"><b>${esc(L.name || 'El Gobernador')}</b><span>Firma del Gobernador</span></div></div>`;
     document.body.appendChild(el);
     document.body.classList.add('gp-printing');
@@ -3683,12 +3881,14 @@ const GOV = (() => {
 
   async function downloadLetter() {
     if (!SIM || !SIM.amt) { celebrate('Escribe tu presupuesto y toca Repartir para preparar la carta.'); return; }
-    const btn = $('btnPdf'), old = btn.textContent; btn.disabled = true; btn.textContent = 'Preparando la carta…';
-    const L = letterData();
+    return savePdf(letterData(), $('btnPdf'));
+  }
+  async function savePdf(L, btn) {
+    const old = btn.textContent; btn.disabled = true; btn.textContent = 'Preparando la carta…';
     try {
       const JsPDF = await loadJsPDF();
       const doc = new JsPDF({ unit: 'mm', format: 'a4', compress: true });
-      doc.setProperties({ title: 'Carta del Gobernador', subject: 'Decreto de presupuesto', creator: 'Ciudad Marea' });
+      doc.setProperties({ title: 'Carta del Gobernador', subject: L.sub, creator: 'Ciudad Marea' });
       drawLetter(doc, L, paper());
       doc.save(L.file);
     } catch (err) {
@@ -3705,7 +3905,7 @@ const GOV = (() => {
     if (b) b.onclick = () => { if (SIM && SIM.amt) printLetter(letterData()); };
   }
 
-  return { story, headline, feed, renderGaceta, objTxt, simButtons, wire, targetPrice, paper, letterData, drawLetter, loadJsPDF };
+  return { story, headline, feed, renderGaceta, objTxt, simButtons, wire, targetPrice, paper, letterData, drawLetter, loadJsPDF, sellHint, sellPlan, sellLetterData, renderSell, openTesoreria, levelCut };
 })();
 
 // [módulos del pueblo]
