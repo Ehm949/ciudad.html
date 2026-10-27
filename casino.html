@@ -315,11 +315,11 @@ function renderPartidos() {
 
 function matchCard(p, T, mb) {
   const tl = findTeam(T, p.id_l, p.local), tv = findTeam(T, p.id_v, p.visita), pre = p.estado === 'pre', res = resultOf(p);
-  const closed = pre && new Date(p.inicio) - Date.now() < 60e3;
-  const head = p.estado === 'in' ? `<span class="pill live">En vivo ${esc(p.detalle)}</span>` : p.estado === 'post' ? `<span class="pill fin">Final</span>` : p.estado === 'cancel' ? `<span class="pill cancel">Pospuesto</span>` : `<span class="pill">${closed ? 'Cerrado' : 'Abierto'}</span>`;
+  const closed = pre && new Date(p.inicio) - Date.now() < 60e3, sin = pre && !(+p.m_1 > 1), abierto = pre && !closed && !sin;
+  const head = p.estado === 'in' ? `<span class="pill live">En vivo ${esc(p.detalle)}</span>` : p.estado === 'post' ? `<span class="pill fin">Final</span>` : p.estado === 'cancel' ? `<span class="pill cancel">Pospuesto</span>` : `<span class="pill">${closed ? 'Cerrado' : sin ? 'Sin momios' : 'Abierto'}</span>`;
   const score = p.estado === 'pre' || p.estado === 'cancel' ? `<div class="sc vs">VS</div>` : `<div class="sc n" aria-label="Marcador">${esc(p.goles_l)} - ${esc(p.goles_v)}</div>`;
   const on = (m, s) => slip && slip.p.id === p.id && slip.mercado === m && slip.sel === s;
-  const ob = (m, s, lab, mo, hit) => `<button type="button" class="odd${hit ? ' hit' : ''}" data-m="${m}" data-s="${s}" aria-pressed="${on(m, s)}" ${pre && !closed ? '' : 'disabled'}><span>${esc(lab)}</span><b>${(+mo || 0).toFixed(2)}</b></button>`;
+  const ob = (m, s, lab, mo, hit) => `<button type="button" class="odd${hit ? ' hit' : ''}" data-m="${m}" data-s="${s}" aria-pressed="${on(m, s)}" ${abierto ? '' : 'disabled'}><span>${esc(lab)}</span><b>${+mo > 1 ? (+mo).toFixed(2) : '—'}</b></button>`;
   const det = openDet.has(p.id);
   return `<article class="mt${mb.length ? ' mine' : ''}" data-id="${esc(p.id)}">
     <div class="mt-h"><span>${p.estado === 'pre' ? fTime.format(new Date(p.inicio)) : fShort.format(new Date(p.inicio))}</span>${head}</div>
@@ -329,7 +329,7 @@ function matchCard(p, T, mb) {
       <div class="tm r">${crest(p.logo_v, p.visita, p.abrev_v)}<div class="nm"><b>${esc(p.visita)}</b><small>${tv ? ord(tv.pos) + ' · ' + tv.pts + ' pts' : 'Visita'}</small></div></div>
     </div>
     <div class="odds" role="group" aria-label="Resultado">${ob('1X2', 'L', '1 · ' + (p.abrev_l || 'Local'), p.m_1, res && res.x === 'L')}${ob('1X2', 'E', 'X · Empate', p.m_x, res && res.x === 'E')}${ob('1X2', 'V', '2 · ' + (p.abrev_v || 'Visita'), p.m_2, res && res.x === 'V')}</div>
-    <div class="odds" role="group" aria-label="Goles">${ob('OU', 'MAS', 'Más de 2.5', p.m_mas, res && res.ou === 'MAS')}${ob('OU', 'MENOS', 'Menos de 2.5', p.m_menos, res && res.ou === 'MENOS')}<button type="button" class="odd" data-m="EX" data-s="${slip && slip.p.id === p.id && slip.mercado === 'EX' ? slip.sel : '1-1'}" aria-pressed="${!!(slip && slip.p.id === p.id && slip.mercado === 'EX')}" ${pre && !closed ? '' : 'disabled'}><span>Marcador exacto</span><b>${res ? esc(res.ex) : '›'}</b></button></div>
+    <div class="odds" role="group" aria-label="Goles">${ob('OU', 'MAS', 'Más de 2.5', p.m_mas, res && res.ou === 'MAS')}${ob('OU', 'MENOS', 'Menos de 2.5', p.m_menos, res && res.ou === 'MENOS')}<button type="button" class="odd" data-m="EX" data-s="${slip && slip.p.id === p.id && slip.mercado === 'EX' ? slip.sel : '1-1'}" aria-pressed="${!!(slip && slip.p.id === p.id && slip.mercado === 'EX')}" ${abierto ? '' : 'disabled'}><span>Marcador exacto</span><b>${res ? esc(res.ex) : '›'}</b></button></div>
     ${mb.map(a => `<p class="mine-l">Tu apuesta: ${esc(selLabel(p, a.mercado, String(a.seleccion)))} · ${F(a.monto)} fichas · ${a.estado === 'ABIERTA' ? 'en juego' : a.estado === 'GANADA' ? 'ganaste ' + F(a.pago) : a.estado === 'ANULADA' ? 'reembolsada' : 'perdida'}</p>`).join('')}
     <button type="button" class="more" aria-expanded="${det}">${det ? 'Ocultar estadísticas ▴' : 'Estadísticas ▾'}</button>
     ${det ? `<div class="det">${detHtml(p, tl, tv)}</div>` : ''}
