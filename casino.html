@@ -174,7 +174,7 @@ table.st tr.top td:first-child{color:var(--gold)}
       <div class="who"><span id="who"></span><a href="index.html">← Volver al pueblo</a></div>
     </header>
     <section class="bal" id="bal" aria-live="polite"></section>
-    <p class="note">Las fichas son virtuales: salen de las ganancias de tu pueblo, no se compran ni se cambian por dinero, y apostar no toca tu portafolio real. Datos de los partidos: ESPN.</p>
+    <p class="note">Las fichas son virtuales: salen de la prosperidad de tu pueblo, no se compran ni se cambian por dinero, y apostar no toca tu portafolio real. Datos de los partidos: ESPN.</p>
     <nav class="tabs" role="tablist" aria-label="Secciones del casino">
       <button type="button" role="tab" id="tPartidos" aria-selected="true" data-t="partidos">Partidos</button>
       <button type="button" role="tab" id="tApuestas" aria-selected="false" data-t="apuestas">Mis apuestas</button>
@@ -281,7 +281,7 @@ function render() {
   const R = S.resumen || {};
   $('bal').innerHTML = `<div><div class="k">Tus fichas</div><div class="v n">${F(S.saldo)}<small>fichas</small></div></div>
     <div class="lim">Tope por apuesta<b class="n">${F(tope())}</b>${S.config.tope_pct}% de tu saldo</div>
-    <p class="src">Salen de la prosperidad de tu pueblo: <b>${F(R.credito)}</b> por tus ganancias${R.bono ? ` + <b>${F(R.bono)}</b> de bienvenida` : ''}. Cada peso nuevo de ganancia es una ficha más.</p>`;
+    <p class="src">Salen de la prosperidad de tu pueblo: <b>${F(R.credito)}</b> por tus ganancias${R.bono ? ` + <b>${F(R.bono)}</b> de bienvenida` : ''}. Cada peso nuevo de prosperidad es una ficha más: cuentan tus ganancias, lo que ya cobraste al vender y los intereses. Sacar dinero no te quita fichas futuras.</p>`;
   const open = (S.apuestas || []).filter(a => a.estado === 'ABIERTA').length;
   $('tApuestas').innerHTML = 'Mis apuestas' + (open ? `<span class="cnt">${open}</span>` : '');
   document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.t === tab)));
