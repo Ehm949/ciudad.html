@@ -324,6 +324,15 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
   #whoName{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   a.casino-lk{padding:5px 9px;font-size:12px;white-space:nowrap}
 }
+
+/* ---------- cuentas ---------- */
+.pw-hint{margin:-4px 0 0;font-size:12px;color:var(--muted)}
+.err.ok{color:var(--ok)}
+.pwm{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:16px;background:rgba(6,10,28,.72);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.pwm[hidden]{display:none}
+.pwm .card{box-shadow:0 24px 70px rgba(0,0,0,.5)}
+#signupForm{margin-top:0}
+@media (max-width:600px){#btnPw{padding:5px 9px}}
 </style>
 </head>
 <body>
@@ -333,16 +342,43 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
   <form class="card" id="loginForm" autocomplete="on">
     <p class="gate-k">Puertas de la ciudad</p>
     <h1>Ciudad <span>Marea</span></h1>
-    <p class="muted" style="margin:0">Bienvenido, gobernador. Las puertas de la ciudad están abiertas: identifícate con tu nombre y tu llave para entrar.</p>
+    <p class="muted" style="margin:0">Bienvenido, gobernador. Las puertas de la ciudad están abiertas: identifícate con tu usuario y tu contraseña para entrar.</p>
     <div class="resume" id="resume" hidden>
       <p style="margin:0">El gobernador <b id="resumeName"></b> ya está dentro de la ciudad.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="btnResume">Volver a la ciudad</button><button type="button" class="ghost" id="btnSwitch">Entrar con otro gobernador</button></div>
     </div>
-    <label for="lgUser">Nombre del gobernador<input id="lgUser" name="username" autocomplete="username" required></label>
-    <label for="lgPin">Llave de la ciudad (PIN)<input id="lgPin" name="password" type="password" inputmode="numeric" autocomplete="current-password" required></label>
+    <label for="lgUser">Usuario<input id="lgUser" name="username" autocomplete="username" required></label>
+    <label for="lgPin">Contraseña<input id="lgPin" name="password" type="password" autocomplete="current-password" required></label>
     <div class="err" id="lgErr"></div>
     <button type="submit" id="lgBtn">Entrar a la ciudad</button>
+    <button type="button" class="ghost" id="btnSignup">Crear mi cuenta</button>
     <div class="demo-note" id="demoNote" hidden>Modo demostración: no hay servidor configurado. Escribe cualquier usuario y PIN para entrar con datos de ejemplo.</div>
+  </form>
+  <form class="card" id="signupForm" hidden autocomplete="on">
+    <p class="gate-k">Funda tu ciudad</p>
+    <h1>Crear <span>cuenta</span></h1>
+    <p class="muted" style="margin:0">Elige tu usuario y una contraseña que solo tú conozcas: se guarda cifrada y nadie más puede verla.</p>
+    <label for="suName">Tu nombre<input id="suName" autocomplete="name" maxlength="40" required></label>
+    <label for="suUser">Usuario<input id="suUser" autocomplete="username" maxlength="30" required placeholder="por ejemplo: juanperez" autocapitalize="none" spellcheck="false"></label>
+    <label for="suPin">Contraseña<input id="suPin" type="password" autocomplete="new-password" minlength="8" maxlength="64" required></label>
+    <label for="suPin2">Repite la contraseña<input id="suPin2" type="password" autocomplete="new-password" minlength="8" maxlength="64" required></label>
+    <label for="suCode">Código de invitación (si te dieron uno)<input id="suCode" autocomplete="off" maxlength="40"></label>
+    <p class="pw-hint">Al menos 8 caracteres. Mejor si mezclas palabras, números o símbolos.</p>
+    <div class="err" id="suErr"></div>
+    <button type="submit" id="suBtn">Crear mi cuenta y entrar</button>
+    <button type="button" class="ghost" id="btnHaveAcc">Ya tengo cuenta</button>
+  </form>
+</div>
+
+<div class="pwm" id="pwModal" hidden role="dialog" aria-modal="true" aria-labelledby="pwTitle">
+  <form class="card" id="pwForm">
+    <h2 id="pwTitle">Cambia tu contraseña</h2>
+    <p class="muted" id="pwWhy" style="margin:0"></p>
+    <label for="pwOld">Contraseña actual<input id="pwOld" type="password" autocomplete="current-password" required></label>
+    <label for="pwNew">Contraseña nueva<input id="pwNew" type="password" autocomplete="new-password" minlength="8" maxlength="64" required></label>
+    <label for="pwNew2">Repite la nueva<input id="pwNew2" type="password" autocomplete="new-password" minlength="8" maxlength="64" required></label>
+    <div class="err" id="pwErr"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="submit" id="pwSave">Guardar contraseña</button><button type="button" class="ghost" id="pwCancel">Cancelar</button></div>
   </form>
 </div>
 
@@ -351,7 +387,7 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
   <div class="wrap">
     <header class="top">
       <h1>Ciudad <span>Marea</span></h1>
-      <div class="who"><span id="whoName"></span><a class="casino-lk" href="casino.html">Casino del pueblo</a><button class="ghost small" id="btnOut" type="button">Salir</button></div>
+      <div class="who"><span id="whoName"></span><a class="casino-lk" href="casino.html">Casino del pueblo</a><button class="ghost small" id="btnPw" type="button">Contraseña</button><button class="ghost small" id="btnOut" type="button">Salir</button></div>
     </header>
 
     <div class="stage" id="stage">
@@ -556,7 +592,9 @@ let demoHist = (() => {
   return rows;
 })();
 function demoApi(accion, data) {
-  if (accion === 'login') return { ok: true, token: 'demo', nombre: 'Inversor de ejemplo' };
+  if (accion === 'login') return { ok: true, token: 'demo', nombre: 'Inversor de ejemplo', cambiar: String(data.pin) === '123456' };   // en la demostración, 123456 simula una contraseña corta
+  if (accion === 'registro') return { ok: true, token: 'demo', nombre: data.nombre || 'Inversor de ejemplo' };
+  if (accion === 'cambiar_clave') return { ok: true, token: 'demo' };
   if (accion === 'salir') return { ok: true };
   if (accion === 'guardar') {
     const map = {}; demoPos.forEach(p => map[p.activo] = p);
@@ -813,6 +851,7 @@ $('loginForm').addEventListener('submit', async e => {
     $('lgPin').value = '';
     await loadData();
     showApp();
+    if (r.cambiar) AUTH.pedir(true);
   } catch (err) { $('lgErr').textContent = err.message; }
   btn.disabled = false;
 });
@@ -2732,6 +2771,65 @@ const GOV = (() => {
   new MutationObserver(() => { if (!host.hidden) { if (host.clientWidth !== W || host.clientHeight !== H) build(); start(); } }).observe(host, { attributes: true, attributeFilter: ['hidden'] });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) start(); });
   build(); start();
+})();
+
+
+// ================= Cuentas: crear cuenta y cambiar contraseña =================
+const AUTH = (() => {
+  const MIN = 8;
+  const show = (a, b) => { $(a).hidden = false; $(b).hidden = true; };
+  // --- crear cuenta ---
+  $('btnSignup').onclick = () => { show('signupForm', 'loginForm'); $('suErr').textContent = ''; $('suName').focus(); };
+  $('btnHaveAcc').onclick = () => { show('loginForm', 'signupForm'); $('lgUser').focus(); };
+  $('signupForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = $('suErr'), btn = $('suBtn'), u = $('suUser').value.trim().toLowerCase(), p = $('suPin').value;
+    err.textContent = '';
+    if (!/^[a-z0-9._-]{3,30}$/.test(u)) { err.textContent = 'El usuario debe tener de 3 a 30 letras, números, punto o guion, sin espacios.'; return; }
+    if (p.length < MIN) { err.textContent = 'La contraseña debe tener al menos ' + MIN + ' caracteres.'; return; }
+    if (p !== $('suPin2').value) { err.textContent = 'Las dos contraseñas no coinciden.'; return; }
+    btn.disabled = true;
+    try {
+      const r = await api('registro', { usuario: u, nombre: $('suName').value.trim(), pin: p, codigo: $('suCode').value.trim() });
+      $('suPin').value = ''; $('suPin2').value = '';
+      if (r.pendiente) { err.className = 'err ok'; err.textContent = 'Tu cuenta quedó registrada. El administrador la va a activar pronto; después entra con tu usuario y contraseña.'; btn.disabled = false; return; }
+      resetState(); token = r.token;
+      try { sessionStorage.setItem('cm_token', token); sessionStorage.setItem('cm_name', r.nombre || u); } catch (_) {}
+      await loadData(); showApp(); show('loginForm', 'signupForm');
+      celebrate('¡Bienvenido a Ciudad Marea, gobernador! Registra tu tesoro en la Tesorería del pueblo para fundar tu ciudad.');
+    } catch (x) { err.className = 'err'; err.textContent = x.message; }
+    btn.disabled = false;
+  });
+  // --- cambiar contraseña ---
+  let forced = false;
+  function pedir(obligatorio) {
+    forced = !!obligatorio;
+    $('pwWhy').textContent = forced
+      ? 'Tu contraseña es muy corta. Para proteger tu ciudad, elige una nueva de al menos ' + MIN + ' caracteres. Solo tú la vas a conocer.'
+      : 'Escribe tu contraseña actual y la nueva (al menos ' + MIN + ' caracteres). Se cerrarán tus sesiones en otros dispositivos.';
+    $('pwCancel').hidden = forced;
+    ['pwOld', 'pwNew', 'pwNew2'].forEach(id => { $(id).value = ''; }); $('pwErr').textContent = '';
+    $('pwModal').hidden = false; $('pwOld').focus();
+  }
+  const cerrar = () => { if (!forced) $('pwModal').hidden = true; };
+  $('btnPw').onclick = () => pedir(false);
+  $('pwCancel').onclick = cerrar;
+  $('pwModal').addEventListener('keydown', e => { if (e.key === 'Escape') cerrar(); });
+  $('pwForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = $('pwErr'), n = $('pwNew').value; err.textContent = '';
+    if (n.length < MIN) { err.textContent = 'La contraseña nueva debe tener al menos ' + MIN + ' caracteres.'; return; }
+    if (n !== $('pwNew2').value) { err.textContent = 'Las dos contraseñas nuevas no coinciden.'; return; }
+    $('pwSave').disabled = true;
+    try {
+      const r = await api('cambiar_clave', { actual: $('pwOld').value, nueva: n });
+      token = r.token; try { sessionStorage.setItem('cm_token', token); } catch (_) {}
+      forced = false; $('pwModal').hidden = true;
+      celebrate('Listo: tu contraseña cambió. Solo tú la conoces.');
+    } catch (x) { err.textContent = x.message; }
+    $('pwSave').disabled = false;
+  });
+  return { pedir };
 })();
 
 // [módulos del pueblo]
