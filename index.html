@@ -334,7 +334,38 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
 .pwm[hidden]{display:none}
 .pwm .card{box-shadow:0 24px 70px rgba(0,0,0,.5)}
 #signupForm{margin-top:0}
+#signupForm label.chk,.chk{display:flex;flex-direction:row;gap:9px;align-items:flex-start;font-size:13px;line-height:1.4;cursor:pointer}
+.chk input{width:18px;height:18px;margin:1px 0 0;flex:none;accent-color:var(--acc)}
+.chk a{color:var(--acc);font-weight:700;text-decoration:underline}
 @media (max-width:600px){#btnPw{padding:5px 9px}}
+
+/* ---------- tus metas ---------- */
+.mt-pick{display:grid;gap:8px;margin-top:4px}
+.mt-opt{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);cursor:pointer}
+.mt-opt:has(input:checked){border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.mt-opt input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:var(--acc)}
+.mt-opt span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mt-opt small{color:var(--muted);font-size:12.5px;line-height:1.4}
+.mt-rows{display:grid;gap:8px}
+.mt-row{display:grid;grid-template-columns:minmax(130px,1.1fr) 120px minmax(160px,1.6fr);gap:10px;align-items:end;padding:10px 12px;border:1px solid var(--line);border-left:3px solid var(--c);border-radius:12px;background:var(--panel2)}
+.mt-name{display:flex;flex-wrap:wrap;align-items:center;gap:4px 7px;min-width:0;align-self:center}
+.mt-name .dot{background:var(--c)}
+.mt-name small{flex-basis:100%;color:var(--muted);font-size:12px}
+.mt-pct,.mt-veh,.mt-tol,.lim{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600}
+.mt-pct span,.mt-tol span,.lim span{display:flex;align-items:center;gap:6px;color:var(--muted);font-weight:500}
+.mt-pct input{width:76px;text-align:right}
+.mt-veh select{width:100%;min-width:0;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font:inherit}
+.mt-tol{margin-top:2px}
+.mt-tol input,.lim input{width:76px;text-align:right;flex:none}
+.lim{margin-top:10px}
+td.sinhoy{vertical-align:middle;text-align:center;font-size:12px;line-height:1.35;max-width:120px;white-space:normal}
+@media (max-width:600px){
+  .mt-row{grid-template-columns:1fr 104px;}
+  .mt-veh{grid-column:1 / -1}
+  .mt-pct input{width:64px}
+}
+/* la regla .under de otro bloque deformaba las filas "abajo de tu límite" del semáforo */
+.bands .band.under{display:grid;justify-content:normal;flex-wrap:nowrap;gap:6px 14px}
 </style>
 </head>
 <body>
@@ -365,7 +396,8 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
     <label for="suPin">Contraseña<input id="suPin" type="password" autocomplete="new-password" minlength="8" maxlength="64" required></label>
     <label for="suPin2">Repite la contraseña<input id="suPin2" type="password" autocomplete="new-password" minlength="8" maxlength="64" required></label>
     <label for="suCode">Código de invitación<input id="suCode" autocomplete="off" maxlength="40"></label>
-    <p class="pw-hint">Al menos 8 caracteres. Mejor si mezclas palabras, números o símbolos.</p>
+    <p class="pw-hint">Al menos 8 caracteres. Puedes mezclar palabras, números o símbolos.</p>
+    <label class="chk" for="suAcepta"><input type="checkbox" id="suAcepta" aria-required="true"><span>Leí y acepto el <a id="suAviso" href="aviso-privacidad.html" target="_blank" rel="noopener">aviso de privacidad</a>.</span></label>
     <div class="err" id="suErr"></div>
     <button type="submit" id="suBtn">Crear mi cuenta y entrar</button>
     <button type="button" class="ghost" id="btnHaveAcc">Ya tengo cuenta</button>
@@ -426,6 +458,8 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
     </div>
 
 
+    <section class="panel" id="metas"></section>
+
     <section class="panel" id="bands"></section>
 
 
@@ -436,16 +470,18 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
 
     <section class="panel" id="ceremony" hidden></section>
       <section class="panel">
-        <h2>Presupuesto del mes</h2>
-        <p class="muted" style="margin:0">¿Cuánto vas a destinar a obras este mes? El consejo te dice dónde construir para acercar el pueblo a su forma ideal, y te prepara la carta con los precios objetivo de compra.</p>
-        <div class="sim"><input id="simAmt" type="number" min="0" step="500" value="10000" aria-label="Presupuesto del mes en pesos"><button id="btnSim" type="button">Repartir presupuesto</button></div>
+        <h2>Aportación del mes</h2>
+        <p class="muted" style="margin:0">Escribe cuánto vas a aportar este mes. La ciudad calcula cómo se repartiría entre tus barrios según las metas que tú definiste.</p>
+        <div class="sim"><input id="simAmt" type="number" min="0" step="500" value="10000" aria-label="Aportación del mes en pesos"><button id="btnSim" type="button">Calcular reparto</button></div>
+        <label class="lim">Tu precio límite<span><input id="simLim" type="number" min="0" max="50" step="0.1" value="0" inputmode="decimal" aria-label="Tu precio límite de compra: porcentaje abajo del precio de hoy">% abajo del precio de hoy (0% = precio de hoy)</span></label>
         <div id="simOut"></div>
       </section>
       <section class="panel" id="sellPanel">
         <h2>Cosecha del tesoro</h2>
-        <p class="muted" style="margin:0">El pueblo trabaja para ti. Sacar parte del tesoro para darte un gusto, un viaje o cumplir una meta es justo: es el fruto de tu esfuerzo. El consejo te dice de dónde tomarlo para que el pueblo siga en orden y te prepara la carta con los precios objetivo de venta.</p>
+        <p class="muted" style="margin:0">El pueblo trabaja para ti. Sacar parte del tesoro para darte un gusto, un viaje o cumplir una meta es justo: es el fruto de tu esfuerzo. Escribe cuánto quieres sacar: la ciudad calcula de qué barrios saldría según las metas que tú definiste y prepara la carta con tu precio límite de venta.</p>
         <div class="viewsw" role="group" aria-label="¿Para qué es la venta?" style="width:max-content;max-width:100%;margin-top:10px"><button type="button" id="smJoy" aria-pressed="true">Para disfrutarlo</button><button type="button" id="smRe" aria-pressed="false">Para reordenar</button></div>
         <div class="sim"><input id="sellAmt" type="number" min="0" step="500" aria-label="Cuánto quieres sacar, en pesos"><button id="btnSell" type="button">Calcular</button></div>
+        <label class="lim">Tu precio límite de venta<span><input id="sellLim" type="number" min="0" max="50" step="0.1" value="0" inputmode="decimal" aria-label="Tu precio límite de venta: porcentaje arriba del precio de hoy">% arriba del precio de hoy (0% = precio de hoy)</span></label>
         <div id="sellOut"></div>
       </section>
 
@@ -457,7 +493,7 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
       <details id="calcBox"><summary style="cursor:pointer;font-weight:700">Así se calcula el tesoro del pueblo</summary><div id="calc" style="margin-top:10px"></div></details>
       <form id="pfForm" style="display:flex;flex-direction:column;gap:14px"></form>
     </section>
-    <p class="foot">Ciudad Marea convierte tu portafolio en un pueblo. Las noticias de la gaceta son narrativa inspirada en cómo se movió cada barrio, no noticias reales. Las animaciones son representaciones y las proyecciones suponen rendimientos constantes: nada de esto es una promesa de resultados ni asesoría financiera.</p>
+    <p class="foot">Ciudad Marea es una herramienta educativa y de visualización: convierte tu portafolio en un pueblo y calcula con las metas y reglas que tú defines. No es una recomendación de inversión ni una oferta de compra o venta. Las noticias de la gaceta son narrativa inspirada en cómo se movió cada barrio, no noticias reales; las animaciones son representaciones y nada de esto es una promesa de resultados.</p>
   </div>
 </div>
 <div class="celebrate" id="celebrate" hidden></div>
@@ -467,6 +503,7 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
 const CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbwQ27XpCTCNOmOPxSGCu7gB8UJx40QPaoAlyXx2rvORM31OER6X9GQABBMS88Do-wCGIw/exec'   // URL /exec de tu Apps Script. Vacío = modo demostración
 };
+CONFIG.AVISO_URL = CONFIG.AVISO_URL || 'aviso-privacidad.html';   // tu aviso de privacidad (archivo en el mismo sitio o liga completa)
 const DEMO = !CONFIG.API_URL;
 
 // Valores por defecto; los reales vienen de la pestaña Juego de tu hoja
@@ -593,7 +630,24 @@ let demoHist = (() => {
   [[0.97, 1], [0.93, 1], [0.89, 0.93], [0.85, 1], [0.81, 1]].forEach(([f, fv]) => { rows.unshift({ mes: m, ...demoSnapshot(f, fv) }); m = prevYm(m); });
   return rows;
 })();
+const DEMO_PLANT = [
+  { id: 'P1', nombre: 'Mayoría renta fija', pct: [20, 10, 70, 0], banda: 5, version: '1', fecha: '2026-10-29' },
+  { id: 'P2', nombre: 'Mixta', pct: [40, 15, 45, 0], banda: 5, version: '1', fecha: '2026-10-29' },
+  { id: 'P3', nombre: 'Mayoría acciones', pct: [65, 15, 15, 5], banda: 5, version: '1', fecha: '2026-10-29' }];
+let demoMetas = [];
 function demoApi(accion, data) {
+  if (accion === 'metas_plantilla') {
+    const t = DEMO_PLANT.find(x => x.id === data.plantilla);
+    demoMetas = GRUPOS.map(([g], i) => ({ grupo: g, objetivo_pct: t ? t.pct[i] : 0, vehiculo: '', tolerancia_pts: t ? t.banda : 5, plantilla: t ? t.id + ' ' + t.nombre + ' v' + t.version : 'en blanco' }));
+    return { ok: true, metas: demoMetas };
+  }
+  if (accion === 'guardar_metas') {
+    const sum = data.metas.reduce((a, m) => a + num(m.objetivo_pct, 0), 0);
+    if (Math.abs(sum - 100) > 0.05) throw new Error('Tus metas suman ' + sum + '%. Deben sumar 100%.');
+    const orig = (demoMetas[0] && demoMetas[0].plantilla || '').replace(/ · editada$/, '');
+    demoMetas = data.metas.map(m => ({ ...m, tolerancia_pts: data.tolerancia, plantilla: orig ? orig + ' · editada' : 'propia' }));
+    return { ok: true, metas: demoMetas };
+  }
   if (accion === 'login') return { ok: true, token: 'demo', nombre: 'Inversor de ejemplo', cambiar: String(data.pin) === '123456' };   // en la demostración, 123456 simula una contraseña corta
   if (accion === 'registro') return { ok: true, token: 'demo', nombre: data.nombre || 'Inversor de ejemplo' };
   if (accion === 'cambiar_clave') return { ok: true, token: 'demo' };
@@ -608,6 +662,7 @@ function demoApi(accion, data) {
   const hoy = new Date(), fin = new Date(Date.now() + 2 * 864e5), prox = new Date(Date.now() + 20 * 864e5);
   return {
     ok: true, nombre: 'Inversor de ejemplo', catalogo: DEMO_CATALOGO, posiciones: demoPos.map(demoCompute), juego: {},
+    metas: demoMetas, plantillas: DEMO_PLANT, precios_hora: new Date().toISOString(),
     historial: demoHist,
     eventos: [
       { inicio: ymd(hoy), fin: ymd(fin), tipo: 'RENTAS', objetivo: 'FUNO11', mensaje: 'FUNO11 está repartiendo las rentas del trimestre a sus dueños.' },
@@ -659,20 +714,16 @@ function buildModel(d, proj) {
 const BAND = () => num(J.banda_pct, 3);
 const maxDev = M => Math.max(...ORDER.map(k => Math.abs(M.classes[k].diff)));
 
-// Bandas por defecto (las reales vienen de la pestaña Bandas de tu hoja)
-const BANDAS_DEF = [
-  { grupo: 'Estados Unidos', miembros: 'VTI, VUAA, IVVPESO, VIG', tolerancia_pts: 5, objetivo_pct: 25, vehiculo: 'VUAA' },
-  { grupo: 'Desarrollados sin EE.UU. (VEA)', miembros: 'VEA', tolerancia_pts: 3.5, objetivo_pct: 15, vehiculo: 'VEA' },
-  { grupo: 'Emergentes (VWO)', miembros: 'VWO', tolerancia_pts: 1.25, objetivo_pct: 5, vehiculo: 'VWO' },
-  { grupo: 'FIBRAs', miembros: 'FIBRAS', tolerancia_pts: 5, objetivo_pct: 20, vehiculo: '' },
-  { grupo: 'Renta fija', miembros: 'RENTA_FIJA', tolerancia_pts: 5, objetivo_pct: 30, vehiculo: '' },
-  { grupo: 'Cripto', miembros: 'CRIPTO', tolerancia_pts: 1.25, objetivo_pct: 5, vehiculo: 'Bitcoin' }
+// Los 4 barrios: las metas de cada usuario se definen por barrio (hoja Metas del servidor)
+const GRUPOS = [['Acciones', 'ACCIONES'], ['FIBRAs', 'FIBRAS'], ['Renta fija', 'RENTA_FIJA'], ['Cripto', 'BITCOIN']];
+// Sectores de la Gaceta: solo agrupan noticias. No son metas ni dicen cuánto tener de nada.
+const SECTORES = [
+  { grupo: 'Estados Unidos', miembros: 'VTI, VUAA, IVVPESO, VIG' }, { grupo: 'Desarrollados sin EE.UU. (VEA)', miembros: 'VEA' },
+  { grupo: 'Emergentes (VWO)', miembros: 'VWO' }, { grupo: 'Otras acciones', miembros: 'ACCIONES' },
+  { grupo: 'FIBRAs', miembros: 'FIBRAS' }, { grupo: 'Renta fija', miembros: 'RENTA_FIJA' }, { grupo: 'Cripto', miembros: 'CRIPTO' }
 ];
-const PESOS_DEF = [
-  ['FUNO11', 25], ['FIBRAPL14', 20], ['DANHOS13', 15], ['FNOVA17', 15], ['FMTY14', 10], ['NEXT23', 15],
-  ['Cetes 91 días', 20], ['Cetes 182 días', 20], ['Cetes 364 días', 20], ['Udibonos', 20], ['Bondia', 20]
-].map(([activo, peso_pct]) => ({ activo, peso_pct }));
-const bandList = () => (raw && raw.bandas && raw.bandas.length) ? raw.bandas : BANDAS_DEF;
+const metasList = () => (raw && raw.metas) || [];
+const hasMetas = () => { const m = metasList(); return m.length > 0 && Math.abs(m.reduce((a, x) => a + num(x.objetivo_pct, 0), 0) - 100) <= 0.05; };
 function resolveMembers(M, txt) {
   const set = new Set();
   String(txt || '').split(/[,;]+/).map(t => t.trim()).filter(Boolean).forEach(t => {
@@ -683,52 +734,44 @@ function resolveMembers(M, txt) {
   });
   return [...set];
 }
-// Convierte tu estrategia por grupo en un objetivo por activo:
-//  vehículo → absorbe todo el rebalanceo del grupo; los demás miembros se mantienen como están
-//  sin vehículo → se reparte según Pesos internos; lo que no esté en Pesos se mantiene
+// Convierte las metas del usuario en un objetivo por instrumento:
+//  el instrumento que el usuario eligió para el barrio absorbe la meta del barrio;
+//  los demás instrumentos del barrio se quedan como están (cuentan, pero no se compran ni venden).
 function applyStrategy(M) {
-  const pesos = (raw.pesos && raw.pesos.length) ? raw.pesos : PESOS_DEF;
-  const pw = {}; pesos.forEach(p => { pw[String(p.activo).toLowerCase()] = num(p.peso_pct, 0); });
-  const assigned = new Set();
   M.groups = [];
-  M.items.forEach(i => { i.hold = false; i.cw = i.objetivo; });
-  bandList().forEach(b => {
-    const tG = num(b.objetivo_pct, NaN);
-    const members = resolveMembers(M, b.miembros).filter(i => !assigned.has(i));
-    members.forEach(i => assigned.add(i));
-    if (!members.length || isNaN(tG)) return;
-    const live = members.filter(i => !i.retirado);
-    members.filter(i => i.retirado).forEach(i => { i.objetivo = 0; i.cw = 0; });
-    const veh = resolveMembers(M, b.vehiculo).filter(i => live.includes(i));
-    let traders;
-    if (veh.length) traders = veh.map(i => ({ i, w: pw[i.activo.toLowerCase()] ?? 1 }));
-    else {
-      const wm = live.filter(i => pw[i.activo.toLowerCase()] != null);
-      traders = wm.length ? wm.map(i => ({ i, w: pw[i.activo.toLowerCase()] })) : live.map(i => ({ i, w: i.objetivo || 1 }));
-    }
-    const tset = new Set(traders.map(t => t.i));
-    const holds = live.filter(i => !tset.has(i));
-    const holdPct = holds.reduce((a, i) => a + i.pct, 0);
-    holds.forEach(i => { i.objetivo = i.pct; i.hold = true; i.cw = 0; });
-    const wsum = traders.reduce((a, t) => a + t.w, 0), avail = Math.max(0, tG - holdPct);
-    traders.forEach(t => { const sh = wsum > 0 ? t.w / wsum : 1 / traders.length; t.sh = sh; t.i.objetivo = avail * sh; t.i.cw = tG * sh; });
-    M.groups.push({ name: b.grupo, tG, members, traders, holds, valor: members.reduce((a, i) => a + i.valor, 0), holdValor: holds.reduce((a, i) => a + i.valor, 0) });
+  M.items.forEach(i => { i.hold = false; i.cw = 0; i.objetivo = 0; });
+  const metas = metasList(), ok = hasMetas();
+  GRUPOS.forEach(([name, k]) => {
+    const m = metas.find(x => x.grupo === name), members = M.classes[k].items;
+    if (!m || !members.length) return;
+    const tG = ok ? Math.max(0, num(m.objetivo_pct, 0)) : 0;
+    const veh = members.find(i => !i.retirado && i.activo === m.vehiculo) || null;
+    const holds = members.filter(i => i !== veh), holdPct = holds.reduce((a, i) => a + i.pct, 0);
+    holds.forEach(i => { i.objetivo = i.pct; i.hold = true; });
+    if (veh) { veh.objetivo = Math.max(0, tG - holdPct); veh.cw = tG; }
+    M.groups.push({ name, key: k, tG, tol: num(m.tolerancia_pts, 5), veh, members, holds,
+      traders: veh ? [{ i: veh, w: 1, sh: 1 }] : [], valor: members.reduce((a, i) => a + i.valor, 0), holdValor: holds.reduce((a, i) => a + i.valor, 0) });
   });
-  ORDER.forEach(k => { const c = M.classes[k]; c.objetivo = c.items.reduce((a, i) => a + i.objetivo, 0); c.diff = c.pct - c.objetivo; });
+  ORDER.forEach(k => { const c = M.classes[k], g = M.groups.find(x => x.key === k); c.objetivo = ok && g ? g.tG : 0; c.diff = ok ? c.pct - c.objetivo : 0; });
+}
+function buildSectors(M) {
+  const used = new Set();
+  return SECTORES.map(s => {
+    const members = resolveMembers(M, s.miembros).filter(i => !used.has(i));
+    members.forEach(i => used.add(i));
+    return members.length ? { name: s.grupo, members } : null;
+  }).filter(Boolean);
 }
 let BD = [], ALERT = new Map();
 function bandsInfo(M) {
-  if (!M.total) return [];
-  return bandList().map(b => {
-    const items = resolveMembers(M, b.miembros);
-    if (!items.length) return null;
-    const actual = items.reduce((a, i) => a + i.pct, 0), target = items.reduce((a, i) => a + i.objetivo, 0), tol = num(b.tolerancia_pts, 5);
-    const dev = actual - target;
+  if (!M.total || !hasMetas()) return [];
+  return M.groups.map(g => {
+    const actual = g.valor / M.total * 100, target = g.tG, tol = g.tol, dev = actual - target;
     const state = Math.abs(dev) > tol ? (dev > 0 ? 'over' : 'under') : Math.abs(dev) > tol * 0.75 ? 'near' : 'ok';
     const need = (target - actual) / 100 * M.total;
     const toLimit = dev > 0 ? (dev - tol) / 100 * M.total : (-dev - tol) / 100 * M.total;
-    return { name: b.grupo, items, actual, target, tol, dev, state, need, toLimit, msg: b.mensaje || '' };
-  }).filter(b => b && (b.target > 0 || b.actual > 0));
+    return { name: g.name, items: g.members, actual, target, tol, dev, state, need, toLimit, msg: '' };
+  }).filter(b => b.target > 0 || b.actual > 0);
 }
 const balanced = () => BD.every(b => b.state !== 'over' && b.state !== 'under');
 
@@ -791,7 +834,7 @@ function missionInfo() {
   const rows = hist(), cm = ym(new Date());
   const prev = [...rows].reverse().find(r => r.mes < cm) || null;
   let it = null, custom = false;
-  if (J.mision_activo) { it = model.items.find(i => i.activo.toLowerCase() === String(J.mision_activo).trim().toLowerCase()) || null; custom = !!it; }
+  if (!hasMetas()) return { type: 'metas', done: false };
   if (!prev && !it) return { type: 'fundar', done: model.total > 0 };
   const base = a => (prev && prev.detalle && prev.detalle[a]) ? prev.detalle[a] : [0, 0];
   const tot = (prev ? prev.valor : model.total) || 1;
@@ -888,6 +931,7 @@ function apply(d) {
   Object.entries(d.juego || {}).forEach(([k, v]) => { if (v !== '' && v != null) J[k] = v; });
   model = buildModel(d);
   applyStrategy(model);
+  model.sectors = buildSectors(model);
   const nCrypto = model.classes.BITCOIN.items.length;
   CLS.BITCOIN.name = nCrypto > 1 ? 'Cripto' : 'Bitcoin';
   CLS.BITCOIN.how = nCrypto > 1
@@ -926,7 +970,7 @@ function renderAll() {
   $('hGain').innerHTML = `<span class="${M.ganancia >= 0 ? 'pos' : 'neg'}">${signed(M.ganancia)}</span><small class="muted">${pct1(gp)}</small>`;
   $('hToday').innerHTML = `<span class="${M.hoy >= 0 ? 'pos' : 'neg'}">${signed2(M.hoy)}</span>`;
   const nA = BD.filter(b => b.state === 'over' || b.state === 'under').length;
-  $('hBal').innerHTML = !nA ? '<span class="pos">En rango</span>' : `<span class="neg">${nA} ${nA === 1 ? 'alerta' : 'alertas'}</span>`;
+  $('hBal').innerHTML = !hasMetas() ? '<span class="muted">Sin metas</span>' : !nA ? '<span class="pos">En tu margen</span>' : `<span class="neg">${nA} ${nA === 1 ? 'alerta' : 'alertas'}</span>`;
   $('hStreak').innerHTML = `<span style="color:var(--acc)">${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}</span>`;
 
   renderEvents();
@@ -937,19 +981,19 @@ function renderAll() {
     const c = M.classes[k], col = CLS[k].color;
     const bs = BD.filter(b => b.items.some(i => i.key === k));
     const bad = bs.find(b => b.state === 'over' || b.state === 'under'), near = bs.find(b => b.state === 'near');
-    const st = bad ? (bad.state === 'over' ? ['lo', 'Sobrepoblado'] : ['lo', 'Le falta']) : near ? ['hi', 'Cerca del límite'] : ['ok', 'En rango'];
+    const st = !hasMetas() ? ['info', 'Sin meta'] : bad ? (bad.state === 'over' ? ['lo', 'Arriba de tu límite'] : ['lo', 'Abajo de tu límite']) : near ? ['hi', 'Cerca de tu límite'] : ['ok', 'En tu margen'];
     const scale = Math.max(60, c.objetivo * 1.6);
     return `<article class="d" style="--c:${col}">
       <div class="dh"><span class="dot"></span><span class="dn">${CLS[k].name}</span><span class="pill ${st[0]}">${st[1]}</span></div>
       <div class="row"><span>Tesoro</span><b>${mxn.format(c.valor)}</b></div>
       <div class="row"><span>Hoy</span><b class="${c.hoy >= 0 ? 'pos' : 'neg'}">${signed2(c.hoy)}</b></div>
       <div class="row"><span>Prosperidad</span><b class="${c.ganancia >= 0 ? 'pos' : 'neg'}">${signed(c.ganancia)}</b></div>
-      <div class="row"><span>Ocupa / ideal</span><b>${pct1(c.pct)} / ${pct1(c.objetivo)}</b></div>
-      <div class="bar" title="La línea blanca es el porcentaje ideal"><i style="width:${Math.min(100, c.pct / scale * 100)}%"></i><u style="left:${Math.min(100, c.objetivo / scale * 100)}%"></u></div>
+      <div class="row"><span>Ocupa / tu meta</span><b>${pct1(c.pct)} / ${hasMetas() ? pct1(c.objetivo) : '—'}</b></div>
+      <div class="bar" title="La línea blanca es tu meta"><i style="width:${Math.min(100, c.pct / scale * 100)}%"></i><u style="left:${Math.min(100, c.objetivo / scale * 100)}%"></u></div>
     </article>`;
   }).join('');
 
-  renderLive(); GOV.renderGaceta(); GOV.sellHint(); renderBands(); renderMission(); renderStreak(); renderCeremony();
+  renderLive(); GOV.renderGaceta(); renderMetas(); GOV.sellHint(); renderBands(); renderMission(); renderStreak(); renderCeremony();
   renderForm(); renderSim(); renderZoom(); renderTm(); renderCalc();
 }
 
@@ -974,43 +1018,38 @@ function renderBands() {
   const box = $('bands');
   if (!BD.length) { box.hidden = true; return; }
   box.hidden = false;
-  const lab = { ok: ['ok', 'En rango'], near: ['hi', 'Cerca del límite'], over: ['lo', 'Sobrepoblado'], under: ['lo', 'Le falta'] };
-  box.innerHTML = `<div class="phead"><h2>Semáforo del pueblo</h2><span class="pill ${balanced() ? 'ok' : 'lo'}">${balanced() ? 'Todo en orden' : 'Revisa las alertas'}</span></div>
+  const lab = { ok: ['ok', 'En tu margen'], near: ['hi', 'Cerca de tu límite'], over: ['lo', 'Arriba de tu límite'], under: ['lo', 'Abajo de tu límite'] };
+  box.innerHTML = `<div class="phead"><h2>Semáforo del pueblo</h2><span class="pill ${balanced() ? 'ok' : 'lo'}">${balanced() ? 'Todo en tu margen' : 'Hay barrios fuera de tu margen'}</span></div>
     <div class="bands">${BD.map(b => {
       const lo = Math.max(0, b.target - b.tol * 2.2), hi = b.target + b.tol * 2.2, span = hi - lo || 1;
       const pos = v => Math.max(0, Math.min(100, (v - lo) / span * 100));
-      const act = b.state === 'over' ? `Congela su presupuesto: le sobran ${mxn.format(b.toLimit)} para volver a su banda.`
-        : b.state === 'under' ? `Mándale el próximo presupuesto: le faltan ${mxn.format(b.toLimit)} para volver a su banda (${mxn.format(b.need)} para su ideal).`
-        : b.state === 'near' ? (b.dev > 0 ? 'Se acerca a su límite de arriba.' : 'Se acerca a su límite de abajo.') : '';
+      const act = b.state === 'over' ? `Está ${mxn.format(b.toLimit)} arriba del límite que definiste.`
+        : b.state === 'under' ? `Le faltan ${mxn.format(b.toLimit)} para volver a tu margen (${mxn.format(b.need)} para llegar a tu meta).`
+        : b.state === 'near' ? (b.dev > 0 ? 'Se acerca a tu límite de arriba.' : 'Se acerca a tu límite de abajo.') : '';
       return `<div class="band ${b.state}" style="--c:${bandColor(b)}">
-        <div style="min-width:0"><b>${esc(b.name)}</b><span class="bsub">${pct1(b.actual)} · ideal ${pct1(b.target)} ± ${b.tol}</span></div>
-        <div class="gauge" role="img" aria-label="${esc(b.name)}: ${pct1(b.actual)}, ideal ${pct1(b.target)}"><span class="zone" style="left:${pos(b.target - b.tol)}%;right:${100 - pos(b.target + b.tol)}%"></span><span class="ideal" style="left:${pos(b.target)}%"></span><span class="mark" style="left:${pos(b.actual)}%"></span></div>
+        <div style="min-width:0"><b>${esc(b.name)}</b><span class="bsub">${pct1(b.actual)} · tu meta ${pct1(b.target)} ± ${b.tol}</span></div>
+        <div class="gauge" role="img" aria-label="${esc(b.name)}: ${pct1(b.actual)}, tu meta ${pct1(b.target)}"><span class="zone" style="left:${pos(b.target - b.tol)}%;right:${100 - pos(b.target + b.tol)}%"></span><span class="ideal" style="left:${pos(b.target)}%"></span><span class="mark" style="left:${pos(b.actual)}%"></span></div>
         <span class="pill ${lab[b.state][0]}">${lab[b.state][1]}</span>
         ${act ? `<span class="bact">${act}</span>` : ''}
       </div>`;
     }).join('')}</div>
-    <p class="foot">La franja verde es la tolerancia que definiste en la pestaña Bandas. Los límites se miden en puntos del tesoro total.</p>`;
+    <p class="foot">La franja verde es el margen de tolerancia que definiste en Tus metas. Se mide en puntos del tesoro total.</p>`;
   const al = BD.filter(b => b.state === 'over' || b.state === 'under');
-  collapsible(box, 'bands', al.length ? 'Fuera de su banda: <b>' + al.map(b => esc(b.name)).join(', ') + '</b>.' : 'Todos los grupos están dentro de su banda.', false);
+  collapsible(box, 'bands', al.length ? 'Fuera de tu margen: <b>' + al.map(b => esc(b.name)).join(', ') + '</b>.' : 'Todos los barrios están dentro de tu margen.', false);
 }
 
 function renderEvents() {
   const out = [];
-  if (!DEMO && raw) {
-    const okB = (raw.bandas || []).some(b => b.objetivo_pct != null && b.objetivo_pct !== '');
-    const okP = (raw.pesos || []).length > 0;
-    if (!okB || !okP) out.push(`<div class="ev" style="--c:var(--warn)"><span class="dot"></span><div><b>La página no está leyendo tu ${!okB && !okP ? 'pestaña Bandas ni Pesos internos' : !okB ? 'pestaña Bandas (objetivo_pct)' : 'pestaña Pesos internos'}</b><span>Está usando valores de ejemplo para el rebalanceo. Publica la versión más reciente del script: Implementar → Administrar implementaciones → editar (lápiz) → Versión: Nueva versión → Implementar.</span></div></div>`);
-  }
   BD.filter(b => b.state === 'over' || b.state === 'under').forEach(b => {
-    const title = b.state === 'over' ? `¡${b.name}: sobrepoblado!` : `¡${b.name} se está quedando vacío!`;
+    const title = b.state === 'over' ? `${b.name}: arriba de tu límite` : `${b.name}: abajo de tu límite`;
     const msg = b.msg ? esc(b.msg) : b.state === 'over'
-      ? `Tiene ${pct1(b.actual)} del pueblo y su límite es ${pct1(b.target + b.tol)}. Ya no caben más vecinos: deja de mandarle presupuesto y dirígelo a lo que falta.`
-      : `Tiene ${pct1(b.actual)} del pueblo y lo mínimo es ${pct1(Math.max(0, b.target - b.tol))}. Hay obras detenidas: mándale unos ${mxn.format(b.toLimit)} para que vuelvan a trabajar.`;
+      ? `Tiene ${pct1(b.actual)} del pueblo y el límite que definiste es ${pct1(b.target + b.tol)}.`
+      : `Tiene ${pct1(b.actual)} del pueblo y el mínimo que definiste es ${pct1(Math.max(0, b.target - b.tol))}: le faltan unos ${mxn.format(b.toLimit)} para volver a tu margen.`;
     out.push(`<div class="ev alert" style="--c:var(--bad)"><span class="dot"></span><div><b>${esc(title)}</b><span>${msg}</span></div></div>`);
   });
   const sinPrecio = model.items.filter(i => i.key !== 'RENTA_FIJA' && i.pos && (+i.pos.titulos > 0) && !(+i.precio_mxn > 0));
   if (sinPrecio.length) out.push(`<div class="ev" style="--c:var(--warn)"><span class="dot"></span><div><b>Sin precio hoy: ${sinPrecio.map(i => esc(i.activo)).join(', ')}</b><span>No pude leer su precio, así que su valor cuenta como $0 en tu ciudad. Revisa su ticker en la pestaña Config de la hoja.</span></div></div>`);
-  EV.storms.forEach(s => out.push(`<div class="ev" style="--c:var(--bad)"><span class="dot"></span><div><b>Tormenta en ${CLS[s.k].scene.toLowerCase()}</b><span>${s.pct != null ? `${CLS[s.k].name} baja ${pct1(Math.abs(s.pct))} hoy. ` : esc(s.msg || '') + ' '}Un buen gobernador no abandona un barrio en tormenta: tu plan ya cuenta con días así. Si aguantas, ganas el logro "Capitán en la tormenta".</span></div></div>`));
+  EV.storms.forEach(s => out.push(`<div class="ev" style="--c:var(--bad)"><span class="dot"></span><div><b>Tormenta en ${CLS[s.k].scene.toLowerCase()}</b><span>${s.pct != null ? `${CLS[s.k].name} baja ${pct1(Math.abs(s.pct))} hoy. ` : esc(s.msg || '') + ' '}Es el movimiento de hoy; tus metas siguen igual.</span></div></div>`));
   EV.rentas.forEach(e => {
     const name = e.it ? e.it.activo : CLS[classKey(e.objetivo || 'fibra')].name;
     const own = e.it ? e.it.valor > 0 : true;
@@ -1027,24 +1066,25 @@ function renderEvents() {
 function renderMission() {
   const box = $('mission'), mes = MESES[new Date().getMonth()];
   let html = `<div class="phead"><h2>Misión de ${mes}</h2><span class="pill ${MI.done ? 'ok' : 'info'}">${MI.done ? '¡Cumplida!' : 'En curso'}</span></div>`;
-  if (MI.type === 'fundar') {
+  if (MI.type === 'metas') {
+    html += `<p class="mission-scene">Define tus metas.</p><p class="muted" style="margin:0">Escribe qué parte de tu tesoro quieres en cada barrio y con qué instrumento lo cubres. Con eso la ciudad calcula tu misión del mes.</p>`;
+  } else if (MI.type === 'fundar') {
     html += `<p class="mission-scene">Funda tu pueblo.</p><p class="muted" style="margin:0">Registra tu tesoro en la tesorería para que aparezcan tus primeros edificios. La próxima misión llega el mes que entra.</p>`;
   } else {
     const it = MI.it, col = CLS[it.key].color;
-    const scene = J.mision_texto ? esc(J.mision_texto) : `El pueblo necesita ${obraName(it)}.`;
-    html += `<p class="mission-scene" style="--c:${col}"><span class="dot"></span> ${scene}</p>
-      <p class="muted" style="margin:0">Destina alrededor de <b style="color:var(--fg)">${mxn.format(MI.amt)}</b> a <b style="color:var(--fg)">${esc(it.activo)}</b> este mes${MI.custom ? '' : ': es lo que más le falta a tu pueblo para llegar a su forma ideal'}.</p>
+    html += `<p class="mission-scene" style="--c:${col}"><span class="dot"></span> Tus metas piden ${obraName(it)}.</p>
+      <p class="muted" style="margin:0">Según las metas que definiste, a <b style="color:var(--fg)">${esc(it.activo)}</b> le faltan unos <b style="color:var(--fg)">${mxn.format(MI.amt)}</b> este mes.</p>
       <div class="pbar" style="--c:${col}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(MI.progress * 100)}"><i style="width:${MI.done ? 100 : Math.round(MI.progress * 100)}%"></i></div>`;
   }
   html += `<ul class="tasks">
-    <li class="${MI.done ? 'on' : ''}">${MI.type === 'fundar' ? 'Registra tu tesoro' : 'Cumple la misión principal'}</li>
+    <li class="${MI.done ? 'on' : ''}">${MI.type === 'metas' ? 'Define tus metas' : MI.type === 'fundar' ? 'Registra tu tesoro' : 'Cumple la misión principal'}</li>
     <li class="${ST.savedThisMonth ? 'on' : ''}">Actualiza la tesorería de ${mes}</li>
-    <li class="${ST.thisMonth ? 'on' : ''}">Destina el presupuesto del mes y mantén tu racha</li>
+    <li class="${ST.thisMonth ? 'on' : ''}">Registra tu aportación del mes y mantén tu racha</li>
   </ul>
-  <div><button type="button" class="small" id="goForm">Ir a la tesorería</button></div>`;
+  <div><button type="button" class="small" id="goForm">${MI.type === 'metas' ? 'Ir a tus metas' : 'Ir a la tesorería'}</button></div>`;
   box.innerHTML = html;
-  $('goForm').onclick = () => GOV.openTesoreria();
-  collapsible(box, 'mission', MI.type === 'fundar' ? 'Funda tu pueblo: registra tu tesoro.' : `${MI.done ? '<b>¡Cumplida!</b> ' : ''}Destina alrededor de <b>${mxn.format(MI.amt)}</b> a <b>${esc(MI.it.activo)}</b>.`, true);
+  $('goForm').onclick = () => MI.type === 'metas' ? $('metas').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }) : GOV.openTesoreria();
+  collapsible(box, 'mission', MI.type === 'metas' ? 'Define tus metas para ver tu misión.' : MI.type === 'fundar' ? 'Funda tu pueblo: registra tu tesoro.' : `${MI.done ? '<b>¡Cumplida!</b> ' : ''}Según tus metas, a <b>${esc(MI.it.activo)}</b> le faltan unos <b>${mxn.format(MI.amt)}</b>.`, true);
 }
 
 function renderStreak() {
@@ -1064,49 +1104,17 @@ function renderStreak() {
     ['Ceremonia completada', CE.done],
     ['Ciudad completa', model.items.filter(i => i.objetivo > 0 && !i.hold).every(i => i.valor > 0)]
   ];
-  box.innerHTML = `<div class="phead"><h2>Racha de obras</h2><span class="pill info">Mejor: ${ST.best} ${ST.best === 1 ? 'mes' : 'meses'}</span></div>
+  box.innerHTML = `<div class="phead"><h2>Racha de obras</h2><span class="pill info">Récord: ${ST.best} ${ST.best === 1 ? 'mes' : 'meses'}</span></div>
     <div class="streak"><span class="num">${ST.s}</span><span>${ST.s === 1 ? 'mes seguido' : 'meses seguidos'} construyendo</span></div>
     <p class="muted" style="margin:0">${msg}</p>
     <div class="months" aria-label="Últimos 12 meses">${months.map(x => `<div><i class="${ST.contribMonths.has(x) ? 'on' : ''} ${x === cm && !ST.contribMonths.has(x) ? 'now' : ''}" title="${MESES[+x.slice(5) - 1]} ${x.slice(0, 4)}"></i>${MESES[+x.slice(5) - 1].slice(0, 1).toUpperCase()}</div>`).join('')}</div>
     <h2 style="font-size:15px;margin-top:4px">Logros</h2>
     <div class="ach">${ach.map(([t, on]) => `<div class="${on ? 'on' : ''}">${t}</div>`).join('')}</div>
     <p class="foot">La racha cuenta los meses en que el pueblo recibió presupuesto nuevo. Actualiza la tesorería al menos una vez al mes.</p>`;
-  collapsible(box, 'streak', `<b>${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}</b> seguidos · mejor ${ST.best} · ${ST.thisMonth ? 'este mes ya cuenta' : 'falta el presupuesto de este mes'}`, true);
+  collapsible(box, 'streak', `<b>${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}</b> seguidos · récord ${ST.best} · ${ST.thisMonth ? 'este mes ya cuenta' : 'falta el presupuesto de este mes'}`, true);
 }
 
-function renderCeremony() {
-  const box = $('ceremony'), M = model, band = BAND();
-  const calendario = CE.months.map(m => MESES[m - 1]).join(' y ') || 'sin fechas';
-  let html = `<div class="phead"><h2>Cabildo de reordenamiento</h2><span class="pill ${CE.done ? 'ok' : CE.active ? 'hi' : 'info'}">${CE.done ? 'Completada' : CE.active ? 'Este mes' : CE.next ? 'En ' + CE.daysTo + ' días' : 'Sin fecha'}</span></div>`;
-  if (!CE.active) {
-    const out = BD.filter(b => b.state === 'over' || b.state === 'under');
-    html += `<p class="muted" style="margin:0">Dos veces al año (${calendario}) el gobernador revisa el pueblo y lo regresa a su forma ideal.${CE.next ? ` La próxima empieza el <b style="color:var(--fg)">${fechaLarga(CE.next)}</b>.` : ''}</p>`;
-    html += out.length
-      ? '<p style="margin:0;font-weight:700">Mientras tanto, esto se salió de su banda:</p><ul class="list">' + out.map(b => `<li>${esc(b.name)}: tiene ${pct1(b.actual)} y lo ideal es ${pct1(b.target)} ± ${b.tol}.</li>`).join('') + '</ul><p class="foot">Lo más sencillo es mandar el presupuesto nuevo al barrio que falta, sin vender. La misión del mes ya te dice a dónde.</p>'
-      : `<p style="margin:0">Todos los grupos están dentro de su banda.</p>`;
-    box.innerHTML = html;
-    collapsible(box, 'ceremony', CE.next ? `Próxima ceremonia: <b>${fechaLarga(CE.next)}</b>.` : 'Sin fecha.', false); return;
-  }
-  const T0 = M.total, minMove = Math.max(200, T0 * 0.005);
-  const moves = M.items.filter(it => !it.hold).map(it => ({ it, d: T0 * it.objetivo / 100 - it.valor })).filter(x => Math.abs(x.d) >= minMove).sort((a, b) => a.d - b.d);
-  const holds = M.items.filter(i => i.hold && i.valor > 0);
-  // sin vender: cuánto habría que aportar para que todos los grupos regresen a su banda
-  const overT = Math.max(T0, ...BD.filter(b => b.state === 'over').map(b => (b.actual / 100 * T0) / ((b.target + b.tol) / 100)));
-  const underSum = BD.filter(b => b.state === 'under').reduce((a, b) => a + b.toLimit, 0);
-  const needNoSell = Math.max(overT - T0, underSum);
-  html += CE.done
-    ? `<p class="mission-scene">Tu pueblo quedó en equilibrio. Todos los grupos están dentro de su banda.</p>`
-    : `<p class="muted" style="margin:0">Así quedaría tu pueblo en su forma ideal. Haz estos movimientos en tu casa de bolsa y luego actualiza la tesorería; la ceremonia se completa cuando todos los grupos queden dentro de su banda.</p>`;
-  if (!CE.done && moves.length) {
-    const unidades = x => { const p = +x.it.precio_mxn; if (x.it.key === 'RENTA_FIJA' || !p) return '—'; const u = Math.abs(x.d) / p; return x.it.key === 'BITCOIN' ? u.toFixed(5) : '≈ ' + Math.round(u); };
-    html += `<div class="tbl"><table><thead><tr><th>Activo</th><th>Movimiento</th><th style="text-align:right">Monto</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${moves.map(x => `<tr><td><span class="dot" style="--c:${CLS[x.it.key].color};margin-right:6px"></span>${esc(x.it.activo)}</td><td class="${x.d > 0 ? 'pos' : 'neg'}">${x.d > 0 ? 'Comprar' : 'Vender'}</td><td class="n">${mxn.format(Math.abs(x.d))}</td><td class="n muted">${unidades(x)}</td></tr>`).join('')}</tbody></table></div>`;
-    if (holds.length) html += `<p class="foot">${holds.map(i => esc(i.activo)).join(', ')} se mantienen como están: cuentan en su grupo, pero no se compran ni venden. El rebalanceo de cada grupo se hace con su vehículo (pestaña Bandas).</p>`;
-    if (needNoSell > 0) html += `<p class="foot">Si prefieres no vender (y no pagar impuestos por ganancias): destinando unos ${mxn.format(needNoSell)} a lo que falta, todos los grupos regresan a su banda. El simulador de abajo te dice cómo repartirlo.</p>`;
-  }
-  html += `<ul class="tasks"><li class="on">Revisa los movimientos</li><li class="${ST.savedThisMonth ? 'on' : ''}">Actualiza la tesorería</li><li class="${CE.inRange ? 'on' : ''}">Deja todos los grupos dentro de su banda</li></ul>`;
-  box.innerHTML = html;
-  collapsible(box, 'ceremony', CE.done ? '<b>Completada.</b> Tu pueblo quedó en equilibrio.' : `<b>Este mes.</b> ${moves.length} movimientos sugeridos.`, false);
-}
+function renderCeremony() { const box = $('ceremony'); if (box) box.innerHTML = ''; }
 
 function renderCalc() {
   const rows = model.items.filter(i => i.pos);
@@ -1177,61 +1185,58 @@ function levelFill(list, NT, A) {
 const isUnit = i => i.key !== 'RENTA_FIJA' && i.key !== 'BITCOIN' && +i.precio_mxn > 0;
 function renderSim() {
   const amt = Math.max(0, Number($('simAmt').value) || 0), M = model, out = $('simOut');
-  const groups = (M.groups || []).filter(g => g.traders.length);
+  if (!hasMetas()) { SIM = null; out.innerHTML = `<p class="foot" style="margin-top:6px">Primero define tus metas (panel Tus metas): el cálculo usa los porcentajes y los instrumentos que tú elijas.</p>`; return; }
+  const groups = (M.groups || []).filter(g => g.tG > 0);
   if (!amt || !groups.length) { out.innerHTML = ''; SIM = null; return; }
   const NT = M.total + amt;
-  // 1) entre grupos, con los objetivos de Bandas
+  // 1) entre barrios, con tus metas
   const gAlloc = levelFill(groups.map(g => ({ t: g.tG / 100, v: g.valor })), NT, amt);
-  // 2) dentro de cada grupo, con Pesos internos (o todo al vehículo)
-  const plan = [];
+  // 2) cada barrio va completo al instrumento que elegiste. Se compran títulos completos;
+  //    lo que no alcanza para uno más se queda SIN ASIGNAR (no se manda a otro barrio).
+  const plan = [], avisos = [];
   groups.forEach((g, gi) => {
-    const pool = g.traders.reduce((a, t) => a + t.i.valor, 0) + gAlloc[gi];
-    const a = levelFill(g.traders.map(t => ({ t: t.sh, v: t.i.valor })), pool, gAlloc[gi]);
-    g.traders.forEach((t, k) => plan.push({ g, gi, i: t.i, ideal: a[k], amt: a[k], units: null }));
+    const a = gAlloc[gi], x = { g, gi, i: g.veh, ideal: a, amt: 0, units: null, free: 0 };
+    if (!g.veh) { x.free = a; if (a >= 1) avisos.push(`Elige en Tus metas con qué instrumento cubres ${esc(g.name)}: mientras tanto, sus ${mxn.format(a)} quedan sin asignar.`); }
+    else if (isUnit(g.veh)) {
+      const p = +g.veh.precio_mxn; x.units = Math.floor(a / p); x.amt = x.units * p; x.free = a - x.amt;
+      if (a >= 1 && x.units === 0) avisos.push(`Este mes no alcanza para un título de ${esc(g.veh.activo)} (${mxn.format(p)} cada uno).`);
+    } else if (g.veh.key !== 'RENTA_FIJA' && g.veh.key !== 'BITCOIN') { x.free = a; if (a >= 1) avisos.push(`No hay precio de hoy para ${esc(g.veh.activo)}: sus ${mxn.format(a)} quedan sin asignar.`); }
+    else x.amt = a;   // renta fija y cripto aceptan montos libres
+    plan.push(x);
   });
-  // 3) títulos completos: se compra lo que alcanza y el resto se usa donde más falte
-  plan.forEach(x => { if (isUnit(x.i)) { x.units = Math.floor(x.ideal / x.i.precio_mxn); x.amt = x.units * x.i.precio_mxn; } });
-  let left = amt - plan.reduce((a, x) => a + x.amt, 0);
-  const after = x => x.i.valor + x.amt, goal = x => x.i.objetivo / 100 * NT;
-  for (let guard = 0; guard < 500 && left > 0; guard++) {
-    const c = plan.filter(x => isUnit(x.i) && x.i.precio_mxn <= left && goal(x) - after(x) > x.i.precio_mxn * 0.5)
-      .sort((a, b) => (goal(b) - after(b)) / goal(b) - (goal(a) - after(a)) / goal(a))[0];
-    if (!c) break;
-    c.units++; c.amt += c.i.precio_mxn; left -= c.i.precio_mxn;
-  }
-  // lo que no alcanza para un título completo va a renta fija o cripto (aceptan montos libres)
-  const flex = plan.filter(x => !isUnit(x.i));
-  if (left > 1 && flex.length) {
-    const fa = levelFill(flex.map(x => ({ t: x.i.objetivo / 100, v: after(x) })), NT, left);
-    flex.forEach((x, k) => { x.amt += fa[k]; }); left = 0;
-  }
-  // resumen por grupo, ordenado por cuánto recibe
-  const pctNow = v => v / M.total * 100, pctAfter = v => v / NT * 100;
+  const spent = plan.reduce((a, x) => a + x.amt, 0), rest = Math.max(0, amt - spent);
+  const restTit = plan.filter(x => x.i && isUnit(x.i)).reduce((a, x) => a + x.free, 0);   // lo que sobra por comprar títulos completos
+  const sinHoy = !M.total;
+  const pctNow = v => M.total ? v / M.total * 100 : null, pctAfter = v => v / NT * 100;
   const rowsG = groups.map((g, gi) => {
     const items = plan.filter(x => x.gi === gi), inv = items.reduce((a, x) => a + x.amt, 0);
     return { g, inv, items, now: pctNow(g.valor), after: pctAfter(g.valor + inv) };
   }).sort((a, b) => b.inv - a.inv);
   const u = x => {
-    if (x.i.key === 'RENTA_FIJA') return 'saldo';
+    if (!x.i) return '—';
+    if (x.i.key === 'RENTA_FIJA') return 'monto';
     if (x.i.key === 'BITCOIN') return +x.i.precio_mxn ? (x.amt / x.i.precio_mxn).toFixed(5) + ' ' + (/eth/i.test(x.i.activo) ? 'ETH' : /sol/i.test(x.i.activo) ? 'SOL' : 'BTC') : '—';
     return x.units + (x.units === 1 ? ' título' : ' títulos');
   };
-  const pc = v => (Math.round(v * 10) / 10).toFixed(1) + '%';
-  const tone = (a, t, tol) => Math.abs(a - t) <= tol * 0.5 ? 'pos' : Math.abs(a - t) <= tol ? '' : 'neg';
+  const pc = v => v == null || isNaN(v) ? '—' : (Math.round(v * 10) / 10).toFixed(1) + '%';
+  const nRows = rowsG.reduce((a, r) => a + 1 + (r.inv >= 1 ? r.items.filter(x => x.amt >= 1).length : 0), 0) + (rest >= 1 ? 1 : 0);
+  let first = true;
+  const hoyTd = v => { if (!sinHoy) return `<td class="n">${pc(v)}</td>`; if (!first) return ''; first = false; return `<td class="n muted sinhoy" rowspan="${nRows}">Captura tu portafolio para ver cómo está hoy</td>`; };
   let rows = '';
   rowsG.forEach((r, n) => {
-    const col = CLS[r.g.members[0].key].color, on = r.inv >= 1, band = BD.find(b => b.name === r.g.name), tol = band ? band.tol : 2;
-    rows += `<tr style="background:var(--panel2);${on ? '' : 'opacity:.6'}"><td class="n"><b>${n + 1}</b></td><td><span class="dot" style="--c:${col};margin-right:6px"></span><b>${esc(r.g.name)}</b></td><td class="n">${pc(r.now)}</td><td class="n muted">${pc(r.g.tG)}</td><td class="n ${tone(r.after, r.g.tG, tol)}">${pc(r.after)}</td><td class="n ${on ? 'pos' : ''}"><b>${on ? mxn.format(r.inv) : '—'}</b></td><td></td></tr>`;
+    const col = CLS[r.g.key].color, on = r.inv >= 1;
+    rows += `<tr style="background:var(--panel2);${on ? '' : 'opacity:.6'}"><td class="n"><b>${n + 1}</b></td><td><span class="dot" style="--c:${col};margin-right:6px"></span><b>${esc(CLS[r.g.key].scene)}</b> <span class="muted">${esc(r.g.name)}</span></td>${hoyTd(r.now)}<td class="n muted">${pc(r.g.tG)}</td><td class="n">${pc(r.after)}</td><td class="n ${on ? 'pos' : 'muted'}"><b>${mxn.format(r.inv)}</b></td><td></td></tr>`;
     if (!on) return;
-    r.items.filter(x => x.amt >= 1).sort((a, b) => b.amt - a.amt).forEach(x => {
-      rows += `<tr><td></td><td style="padding-left:26px">${esc(x.i.activo)}</td><td class="n muted">${pc(pctNow(x.i.valor))}</td><td class="n muted">${pc(x.i.objetivo)}</td><td class="n muted">${pc(pctAfter(after(x)))}</td><td class="n pos">${mxn.format(x.amt)}</td><td class="n muted">${u(x)}${GOV.objTxt(x.i)}</td></tr>`;
+    r.items.filter(x => x.amt >= 1).forEach(x => {
+      rows += `<tr><td></td><td style="padding-left:26px">${esc(x.i.activo)}</td>${hoyTd(pctNow(x.i.valor))}<td class="n muted">—</td><td class="n muted">${pc(pctAfter(x.i.valor + x.amt))}</td><td class="n pos">${mxn.format(x.amt)}</td><td class="n muted">${u(x)}${GOV.objTxt(x.i)}</td></tr>`;
     });
   });
-  const spent = plan.reduce((a, x) => a + x.amt, 0), rest = amt - spent;
-  SIM = { amt, plan, rowsG, rest, NT, spent };
-  out.innerHTML = `<div class="tbl"><table><thead><tr><th>#</th><th>Barrio / obra</th><th style="text-align:right">Hoy</th><th style="text-align:right">Ideal</th><th style="text-align:right">Después</th><th style="text-align:right">Destina</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${rows}</tbody></table></div>
-    ${rest > 1 ? `<p class="foot" style="margin-top:6px">Sobran ${mxn.format(rest)} que no alcanzan para un título completo.</p>` : ''}
-    <p class="foot" style="margin-top:6px">El dinero se reparte para que todos los grupos queden igual de cerca de su objetivo de Bandas; dentro de cada grupo, igual con Pesos internos (o todo al vehículo). Se redondea a títulos completos y lo que sobra va a renta fija. Si un barrio está sobrepoblado, no recibe nada y los demás quedan un poco abajo de su ideal en la misma proporción. Precios de hoy; el precio objetivo es una orden límite sugerida un poco abajo del precio de hoy.</p>${GOV.simButtons()}`;
+  if (rest >= 1) rows += `<tr><td></td><td><b>Sin asignar</b> <span class="muted">${restTit >= 1 && rest - restTit < 1 ? 'no alcanza para un título completo' : 'ver la nota de abajo'}</span></td>${hoyTd(null)}<td></td><td></td><td class="n"><b>${mxn.format(rest)}</b></td><td></td></tr>`;
+  SIM = { amt, plan, rowsG, rest, restTit, NT, spent, avisos };
+  out.innerHTML = `<div class="tbl"><table><thead><tr><th>#</th><th>Barrio / obra</th><th style="text-align:right">Hoy</th><th style="text-align:right">Tu meta</th><th style="text-align:right">Después</th><th style="text-align:right">Monto según tus metas</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${rows}</tbody></table></div>
+    ${avisos.map(a => `<p class="foot" style="margin-top:6px">${a}</p>`).join('')}
+    ${restTit >= 1 ? `<p class="foot" style="margin-top:6px">${mxn.format(restTit)} quedan sin asignar porque no alcanzan para un título completo del instrumento que elegiste. No se mandan a otro barrio.</p>` : ''}
+    <p class="foot" style="margin-top:6px">${GOV.pie()}</p>${GOV.simButtons()}`;
   GOV.wire();
 }
 $('btnSim').addEventListener('click', renderSim);
@@ -1259,9 +1264,9 @@ function renderZoom() {
       const chg = it.key === 'RENTA_FIJA' ? (it.tasa != null && it.tasa !== '' ? it.tasa + '% anual' : '') : (it.cambio_dia >= 0 ? '▲ ' : '▼ ') + Math.abs(it.cambio_dia).toFixed(2) + '%';
       const chgCls = it.key === 'RENTA_FIJA' ? 'muted' : (it.cambio_dia >= 0 ? 'pos' : 'neg');
       return `<div class="zrow" tabindex="0" role="option" aria-selected="${selected === it.activo}" data-a="${esc(it.activo)}">
-        <div style="min-width:0"><b>${esc(it.activo)}${it.key === 'RENTA_FIJA' ? ' · ' + OBRA[kindOf(k, it)] : ''}</b><span class="zd">${it.valor > 0 ? esc(it.descripcion || '') : '<span class="empty-lot">Lote por construir</span>'}</span></div>
+        <div style="min-width:0"><b>${esc(it.activo)}${it.key === 'RENTA_FIJA' ? ' · ' + OBRA[kindOf(k, it)] : ''}</b><span class="zd">${it.valor > 0 ? esc(it.descripcion || '') : (it.objetivo > 0 ? '<span class="empty-lot">Lote por construir · el instrumento que elegiste</span>' : '<span class="empty-lot">Sin títulos</span>')}</span></div>
         <div class="n ${chgCls}">${chg}${it.valor > 0 && it.key !== 'RENTA_FIJA' ? `<br><span class="${it.hoy >= 0 ? 'pos' : 'neg'}">${signed2(it.hoy)}</span>` : ''}</div>
-        <div class="n">${mxn.format(it.valor)}<br><span class="muted">${it.hold ? pct1(it.pct) + ' · se mantiene' : pct1(it.pct) + ' de ' + pct1(it.objetivo)}</span></div>
+        <div class="n">${mxn.format(it.valor)}<br><span class="muted">${it.hold ? pct1(it.pct) + ' · se mantiene' : pct1(it.pct) + ' · tu meta ' + pct1(it.objetivo)}</span></div>
       </div>`;
     }).join('')}</div>`;
   box.querySelectorAll('.zrow').forEach(r => {
@@ -1286,8 +1291,8 @@ function renderLive() {
   const mov = M.items.filter(i => i.valor > 0 && i.key !== 'RENTA_FIJA').sort((a, b) => b.hoy - a.hoy);
   const top = mov[0], worst = mov[mov.length - 1];
   $('liveFoot').innerHTML = `Ayer al cierre el tesoro del pueblo valía <b>${mxn.format(ayer)}</b>; ahora vale <b>${mxn.format(M.total)}</b>.`
-    + ((b => b ? ` Lo mejor del día: ${esc(b.text)} (<b>${esc(b.x.title)}</b> ${signed2(b.x.hoy)}).` : '')(GOV.sectorBest(true)))
-    + ((b => b ? ` Lo peor: ${esc(b.text)} (<b>${esc(b.x.title)}</b> ${signed2(b.x.hoy)}).` : '')(GOV.sectorBest(false)))
+    + ((b => b ? ` Lo que más subió hoy: ${esc(b.text)} (<b>${esc(b.x.title)}</b> ${signed2(b.x.hoy)}).` : '')(GOV.sectorBest(true)))
+    + ((b => b ? ` Lo que más bajó: ${esc(b.text)} (<b>${esc(b.x.title)}</b> ${signed2(b.x.hoy)}).` : '')(GOV.sectorBest(false)))
     + `<br>Fábricas e inmuebles se comparan contra el cierre anterior, con tipo de cambio; el oro virtual contra las 7:00 de hoy; las obras públicas suman un día de intereses. Aparte, el pueblo cobra unos <b>${mxn2.format(incomePerDay(M))}</b> al día en intereses, rentas y dividendos.`;
 }
 function tickLive(now) {
@@ -1872,7 +1877,7 @@ function draw() {
       const [bx, by] = toS(b.x + b.w / 2, G - b.h - tagTop(b));
       const tk = b.it.activo.length > 12 ? b.it.activo.replace('Cetes ', 'C') : b.it.activo;
       const ch = travel ? short(b.it.valor) : k === 'RENTA_FIJA' ? (b.it.tasa != null && b.it.tasa !== '' ? b.it.tasa + '%' : '') : ((b.it.cambio_dia >= 0 ? '▲' : '▼') + Math.abs(b.it.cambio_dia).toFixed(1) + '%');
-      const t1 = tk + (b.owned ? '  ' + ch : (bw > 120 ? '  por construir' : ''));
+      const t1 = tk + (b.owned ? '  ' + ch : (bw > 120 && b.it.objetivo > 0 ? '  por construir' : ''));
       ctx.font = '700 11px Figtree, system-ui, sans-serif';
       const w1 = ctx.measureText(t1).width + 12, y = Math.max(72, by - 4), sel = selected === b.it.activo;
       if (!sel && !free(bx - w1 / 2, y - 13, w1, 17)) return;
@@ -1940,9 +1945,9 @@ const GOV = (() => {
   };
   // decisiones del gobernador: el activo recibió presupuesto nuevo este mes
   const DEC = {
-    up: ['Tu decreto dio frutos: el presupuesto que mandaste a {L} ya trabaja y hoy rindió.', 'Buena decisión, gobernador: {L}, donde construiste este mes, tuvo un buen día.'],
-    upBig: ['¡Gran decisión, gobernador! Mandaste presupuesto a {L} y hoy fue de lo que más creció.', 'El pueblo celebra tu decreto: {L} se disparó justo después de que invertiste ahí.'],
-    down: ['{L} tuvo un mal día, pero tu decreto es de largo plazo: las obras siguen.', 'Bajó {L}, donde construiste este mes; los buenos gobernadores no deshacen sus obras por un mal día.']
+    up: ['Tu decreto dio frutos: el presupuesto que mandaste a {L} ya trabaja y hoy rindió.', '{L}, donde construiste este mes, tuvo un buen día.'],
+    upBig: ['Mandaste presupuesto a {L} y hoy fue de lo que más creció.', 'El pueblo celebra tu decreto: {L} se disparó justo después de que invertiste ahí.'],
+    down: ['{L} tuvo un mal día, pero tu decreto es de largo plazo: las obras siguen.', 'Bajó {L}, donde construiste este mes.']
   };
   const fam = it => it.key === 'FIBRAS' ? 'inmueble' : it.key === 'BITCOIN' ? 'boveda' : 'fabrica';
   const isBig = it => Math.abs(it.cambio_dia) >= (it.key === 'BITCOIN' ? 4 : 1.5);
@@ -2014,13 +2019,13 @@ const GOV = (() => {
     calm: ['Día tranquilo en {L}: todo siguió igual.', 'Sin novedades en {L}.']
   };
   const NEWSDEC = {
-    up: ['Tu decreto dio frutos: el presupuesto que mandaste a {L} hoy rindió.', 'Buena decisión, gobernador: {L}, donde construiste este mes, tuvo un buen día.'],
-    upBig: ['¡Gran decisión, gobernador! Mandaste presupuesto a {L} y hoy fue de lo que más creció.', 'El pueblo celebra tu decreto: {L} se disparó justo después de que invertiste ahí.'],
-    down: ['Mal día en {L}, pero tu decreto es de largo plazo: las obras siguen.', 'Bajó {L}, donde construiste este mes; los buenos gobernadores no deshacen sus obras por un mal día.']
+    up: ['Tu decreto dio frutos: el presupuesto que mandaste a {L} hoy rindió.', '{L}, donde construiste este mes, tuvo un buen día.'],
+    upBig: ['Mandaste presupuesto a {L} y hoy fue de lo que más creció.', 'El pueblo celebra tu decreto: {L} se disparó justo después de que invertiste ahí.'],
+    down: ['Mal día en {L}, pero tu decreto es de largo plazo: las obras siguen.', 'Bajó {L}, donde construiste este mes.']
   };
   const famK = k => k === 'FIBRAS' ? 'inmueble' : k === 'BITCOIN' ? 'boveda' : k === 'RENTA_FIJA' ? 'obra' : 'fabrica';
   function sectors() {
-    return (model.groups || []).map(g => {
+    return (model.sectors || []).map(g => {
       const its = g.members.filter(i => i.valor > 0); if (!its.length) return null;
       const key = g.members[0].key, hoy = its.reduce((a, i) => a + (+i.hoy || 0), 0), val = its.reduce((a, i) => a + i.valor, 0);
       return { g, key, hoy, val, pct: val - hoy > 0 ? hoy / (val - hoy) * 100 : 0, title: groupTitle(g), place: placeOf(key, g.name), dec: its.some(i => key !== 'RENTA_FIJA' && decreed(i)) };
@@ -2063,10 +2068,27 @@ const GOV = (() => {
     requestAnimationFrame(() => { box.style.setProperty('--gz-dur', Math.max(18, Math.round(r.scrollWidth / 55)) + 's'); });
   }
 
-  // ---------- precio objetivo de compra ----------
-  const DESC = it => it.key === 'FIBRAS' ? num(J.desc_fibras_pct, 1) : it.key === 'BITCOIN' ? num(J.desc_cripto_pct, 2) : num(J.desc_acciones_pct, 0.5);
-  const targetPrice = it => { const p = +it.precio_mxn; if (it.key === 'RENTA_FIJA' || !(p > 0)) return null; const t = p * (1 - DESC(it) / 100); return p >= 1 ? Math.round(t * 100) / 100 : Math.round(t * 1e6) / 1e6; };
-  const objTxt = it => { const t = targetPrice(it); return t ? `<br><small class="obj">objetivo ${t >= 1000 ? mxn.format(t) : mxn2.format(t)}</small>` : ''; };
+  // ---------- tu precio límite: lo escribe cada usuario (0% = precio de hoy); la ciudad no propone uno ----------
+  const limKey = k => k + '_' + String((raw && raw.nombre) || '').toLowerCase();
+  const limGet = k => { try { return Math.max(0, Math.min(50, num(localStorage.getItem(limKey(k)), 0))); } catch (_) { return 0; } };
+  const DESC = () => limGet('cm_lim_compra');
+  const LIMV = () => limGet('cm_lim_venta');
+  const limIds = [];
+  function limInput(id, key, cb) {
+    const el = $(id); if (!el) return;
+    limIds.push([id, key]);
+    el.addEventListener('input', () => { const v = Math.max(0, Math.min(50, num(el.value, 0))); try { localStorage.setItem(limKey(key), String(v)); } catch (_) {} cb(); });
+  }
+  function limSync() { limIds.forEach(([id, key]) => { const el = $(id); if (el && document.activeElement !== el) el.value = limGet(key); }); }
+  // pie de todos los cálculos: fecha y fuente de los precios
+  function pie() {
+    const d = raw && raw.precios_hora ? new Date(raw.precios_hora) : new Date();
+    const f = new Set(); (model ? model.items : []).forEach(i => { if (i.fuente && (i.valor > 0 || i.objetivo > 0)) f.add(i.fuente); });
+    const src = DEMO ? 'datos de ejemplo' : ([...f].join(' y ') || 'tu hoja de Ciudad Marea');
+    return `Cálculo con las metas y reglas que tú definiste. Precios de ${fechaLarga(d)} de ${d.getFullYear()}, ${pad2(d.getHours())}:${pad2(d.getMinutes())}, fuente: ${src}. No es una recomendación de inversión ni una oferta de compra o venta.`;
+  }
+  const targetPrice = it => { const p = +it.precio_mxn; if (it.key === 'RENTA_FIJA' || !(p > 0)) return null; const t = p * (1 - DESC() / 100); return p >= 1 ? Math.round(t * 100) / 100 : Math.round(t * 1e6) / 1e6; };
+  const objTxt = it => { const t = targetPrice(it); return t ? `<br><small class="obj">tu límite ${t >= 1000 ? mxn.format(t) : mxn2.format(t)}</small>` : ''; };
 
   // ---------- carta del gobernador: datos ----------
   const pf = v => v == null ? '—' : v >= 1000 ? mxn.format(v) : mxn2.format(v);
@@ -2079,66 +2101,49 @@ const GOV = (() => {
     if (key === 'RENTA_FIJA') return 'las Obras públicas';
     return 'el barrio del Oro virtual';
   }
-  const groupTitle = g => { const k = g.members[0].key, n = clean(g.name), lo = n.toLowerCase(); return CLS[k].scene + (n && lo !== CLS[k].name.toLowerCase() && lo !== CLS[k].scene.toLowerCase() ? ' · ' + n : ''); };
-  function needNoSell() {
-    const T0 = model.total; if (!T0) return 0;
-    const overT = Math.max(T0, ...BD.filter(b => b.state === 'over').map(b => (b.actual / 100 * T0) / ((b.target + b.tol) / 100)));
-    const underSum = BD.filter(b => b.state === 'under').reduce((a, b) => a + b.toLimit, 0);
-    return Math.max(overT - T0, underSum);
-  }
+  const groupTitle = g => { const k = g.key || g.members[0].key, n = clean(g.name), lo = n.toLowerCase(); return CLS[k].scene + (n && lo !== CLS[k].name.toLowerCase() && lo !== CLS[k].scene.toLowerCase() ? ' · ' + n : ''); };
+  // la historia de la carta: describe el cálculo con tus metas; no da consejos
   function letterStory(S, groups) {
     const s = [], nm = clean((raw && raw.nombre) || '').split(' ')[0];
-    s.push(`${nm ? 'Gobernador ' + nm : 'Gobernador'}: este mes el tesoro destina ${mxn.format(S.amt)} a nuevas obras.`);
+    s.push(`${nm ? 'Gobernador ' + nm : 'Gobernador'}: este mes aportas ${mxn.format(S.amt)} al tesoro.`);
     const top = groups[0];
-    if (top) {
-      const b = BD.find(x => x.name === top.g.name), where = placeOf(top.key, top.g.name);
-      const NEED = { ACCIONES: 'faltan obreros y maquinaria', FIBRAS: 'faltan edificios para tantos inquilinos', RENTA_FIJA: 'hay obras detenidas por falta de fondos', BITCOIN: 'hay menos oro del que debería' };
-      s.push(b && b.state === 'under' ? `En ${where} ${NEED[top.key]}; por eso ahí va la mayor parte (${mxn.format(top.inv)}).`
-        : `Lo que más lejos está de su forma ideal es ${where}; por eso ahí va la mayor parte (${mxn.format(top.inv)}).`);
-    }
+    if (top) s.push(`Según las metas que definiste, la parte más grande va a${placeOf(top.key, top.g.name).replace(/^el /, 'l ').replace(/^(?!l )/, ' ')} (${mxn.format(top.inv)}), el barrio que más lejos está de su meta.`);
     const over = BD.find(b => b.state === 'over'), stormK = EV && EV.storms[0] ? EV.storms[0].k : null;
-    const FULL = { ACCIONES: 'ya no caben más obreros', FIBRAS: 'ya no caben más inquilinos', RENTA_FIJA: 'las obras ya tienen fondos de sobra', BITCOIN: 'ya hay oro de sobra' };
-    if (over) { const ok = over.items[0].key; s.push(`En ${placeOf(ok, over.name)} ${FULL[ok]}: este mes no recibe fondos.`); }
-    else if (stormK) s.push(`Hoy hubo tormenta en ${placeOf(stormK, '')}, pero el consejo mantiene el plan.`);
-    else s.push('Así el pueblo se acerca a su forma ideal sin vender nada.');
+    if (over) { const ok = over.items[0].key; s.push(`${cap(placeOf(ok, over.name))} ya está arriba del límite que definiste: este mes no recibe.`); }
+    else if (stormK) s.push(`Hoy hubo tormenta en ${placeOf(stormK, '')}; el cálculo usa tus mismas metas.`);
+    if (S.rest >= 1) s.push(`Quedan ${mxn.format(S.rest)} sin asignar.`);
     return s.join(' ');
   }
   function letterData() {
     const S = SIM, M = model, now = new Date();
     const groups = S.rowsG.filter(r => r.inv >= 1).map(r => ({
-      g: r.g, title: groupTitle(r.g), key: r.g.members[0].key, inv: r.inv, now: r.now, after: r.after, ideal: r.g.tG,
+      g: r.g, title: groupTitle(r.g), key: r.g.key, inv: r.inv, now: r.now, after: r.after, ideal: r.g.tG,
       items: r.items.filter(x => x.amt >= 1).sort((a, b) => b.amt - a.amt).map(x => {
         const it = x.i, tp = targetPrice(it);
         let units = '', amtT = x.amt;
         if (it.key === 'RENTA_FIJA') units = 'monto libre';
         else if (isUnit(it)) { units = String(x.units); amtT = x.units * tp; }
         else if (tp) units = (x.amt / tp).toFixed(6) + (unitSym(it) ? ' ' + unitSym(it) : '');
-        return { name: it.activo, kind: kindName(it), desc: it.descripcion || '', key: it.key, units, price: +it.precio_mxn > 0 ? +it.precio_mxn : null, tp, amt: x.amt, amtT, tasa: it.tasa, dp: DESC(it) };
+        return { name: it.activo, kind: kindName(it), desc: it.descripcion || '', key: it.key, units, price: +it.precio_mxn > 0 ? +it.precio_mxn : null, tp, amt: x.amt, amtT, tasa: it.tasa, dp: DESC() };
       })
     }));
     const spentT = groups.reduce((a, g) => a + g.items.reduce((b, x) => b + x.amtT, 0), 0);
-    const need = needNoSell();
-    let sug = 0, sugWhy = '';
-    if (need > 1) { sug = need; sugWhy = 'para que todos los barrios vuelvan a su límite sin vender'; }
-    else if (ST && ST.avg > 0) { sug = ST.avg; sugWhy = 'tu presupuesto promedio de los últimos meses'; }
-    else if (MI && MI.amt) { sug = MI.amt; sugWhy = 'lo que pide la misión del mes'; }
-    sug = Math.round(sug / 100) * 100;
-    const lv = levelOf(M.total), hora = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
-    const d = [num(J.desc_acciones_pct, 0.5), num(J.desc_fibras_pct, 1), num(J.desc_cripto_pct, 2)];
+    const lv = levelOf(M.total), hora = pad2(now.getHours()) + ':' + pad2(now.getMinutes()), dp = DESC();
     const notes = [];
-    if (S.spent - spentT >= 1) notes.push(`A precio de hoy serían ${mxn.format(S.spent)}; si las órdenes se llenan al precio objetivo te ahorras unos ${mxn.format(S.spent - spentT)}.`);
-    if (S.rest >= 1) notes.push(`Sobran ${mxn.format(S.rest)} que no alcanzan para un título completo.`);
-    notes.push(`Precio objetivo: es una orden límite de compra sugerida, ${d[0]}% abajo del precio de hoy en las fábricas, ${d[1]}% en los inmuebles y ${d[2]}% en el oro virtual. Si el precio no llega, la orden no se ejecuta: espera unos días o súbela hasta el precio de hoy. Las obras públicas (Cetes, Udibonos y similares) se compran por monto, a la tasa vigente.`);
-    notes.push(`Precios consultados el ${fechaLarga(now)} a las ${hora}.`);
-    return { now, amt: S.amt, spent: S.spent, spentT, rest: S.rest, sug, sugWhy, groups, total: M.total, lvl: lv.name, next: lv.next,
-      name: (raw && raw.nombre) || '', story: letterStory(S, groups), hora, d, notes,
-      sub: 'Decreto de presupuesto', dir: 'abajo', totalLbl: 'Total del decreto',
-      cols: ['OBRA / ACTIVO', 'TÍTULOS', 'PRECIO HOY', 'PRECIO OBJETIVO', 'MONTO'],
-      boxes: [['LO QUE DESTINAS', mxn.format(S.amt), 'tu presupuesto de este mes'],
-        ['SUGERENCIA DEL CONSEJO', sug ? mxn.format(sug) : '—', sug ? sugWhy : 'sin sugerencia por ahora'],
+    if (S.spent - spentT >= 1) notes.push(`A precio de hoy serían ${mxn.format(S.spent)}; si las órdenes se llenan a tu precio límite, serían unos ${mxn.format(spentT)}.`);
+    (S.avisos || []).forEach(a => notes.push(a.replace(/<[^>]+>/g, '')));
+    if (S.restTit >= 1) notes.push(`${mxn.format(S.restTit)} quedan sin asignar porque no alcanzan para un título completo del instrumento que elegiste. No se mandan a otro barrio.`);
+    notes.push(`Tu precio límite: ${dp}% abajo del precio de hoy (lo definiste tú; 0% es el precio de hoy). Si el precio no llega a ese nivel, la orden no se ejecuta. Las obras públicas (Cetes, Udibonos y similares) se compran por monto, a la tasa vigente.`);
+    notes.push(pie());
+    return { now, amt: S.amt, spent: S.spent, spentT, rest: S.rest, groups, total: M.total, lvl: lv.name, next: lv.next,
+      name: (raw && raw.nombre) || '', story: letterStory(S, groups), hora, notes,
+      sub: 'Aportación del mes', dir: 'abajo', totalLbl: 'Total según tus metas',
+      cols: ['OBRA / ACTIVO', 'TÍTULOS', 'PRECIO HOY', 'TU PRECIO\nLÍMITE', 'MONTO SEGÚN\nTUS METAS'],
+      boxes: [['LO QUE APORTAS', mxn.format(S.amt), 'tu aportación de este mes'],
+        ['SIN ASIGNAR', mxn.format(S.rest), S.rest < 1 ? 'todo quedó asignado' : S.rest - (S.restTit || 0) < 1 ? 'no alcanza para un título completo' : 'ver las notas de la carta'],
         ['TESORO DEL PUEBLO', mxn.format(M.total), lv.next ? `faltan ${short(lv.next[0] - M.total)} para ${lv.next[1]}` : 'nivel máximo']],
-      gline: g => `Hoy ocupa ${pct1(g.now)} del pueblo  ·  con esta compra ${pct1(g.after)}  ·  ideal ${pct1(g.ideal)}`,
-      file: 'Carta-del-gobernador-' + ymd(now) + '.pdf' };
+      gline: g => `${g.now == null ? 'Captura tu portafolio para ver cómo está hoy' : 'Hoy ocupa ' + pct1(g.now) + ' del pueblo'}  ·  con esta compra ${pct1(g.after)}  ·  tu meta ${pct1(g.ideal)}`,
+      file: 'Carta-de-aportacion-' + ymd(now) + '.pdf' };
   }
 
   // ---------- papel del pueblo (fondo de todas las cartas), dibujado en canvas ----------
@@ -2259,14 +2264,14 @@ const GOV = (() => {
 
   // ---------- cosecha del tesoro (venta) ----------
   // Dos intenciones:
-  //  · disfrutar: sacar dinero para ti. Sin tope: el consejo lo toma primero de donde sobra tesoro y el resto parejo de todos
-  //    los barrios, para que el pueblo conserve su forma ideal (más chico, pero en orden).
-  //  · reordenar: vender solo lo que sobra en los barrios pasados de su ideal y mover el dinero a los que se quedaron cortos.
+  //  · disfrutar: sacar dinero para ti. Sin tope: primero sale de donde el tesoro rebasa tu meta y el resto parejo de todos
+  //    los barrios, para que el pueblo conserve las proporciones que definiste.
+  //  · reordenar: vender solo lo que rebasa tu meta en cada barrio y llevarlo a los que quedaron abajo.
   let SELL = null, sellTouched = false, tesInit = false, sellTimer = null;
   let sellMode = 'disfrutar';
   try { const m = localStorage.getItem('cm_sell_mode'); if (m === 'reordenar' || m === 'disfrutar') sellMode = m; } catch (_) {}
-  const sellPrice = it => { const p = +it.precio_mxn; if (it.key === 'RENTA_FIJA' || !(p > 0)) return null; const t = p * (1 + DESC(it) / 100); return p >= 1 ? Math.round(t * 100) / 100 : Math.round(t * 1e6) / 1e6; };
-  const sellObjTxt = it => { const t = sellPrice(it); return t ? `<br><small class="obj">objetivo de venta ${t >= 1000 ? mxn.format(t) : mxn2.format(t)}</small>` : ''; };
+  const sellPrice = it => { const p = +it.precio_mxn; if (it.key === 'RENTA_FIJA' || !(p > 0)) return null; const t = p * (1 + LIMV() / 100); return p >= 1 ? Math.round(t * 100) / 100 : Math.round(t * 1e6) / 1e6; };
+  const sellObjTxt = it => { const t = sellPrice(it); return t ? `<br><small class="obj">tu límite de venta ${t >= 1000 ? mxn.format(t) : mxn2.format(t)}</small>` : ''; };
   // Recorte "nivelado": quita A de modo que lo más pasado de su objetivo baje primero, hasta quedar parejo.
   // t es la proporción objetivo; si t = 0 (algo que no debería tener), se vende primero.
   function levelCut(list, A) {
@@ -2284,7 +2289,7 @@ const GOV = (() => {
   const excG = (g, T) => Math.max(0, g.valor - g.tG / 100 * T);
   // lo que sobra en los barrios que rebasaron su límite (sugerencia para reordenar)
   function sellSuggest() {
-    const M = model, T = M && M.total; if (!T) return { amt: 0, groups: [] };
+    const M = model, T = M && M.total; if (!T || !hasMetas()) return { amt: 0, groups: [] };
     const gs = (M.groups || []).filter(g => g.valor > 0 && isOverG(g) && excG(g, T) > 1);
     const amt = gs.reduce((a, g) => a + excG(g, T), 0);
     return { amt: amt >= 1000 ? Math.round(amt / 100) * 100 : Math.round(amt), groups: gs };
@@ -2292,7 +2297,7 @@ const GOV = (() => {
   function sellPlan(req, mode) {
     const M = model, T = M.total, groups = (M.groups || []).filter(g => g.valor > 0);
     const joy = mode !== 'reordenar';
-    const excess = groups.reduce((a, g) => a + excG(g, T), 0);
+    const excess = hasMetas() ? groups.reduce((a, g) => a + excG(g, T), 0) : 0;   // sin metas no hay nada que reordenar
     const maxA = joy ? T : excess;
     const A = Math.min(req, maxA);
     // 1) primero lo que sobra en los barrios que rebasaron su límite
@@ -2351,11 +2356,11 @@ const GOV = (() => {
     const sg = sellSuggest(), names = sg.groups.map(g => esc(groupTitle(g))).join(' y ');
     if (sellMode === 'disfrutar') {
       return `<p class="foot" style="margin-top:6px">Escribe cuánto quieres sacar y toca <b>Calcular</b>. ${sg.amt >= 1
-        ? `El consejo lo toma primero de donde sobra tesoro (hoy hasta ${mxn.format(sg.amt)} en ${names}) y el resto parejo de todos los barrios, para que el pueblo conserve su forma.`
-        : 'Hoy ningún barrio rebasa su límite, así que el consejo lo toma parejo de todos los barrios y el pueblo conserva su forma.'}</p>`;
+        ? `Según tus metas, primero sale de donde el tesoro rebasa tu límite (hoy hasta ${mxn.format(sg.amt)} en ${names}) y el resto parejo de todos los barrios.`
+        : 'Hoy ningún barrio rebasa el límite que definiste, así que sale parejo de todos los barrios y el pueblo conserva tus proporciones.'}</p>`;
     }
-    if (sg.amt >= 1) return `<p class="foot" style="margin-top:6px">El consejo sugiere vender <b>${mxn.format(sg.amt)}</b>: ${names} rebasó su límite. Toca <b>Calcular</b> para ver qué títulos y a qué precio.</p>`;
-    return `<p class="foot" style="margin-top:6px">Hoy ningún barrio rebasa su límite: el pueblo está en orden y no hace falta reordenar. Si quieres sacar dinero para ti, elige <b>Para disfrutarlo</b>.</p>`;
+    if (sg.amt >= 1) return `<p class="foot" style="margin-top:6px">Según tus metas, ${names} rebasa el límite que definiste por <b>${mxn.format(sg.amt)}</b>. Toca <b>Calcular</b> para ver los títulos.</p>`;
+    return `<p class="foot" style="margin-top:6px">Hoy ningún barrio rebasa el límite que definiste: no hay nada que reordenar. Si quieres sacar dinero para ti, elige <b>Para disfrutarlo</b>.</p>`;
   }
   function setSellMode(m) {
     sellMode = m === 'reordenar' ? 'reordenar' : 'disfrutar';
@@ -2386,53 +2391,53 @@ const GOV = (() => {
     const P = sellPlan(amt, sellMode);
     if (P.total < 1) {
       SELL = null;
-      out.innerHTML = `<p class="foot" style="margin-top:6px">${P.mode === 'reordenar' && P.maxA < 1 ? 'Ningún barrio está arriba de su forma ideal: el pueblo ya está en orden. Si quieres sacar dinero para ti, elige <b>Para disfrutarlo</b>.' : 'Con ese monto no alcanza para vender ni un título completo. Prueba con una cantidad mayor.'}</p>`;
+      out.innerHTML = `<p class="foot" style="margin-top:6px">${P.mode === 'reordenar' && P.maxA < 1 ? 'Ningún barrio está arriba de tu meta: no hay nada que reordenar. Si quieres sacar dinero para ti, elige <b>Para disfrutarlo</b>.' : 'Con ese monto no alcanza para vender ni un título completo. Prueba con una cantidad mayor.'}</p>`;
       return;
     }
     SELL = P;
     const T = P.T, joy = P.mode === 'disfrutar', pc = v => (Math.round(v * 10) / 10).toFixed(1) + '%';
     let rows = '';
     P.rowsG.forEach((r, n) => {
-      const col = CLS[r.g.members[0].key].color;
-      rows += `<tr style="background:var(--panel2)"><td class="n"><b>${n + 1}</b></td><td><span class="dot" style="--c:${col};margin-right:6px"></span><b>${esc(r.g.name)}</b></td><td class="n">${pc(r.now)}</td><td class="n muted">${pc(r.g.tG)}</td><td class="n">${pc(r.after)}</td><td class="n"><b>${mxn.format(r.inv)}</b></td><td></td></tr>`;
+      const col = CLS[r.g.key].color;
+      rows += `<tr style="background:var(--panel2)"><td class="n"><b>${n + 1}</b></td><td><span class="dot" style="--c:${col};margin-right:6px"></span><b>${esc(CLS[r.g.key].scene)}</b> <span class="muted">${esc(r.g.name)}</span></td><td class="n">${pc(r.now)}</td><td class="n muted">${pc(r.g.tG)}</td><td class="n">${pc(r.after)}</td><td class="n"><b>${mxn.format(r.inv)}</b></td><td></td></tr>`;
       r.items.slice().sort((a, b) => b.amt - a.amt).forEach(x => {
-        rows += `<tr><td></td><td style="padding-left:26px">${esc(x.i.activo)}</td><td class="n muted">${pc(x.i.valor / T * 100)}</td><td class="n muted">${pc(x.i.objetivo)}</td><td class="n muted">${pc((x.i.valor - x.amt) / P.T2 * 100)}</td><td class="n">${mxn.format(x.amt)}</td><td class="n muted">${unitTxt(x)}${sellObjTxt(x.i)}</td></tr>`;
+        rows += `<tr><td></td><td style="padding-left:26px">${esc(x.i.activo)}</td><td class="n muted">${pc(x.i.valor / T * 100)}</td><td class="n muted">—</td><td class="n muted">${pc((x.i.valor - x.amt) / P.T2 * 100)}</td><td class="n">${mxn.format(x.amt)}</td><td class="n muted">${unitTxt(x)}${sellObjTxt(x.i)}</td></tr>`;
       });
     });
     const dest = P.dest.length ? `<p style="margin:12px 0 4px;font-weight:700">Destino del dinero</p>
-      <div class="tbl"><table><thead><tr><th>Barrio que se quedó corto</th><th style="text-align:right">Hoy</th><th style="text-align:right">Ideal</th><th style="text-align:right">Después</th><th style="text-align:right">Recibe</th></tr></thead><tbody>
+      <div class="tbl"><table><thead><tr><th>Barrio abajo de tu meta</th><th style="text-align:right">Hoy</th><th style="text-align:right">Tu meta</th><th style="text-align:right">Después</th><th style="text-align:right">Recibe</th></tr></thead><tbody>
       ${P.dest.map(d => `<tr><td><span class="dot" style="--c:${CLS[d.key].color};margin-right:6px"></span>${esc(d.g.name)}</td><td class="n">${pc(d.now)}</td><td class="n muted">${pc(d.g.tG)}</td><td class="n pos">${pc(d.after)}</td><td class="n pos"><b>${mxn.format(d.amt)}</b></td></tr>`).join('')}</tbody></table></div>
-      <p class="foot" style="margin-top:6px">Cuando se venda, escribe ${mxn.format(P.total)} en el Presupuesto del mes para elegir los títulos de compra.</p>` : '';
+      <p class="foot" style="margin-top:6px">Cuando se venda, puedes escribir ${mxn.format(P.total)} en la Aportación del mes para ver el reparto según tus metas.</p>` : '';
     const notes = [];
     if (joy) notes.push(`<b>${mxn.format(P.total)}</b> para ti. El tesoro queda en ${mxn.format(P.T - P.total)} y sigue trabajando${P.fromOver >= 1 ? `; ${mxn.format(P.fromOver)} salen de lo que sobraba, así que el pueblo además queda más ordenado` : ''}.`);
-    if (P.req > P.maxA + 1) notes.push(joy ? `No puedes sacar más de lo que vale el pueblo: el consejo ajustó a ${mxn.format(P.maxA)}.` : `Para reordenar no hace falta vender más de ${mxn.format(P.maxA)}. Si quieres sacar más para ti, elige Para disfrutarlo.`);
+    if (P.req > P.maxA + 1) notes.push(joy ? `No puedes sacar más de lo que vale el pueblo: se ajustó a ${mxn.format(P.maxA)}.` : `Según tus metas, lo que rebasa es ${mxn.format(P.maxA)}; el cálculo para reordenar no pasa de ahí. Para sacar más, elige Para disfrutarlo.`);
     if (Math.abs(P.total - P.A) >= 1) notes.push(`Se redondea a títulos completos: la venta queda en ${mxn.format(P.total)}.`);
     if (P.gain >= 1) notes.push(`Ganancia estimada sobre tu precio promedio: ${mxn.format(P.gain)}. Vender con ganancia puede causar impuestos; tu casa de bolsa te da la constancia.`);
     else if (P.gain <= -1) notes.push(`Esta venta realiza una pérdida estimada de ${mxn.format(-P.gain)} sobre tu precio promedio.`);
-    out.innerHTML = `<div class="tbl"><table><thead><tr><th scope="col">#</th><th>Barrio / obra</th><th style="text-align:right">Hoy</th><th style="text-align:right">Ideal</th><th style="text-align:right">Después</th><th style="text-align:right">Vende</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${rows}</tbody></table></div>
+    out.innerHTML = `<div class="tbl"><table><thead><tr><th scope="col">#</th><th>Barrio / obra</th><th style="text-align:right">Hoy</th><th style="text-align:right">Tu meta</th><th style="text-align:right">Después</th><th style="text-align:right">Vende</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${rows}</tbody></table></div>
       ${notes.map(n => `<p class="foot" style="margin-top:6px">${n}</p>`).join('')}
       ${dest}
-      <p class="foot" style="margin-top:6px">${joy ? 'El consejo saca primero de donde sobra tesoro y el resto parejo de todos los barrios.' : 'El consejo vende solo lo que sobra y nunca deja un barrio abajo de su forma ideal.'} El precio objetivo de venta es una orden límite sugerida un poco arriba del precio de hoy. Después de vender, actualiza la Tesorería del pueblo.</p>
+      <p class="foot" style="margin-top:6px">${joy ? 'Primero sale de donde el tesoro rebasa tu meta y el resto parejo de todos los barrios.' : 'Solo se vende lo que rebasa tu meta y ningún barrio queda abajo de ella.'} Tu precio límite de venta es el que escribiste arriba (${LIMV()}% arriba del precio de hoy). Después de vender, actualiza la Tesorería del pueblo.</p>
+      <p class="foot" style="margin-top:6px">${pie()}</p>
       <div class="simact"><button type="button" id="btnSellPdf">Descargar carta (PDF)</button><button type="button" class="ghost" id="btnSellPrint">Imprimir carta</button></div>`;
     $('btnSellPdf').onclick = () => { const L = sellLetterData(); if (L) savePdf(L, $('btnSellPdf')); };
     $('btnSellPrint').onclick = () => { const L = sellLetterData(); if (L) printLetter(L); };
   }
   function sellStory(P) {
     const s = [], nm = clean((raw && raw.nombre) || '').split(' ')[0], hi = nm ? 'Gobernador ' + nm : 'Gobernador';
-    const place = g => placeOf(g.members[0].key, g.name);
+    const place = g => placeOf(g.key || g.members[0].key, g.name);
     if (P.mode === 'disfrutar') {
       s.push(`${hi}: el pueblo prosperó gracias a tu trabajo y hoy te entrega ${mxn.format(P.total)} de su cosecha. Disfrútalos: para eso se construyó.`);
-      if (P.fromOver >= 1 && P.overG[0]) s.push(`El consejo los toma primero de ${P.overG.map(place).join(' y ')}, donde sobraba tesoro${P.total - P.fromOver >= 1 ? ', y el resto parejo de todos los barrios' : ''}, para que el pueblo conserve su forma ideal.`);
-      else s.push('El consejo los toma parejo de todos los barrios, para que el pueblo conserve su forma ideal.');
+      if (P.fromOver >= 1 && P.overG[0]) s.push(`Según tus metas, salen primero de ${P.overG.map(place).join(' y ')}, donde el tesoro rebasaba tu meta${P.total - P.fromOver >= 1 ? ', y el resto parejo de todos los barrios' : ''}.`);
+      else s.push('Según tus metas, salen parejo de todos los barrios y el pueblo conserva tus proporciones.');
       s.push(`El tesoro queda en ${mxn.format(P.T - P.total)} y sigue trabajando para ti.`);
       return s.join(' ');
     }
     const top = P.rowsG[0];
-    s.push(`${hi}: en ${place(top.g)} sobra tesoro (${pct1(top.now)} del pueblo, cuando su forma ideal es ${pct1(top.g.tG)}).`);
+    s.push(`${hi}: ${place(top.g)} tiene ${pct1(top.now)} del pueblo y tu meta es ${pct1(top.g.tG)}.`);
     const others = P.rowsG.slice(1).map(r => place(r.g));
-    s.push(`El consejo decreta vender ${mxn.format(P.total)} para reordenarlo${others.length ? ', junto con ' + others.join(' y ') : ''}.`);
-    if (P.dest[0]) s.push(`El dinero vuelve a la tesorería y se usará en ${place(P.dest[0].g)}${P.dest[1] ? ' y ' + place(P.dest[1].g) : ''}, que se quedaron cortos.`);
-    s.push('Así el pueblo recupera su forma ideal y sigue creciendo en orden.');
+    s.push(`Según tus metas, la venta para reordenar es de ${mxn.format(P.total)}${others.length ? ', junto con ' + others.join(' y ') : ''}.`);
+    if (P.dest[0]) s.push(`Con tus metas, ese dinero iría a${place(P.dest[0].g).replace(/^el /, 'l ').replace(/^(?!l )/, ' ')}${P.dest[1] ? ' y ' + place(P.dest[1].g) : ''}, que quedaron abajo de su meta.`);
     return s.join(' ');
   }
   function sellLetterData() {
@@ -2440,38 +2445,37 @@ const GOV = (() => {
     if (!P) { celebrate('Escribe un monto y toca Calcular para preparar la carta.'); return null; }
     SELL = P;
     const M = model, now = new Date(), lv = levelOf(M.total), hora = pad2(now.getHours()) + ':' + pad2(now.getMinutes()), joy = P.mode === 'disfrutar';
-    const d = [num(J.desc_acciones_pct, 0.5), num(J.desc_fibras_pct, 1), num(J.desc_cripto_pct, 2)];
     const groups = P.rowsG.map(r => ({
-      title: groupTitle(r.g), key: r.g.members[0].key, inv: r.inv, now: r.now, after: r.after, ideal: r.g.tG,
+      title: groupTitle(r.g), key: r.g.key, inv: r.inv, now: r.now, after: r.after, ideal: r.g.tG,
       items: r.items.slice().sort((a, b) => b.amt - a.amt).map(x => {
         const it = x.i, tp = sellPrice(it);
         let units = '', amtT = x.amt;
         if (it.key === 'RENTA_FIJA' || x.units == null) units = 'monto libre';
         else if (isUnit(it)) { units = String(x.units); amtT = x.units * tp; }
         else { units = x.units.toFixed(6) + (unitSym(it) ? ' ' + unitSym(it) : ''); if (tp) amtT = x.units * tp; }
-        return { name: it.activo, kind: kindName(it), desc: it.descripcion || '', key: it.key, units, price: +it.precio_mxn > 0 ? +it.precio_mxn : null, tp, amt: x.amt, amtT, tasa: it.tasa, dp: DESC(it) };
+        return { name: it.activo, kind: kindName(it), desc: it.descripcion || '', key: it.key, units, price: +it.precio_mxn > 0 ? +it.precio_mxn : null, tp, amt: x.amt, amtT, tasa: it.tasa, dp: LIMV() };
       })
     }));
     const spentT = groups.reduce((a, g) => a + g.items.reduce((b, x) => b + x.amtT, 0), 0), sg = sellSuggest();
     const notes = [];
-    if (spentT - P.total >= 1) notes.push(`A precio de hoy la venta deja ${mxn.format(P.total)}; si las órdenes se llenan al precio objetivo, recibes unos ${mxn.format(spentT - P.total)} más.`);
-    if (P.dest.length) notes.push(`Destino del dinero: ${P.dest.map(x => groupTitle(x.g) + ' ' + mxn.format(x.amt)).join(', ')}. Cuando se venda, escribe esa cantidad en el Presupuesto del mes para elegir los títulos de compra.`);
+    if (spentT - P.total >= 1) notes.push(`A precio de hoy la venta deja ${mxn.format(P.total)}; si las órdenes se llenan a tu precio límite, serían unos ${mxn.format(spentT)}.`);
+    if (P.dest.length) notes.push(`Destino del dinero: ${P.dest.map(x => groupTitle(x.g) + ' ' + mxn.format(x.amt)).join(', ')}. Cuando se venda, puedes escribir esa cantidad en la Aportación del mes para ver el reparto según tus metas.`);
     if (joy) notes.push('Cuando se venda, el dinero queda en tu cuenta de la casa de bolsa y de ahí lo pasas a tu banco. Después actualiza la Tesorería del pueblo con tus nuevos títulos.');
     if (P.gain >= 1) notes.push(`Ganancia estimada sobre tu precio promedio: ${mxn.format(P.gain)}. Vender con ganancia puede causar impuestos; tu casa de bolsa te da la constancia fiscal.`);
     else if (P.gain <= -1) notes.push(`Esta venta realiza una pérdida estimada de ${mxn.format(-P.gain)} sobre tu precio promedio.`);
-    notes.push(`Precio objetivo de venta: es una orden límite sugerida, ${d[0]}% arriba del precio de hoy en las fábricas, ${d[1]}% en los inmuebles y ${d[2]}% en el oro virtual. Si el precio no llega, la orden no se ejecuta: espera unos días o bájala hasta el precio de hoy. Las obras públicas se retiran por monto.`);
-    notes.push(`Precios consultados el ${fechaLarga(now)} a las ${hora}.`);
-    return { now, groups, spentT, total: M.total, lvl: lv.name, next: lv.next, name: (raw && raw.nombre) || '', story: sellStory(P), hora, d, notes,
+    notes.push(`Tu precio límite de venta: ${LIMV()}% arriba del precio de hoy (lo definiste tú; 0% es el precio de hoy). Si el precio no llega a ese nivel, la orden no se ejecuta. Las obras públicas se retiran por monto.`);
+    notes.push(pie());
+    return { now, groups, spentT, total: M.total, lvl: lv.name, next: lv.next, name: (raw && raw.nombre) || '', story: sellStory(P), hora, notes,
       sub: joy ? 'Decreto de cosecha' : 'Decreto de reordenamiento', dir: 'arriba', totalLbl: joy ? 'Total de la cosecha' : 'Total de la venta',
-      cols: ['OBRA / ACTIVO', 'TÍTULOS A VENDER', 'PRECIO HOY', 'PRECIO OBJETIVO', 'MONTO'],
+      cols: ['OBRA / ACTIVO', 'TÍTULOS\nA VENDER', 'PRECIO HOY', 'TU PRECIO\nLÍMITE', 'MONTO SEGÚN\nTUS METAS'],
       boxes: joy
         ? [['TU COSECHA', mxn.format(P.total), 'el fruto de tu esfuerzo, para disfrutarlo'],
-          ['DE LO QUE SOBRABA', P.fromOver >= 1 ? mxn.format(P.fromOver) : '—', P.fromOver >= 1 ? 'sale de barrios pasados de su ideal' : 'se toma parejo de todos los barrios'],
+          ['DE LO QUE SOBRABA', P.fromOver >= 1 ? mxn.format(P.fromOver) : '—', P.fromOver >= 1 ? 'sale de barrios arriba de tu meta' : 'se toma parejo de todos los barrios'],
           ['TESORO DEL PUEBLO', mxn.format(P.T - P.total), 'queda trabajando para ti']]
         : [['LO QUE VENDES', mxn.format(P.total), 'para reordenar el pueblo'],
-          ['SUGERENCIA DEL CONSEJO', sg.amt ? mxn.format(sg.amt) : '—', sg.amt ? 'para regresar a su ideal los barrios que rebasaron su límite' : 'ningún barrio rebasa su límite'],
+          ['LO QUE REBASA TU LÍMITE', sg.amt ? mxn.format(sg.amt) : '—', sg.amt ? 'según el margen que definiste' : 'ningún barrio rebasa tu límite'],
           ['TESORO DEL PUEBLO', mxn.format(M.total), 'no cambia: el dinero se reinvierte en el pueblo']],
-      gline: g => `Hoy ocupa ${pct1(g.now)} del pueblo  ·  después ${pct1(g.after)}  ·  ideal ${pct1(g.ideal)}`,
+      gline: g => `Hoy ocupa ${pct1(g.now)} del pueblo  ·  después ${pct1(g.after)}  ·  tu meta ${pct1(g.ideal)}`,
       file: (joy ? 'Carta-de-cosecha-' : 'Carta-de-reordenamiento-') + ymd(now) + '.pdf' };
   }
   // se llama en cada actualización del pueblo
@@ -2488,6 +2492,7 @@ const GOV = (() => {
         $('btnSell').addEventListener('click', () => { sellTouched = true; clearTimeout(sellTimer); renderSell(); });
         $('smJoy').addEventListener('click', () => setSellMode('disfrutar'));
         $('smRe').addEventListener('click', () => setSellMode('reordenar'));
+        limInput('sellLim', 'cm_lim_venta', renderSell);
       }
       setSellMode(sellMode);
       return;
@@ -2549,12 +2554,15 @@ const GOV = (() => {
     y += 27;
     // tabla de compras
     const X = { name: 20, units: 113, price: 139, tp: 166, amt: 189 }, LIMIT = 250;
+    // encabezados en una o dos líneas ("\n" parte la etiqueta)
+    const two = L.cols.some(c => c.indexOf('\n') >= 0), HH = two ? 9.6 : 7;
     const head = () => {
-      doc.setFillColor(...C.head); doc.rect(20, y, 170, 7, 'F');
-      font('helvetica', 'bold', 7.3, [255, 244, 222]);
-      txt(L.cols[0], X.name + 3, y + 4.7); txt(L.cols[1], X.units, y + 4.7, { align: 'right' }); txt(L.cols[2], X.price, y + 4.7, { align: 'right' });
-      txt(L.cols[3], X.tp, y + 4.7, { align: 'right' }); txt(L.cols[4], X.amt, y + 4.7, { align: 'right' });
-      y += 7;
+      doc.setFillColor(...C.head); doc.rect(20, y, 170, HH, 'F');
+      font('helvetica', 'bold', 7.1, [255, 244, 222]);
+      const put = (c, x, o) => { const ls = c.split('\n').map(T); doc.text(ls, x, y + (ls.length > 1 ? 3.9 : two ? 5.9 : 4.7), Object.assign({ lineHeightFactor: 1.15 }, o || {})); };
+      put(L.cols[0], X.name + 3); put(L.cols[1], X.units, { align: 'right' }); put(L.cols[2], X.price, { align: 'right' });
+      put(L.cols[3], X.tp, { align: 'right' }); put(L.cols[4], X.amt, { align: 'right' });
+      y += HH;
     };
     const ensure = h => { if (y + h > LIMIT) { doc.addPage(); page(); y = 46; head(); } };
     head();
@@ -2593,8 +2601,8 @@ const GOV = (() => {
     font('times', 'italic', 13, C.ink); txt(L.name || 'El Gobernador', 50, 241, { align: 'center' });
     doc.setDrawColor(...C.soft); doc.setLineWidth(.3); doc.line(22, 243, 78, 243);
     font('helvetica', 'normal', 7.5, C.soft); txt('Firma del Gobernador', 50, 247, { align: 'center' });
-    font('helvetica', 'normal', 6.6, C.soft); txt('Sello del Consejo', 176, 257.2, { align: 'center' });
-    font('helvetica', 'normal', 6.2, C.soft); txt('Ciudad Marea · herramienta personal. Los sucesos del pueblo son narrativa; esto no es asesoría financiera.', 20, 256.8);
+    font('helvetica', 'normal', 6.6, C.soft); txt('Sello de la ciudad', 176, 257.2, { align: 'center' });
+    font('helvetica', 'normal', 6.2, C.soft); txt('Ciudad Marea · herramienta educativa y de visualización. Los sucesos del pueblo son narrativa.', 20, 256.8);
     const np = doc.internal.getNumberOfPages();
     if (np > 1) for (let p = 1; p <= np; p++) { doc.setPage(p); font('helvetica', 'normal', 7, C.soft); txt(`Página ${p} de ${np}`, 190, 15, { align: 'right' }); }
   }
@@ -2610,7 +2618,7 @@ const GOV = (() => {
       <h1>Carta del Gobernador</h1><p class="gp-sub">${esc(L.sub)} · ${fechaLarga(L.now)} de ${L.now.getFullYear()}<br>${L.name ? 'Gobierno de ' + esc(L.name) + ' · ' : ''}Pueblo nivel ${esc(L.lvl)}</p>
       <p class="gp-st">${esc(L.story)}</p>
       <div class="gp-bx">${L.boxes.map(([k, v, c2]) => `<div><small>${esc(k)}</small><b>${esc(v)}</b><span>${esc(c2)}</span></div>`).join('')}</div>
-      <table><thead><tr>${L.cols.map((c2, i) => `<th${i ? ' class="n"' : ''}>${esc(c2.charAt(0) + c2.slice(1).toLowerCase())}</th>`).join('')}</tr></thead><tbody>${rows}<tr class="gpt"><td colspan="4">${esc(L.totalLbl)}</td><td class="n">${mxn.format(L.spentT)}</td></tr></tbody></table>
+      <table><thead><tr>${L.cols.map((c2, i) => { const t = c2.replace(/\n/g, ' '); return `<th${i ? ' class="n"' : ''}>${esc(t.charAt(0) + t.slice(1).toLowerCase())}</th>`; }).join('')}</tr></thead><tbody>${rows}<tr class="gpt"><td colspan="4">${esc(L.totalLbl)}</td><td class="n">${mxn.format(L.spentT)}</td></tr></tbody></table>
       ${L.notes.map(n => `<p class="gp-n">${esc(n)}</p>`).join('')}
       </div><div class="gp-sign"><b>${esc(L.name || 'El Gobernador')}</b><span>Firma del Gobernador</span></div></div>`;
     document.body.appendChild(el);
@@ -2623,7 +2631,7 @@ const GOV = (() => {
   }
 
   async function downloadLetter() {
-    if (!SIM || !SIM.amt) { celebrate('Escribe tu presupuesto y toca Repartir para preparar la carta.'); return; }
+    if (!SIM || !SIM.amt) { celebrate('Escribe tu aportación y toca Calcular reparto para preparar la carta.'); return; }
     return savePdf(letterData(), $('btnPdf'));
   }
   async function savePdf(L, btn) {
@@ -2641,14 +2649,14 @@ const GOV = (() => {
     }
     btn.disabled = false; btn.textContent = old;
   }
-  const simButtons = () => `<div class="simact"><button type="button" id="btnPdf">Descargar carta del gobernador (PDF)</button><button type="button" class="ghost" id="btnPrint">Imprimir carta</button></div>`;
+  const simButtons = () => `<div class="simact"><button type="button" id="btnPdf">Descargar carta (PDF)</button><button type="button" class="ghost" id="btnPrint">Imprimir carta</button></div>`;
   function wire() {
     const a = $('btnPdf'), b = $('btnPrint');
     if (a) a.onclick = downloadLetter;
     if (b) b.onclick = () => { if (SIM && SIM.amt) printLetter(letterData()); };
   }
 
-  return { story, sectorBest, headline, feed, renderGaceta, objTxt, simButtons, wire, targetPrice, paper, letterData, drawLetter, loadJsPDF, sellHint, sellPlan, sellLetterData, renderSell, openTesoreria, levelCut };
+  return { story, sectorBest, headline, feed, renderGaceta, objTxt, simButtons, wire, targetPrice, paper, letterData, drawLetter, loadJsPDF, sellHint, sellPlan, sellLetterData, renderSell, openTesoreria, levelCut, pie, limInput, limSync };
 })();
 
 // ================= Entrada: la ciudad al anochecer junto al mar (dibujada en canvas) =================
@@ -2788,24 +2796,30 @@ const AUTH = (() => {
   const MIN = 8;
   const show = (a, b) => { $(a).hidden = false; $(b).hidden = true; };
   // --- crear cuenta ---
+  $('suAviso').href = CONFIG.AVISO_URL;
   $('btnSignup').onclick = () => { show('signupForm', 'loginForm'); $('suErr').textContent = ''; $('suName').focus(); };
   $('btnHaveAcc').onclick = () => { show('loginForm', 'signupForm'); $('lgUser').focus(); };
   $('signupForm').addEventListener('submit', async e => {
     e.preventDefault();
     const err = $('suErr'), btn = $('suBtn'), u = $('suUser').value.trim().toLowerCase(), p = $('suPin').value;
     err.textContent = '';
+    const nom = $('suName').value.trim();
+    // el nombre se guarda tal como lo escribes; si trae algo que no se puede guardar, se avisa en vez de cambiarlo
+    if (!nom) { err.textContent = 'Escribe tu nombre.'; return; }
+    if (nom.length > 40 || /[<>]/.test(nom) || /^[=+\-@]/.test(nom)) { err.textContent = 'Revisa tu nombre: máximo 40 caracteres, sin los signos < > y sin empezar con = + - @. Así se guarda tal como lo escribes.'; return; }
     if (!/^[a-z0-9._-]{3,30}$/.test(u)) { err.textContent = 'El usuario debe tener de 3 a 30 letras, números, punto o guion, sin espacios.'; return; }
     if (p.length < MIN) { err.textContent = 'La contraseña debe tener al menos ' + MIN + ' caracteres.'; return; }
     if (p !== $('suPin2').value) { err.textContent = 'Las dos contraseñas no coinciden.'; return; }
+    if (!$('suAcepta').checked) { err.textContent = 'Para crear tu cuenta, lee y acepta el aviso de privacidad.'; return; }
     btn.disabled = true;
     try {
-      const r = await api('registro', { usuario: u, nombre: $('suName').value.trim(), pin: p, codigo: $('suCode').value.trim() });
+      const r = await api('registro', { usuario: u, nombre: nom, pin: p, codigo: $('suCode').value.trim(), acepta_privacidad: true });
       $('suPin').value = ''; $('suPin2').value = '';
       if (r.pendiente) { err.className = 'err ok'; err.textContent = 'Tu cuenta quedó registrada. El administrador la va a activar pronto; después entra con tu usuario y contraseña.'; btn.disabled = false; return; }
       resetState(); token = r.token;
       try { sessionStorage.setItem('cm_token', token); sessionStorage.setItem('cm_name', r.nombre || u); } catch (_) {}
       await loadData(); showApp(); show('loginForm', 'signupForm');
-      celebrate('¡Bienvenido a Ciudad Marea, gobernador! Registra tu tesoro en la Tesorería del pueblo para fundar tu ciudad.');
+      celebrate('¡Bienvenido a Ciudad Marea, gobernador! Define tus metas y registra tu tesoro para fundar tu ciudad.');
     } catch (x) { err.className = 'err'; err.textContent = x.message; }
     btn.disabled = false;
   });
@@ -2840,6 +2854,89 @@ const AUTH = (() => {
   });
   return { pedir };
 })();
+
+
+// ================= Tus metas (cada usuario define las suyas) =================
+// Las metas viven en la hoja Metas del servidor. Las plantillas son puntos de partida opcionales:
+// se muestran en orden fijo, ninguna viene marcada, y al elegir una se copia a las metas del usuario.
+let metasPicker = false, metasBusy = false;
+GOV.limInput('simLim', 'cm_lim_compra', () => { if (model) renderSim(); });   // tu precio límite de compra
+function metaPctOf(name) { const g = (model && model.groups || []).find(x => x.name === name); return g && model.total ? g.valor / model.total * 100 : null; }
+function plantillaTxt(t) { return GRUPOS.map(([n], i) => `${n} ${t.pct[i]}%`).join(' · ') + ` · margen ±${t.banda} pts`; }
+function origenTxt(tag) {
+  if (!tag) return '';
+  if (tag === 'en blanco') return 'Empezaste en blanco.';
+  if (tag === 'propia') return 'Metas escritas por ti.';
+  const ed = / · editada$/.test(tag), base = tag.replace(/ · editada$/, ''), m = base.match(/^\S+\s+(.*)\s+v(\S+)$/);
+  return `Punto de partida: plantilla «${esc(m ? m[1] : base)}»${m ? ' (versión ' + esc(m[2]) + ')' : ''}${ed ? ', después cambiada por ti' : ''}.`;
+}
+function renderMetas() {
+  const box = $('metas'); if (!box || !raw) return;
+  GOV.limSync();
+  const metas = metasList(), plant = raw.plantillas || [];
+  if (!metas.length || metasPicker) {
+    box.innerHTML = `<div class="phead"><h2>Tus metas</h2>${metas.length ? '<span class="pill info">Cambiar punto de partida</span>' : '<span class="pill hi">Pendiente</span>'}</div>
+      <p class="muted" style="margin:0">Tú decides qué parte de tu tesoro quieres en cada barrio. Puedes copiar una plantilla y cambiarla como quieras, o empezar en blanco. Las plantillas solo son puntos de partida con nombres descriptivos.</p>
+      ${metas.length ? '<p class="foot" style="margin:0">Al copiar una plantilla se reemplazan tus metas actuales.</p>' : ''}
+      <div class="mt-pick" role="radiogroup" aria-label="Punto de partida de tus metas">
+        ${plant.map(t => `<label class="mt-opt"><input type="radio" name="mtPlant" value="${esc(t.id)}"><span><b>${esc(t.nombre)}</b><small>${esc(plantillaTxt(t))}</small></span></label>`).join('')}
+        <label class="mt-opt"><input type="radio" name="mtPlant" value="blanco"><span><b>Empezar en blanco</b><small>Los cuatro barrios en 0%: tú escribes tus porcentajes.</small></span></label>
+      </div>
+      <div class="err" id="mtErr"></div>
+      <div class="simact"><button type="button" id="mtUse" disabled>Usar como punto de partida</button>${metas.length ? '<button type="button" class="ghost" id="mtCancel">Cancelar</button>' : ''}</div>`;
+    box.querySelectorAll('input[name=mtPlant]').forEach(r => r.onchange = () => { $('mtUse').disabled = false; });
+    $('mtUse').onclick = async () => {
+      const sel = box.querySelector('input[name=mtPlant]:checked'); if (!sel || metasBusy) return;
+      metasBusy = true; $('mtUse').disabled = true; $('mtErr').textContent = '';
+      try { const r = await api('metas_plantilla', { plantilla: sel.value }); metasPicker = false; raw.metas = r.metas; apply(raw); celebrate('Listo: ya son tus metas. Ahora elige con qué instrumento cubres cada barrio.'); }
+      catch (e) { $('mtErr').textContent = e.message; $('mtUse').disabled = false; }
+      metasBusy = false;
+    };
+    if ($('mtCancel')) $('mtCancel').onclick = () => { metasPicker = false; renderMetas(); };
+    return;
+  }
+  const tol = num(metas[0].tolerancia_pts, 5);
+  const rows = GRUPOS.map(([name, k]) => {
+    const m = metas.find(x => x.grupo === name) || { objetivo_pct: 0, vehiculo: '' };
+    const opts = (model.classes[k].items || []).filter(i => !i.retirado);
+    const hoy = metaPctOf(name);
+    return `<div class="mt-row" style="--c:${CLS[k].color}">
+      <div class="mt-name"><span class="dot"></span><b>${CLS[k].scene}</b><small>${esc(name)}${hoy != null ? ' · hoy ' + pct1(hoy) : ''}</small></div>
+      <label class="mt-pct">Tu meta<span><input type="number" min="0" max="100" step="0.5" inputmode="decimal" data-g="${esc(name)}" value="${+m.objetivo_pct || 0}" aria-label="Meta de ${esc(name)} en %">%</span></label>
+      <label class="mt-veh">Lo cubres con<select data-v="${esc(name)}" aria-label="Instrumento para ${esc(name)}"><option value="">— Elige —</option>${opts.map(i => `<option value="${esc(i.activo)}"${i.activo === m.vehiculo ? ' selected' : ''}>${esc(i.activo)}${i.descripcion ? ' · ' + esc(i.descripcion) : ''}</option>`).join('')}</select></label>
+    </div>`;
+  }).join('');
+  box.innerHTML = `<div class="phead"><h2>Tus metas</h2><span class="pill ok" id="mtSumPill"></span></div>
+    <p class="muted" style="margin:0">Estas son tus reglas: qué porcentaje del tesoro quieres en cada barrio, con qué instrumento lo cubres y cuánto se puede alejar antes de marcarlo en el semáforo. La ciudad calcula con ellas y no elige por ti.</p>
+    <div class="mt-rows">${rows}</div>
+    <label class="mt-tol">Margen de tolerancia<span><input type="number" id="mtTol" min="0.5" max="20" step="0.25" inputmode="decimal" value="${tol}" aria-label="Margen de tolerancia en puntos">puntos del tesoro total, arriba o abajo de cada meta</span></label>
+    <p class="foot" style="margin:0">${origenTxt(metas[0].plantilla)} Los instrumentos que no elijas se quedan como están: cuentan en su barrio, pero el cálculo no compra ni vende de ellos.</p>
+    <div class="err" id="mtErr"></div>
+    <div class="simact"><button type="button" id="mtSave">Guardar mis metas</button><button type="button" class="ghost" id="mtRestart">Empezar de nuevo con una plantilla</button></div>`;
+  const sumNow = () => [...box.querySelectorAll('input[data-g]')].reduce((a, i) => a + num(i.value, 0), 0);
+  const showSum = () => { const s = Math.round(sumNow() * 100) / 100, ok = Math.abs(s - 100) <= 0.05, p = $('mtSumPill'); p.textContent = ok ? 'Suman 100%' : `Suman ${s}%`; p.className = 'pill ' + (ok ? 'ok' : 'lo'); };
+  box.querySelectorAll('input[data-g]').forEach(i => i.addEventListener('input', showSum)); showSum();
+  $('mtRestart').onclick = () => { metasPicker = true; renderMetas(); };
+  $('mtSave').onclick = async () => {
+    if (metasBusy) return;
+    const err = $('mtErr'); err.textContent = '';
+    const s = sumNow();
+    if (Math.abs(s - 100) > 0.05) { err.textContent = `Tus metas suman ${Math.round(s * 100) / 100}%. Deben sumar 100%.`; return; }
+    const lista = GRUPOS.map(([name]) => ({ grupo: name, objetivo_pct: num(box.querySelector(`input[data-g="${name}"]`).value, 0), vehiculo: box.querySelector(`select[data-v="${name}"]`).value }));
+    const sinVeh = lista.filter(x => x.objetivo_pct > 0 && !x.vehiculo).map(x => x.grupo);
+    metasBusy = true; $('mtSave').disabled = true;
+    try {
+      const r = await api('guardar_metas', { metas: lista, tolerancia: num($('mtTol').value, NaN) });
+      raw.metas = r.metas; apply(raw);
+      celebrate(sinVeh.length ? `Metas guardadas. Falta elegir instrumento en ${sinVeh.join(' y ')}: mientras tanto, su parte queda sin asignar.` : 'Metas guardadas. La ciudad ya calcula con ellas.');
+    } catch (e) { err.textContent = e.message; }
+    metasBusy = false; const b = $('mtSave'); if (b) b.disabled = false;
+  };
+  // se abre sola mientras falte algo por definir
+  const listo = hasMetas() && metas.every(m => !(+m.objetivo_pct > 0) || m.vehiculo);
+  collapsible(box, 'metas', GRUPOS.map(([name, k]) => { const m = metas.find(x => x.grupo === name); return `${CLS[k].scene} <b>${m ? +m.objetivo_pct : 0}%</b>${m && m.vehiculo ? ' (' + esc(m.vehiculo) + ')' : ''}`; }).join(' · '), listo);
+  if (!listo) { box.classList.remove('collapsed'); const b = box.querySelector('.phead button'); if (b) { b.textContent = 'Minimizar'; b.setAttribute('aria-expanded', 'true'); } }
+}
 
 // [módulos del pueblo]
 
