@@ -2957,7 +2957,7 @@ const METAS_CONF_DEF = {
   'Renta fija': { varios: ['Bondia', 'Cetes 91 días', 'Cetes 182 días', 'Udibonos'], tol: 5 },
   'Cripto': { uno: 'Bitcoin', tol: 1.25 }
 };
-const MC = n => ((raw && raw.metas_inicial) || METAS_CONF_DEF)[n] || {};
+const MC = n => { const c = raw && raw.metas_inicial; return (c && c[n] && typeof c[n] === 'object') ? c[n] : (METAS_CONF_DEF[n] || {}); };   // si el servidor es de otra versión, usa los valores de la página
 const RF_TXT = { 'Bondia': 'Dinero líquido: disponible al día siguiente.', 'Cetes 91 días': 'Préstamo al gobierno a 3 meses.', 'Cetes 182 días': 'Préstamo al gobierno a 6 meses.',
   'Udibonos': 'Su valor sube con la inflación (se miden en UDIS) y además pagan intereses.' };
 const numTxt = v => v == null || v === '' || isNaN(v) ? '' : String(+v);
@@ -3090,7 +3090,16 @@ function wzCheck() {
   }
   return '';
 }
+// un error en Tus metas nunca debe impedir entrar a la ciudad
 function renderMetas() {
+  try { renderMetasIn(); }
+  catch (e) {
+    console.error(e);
+    const box = $('metas');
+    if (box) box.innerHTML = '<div class="phead"><h2>Tus metas</h2><span class="pill lo">No se pudo mostrar</span></div><p class="muted" style="margin:0">La página y el servidor parecen ser de versiones distintas. Recarga con Ctrl/Cmd + Shift + R; si sigue igual, revisa que index.html y la implementación de Apps Script sean la versión más reciente.</p>';
+  }
+}
+function renderMetasIn() {
   const box = $('metas'); if (!box || !raw) return;
   GOV.limSync();
   const metas = metasList();
