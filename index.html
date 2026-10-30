@@ -347,7 +347,7 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
 .mt-opt span{display:flex;flex-direction:column;gap:2px;min-width:0}
 .mt-opt small{color:var(--muted);font-size:12.5px;line-height:1.4}
 .mt-rows{display:grid;gap:8px}
-.mt-row{display:grid;grid-template-columns:minmax(130px,1.1fr) 120px minmax(160px,1.6fr);gap:10px;align-items:end;padding:10px 12px;border:1px solid var(--line);border-left:3px solid var(--c);border-radius:12px;background:var(--panel2)}
+.mt-row{display:grid;grid-template-columns:minmax(120px,1fr) 104px minmax(150px,1.6fr) 118px;gap:10px;align-items:end;padding:10px 12px;border:1px solid var(--line);border-left:3px solid var(--c);border-radius:12px;background:var(--panel2)}
 .mt-name{display:flex;flex-wrap:wrap;align-items:center;gap:4px 7px;min-width:0;align-self:center}
 .mt-name .dot{background:var(--c)}
 .mt-name small{flex-basis:100%;color:var(--muted);font-size:12px}
@@ -359,10 +359,40 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
 .mt-tol input,.lim input{width:76px;text-align:right;flex:none}
 .lim{margin-top:10px}
 td.sinhoy{vertical-align:middle;text-align:center;font-size:12px;line-height:1.35;max-width:120px;white-space:normal}
-@media (max-width:600px){
-  .mt-row{grid-template-columns:1fr 104px;}
+/* tolerancia, Fábricas y fichas */
+.mt-tolr{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600}
+.mt-tolr span{display:flex;align-items:center;gap:6px;font-weight:500}
+.mt-tolr input{width:72px;text-align:right}
+.mt-fab{grid-template-columns:minmax(120px,1fr) 104px}
+.mt-fab > .mt-modes,.mt-fab > .mt-sub,.mt-fab > .mt-ej,.mt-fab > .mt-tres{grid-column:1 / -1}
+.mt-q{margin:2px 0 0;font-size:13px;font-weight:700;color:var(--fg)}
+.mt-modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mt-modes .mt-q{grid-column:1 / -1}
+.mt-mode{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);cursor:pointer;min-width:0}
+.mt-mode:has(input:checked){border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.mt-mode input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:var(--acc)}
+.mt-mode > span{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
+.mt-ficha{display:flex;flex-direction:column;gap:6px}
+.mt-ficha dl{margin:0;padding:6px 0;border-top:1px solid var(--line);display:grid;gap:2px}
+.mt-ficha dt{font-weight:800;font-size:13px}
+.mt-ficha dl > div{display:grid;grid-template-columns:150px 1fr;gap:8px;font-size:12px}
+.mt-ficha dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.mt-ficha dd.k{color:var(--muted)}
+.mt-ficha a{color:var(--acc)}
+.mt-nreb{margin:0;font-size:12px;color:var(--muted)}
+.mt-sub{display:grid;grid-template-columns:minmax(150px,1fr) 118px;gap:10px;align-items:end}
+.mt-ej{padding:10px 12px;border:1px dashed var(--line);border-radius:12px}
+.mt-tres{display:grid;gap:8px}
+.mt-trow{display:grid;grid-template-columns:70px 130px 118px;gap:10px;align-items:end}
+.mt-trow > b{align-self:center}
+@media (max-width:700px){
+  .mt-row{grid-template-columns:1fr 104px}
   .mt-veh{grid-column:1 / -1}
   .mt-pct input{width:64px}
+  .mt-modes{grid-template-columns:1fr}
+  .mt-ficha dl > div{grid-template-columns:110px 1fr}
+  .mt-trow{grid-template-columns:56px 1fr 1fr}
+  .mt-sub{grid-template-columns:1fr 104px}
 }
 /* la regla .under de otro bloque deformaba las filas "abajo de tu límite" del semáforo */
 .bands .band.under{display:grid;justify-content:normal;flex-wrap:nowrap;gap:6px 14px}
@@ -635,17 +665,21 @@ const DEMO_PLANT = [
   { id: 'P2', nombre: 'Mixta', pct: [40, 15, 45, 0], banda: 5, version: '1', fecha: '2026-10-29' },
   { id: 'P3', nombre: 'Mayoría acciones', pct: [65, 15, 15, 5], banda: 5, version: '1', fecha: '2026-10-29' }];
 let demoMetas = [];
+const DEMO_FICHAS = { VT: ['FTSE Global All Cap Index', 0.06, 'https://fund-docs.vanguard.com/F3141.pdf'], VUAA: ['S&P 500', 0.07, 'https://fund-docs.vanguard.com/SandP_500_UCITS_ETF_USD_Accumulating_9694_NETH_INT_EN.pdf'],
+  VEA: ['FTSE Developed All Cap ex US Index', 0.03, 'https://fund-docs.vanguard.com/F0936.pdf'], VWO: ['FTSE Emerging Markets All Cap China A Inclusion Index', 0.06, 'https://fund-docs.vanguard.com/F0964.pdf'] };
+if (!DEMO_CATALOGO.some(c => c.activo === 'VT')) DEMO_CATALOGO.splice(1, 0, { activo: 'VT', clase: 'ACCIONES', subclase: 'Global', descripcion: 'Acciones de empresas de todo el mundo', precio_mxn: 2580, cambio_dia: 0.4 });
+DEMO_CATALOGO.forEach(c => { const f = DEMO_FICHAS[c.activo]; if (f) Object.assign(c, { indice: f[0], costo_pct: f[1], costo_fecha: '2026-09-30', costo_url: f[2], moneda: 'USD' }); });
 function demoApi(accion, data) {
   if (accion === 'metas_plantilla') {
     const t = DEMO_PLANT.find(x => x.id === data.plantilla);
-    demoMetas = GRUPOS.map(([g], i) => ({ grupo: g, objetivo_pct: t ? t.pct[i] : 0, vehiculo: '', tolerancia_pts: t ? t.banda : 5, plantilla: t ? t.id + ' ' + t.nombre + ' v' + t.version : 'en blanco' }));
+    demoMetas = GRUPOS.map(([g], i) => ({ grupo: g, objetivo_pct: t ? t.pct[i] : 0, vehiculo: '', tolerancia_pts: null, plantilla: t ? t.id + ' ' + t.nombre + ' v' + t.version : 'en blanco', modo: '', reparto: [] }));
     return { ok: true, metas: demoMetas };
   }
   if (accion === 'guardar_metas') {
     const sum = data.metas.reduce((a, m) => a + num(m.objetivo_pct, 0), 0);
-    if (Math.abs(sum - 100) > 0.05) throw new Error('Tus metas suman ' + sum + '%. Deben sumar 100%.');
+    if (Math.abs(sum - 100) > 0.05) throw new Error('Las metas de tus barrios suman ' + sum + '%. Deben sumar 100%.');
     const orig = (demoMetas[0] && demoMetas[0].plantilla || '').replace(/ · editada$/, '');
-    demoMetas = data.metas.map(m => ({ ...m, tolerancia_pts: data.tolerancia, plantilla: orig ? orig + ' · editada' : 'propia' }));
+    demoMetas = data.metas.map(m => ({ ...m, reparto: m.reparto || [], plantilla: orig ? orig + ' · editada' : 'propia' }));
     return { ok: true, metas: demoMetas };
   }
   if (accion === 'login') return { ok: true, token: 'demo', nombre: 'Inversor de ejemplo', cambiar: String(data.pin) === '123456' };   // en la demostración, 123456 simula una contraseña corta
@@ -735,22 +769,26 @@ function resolveMembers(M, txt) {
   return [...set];
 }
 // Convierte las metas del usuario en un objetivo por instrumento:
-//  el instrumento que el usuario eligió para el barrio absorbe la meta del barrio;
-//  los demás instrumentos del barrio se quedan como están (cuentan, pero no se compran ni venden).
+//  Fábricas puede ser "uno" (VT cubre el 100%) o "tres" (VUAA/VEA/VWO con pesos que suman 100% del barrio);
+//  en los demás barrios, el instrumento elegido cubre el barrio. Lo que no eligió se queda como está.
+//  Cada barrio (o cada instrumento en el modo de tres) tiene su propia tolerancia; vacía = todavía no la guarda.
 function applyStrategy(M) {
   M.groups = [];
-  M.items.forEach(i => { i.hold = false; i.cw = 0; i.objetivo = 0; });
+  M.items.forEach(i => { i.hold = false; i.cw = 0; i.objetivo = 0; i.tol = null; });
   const metas = metasList(), ok = hasMetas();
   GRUPOS.forEach(([name, k]) => {
     const m = metas.find(x => x.grupo === name), members = M.classes[k].items;
     if (!m || !members.length) return;
-    const tG = ok ? Math.max(0, num(m.objetivo_pct, 0)) : 0;
-    const veh = members.find(i => !i.retirado && i.activo === m.vehiculo) || null;
-    const holds = members.filter(i => i !== veh), holdPct = holds.reduce((a, i) => a + i.pct, 0);
+    const tG = ok ? Math.max(0, num(m.objetivo_pct, 0)) : 0, tres = k === 'ACCIONES' && m.modo === 'tres';
+    let parts = [];
+    if (tres) parts = (m.reparto || []).map(x => ({ i: members.find(it => !it.retirado && it.activo === x.activo), w: num(x.peso_pct, 0) / 100, tol: x.tolerancia_pts })).filter(x => x.i && x.w > 0);
+    else if (k !== 'ACCIONES' || m.modo === 'uno') { const v = members.find(i => !i.retirado && i.activo === m.vehiculo); if (v) parts = [{ i: v, w: 1, tol: m.tolerancia_pts }]; }
+    const tset = new Set(parts.map(x => x.i)), holds = members.filter(i => !tset.has(i)), holdPct = holds.reduce((a, i) => a + i.pct, 0);
     holds.forEach(i => { i.objetivo = i.pct; i.hold = true; });
-    if (veh) { veh.objetivo = Math.max(0, tG - holdPct); veh.cw = tG; }
-    M.groups.push({ name, key: k, tG, tol: num(m.tolerancia_pts, 5), veh, members, holds,
-      traders: veh ? [{ i: veh, w: 1, sh: 1 }] : [], valor: members.reduce((a, i) => a + i.valor, 0), holdValor: holds.reduce((a, i) => a + i.valor, 0) });
+    const wsum = parts.reduce((a, x) => a + x.w, 0) || 1;
+    parts.forEach(x => { x.sh = x.w / wsum; x.t = tG * x.sh; x.i.objetivo = Math.max(0, tG - holdPct) * x.sh; x.i.cw = x.t; x.i.tol = x.tol; });
+    M.groups.push({ name, key: k, tG, modo: k === 'ACCIONES' ? (m.modo || '') : '', tres, tol: tres ? null : m.tolerancia_pts, veh: parts.length === 1 ? parts[0].i : null, members, holds,
+      traders: parts.map(x => ({ i: x.i, w: x.w, sh: x.sh, t: x.t, tol: x.tol })), valor: members.reduce((a, i) => a + i.valor, 0), holdValor: holds.reduce((a, i) => a + i.valor, 0) });
   });
   ORDER.forEach(k => { const c = M.classes[k], g = M.groups.find(x => x.key === k); c.objetivo = ok && g ? g.tG : 0; c.diff = ok ? c.pct - c.objetivo : 0; });
 }
@@ -765,13 +803,19 @@ function buildSectors(M) {
 let BD = [], ALERT = new Map();
 function bandsInfo(M) {
   if (!M.total || !hasMetas()) return [];
-  return M.groups.map(g => {
-    const actual = g.valor / M.total * 100, target = g.tG, tol = g.tol, dev = actual - target;
+  const row = (name, items, actual, target, tol) => {
+    const dev = actual - target, need = (target - actual) / 100 * M.total;
+    if (tol == null) return { name, items, actual, target, tol: null, dev, state: 'pend', need, toLimit: 0, msg: '' };
     const state = Math.abs(dev) > tol ? (dev > 0 ? 'over' : 'under') : Math.abs(dev) > tol * 0.75 ? 'near' : 'ok';
-    const need = (target - actual) / 100 * M.total;
     const toLimit = dev > 0 ? (dev - tol) / 100 * M.total : (-dev - tol) / 100 * M.total;
-    return { name: g.name, items: g.members, actual, target, tol, dev, state, need, toLimit, msg: '' };
-  }).filter(b => b.target > 0 || b.actual > 0);
+    return { name, items, actual, target, tol, dev, state, need, toLimit, msg: '' };
+  };
+  const out = [];
+  M.groups.forEach(g => {
+    if (g.tres) g.traders.forEach(t => out.push(row(g.name + ' · ' + t.i.activo, [t.i], t.i.valor / M.total * 100, t.t, t.tol)));
+    else out.push(row(g.name, g.members, g.valor / M.total * 100, g.tG, g.tol));
+  });
+  return out.filter(b => b.target > 0 || b.actual > 0);
 }
 const balanced = () => BD.every(b => b.state !== 'over' && b.state !== 'under');
 
@@ -1018,22 +1062,23 @@ function renderBands() {
   const box = $('bands');
   if (!BD.length) { box.hidden = true; return; }
   box.hidden = false;
-  const lab = { ok: ['ok', 'En tu margen'], near: ['hi', 'Cerca de tu límite'], over: ['lo', 'Arriba de tu límite'], under: ['lo', 'Abajo de tu límite'] };
+  const lab = { ok: ['ok', 'En tu margen'], near: ['hi', 'Cerca de tu límite'], over: ['lo', 'Arriba de tu límite'], under: ['lo', 'Abajo de tu límite'], pend: ['info', 'Sin tolerancia guardada'] };
   box.innerHTML = `<div class="phead"><h2>Semáforo del pueblo</h2><span class="pill ${balanced() ? 'ok' : 'lo'}">${balanced() ? 'Todo en tu margen' : 'Hay barrios fuera de tu margen'}</span></div>
     <div class="bands">${BD.map(b => {
-      const lo = Math.max(0, b.target - b.tol * 2.2), hi = b.target + b.tol * 2.2, span = hi - lo || 1;
+      const tl = b.tol == null ? 0 : b.tol, ext = Math.max(tl * 2.2, 2), lo = Math.max(0, b.target - ext), hi = b.target + ext, span = hi - lo || 1;
       const pos = v => Math.max(0, Math.min(100, (v - lo) / span * 100));
       const act = b.state === 'over' ? `Está ${mxn.format(b.toLimit)} arriba del límite que definiste.`
         : b.state === 'under' ? `Le faltan ${mxn.format(b.toLimit)} para volver a tu margen (${mxn.format(b.need)} para llegar a tu meta).`
-        : b.state === 'near' ? (b.dev > 0 ? 'Se acerca a tu límite de arriba.' : 'Se acerca a tu límite de abajo.') : '';
+        : b.state === 'near' ? (b.dev > 0 ? 'Se acerca a tu límite de arriba.' : 'Se acerca a tu límite de abajo.')
+        : b.state === 'pend' ? 'Guarda tus metas en Tus metas para medirlo contra tu tolerancia.' : '';
       return `<div class="band ${b.state}" style="--c:${bandColor(b)}">
-        <div style="min-width:0"><b>${esc(b.name)}</b><span class="bsub">${pct1(b.actual)} · tu meta ${pct1(b.target)} ± ${b.tol}</span></div>
-        <div class="gauge" role="img" aria-label="${esc(b.name)}: ${pct1(b.actual)}, tu meta ${pct1(b.target)}"><span class="zone" style="left:${pos(b.target - b.tol)}%;right:${100 - pos(b.target + b.tol)}%"></span><span class="ideal" style="left:${pos(b.target)}%"></span><span class="mark" style="left:${pos(b.actual)}%"></span></div>
+        <div style="min-width:0"><b>${esc(b.name)}</b><span class="bsub">${pct1(b.actual)} · tu meta ${pct1(b.target)}${b.tol == null ? '' : ' ± ' + b.tol}</span></div>
+        <div class="gauge" role="img" aria-label="${esc(b.name)}: ${pct1(b.actual)}, tu meta ${pct1(b.target)}"><span class="zone" style="left:${pos(b.target - tl)}%;right:${100 - pos(b.target + tl)}%"></span><span class="ideal" style="left:${pos(b.target)}%"></span><span class="mark" style="left:${pos(b.actual)}%"></span></div>
         <span class="pill ${lab[b.state][0]}">${lab[b.state][1]}</span>
         ${act ? `<span class="bact">${act}</span>` : ''}
       </div>`;
     }).join('')}</div>
-    <p class="foot">La franja verde es el margen de tolerancia que definiste en Tus metas. Se mide en puntos del tesoro total.</p>`;
+    <p class="foot">La franja verde es la tolerancia que definiste en Tus metas para cada barrio (o para cada instrumento de Fábricas, si usas tres). Se mide en puntos del tesoro total.</p>`;
   const al = BD.filter(b => b.state === 'over' || b.state === 'under');
   collapsible(box, 'bands', al.length ? 'Fuera de tu margen: <b>' + al.map(b => esc(b.name)).join(', ') + '</b>.' : 'Todos los barrios están dentro de tu margen.', false);
 }
@@ -1195,14 +1240,23 @@ function renderSim() {
   //    lo que no alcanza para uno más se queda SIN ASIGNAR (no se manda a otro barrio).
   const plan = [], avisos = [];
   groups.forEach((g, gi) => {
-    const a = gAlloc[gi], x = { g, gi, i: g.veh, ideal: a, amt: 0, units: null, free: 0 };
-    if (!g.veh) { x.free = a; if (a >= 1) avisos.push(`Elige en Tus metas con qué instrumento cubres ${esc(g.name)}: mientras tanto, sus ${mxn.format(a)} quedan sin asignar.`); }
-    else if (isUnit(g.veh)) {
-      const p = +g.veh.precio_mxn; x.units = Math.floor(a / p); x.amt = x.units * p; x.free = a - x.amt;
-      if (a >= 1 && x.units === 0) avisos.push(`Este mes no alcanza para un título de ${esc(g.veh.activo)} (${mxn.format(p)} cada uno).`);
-    } else if (g.veh.key !== 'RENTA_FIJA' && g.veh.key !== 'BITCOIN') { x.free = a; if (a >= 1) avisos.push(`No hay precio de hoy para ${esc(g.veh.activo)}: sus ${mxn.format(a)} quedan sin asignar.`); }
-    else x.amt = a;   // renta fija y cripto aceptan montos libres
-    plan.push(x);
+    const a = gAlloc[gi];
+    if (!g.traders.length) {
+      plan.push({ g, gi, i: null, ideal: a, amt: 0, units: null, free: a, meta: null });
+      if (a >= 1) avisos.push(g.key === 'ACCIONES' && !g.modo ? `Elige en Tus metas cómo cubres Fábricas (un instrumento o tres): mientras tanto, sus ${mxn.format(a)} quedan sin asignar.` : `Elige en Tus metas con qué instrumento cubres ${esc(g.name)}: mientras tanto, sus ${mxn.format(a)} quedan sin asignar.`);
+      return;
+    }
+    // dentro del barrio, con los pesos que definiste (en el modo de tres)
+    const parts = g.traders.length === 1 ? [a] : levelFill(g.traders.map(t => ({ t: t.sh, v: t.i.valor })), g.traders.reduce((s2, t) => s2 + t.i.valor, 0) + a, a);
+    g.traders.forEach((t, k) => {
+      const v = t.i, b = parts[k], x = { g, gi, i: v, ideal: b, amt: 0, units: null, free: 0, meta: g.tres ? t.t : null };
+      if (isUnit(v)) {
+        const p = +v.precio_mxn; x.units = Math.floor(b / p); x.amt = x.units * p; x.free = b - x.amt;
+        if (b >= 1 && x.units === 0) avisos.push(`Este mes no alcanza para un título de ${esc(v.activo)} (${mxn.format(p)} cada uno).`);
+      } else if (v.key !== 'RENTA_FIJA' && v.key !== 'BITCOIN') { x.free = b; if (b >= 1) avisos.push(`No hay precio de hoy para ${esc(v.activo)}: sus ${mxn.format(b)} quedan sin asignar.`); }
+      else x.amt = b;   // renta fija y cripto aceptan montos libres
+      plan.push(x);
+    });
   });
   const spent = plan.reduce((a, x) => a + x.amt, 0), rest = Math.max(0, amt - spent);
   const restTit = plan.filter(x => x.i && isUnit(x.i)).reduce((a, x) => a + x.free, 0);   // lo que sobra por comprar títulos completos
@@ -1228,7 +1282,7 @@ function renderSim() {
     rows += `<tr style="background:var(--panel2);${on ? '' : 'opacity:.6'}"><td class="n"><b>${n + 1}</b></td><td><span class="dot" style="--c:${col};margin-right:6px"></span><b>${esc(CLS[r.g.key].scene)}</b> <span class="muted">${esc(r.g.name)}</span></td>${hoyTd(r.now)}<td class="n muted">${pc(r.g.tG)}</td><td class="n">${pc(r.after)}</td><td class="n ${on ? 'pos' : 'muted'}"><b>${mxn.format(r.inv)}</b></td><td></td></tr>`;
     if (!on) return;
     r.items.filter(x => x.amt >= 1).forEach(x => {
-      rows += `<tr><td></td><td style="padding-left:26px">${esc(x.i.activo)}</td>${hoyTd(pctNow(x.i.valor))}<td class="n muted">—</td><td class="n muted">${pc(pctAfter(x.i.valor + x.amt))}</td><td class="n pos">${mxn.format(x.amt)}</td><td class="n muted">${u(x)}${GOV.objTxt(x.i)}</td></tr>`;
+      rows += `<tr><td></td><td style="padding-left:26px">${esc(x.i.activo)}</td>${hoyTd(pctNow(x.i.valor))}<td class="n muted">${x.meta == null ? '—' : pc(x.meta)}</td><td class="n muted">${pc(pctAfter(x.i.valor + x.amt))}</td><td class="n pos">${mxn.format(x.amt)}</td><td class="n muted">${u(x)}${GOV.objTxt(x.i)}</td></tr>`;
     });
   });
   if (rest >= 1) rows += `<tr><td></td><td><b>Sin asignar</b> <span class="muted">${restTit >= 1 && rest - restTit < 1 ? 'no alcanza para un título completo' : 'ver la nota de abajo'}</span></td>${hoyTd(null)}<td></td><td></td><td class="n"><b>${mxn.format(rest)}</b></td><td></td></tr>`;
@@ -2285,7 +2339,7 @@ const GOV = (() => {
     for (let k = 0; k < 90; k++) { const m = (lo + hi) / 2; if (f(m) > A) lo = m; else hi = m; }
     return list.map(x => x.t > 0 ? Math.max(0, x.v - hi * x.t) : x.v);
   }
-  const isOverG = g => BD.some(b => b.name === g.name && b.state === 'over');
+  const isOverG = g => BD.some(b => (b.name === g.name || b.name.indexOf(g.name + ' · ') === 0) && b.state === 'over');
   const excG = (g, T) => Math.max(0, g.valor - g.tG / 100 * T);
   // lo que sobra en los barrios que rebasaron su límite (sugerencia para reordenar)
   function sellSuggest() {
@@ -2857,12 +2911,16 @@ const AUTH = (() => {
 
 
 // ================= Tus metas (cada usuario define las suyas) =================
-// Las metas viven en la hoja Metas del servidor. Las plantillas son puntos de partida opcionales:
-// se muestran en orden fijo, ninguna viene marcada, y al elegir una se copia a las metas del usuario.
-let metasPicker = false, metasBusy = false;
+// Regla: ningún valor cuenta como elección del usuario hasta que pulsa "Guardar mis metas".
+// Los valores iniciales son los mismos para todos (vienen del servidor: metas_inicial) y no dependen de sus respuestas.
+let metasPicker = false, metasBusy = false, MD = null, MDkey = '';
 GOV.limInput('simLim', 'cm_lim_compra', () => { if (model) renderSim(); });   // tu precio límite de compra
-function metaPctOf(name) { const g = (model && model.groups || []).find(x => x.name === name); return g && model.total ? g.valor / model.total * 100 : null; }
-function plantillaTxt(t) { return GRUPOS.map(([n], i) => `${n} ${t.pct[i]}%`).join(' · ') + ` · margen ±${t.banda} pts`; }
+const METAS_DEF = { tol: { 'FIBRAs': 5, 'Renta fija': 5, 'Cripto': 1.25 }, uno: 'VT', tol_uno: 7.5,
+  tres: ['VUAA', 'VEA', 'VWO'], tol_tres: { VUAA: 5, VEA: 3.5, VWO: 1.25 }, ejemplo_tres: { VUAA: 60, VEA: 30, VWO: 10 } };
+const MI0 = () => (raw && raw.metas_inicial) || METAS_DEF;
+const byName = (a, b) => a.activo.localeCompare(b.activo, 'es', { sensitivity: 'base' });
+const numTxt = v => v == null || v === '' || isNaN(v) ? '' : String(+v);
+function plantillaTxt(t) { return GRUPOS.map(([n], i) => `${n} ${t.pct[i]}%`).join(' · '); }
 function origenTxt(tag) {
   if (!tag) return '';
   if (tag === 'en blanco') return 'Empezaste en blanco.';
@@ -2870,71 +2928,150 @@ function origenTxt(tag) {
   const ed = / · editada$/.test(tag), base = tag.replace(/ · editada$/, ''), m = base.match(/^\S+\s+(.*)\s+v(\S+)$/);
   return `Punto de partida: plantilla «${esc(m ? m[1] : base)}»${m ? ' (versión ' + esc(m[2]) + ')' : ''}${ed ? ', después cambiada por ti' : ''}.`;
 }
+// borrador de la pantalla: se arma con lo guardado; lo que no está guardado muestra el valor inicial (igual para todos)
+function metasDraft() {
+  const metas = metasList(), key = JSON.stringify(metas);
+  if (MD && MDkey === key) return MD;
+  const I = MI0(), get = n => metas.find(x => x.grupo === n) || {}, F = get('Acciones');
+  MDkey = key;
+  MD = { pct: {}, veh: {}, tol: {}, modo: F.modo || '', unoVeh: F.modo === 'uno' ? (F.vehiculo || '') : '',
+    unoTol: F.modo === 'uno' && F.tolerancia_pts != null ? F.tolerancia_pts : I.tol_uno, tres: {} };
+  GRUPOS.forEach(([n]) => { const m = get(n); MD.pct[n] = numTxt(m.objetivo_pct ?? 0); if (n !== 'Acciones') { MD.veh[n] = m.vehiculo || ''; MD.tol[n] = m.tolerancia_pts != null ? m.tolerancia_pts : I.tol[n]; } });
+  I.tres.forEach(a => { const x = (F.reparto || []).find(y => y.activo === a); MD.tres[a] = { peso: F.modo === 'tres' && x ? numTxt(x.peso_pct) : '', tol: F.modo === 'tres' && x && x.tolerancia_pts != null ? x.tolerancia_pts : I.tol_tres[a] }; });
+  return MD;
+}
+// ficha de cada instrumento: mismo formato en los dos modos, sin adjetivos
+function fichaHtml(acts) {
+  const it = a => (model.items || []).find(i => i.activo === a) || { activo: a };
+  const fecha = f => { const d = /^\d{4}-\d{2}-\d{2}$/.test(f || '') ? parseYmd(f) : null; return d ? `${fechaLarga(d)} de ${d.getFullYear()}` : (f || ''); };
+  return `<div class="mt-ficha">${acts.map(a => { const i = it(a), p = +i.precio_mxn;
+    return `<dl><dt>${esc(a)}</dt>
+      <div><dd class="k">Qué replica</dd><dd>${esc(i.indice || '—')}</dd></div>
+      <div><dd class="k">Moneda</dd><dd>${esc(i.moneda || '—')}</dd></div>
+      <div><dd class="k">Costo anual</dd><dd>${i.costo_pct != null && i.costo_pct !== '' ? esc(String(i.costo_pct)) + '%' : '—'}${i.costo_url ? ` · <a href="${esc(i.costo_url)}" target="_blank" rel="noopener">ficha oficial${i.costo_fecha ? ' al ' + esc(fecha(i.costo_fecha)) : ''}</a>` : ''}</dd></div>
+      <div><dd class="k">Precio aprox. de un título</dd><dd>${p > 0 ? '≈ ' + mxn.format(p) : '—'}</dd></div></dl>`; }).join('')}
+    <p class="mt-nreb">Instrumentos que hay que rebalancear: <b>${acts.length}</b></p></div>`;
+}
+function renderPicker(box, metas) {
+  const plant = raw.plantillas || [];
+  box.innerHTML = `<div class="phead"><h2>Tus metas</h2>${metas.length ? '<span class="pill info">Cambiar punto de partida</span>' : '<span class="pill hi">Pendiente</span>'}</div>
+    <p class="muted" style="margin:0">Tú decides qué parte de tu tesoro quieres en cada barrio. Puedes copiar los porcentajes de una plantilla y cambiarlos como quieras, o empezar en blanco. Las plantillas solo son puntos de partida con nombres descriptivos.</p>
+    ${metas.length ? '<p class="foot" style="margin:0">Al copiar una plantilla se reemplazan tus metas actuales.</p>' : ''}
+    <div class="mt-pick" role="radiogroup" aria-label="Punto de partida de tus metas">
+      ${plant.map(t => `<label class="mt-opt"><input type="radio" name="mtPlant" value="${esc(t.id)}" autocomplete="off"><span><b>${esc(t.nombre)}</b><small>${esc(plantillaTxt(t))}</small></span></label>`).join('')}
+      <label class="mt-opt"><input type="radio" name="mtPlant" value="blanco" autocomplete="off"><span><b>Empezar en blanco</b><small>Los cuatro barrios en 0%: tú escribes tus porcentajes.</small></span></label>
+    </div>
+    <div class="err" id="mtErr"></div>
+    <div class="simact"><button type="button" id="mtUse" disabled>Usar como punto de partida</button>${metas.length ? '<button type="button" class="ghost" id="mtCancel">Cancelar</button>' : ''}</div>`;
+  box.querySelectorAll('input[name=mtPlant]').forEach(r => { r.checked = false; r.onchange = () => { $('mtUse').disabled = false; }; });
+  $('mtUse').onclick = async () => {
+    const sel = box.querySelector('input[name=mtPlant]:checked'); if (!sel || metasBusy) return;
+    metasBusy = true; $('mtUse').disabled = true; $('mtErr').textContent = '';
+    try { const r = await api('metas_plantilla', { plantilla: sel.value }); metasPicker = false; MD = null; raw.metas = r.metas; apply(raw); celebrate('Listo: ya tienes tus porcentajes. Elige con qué cubres cada barrio, revisa las tolerancias y pulsa Guardar mis metas.'); }
+    catch (e) { $('mtErr').textContent = e.message; $('mtUse').disabled = false; }
+    metasBusy = false;
+  };
+  if ($('mtCancel')) $('mtCancel').onclick = () => { metasPicker = false; renderMetas(); };
+}
 function renderMetas() {
   const box = $('metas'); if (!box || !raw) return;
   GOV.limSync();
-  const metas = metasList(), plant = raw.plantillas || [];
-  if (!metas.length || metasPicker) {
-    box.innerHTML = `<div class="phead"><h2>Tus metas</h2>${metas.length ? '<span class="pill info">Cambiar punto de partida</span>' : '<span class="pill hi">Pendiente</span>'}</div>
-      <p class="muted" style="margin:0">Tú decides qué parte de tu tesoro quieres en cada barrio. Puedes copiar una plantilla y cambiarla como quieras, o empezar en blanco. Las plantillas solo son puntos de partida con nombres descriptivos.</p>
-      ${metas.length ? '<p class="foot" style="margin:0">Al copiar una plantilla se reemplazan tus metas actuales.</p>' : ''}
-      <div class="mt-pick" role="radiogroup" aria-label="Punto de partida de tus metas">
-        ${plant.map(t => `<label class="mt-opt"><input type="radio" name="mtPlant" value="${esc(t.id)}"><span><b>${esc(t.nombre)}</b><small>${esc(plantillaTxt(t))}</small></span></label>`).join('')}
-        <label class="mt-opt"><input type="radio" name="mtPlant" value="blanco"><span><b>Empezar en blanco</b><small>Los cuatro barrios en 0%: tú escribes tus porcentajes.</small></span></label>
-      </div>
-      <div class="err" id="mtErr"></div>
-      <div class="simact"><button type="button" id="mtUse" disabled>Usar como punto de partida</button>${metas.length ? '<button type="button" class="ghost" id="mtCancel">Cancelar</button>' : ''}</div>`;
-    box.querySelectorAll('input[name=mtPlant]').forEach(r => r.onchange = () => { $('mtUse').disabled = false; });
-    $('mtUse').onclick = async () => {
-      const sel = box.querySelector('input[name=mtPlant]:checked'); if (!sel || metasBusy) return;
-      metasBusy = true; $('mtUse').disabled = true; $('mtErr').textContent = '';
-      try { const r = await api('metas_plantilla', { plantilla: sel.value }); metasPicker = false; raw.metas = r.metas; apply(raw); celebrate('Listo: ya son tus metas. Ahora elige con qué instrumento cubres cada barrio.'); }
-      catch (e) { $('mtErr').textContent = e.message; $('mtUse').disabled = false; }
-      metasBusy = false;
-    };
-    if ($('mtCancel')) $('mtCancel').onclick = () => { metasPicker = false; renderMetas(); };
-    return;
+  const metas = metasList();
+  if (!metas.length || metasPicker) return renderPicker(box, metas);
+  const D = metasDraft(), I = MI0();
+  const hoyPct = k => model.total ? model.classes[k].valor / model.total * 100 : null;
+  const tolIn = (id, v, label) => `<label class="mt-tolr">Tolerancia<span><input type="number" min="0" max="20" step="0.25" inputmode="decimal" id="${id}" value="${numTxt(v)}" aria-label="Tolerancia de ${esc(label)} en puntos">pts</span></label>`;
+  const pctIn = (n, label) => `<label class="mt-pct">Tu meta<span><input type="number" min="0" max="100" step="0.5" inputmode="decimal" data-g="${esc(n)}" value="${D.pct[n]}" aria-label="Meta de ${esc(label)} en %">%</span></label>`;
+  const head = (k, n) => { const h = hoyPct(k); return `<div class="mt-name"><span class="dot"></span><b>${CLS[k].scene}</b><small>${esc(n)}${h != null ? ' · hoy ' + pct1(h) : ''}</small></div>`; };
+  // Fábricas
+  const fab = model.classes.ACCIONES.items.filter(i => !i.retirado);
+  const unoOk = fab.some(i => i.activo === I.uno);
+  let fabMode = '';
+  if (D.modo === 'uno') fabMode = `<div class="mt-sub">
+      <label class="mt-veh">Lo cubres con<select id="mtUnoVeh" autocomplete="off" aria-label="Instrumento para Fábricas"><option value="">— Elige —</option>${unoOk ? `<option value="${esc(I.uno)}">${esc(I.uno)}</option>` : ''}</select></label>
+      ${tolIn('mtUnoTol', D.unoTol, 'Fábricas')}
+      <p class="foot" style="margin:0;grid-column:1/-1">El instrumento que elijas cubre el 100% del barrio.${unoOk ? '' : ' ' + esc(I.uno) + ' no está en el catálogo todavía.'}</p></div>`;
+  else if (D.modo === 'tres') {
+    const ej = I.ejemplo_tres;
+    fabMode = `<div class="mt-ej"><p style="margin:0"><b>Reparto de ejemplo:</b> ${I.tres.map(a => `${esc(a)} ${ej[a]}%`).join(' · ')}</p>
+        <p class="foot" style="margin:4px 0 8px">Reparto de ejemplo, igual para todos los usuarios, tomado de las proporciones del esquema Swensen. No considera tu situación. Edita los números como quieras.</p>
+        <button type="button" class="ghost small" id="mtEj">Usar este reparto</button></div>
+      <div class="mt-tres">${I.tres.map(a => `<div class="mt-trow"><b>${esc(a)}</b>
+        <label class="mt-pct">Peso en Fábricas<span><input type="number" min="0" max="100" step="0.5" inputmode="decimal" data-w="${esc(a)}" value="${D.tres[a].peso}" aria-label="Peso de ${esc(a)} dentro de Fábricas">%</span></label>
+        ${tolIn('mtTol_' + a, D.tres[a].tol, a)}</div>`).join('')}
+        <p class="foot" style="margin:0" id="mtWsum"></p></div>`;
   }
-  const tol = num(metas[0].tolerancia_pts, 5);
-  const rows = GRUPOS.map(([name, k]) => {
-    const m = metas.find(x => x.grupo === name) || { objetivo_pct: 0, vehiculo: '' };
-    const opts = (model.classes[k].items || []).filter(i => !i.retirado);
-    const hoy = metaPctOf(name);
-    return `<div class="mt-row" style="--c:${CLS[k].color}">
-      <div class="mt-name"><span class="dot"></span><b>${CLS[k].scene}</b><small>${esc(name)}${hoy != null ? ' · hoy ' + pct1(hoy) : ''}</small></div>
-      <label class="mt-pct">Tu meta<span><input type="number" min="0" max="100" step="0.5" inputmode="decimal" data-g="${esc(name)}" value="${+m.objetivo_pct || 0}" aria-label="Meta de ${esc(name)} en %">%</span></label>
-      <label class="mt-veh">Lo cubres con<select data-v="${esc(name)}" aria-label="Instrumento para ${esc(name)}"><option value="">— Elige —</option>${opts.map(i => `<option value="${esc(i.activo)}"${i.activo === m.vehiculo ? ' selected' : ''}>${esc(i.activo)}${i.descripcion ? ' · ' + esc(i.descripcion) : ''}</option>`).join('')}</select></label>
-    </div>`;
+  const modeOpt = (v, t, acts) => `<label class="mt-mode"><input type="radio" name="mtModo" value="${v}" autocomplete="off"><span><b>${t}</b>${fichaHtml(acts)}</span></label>`;
+  const fabBlock = `<div class="mt-row mt-fab" style="--c:${CLS.ACCIONES.color}">${head('ACCIONES', 'Acciones')}${pctIn('Acciones', 'Fábricas')}
+      <div class="mt-modes" role="radiogroup" aria-label="Cómo cubres Fábricas"><p class="mt-q">¿Cómo cubres Fábricas?</p>${modeOpt('uno', 'Un instrumento', [I.uno])}${modeOpt('tres', 'Tres instrumentos', I.tres)}</div>
+      ${fabMode}</div>`;
+  // otros barrios
+  const rows = GRUPOS.filter(([n]) => n !== 'Acciones').map(([n, k]) => {
+    const opts = model.classes[k].items.filter(i => !i.retirado).slice().sort(byName);
+    return `<div class="mt-row" style="--c:${CLS[k].color}">${head(k, n)}${pctIn(n, CLS[k].scene)}
+      <label class="mt-veh">Lo cubres con<select data-v="${esc(n)}" autocomplete="off" aria-label="Instrumento para ${esc(n)}"><option value="">— Elige —</option>${opts.map(i => `<option value="${esc(i.activo)}">${esc(i.activo)}${i.descripcion ? ' · ' + esc(i.descripcion) : ''}</option>`).join('')}</select></label>
+      ${tolIn('mtTolG_' + k, D.tol[n], CLS[k].scene)}</div>`;
   }).join('');
   box.innerHTML = `<div class="phead"><h2>Tus metas</h2><span class="pill ok" id="mtSumPill"></span></div>
-    <p class="muted" style="margin:0">Estas son tus reglas: qué porcentaje del tesoro quieres en cada barrio, con qué instrumento lo cubres y cuánto se puede alejar antes de marcarlo en el semáforo. La ciudad calcula con ellas y no elige por ti.</p>
-    <div class="mt-rows">${rows}</div>
-    <label class="mt-tol">Margen de tolerancia<span><input type="number" id="mtTol" min="0.5" max="20" step="0.25" inputmode="decimal" value="${tol}" aria-label="Margen de tolerancia en puntos">puntos del tesoro total, arriba o abajo de cada meta</span></label>
-    <p class="foot" style="margin:0">${origenTxt(metas[0].plantilla)} Los instrumentos que no elijas se quedan como están: cuentan en su barrio, pero el cálculo no compra ni vende de ellos.</p>
+    <p class="muted" style="margin:0">Estas son tus reglas: qué porcentaje del tesoro quieres en cada barrio, con qué lo cubres y cuántos puntos se puede alejar cada uno antes de marcarlo en el semáforo. La ciudad calcula con ellas y no elige por ti. Nada cuenta hasta que pulses <b>Guardar mis metas</b>.</p>
+    <div class="mt-rows">${fabBlock}${rows}</div>
+    <p class="foot" style="margin:0">La tolerancia se mide en puntos del tesoro total. Los valores que ves sin guardar son los iniciales, iguales para todos. ${origenTxt(metas[0].plantilla)} Los instrumentos que no elijas se quedan como están: cuentan en su barrio, pero el cálculo no compra ni vende de ellos.</p>
     <div class="err" id="mtErr"></div>
     <div class="simact"><button type="button" id="mtSave">Guardar mis metas</button><button type="button" class="ghost" id="mtRestart">Empezar de nuevo con una plantilla</button></div>`;
-  const sumNow = () => [...box.querySelectorAll('input[data-g]')].reduce((a, i) => a + num(i.value, 0), 0);
-  const showSum = () => { const s = Math.round(sumNow() * 100) / 100, ok = Math.abs(s - 100) <= 0.05, p = $('mtSumPill'); p.textContent = ok ? 'Suman 100%' : `Suman ${s}%`; p.className = 'pill ' + (ok ? 'ok' : 'lo'); };
-  box.querySelectorAll('input[data-g]').forEach(i => i.addEventListener('input', showSum)); showSum();
+  // valores elegidos: solo los que vienen del borrador (nunca se preselecciona nada)
+  box.querySelectorAll('input[name=mtModo]').forEach(r => { r.checked = r.value === D.modo; r.onchange = () => { D.modo = r.value; renderMetas(); }; });
+  box.querySelectorAll('select[data-v]').forEach(s => { s.value = D.veh[s.dataset.v] || ''; s.onchange = () => { D.veh[s.dataset.v] = s.value; }; });
+  if ($('mtUnoVeh')) { $('mtUnoVeh').value = D.unoVeh || ''; $('mtUnoVeh').onchange = e => { D.unoVeh = e.target.value; }; }
+  if ($('mtUnoTol')) $('mtUnoTol').oninput = e => { D.unoTol = e.target.value; };
+  GRUPOS.filter(([n]) => n !== 'Acciones').forEach(([n, k]) => { const el = $('mtTolG_' + k); if (el) el.oninput = () => { D.tol[n] = el.value; }; });
+  I.tres.forEach(a => { const el = $('mtTol_' + a); if (el) el.oninput = () => { D.tres[a].tol = el.value; }; });
+  const sumG = () => GRUPOS.reduce((s, [n]) => s + num(D.pct[n], 0), 0);
+  const sumW = () => I.tres.reduce((s, a) => s + num(D.tres[a].peso, 0), 0);
+  const showSum = () => {
+    const s = Math.round(sumG() * 100) / 100, ok = Math.abs(s - 100) <= 0.05, p = $('mtSumPill');
+    p.textContent = ok ? 'Barrios: suman 100%' : `Barrios: suman ${s}%`; p.className = 'pill ' + (ok ? 'ok' : 'lo');
+    const w = $('mtWsum'); if (w) { const t = Math.round(sumW() * 100) / 100; w.textContent = `Pesos dentro de Fábricas: suman ${t}%${Math.abs(t - 100) <= 0.05 ? '.' : ' (deben sumar 100%).'}`; }
+  };
+  box.querySelectorAll('input[data-g]').forEach(i => i.addEventListener('input', () => { D.pct[i.dataset.g] = i.value; showSum(); }));
+  box.querySelectorAll('input[data-w]').forEach(i => i.addEventListener('input', () => { D.tres[i.dataset.w].peso = i.value; showSum(); }));
+  if ($('mtEj')) $('mtEj').onclick = () => { I.tres.forEach(a => { D.tres[a].peso = String(I.ejemplo_tres[a]); }); renderMetas(); };
+  showSum();
   $('mtRestart').onclick = () => { metasPicker = true; renderMetas(); };
   $('mtSave').onclick = async () => {
     if (metasBusy) return;
     const err = $('mtErr'); err.textContent = '';
-    const s = sumNow();
-    if (Math.abs(s - 100) > 0.05) { err.textContent = `Tus metas suman ${Math.round(s * 100) / 100}%. Deben sumar 100%.`; return; }
-    const lista = GRUPOS.map(([name]) => ({ grupo: name, objetivo_pct: num(box.querySelector(`input[data-g="${name}"]`).value, 0), vehiculo: box.querySelector(`select[data-v="${name}"]`).value }));
-    const sinVeh = lista.filter(x => x.objetivo_pct > 0 && !x.vehiculo).map(x => x.grupo);
+    const fail = m => { err.textContent = m; return true; };
+    const badTol = (v, quien) => { const t = num(v, NaN); return isNaN(t) || t < 0 || t > 20 ? fail(`La tolerancia de ${quien} debe ser un número entre 0 y 20.`) : false; };
+    const s = sumG();
+    if (Math.abs(s - 100) > 0.05) return fail(`Las metas de tus barrios suman ${Math.round(s * 100) / 100}%. Deben sumar 100%.`);
+    if (D.modo === 'tres') {
+      if (I.tres.some(a => D.tres[a].peso === '' || isNaN(num(D.tres[a].peso, NaN)))) return fail(`Escribe el peso de ${I.tres.join(', ')} o usa el reparto de ejemplo.`);
+      const w = sumW(); if (Math.abs(w - 100) > 0.05) return fail(`Los pesos de ${I.tres.join(', ')} suman ${Math.round(w * 100) / 100}%. Deben sumar 100% del barrio de Fábricas.`);
+      for (const a of I.tres) if (badTol(D.tres[a].tol, a)) return;
+    }
+    if (D.modo === 'uno' && badTol(D.unoTol, 'Fábricas')) return;
+    for (const [n, k] of GRUPOS) if (n !== 'Acciones' && badTol(D.tol[n], CLS[k].scene)) return;
+    const lista = GRUPOS.map(([n]) => n === 'Acciones'
+      ? { grupo: n, objetivo_pct: num(D.pct[n], 0), modo: D.modo, vehiculo: D.modo === 'uno' ? D.unoVeh : '', tolerancia_pts: D.modo === 'uno' ? num(D.unoTol, NaN) : null,
+          reparto: D.modo === 'tres' ? I.tres.map(a => ({ activo: a, peso_pct: num(D.tres[a].peso, NaN), tolerancia_pts: num(D.tres[a].tol, NaN) })) : [] }
+      : { grupo: n, objetivo_pct: num(D.pct[n], 0), vehiculo: D.veh[n] || '', tolerancia_pts: num(D.tol[n], NaN) });
+    const falta = [];
+    if (num(D.pct.Acciones, 0) > 0 && !D.modo) falta.push('Fábricas (elige un instrumento o tres)');
+    if (num(D.pct.Acciones, 0) > 0 && D.modo === 'uno' && !D.unoVeh) falta.push('Fábricas');
+    GRUPOS.forEach(([n, k]) => { if (n !== 'Acciones' && num(D.pct[n], 0) > 0 && !D.veh[n]) falta.push(CLS[k].scene); });
     metasBusy = true; $('mtSave').disabled = true;
     try {
-      const r = await api('guardar_metas', { metas: lista, tolerancia: num($('mtTol').value, NaN) });
-      raw.metas = r.metas; apply(raw);
-      celebrate(sinVeh.length ? `Metas guardadas. Falta elegir instrumento en ${sinVeh.join(' y ')}: mientras tanto, su parte queda sin asignar.` : 'Metas guardadas. La ciudad ya calcula con ellas.');
+      const r = await api('guardar_metas', { metas: lista });
+      MD = null; raw.metas = r.metas; apply(raw);
+      celebrate(falta.length ? `Metas guardadas. Falta elegir cómo cubres ${falta.join(', ')}: mientras tanto, su parte queda sin asignar.` : 'Metas guardadas. La ciudad ya calcula con ellas.');
     } catch (e) { err.textContent = e.message; }
     metasBusy = false; const b = $('mtSave'); if (b) b.disabled = false;
   };
-  // se abre sola mientras falte algo por definir
-  const listo = hasMetas() && metas.every(m => !(+m.objetivo_pct > 0) || m.vehiculo);
-  collapsible(box, 'metas', GRUPOS.map(([name, k]) => { const m = metas.find(x => x.grupo === name); return `${CLS[k].scene} <b>${m ? +m.objetivo_pct : 0}%</b>${m && m.vehiculo ? ' (' + esc(m.vehiculo) + ')' : ''}`; }).join(' · '), listo);
+  // se abre sola mientras falte algo por guardar
+  const F = metas.find(x => x.grupo === 'Acciones') || {};
+  const listo = hasMetas() && metas.every(m => m.grupo === 'Acciones' ? (!(+m.objetivo_pct > 0) || (m.modo === 'uno' ? m.vehiculo && m.tolerancia_pts != null : m.modo === 'tres'))
+    : (m.tolerancia_pts != null && (!(+m.objetivo_pct > 0) || m.vehiculo)));
+  collapsible(box, 'metas', GRUPOS.map(([n, k]) => { const m = metas.find(x => x.grupo === n); const v = n === 'Acciones' ? (F.modo === 'tres' ? (F.reparto || []).map(x => x.activo).join('/') : F.vehiculo) : m && m.vehiculo; return `${CLS[k].scene} <b>${m ? +m.objetivo_pct : 0}%</b>${v ? ' (' + esc(v) + ')' : ''}`; }).join(' · '), listo);
   if (!listo) { box.classList.remove('collapsed'); const b = box.querySelector('.phead button'); if (b) { b.textContent = 'Minimizar'; b.setAttribute('aria-expanded', 'true'); } }
 }
 
