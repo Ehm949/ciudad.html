@@ -396,6 +396,28 @@ td.sinhoy{vertical-align:middle;text-align:center;font-size:12px;line-height:1.3
 }
 /* la regla .under de otro bloque deformaba las filas "abajo de tu límite" del semáforo */
 .bands .band.under{display:grid;justify-content:normal;flex-wrap:nowrap;gap:6px 14px}
+/* ---------- asistente por ventanas ---------- */
+.wz{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--panel2)}
+.wz-k{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.wz-t{margin:0;font-size:19px;line-height:1.25}
+.wz-dots{display:flex;gap:6px}
+.wz-dots i{flex:1;height:4px;border-radius:3px;background:var(--line)}
+.wz-dots i.done{background:color-mix(in srgb,var(--acc) 55%,var(--line))}
+.wz-dots i.on{background:var(--acc)}
+.wz-modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wz-opt{background:var(--bg)}
+.wz-opt > span{flex:1}
+.wz-note{margin:4px 0 0;font-size:12.5px;line-height:1.45;color:var(--fg);padding:8px 10px;border-left:3px solid var(--warn);background:color-mix(in srgb,var(--warn) 8%,transparent);border-radius:6px}
+.wz-pct,.mt-w{display:grid;gap:8px}
+.wz-prow,.mt-wrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.wz-prow{border-left:3px solid var(--c)}
+.mt-wn{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mt-wn small{color:var(--muted);font-size:12px;line-height:1.4}
+.mt-wi{display:flex;align-items:center;gap:6px;flex:none;color:var(--muted)}
+.mt-wi input{width:82px;text-align:right}
+.foot.pos{color:var(--ok)}.foot.neg{color:var(--bad)}
+.wz-sum td{vertical-align:top}
+@media (max-width:700px){.wz-modes{grid-template-columns:1fr}.wz{padding:12px}}
 </style>
 </head>
 <body>
@@ -661,14 +683,23 @@ let demoHist = (() => {
   return rows;
 })();
 const DEMO_PLANT = [
-  { id: 'P1', nombre: 'Mayoría renta fija', pct: [20, 10, 70, 0], banda: 5, version: '1', fecha: '2026-10-29' },
-  { id: 'P2', nombre: 'Mixta', pct: [40, 15, 45, 0], banda: 5, version: '1', fecha: '2026-10-29' },
-  { id: 'P3', nombre: 'Mayoría acciones', pct: [65, 15, 15, 5], banda: 5, version: '1', fecha: '2026-10-29' }];
+  { id: 'P1', nombre: 'Mayoría renta fija', pct: [20, 10, 70, 0], version: '1', fecha: '2026-10-30' },
+  { id: 'S1', nombre: 'Esquema Swensen', pct: [50, 20, 30, 0], version: '1', fecha: '2026-10-30', fabricas: { VUAA: 60, VEA: 30, VWO: 10 } },
+  { id: 'S2', nombre: 'Esquema Swensen con bitcoin', pct: [45, 20, 30, 5], version: '1', fecha: '2026-10-30', fabricas: { VUAA: 55.56, VEA: 33.33, VWO: 11.11 } }];
 let demoMetas = [];
-const DEMO_FICHAS = { VT: ['FTSE Global All Cap Index', 0.06, 'https://fund-docs.vanguard.com/F3141.pdf'], VUAA: ['S&P 500', 0.07, 'https://fund-docs.vanguard.com/SandP_500_UCITS_ETF_USD_Accumulating_9694_NETH_INT_EN.pdf'],
-  VEA: ['FTSE Developed All Cap ex US Index', 0.03, 'https://fund-docs.vanguard.com/F0936.pdf'], VWO: ['FTSE Emerging Markets All Cap China A Inclusion Index', 0.06, 'https://fund-docs.vanguard.com/F0964.pdf'] };
+const DEMO_FICHAS = {
+  VT: ['FTSE Global All Cap Index: empresas de todo el mundo, incluido Estados Unidos.', 0.06, 'https://fund-docs.vanguard.com/F3141.pdf', 'USD', '2026-09-30'],
+  VUAA: ['S&P 500: 500 empresas grandes de Estados Unidos.', 0.07, 'https://fund-docs.vanguard.com/SandP_500_UCITS_ETF_USD_Accumulating_9694_NETH_INT_EN.pdf', 'USD', '2026-09-30'],
+  VEA: ['FTSE Developed All Cap ex US Index: miles de empresas de países desarrollados sin Estados Unidos; las más grandes pesan más. Países con más peso: Japón 21.9%, Reino Unido 11.1%, Canadá 10.8%, Corea 9.2%, Suiza 6.6% y Francia 6.6% (al 30 sep 2026).', 0.03, 'https://fund-docs.vanguard.com/F0936.pdf', 'USD', '2026-09-30'],
+  VWO: ['FTSE Emerging Markets All Cap China A Inclusion Index: miles de empresas de países en desarrollo; las más grandes pesan más. Países con más peso: Taiwán 35.1%, China 26.0%, India 16.0%, Brasil 4.5% y Sudáfrica 3.6%; México 1.9% (al 30 sep 2026).', 0.06, 'https://fund-docs.vanguard.com/F0964.pdf', 'USD', '2026-09-30'],
+  FIBRATC14: ['S&P/BMV FIBRAS: hasta 20 FIBRAs de la Bolsa Mexicana en un solo instrumento.', 0.5, 'https://www.rankia.mx/etfs/fibratc-etf-bbva-bancomer-asset-management', 'MXN', '2025-12-01'],
+  Bitcoin: ['No replica un índice: es la moneda digital bitcoin.', '', '', 'MXN', ''] };
 if (!DEMO_CATALOGO.some(c => c.activo === 'VT')) DEMO_CATALOGO.splice(1, 0, { activo: 'VT', clase: 'ACCIONES', subclase: 'Global', descripcion: 'Acciones de empresas de todo el mundo', precio_mxn: 2580, cambio_dia: 0.4 });
-DEMO_CATALOGO.forEach(c => { const f = DEMO_FICHAS[c.activo]; if (f) Object.assign(c, { indice: f[0], costo_pct: f[1], costo_fecha: '2026-09-30', costo_url: f[2], moneda: 'USD' }); });
+if (!DEMO_CATALOGO.some(c => c.activo === 'FIBRATC14')) DEMO_CATALOGO.push({ activo: 'FIBRATC14', clase: 'FIBRAS', subclase: 'ETF de FIBRAs', descripcion: 'ETF que replica el índice S&P/BMV FIBRAS', precio_mxn: 27.75, cambio_dia: 0.5 });
+DEMO_CATALOGO.forEach(c => { const f = DEMO_FICHAS[c.activo]; if (f) Object.assign(c, { indice: f[0], costo_pct: f[1], costo_url: f[2], moneda: f[3], costo_fecha: f[4] }); });
+const DEMO_CONF = { 'Acciones': { uno: 'VT', varios: ['VUAA', 'VEA', 'VWO'], ejemplo: { VUAA: 60, VEA: 30, VWO: 10 }, tol_uno: 7.5, tol_inst: { VUAA: 5, VEA: 3.5, VWO: 1.25 } },
+  'FIBRAs': { uno: 'FIBRATC14', varios: ['FUNO11', 'FIBRAPL14', 'DANHOS13', 'FNOVA17', 'FMTY14', 'NEXT23'], pesos: { FUNO11: 25, FIBRAPL14: 20, DANHOS13: 15, FNOVA17: 15, FMTY14: 10, NEXT23: 15 }, tol: 5 },
+  'Renta fija': { varios: ['Bondia', 'Cetes 91 días', 'Cetes 182 días', 'Udibonos'], tol: 5 }, 'Cripto': { uno: 'Bitcoin', tol: 1.25 } };
 function demoApi(accion, data) {
   if (accion === 'metas_plantilla') {
     const t = DEMO_PLANT.find(x => x.id === data.plantilla);
@@ -678,8 +709,12 @@ function demoApi(accion, data) {
   if (accion === 'guardar_metas') {
     const sum = data.metas.reduce((a, m) => a + num(m.objetivo_pct, 0), 0);
     if (Math.abs(sum - 100) > 0.05) throw new Error('Las metas de tus barrios suman ' + sum + '%. Deben sumar 100%.');
-    const orig = (demoMetas[0] && demoMetas[0].plantilla || '').replace(/ · editada$/, '');
-    demoMetas = data.metas.map(m => ({ ...m, reparto: m.reparto || [], plantilla: orig ? orig + ' · editada' : 'propia' }));
+    const t = DEMO_PLANT.find(x => x.id === data.plantilla), orig = (demoMetas[0] && demoMetas[0].plantilla || '').replace(/ · editada$/, '');
+    const tag = data.plantilla === 'blanco' ? 'en blanco' : t ? t.id + ' ' + t.nombre + ' v' + t.version : orig ? orig + ' · editada' : 'propia';
+    demoMetas = data.metas.map(m => { const C = DEMO_CONF[m.grupo], A = m.grupo === 'Acciones';
+      return { grupo: m.grupo, objetivo_pct: m.objetivo_pct, modo: m.modo, vehiculo: m.modo === 'uno' ? C.uno : '', plantilla: tag,
+        tolerancia_pts: A ? (m.modo === 'varios' ? null : C.tol_uno) : C.tol,
+        reparto: m.modo === 'varios' ? m.reparto.filter(x => x.peso_pct > 0).map(x => ({ ...x, tolerancia_pts: A ? C.tol_inst[x.activo] : null })) : [] }; });
     return { ok: true, metas: demoMetas };
   }
   if (accion === 'login') return { ok: true, token: 'demo', nombre: 'Inversor de ejemplo', cambiar: String(data.pin) === '123456' };   // en la demostración, 123456 simula una contraseña corta
@@ -696,7 +731,7 @@ function demoApi(accion, data) {
   const hoy = new Date(), fin = new Date(Date.now() + 2 * 864e5), prox = new Date(Date.now() + 20 * 864e5);
   return {
     ok: true, nombre: 'Inversor de ejemplo', catalogo: DEMO_CATALOGO, posiciones: demoPos.map(demoCompute), juego: {},
-    metas: demoMetas, plantillas: DEMO_PLANT, precios_hora: new Date().toISOString(),
+    metas: demoMetas, plantillas: DEMO_PLANT, metas_inicial: DEMO_CONF, precios_hora: new Date().toISOString(),
     historial: demoHist,
     eventos: [
       { inicio: ymd(hoy), fin: ymd(fin), tipo: 'RENTAS', objetivo: 'FUNO11', mensaje: 'FUNO11 está repartiendo las rentas del trimestre a sus dueños.' },
@@ -779,10 +814,11 @@ function applyStrategy(M) {
   GRUPOS.forEach(([name, k]) => {
     const m = metas.find(x => x.grupo === name), members = M.classes[k].items;
     if (!m || !members.length) return;
-    const tG = ok ? Math.max(0, num(m.objetivo_pct, 0)) : 0, tres = k === 'ACCIONES' && m.modo === 'tres';
+    const tG = ok ? Math.max(0, num(m.objetivo_pct, 0)) : 0, varios = m.modo === 'varios' || m.modo === 'tres';
+    const tres = k === 'ACCIONES' && varios;   // solo Fábricas mide cada instrumento en el semáforo
     let parts = [];
-    if (tres) parts = (m.reparto || []).map(x => ({ i: members.find(it => !it.retirado && it.activo === x.activo), w: num(x.peso_pct, 0) / 100, tol: x.tolerancia_pts })).filter(x => x.i && x.w > 0);
-    else if (k !== 'ACCIONES' || m.modo === 'uno') { const v = members.find(i => !i.retirado && i.activo === m.vehiculo); if (v) parts = [{ i: v, w: 1, tol: m.tolerancia_pts }]; }
+    if (varios) parts = (m.reparto || []).map(x => ({ i: members.find(it => !it.retirado && it.activo === x.activo), w: num(x.peso_pct, 0) / 100, tol: x.tolerancia_pts })).filter(x => x.i && x.w > 0);
+    else if (m.modo === 'uno' || (k !== 'ACCIONES' && m.vehiculo)) { const v = members.find(i => !i.retirado && i.activo === m.vehiculo); if (v) parts = [{ i: v, w: 1, tol: m.tolerancia_pts }]; }
     const tset = new Set(parts.map(x => x.i)), holds = members.filter(i => !tset.has(i)), holdPct = holds.reduce((a, i) => a + i.pct, 0);
     holds.forEach(i => { i.objetivo = i.pct; i.hold = true; });
     const wsum = parts.reduce((a, x) => a + x.w, 0) || 1;
@@ -1243,13 +1279,13 @@ function renderSim() {
     const a = gAlloc[gi];
     if (!g.traders.length) {
       plan.push({ g, gi, i: null, ideal: a, amt: 0, units: null, free: a, meta: null });
-      if (a >= 1) avisos.push(g.key === 'ACCIONES' && !g.modo ? `Elige en Tus metas cómo cubres Fábricas (un instrumento o tres): mientras tanto, sus ${mxn.format(a)} quedan sin asignar.` : `Elige en Tus metas con qué instrumento cubres ${esc(g.name)}: mientras tanto, sus ${mxn.format(a)} quedan sin asignar.`);
+      if (a >= 1) avisos.push(`Elige en Tus metas cómo cubres ${esc(CLS[g.key].scene)}: mientras tanto, sus ${mxn.format(a)} quedan sin asignar.`);
       return;
     }
     // dentro del barrio, con los pesos que definiste (en el modo de tres)
     const parts = g.traders.length === 1 ? [a] : levelFill(g.traders.map(t => ({ t: t.sh, v: t.i.valor })), g.traders.reduce((s2, t) => s2 + t.i.valor, 0) + a, a);
     g.traders.forEach((t, k) => {
-      const v = t.i, b = parts[k], x = { g, gi, i: v, ideal: b, amt: 0, units: null, free: 0, meta: g.tres ? t.t : null };
+      const v = t.i, b = parts[k], x = { g, gi, i: v, ideal: b, amt: 0, units: null, free: 0, meta: g.traders.length > 1 ? t.t : null };
       if (isUnit(v)) {
         const p = +v.precio_mxn; x.units = Math.floor(b / p); x.amt = x.units * p; x.free = b - x.amt;
         if (b >= 1 && x.units === 0) avisos.push(`Este mes no alcanza para un título de ${esc(v.activo)} (${mxn.format(p)} cada uno).`);
@@ -2910,169 +2946,214 @@ const AUTH = (() => {
 })();
 
 
-// ================= Tus metas (cada usuario define las suyas) =================
-// Regla: ningún valor cuenta como elección del usuario hasta que pulsa "Guardar mis metas".
-// Los valores iniciales son los mismos para todos (vienen del servidor: metas_inicial) y no dependen de sus respuestas.
-let metasPicker = false, metasBusy = false, MD = null, MDkey = '';
+// ================= Tus metas: asistente por ventanas =================
+// Cada ventana es una pregunta; al responder pasas a la siguiente. Nada se guarda hasta "Guardar mis metas".
+// Las tolerancias son fijas (las pone el servidor) y se muestran solo como información.
+let metasEdit = false, metasBusy = false, WZ = null;
 GOV.limInput('simLim', 'cm_lim_compra', () => { if (model) renderSim(); });   // tu precio límite de compra
-const METAS_DEF = { tol: { 'FIBRAs': 5, 'Renta fija': 5, 'Cripto': 1.25 }, uno: 'VT', tol_uno: 7.5,
-  tres: ['VUAA', 'VEA', 'VWO'], tol_tres: { VUAA: 5, VEA: 3.5, VWO: 1.25 }, ejemplo_tres: { VUAA: 60, VEA: 30, VWO: 10 } };
-const MI0 = () => (raw && raw.metas_inicial) || METAS_DEF;
-const byName = (a, b) => a.activo.localeCompare(b.activo, 'es', { sensitivity: 'base' });
+const METAS_CONF_DEF = {
+  'Acciones': { uno: 'VT', varios: ['VUAA', 'VEA', 'VWO'], ejemplo: { VUAA: 60, VEA: 30, VWO: 10 }, tol_uno: 7.5, tol_inst: { VUAA: 5, VEA: 3.5, VWO: 1.25 } },
+  'FIBRAs': { uno: 'FIBRATC14', varios: ['FUNO11', 'FIBRAPL14', 'DANHOS13', 'FNOVA17', 'FMTY14', 'NEXT23'], pesos: {}, tol: 5 },
+  'Renta fija': { varios: ['Bondia', 'Cetes 91 días', 'Cetes 182 días', 'Udibonos'], tol: 5 },
+  'Cripto': { uno: 'Bitcoin', tol: 1.25 }
+};
+const MC = n => ((raw && raw.metas_inicial) || METAS_CONF_DEF)[n] || {};
+const RF_TXT = { 'Bondia': 'Dinero líquido: disponible al día siguiente.', 'Cetes 91 días': 'Préstamo al gobierno a 3 meses.', 'Cetes 182 días': 'Préstamo al gobierno a 6 meses.',
+  'Udibonos': 'Su valor sube con la inflación (se miden en UDIS) y además pagan intereses.' };
 const numTxt = v => v == null || v === '' || isNaN(v) ? '' : String(+v);
-function plantillaTxt(t) { return GRUPOS.map(([n], i) => `${n} ${t.pct[i]}%`).join(' · '); }
+const itemOf = a => (model && model.items || []).find(i => i.activo === a) || { activo: a };
+const sumObj = o => Object.values(o || {}).reduce((s, v) => s + num(v, 0), 0);
+const r2 = v => Math.round(v * 100) / 100;
 function origenTxt(tag) {
   if (!tag) return '';
   if (tag === 'en blanco') return 'Empezaste en blanco.';
   if (tag === 'propia') return 'Metas escritas por ti.';
   const ed = / · editada$/.test(tag), base = tag.replace(/ · editada$/, ''), m = base.match(/^\S+\s+(.*)\s+v(\S+)$/);
-  return `Punto de partida: plantilla «${esc(m ? m[1] : base)}»${m ? ' (versión ' + esc(m[2]) + ')' : ''}${ed ? ', después cambiada por ti' : ''}.`;
+  return `Punto de partida: plantilla «${esc(m ? m[1] : base)}»${ed ? ', después cambiada por ti' : ''}.`;
 }
-// borrador de la pantalla: se arma con lo guardado; lo que no está guardado muestra el valor inicial (igual para todos)
-function metasDraft() {
-  const metas = metasList(), key = JSON.stringify(metas);
-  if (MD && MDkey === key) return MD;
-  const I = MI0(), get = n => metas.find(x => x.grupo === n) || {}, F = get('Acciones');
-  MDkey = key;
-  MD = { pct: {}, veh: {}, tol: {}, modo: F.modo || '', unoVeh: F.modo === 'uno' ? (F.vehiculo || '') : '',
-    unoTol: F.modo === 'uno' && F.tolerancia_pts != null ? F.tolerancia_pts : I.tol_uno, tres: {} };
-  GRUPOS.forEach(([n]) => { const m = get(n); MD.pct[n] = numTxt(m.objetivo_pct ?? 0); if (n !== 'Acciones') { MD.veh[n] = m.vehiculo || ''; MD.tol[n] = m.tolerancia_pts != null ? m.tolerancia_pts : I.tol[n]; } });
-  I.tres.forEach(a => { const x = (F.reparto || []).find(y => y.activo === a); MD.tres[a] = { peso: F.modo === 'tres' && x ? numTxt(x.peso_pct) : '', tol: F.modo === 'tres' && x && x.tolerancia_pts != null ? x.tolerancia_pts : I.tol_tres[a] }; });
-  return MD;
-}
-// ficha de cada instrumento: mismo formato en los dos modos, sin adjetivos
-function fichaHtml(acts) {
-  const it = a => (model.items || []).find(i => i.activo === a) || { activo: a };
+// ficha de un instrumento: mismo formato para todos, sin adjetivos
+function fichaHtml(acts, n) {
   const fecha = f => { const d = /^\d{4}-\d{2}-\d{2}$/.test(f || '') ? parseYmd(f) : null; return d ? `${fechaLarga(d)} de ${d.getFullYear()}` : (f || ''); };
-  return `<div class="mt-ficha">${acts.map(a => { const i = it(a), p = +i.precio_mxn;
+  return `<div class="mt-ficha">${acts.map(a => { const i = itemOf(a), p = +i.precio_mxn;
     return `<dl><dt>${esc(a)}</dt>
-      <div><dd class="k">Qué replica</dd><dd>${esc(i.indice || '—')}</dd></div>
+      <div><dd class="k">Qué replica</dd><dd>${esc(i.indice || i.descripcion || '—')}</dd></div>
       <div><dd class="k">Moneda</dd><dd>${esc(i.moneda || '—')}</dd></div>
-      <div><dd class="k">Costo anual</dd><dd>${i.costo_pct != null && i.costo_pct !== '' ? esc(String(i.costo_pct)) + '%' : '—'}${i.costo_url ? ` · <a href="${esc(i.costo_url)}" target="_blank" rel="noopener">ficha oficial${i.costo_fecha ? ' al ' + esc(fecha(i.costo_fecha)) : ''}</a>` : ''}</dd></div>
-      <div><dd class="k">Precio aprox. de un título</dd><dd>${p > 0 ? '≈ ' + mxn.format(p) : '—'}</dd></div></dl>`; }).join('')}
-    <p class="mt-nreb">Instrumentos que hay que rebalancear: <b>${acts.length}</b></p></div>`;
+      <div><dd class="k">Costo anual</dd><dd>${i.costo_pct != null && i.costo_pct !== '' ? esc(String(i.costo_pct)) + '%' : '—'}${i.costo_url ? ` · <a href="${esc(i.costo_url)}" target="_blank" rel="noopener">fuente${i.costo_fecha ? ' al ' + esc(fecha(i.costo_fecha)) : ''}</a>` : ''}</dd></div>
+      <div><dd class="k">Precio aprox. de un título</dd><dd>${p > 0 ? '≈ ' + (p >= 1000 ? mxn.format(p) : mxn2.format(p)) : '—'}</dd></div></dl>`; }).join('')}
+    <p class="mt-nreb">Instrumentos que hay que rebalancear: <b>${n == null ? acts.length : n}</b></p></div>`;
 }
-function renderPicker(box, metas) {
-  const plant = raw.plantillas || [];
-  box.innerHTML = `<div class="phead"><h2>Tus metas</h2>${metas.length ? '<span class="pill info">Cambiar punto de partida</span>' : '<span class="pill hi">Pendiente</span>'}</div>
-    <p class="muted" style="margin:0">Tú decides qué parte de tu tesoro quieres en cada barrio. Puedes copiar los porcentajes de una plantilla y cambiarlos como quieras, o empezar en blanco. Las plantillas solo son puntos de partida con nombres descriptivos.</p>
-    ${metas.length ? '<p class="foot" style="margin:0">Al copiar una plantilla se reemplazan tus metas actuales.</p>' : ''}
-    <div class="mt-pick" role="radiogroup" aria-label="Punto de partida de tus metas">
-      ${plant.map(t => `<label class="mt-opt"><input type="radio" name="mtPlant" value="${esc(t.id)}" autocomplete="off"><span><b>${esc(t.nombre)}</b><small>${esc(plantillaTxt(t))}</small></span></label>`).join('')}
-      <label class="mt-opt"><input type="radio" name="mtPlant" value="blanco" autocomplete="off"><span><b>Empezar en blanco</b><small>Los cuatro barrios en 0%: tú escribes tus porcentajes.</small></span></label>
-    </div>
-    <div class="err" id="mtErr"></div>
-    <div class="simact"><button type="button" id="mtUse" disabled>Usar como punto de partida</button>${metas.length ? '<button type="button" class="ghost" id="mtCancel">Cancelar</button>' : ''}</div>`;
-  box.querySelectorAll('input[name=mtPlant]').forEach(r => { r.checked = false; r.onchange = () => { $('mtUse').disabled = false; }; });
-  $('mtUse').onclick = async () => {
-    const sel = box.querySelector('input[name=mtPlant]:checked'); if (!sel || metasBusy) return;
-    metasBusy = true; $('mtUse').disabled = true; $('mtErr').textContent = '';
-    try { const r = await api('metas_plantilla', { plantilla: sel.value }); metasPicker = false; MD = null; raw.metas = r.metas; apply(raw); celebrate('Listo: ya tienes tus porcentajes. Elige con qué cubres cada barrio, revisa las tolerancias y pulsa Guardar mis metas.'); }
-    catch (e) { $('mtErr').textContent = e.message; $('mtUse').disabled = false; }
-    metasBusy = false;
-  };
-  if ($('mtCancel')) $('mtCancel').onclick = () => { metasPicker = false; renderMetas(); };
+// ---------- estado del asistente ----------
+function wizardFrom(metas) {
+  const w = { step: metas.length ? 'pct' : 'inicio', origin: '', tplFab: null, pct: {}, modo: {}, rep: {} };
+  GRUPOS.forEach(([n]) => {
+    const m = metas.find(x => x.grupo === n) || {};
+    w.pct[n] = numTxt(m.objetivo_pct ?? 0) || '0';
+    w.modo[n] = m.modo === 'tres' ? 'varios' : (m.modo || '');
+    w.rep[n] = {}; (m.reparto || []).forEach(x => { w.rep[n][x.activo] = numTxt(x.peso_pct); });
+  });
+  return w;
+}
+const wzSteps = () => ['inicio', 'pct'].concat(GRUPOS.map(([n]) => n).filter(n => num(WZ.pct[n], 0) > 0), ['resumen']);
+function wzGo(step) { WZ.step = step; WZ.err = ''; renderMetas(); const b = $('metas'); if (b && b.getBoundingClientRect().top < 0) b.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); }
+function wzNext() { const s = wzSteps(), i = s.indexOf(WZ.step); wzGo(s[Math.min(s.length - 1, i + 1)]); }
+function wzBack() { const s = wzSteps(), i = s.indexOf(WZ.step); wzGo(s[Math.max(0, i - 1)]); }
+// reparto inicial al elegir la versión de varios instrumentos (igual para todos)
+function repInicial(n) {
+  const C = MC(n);
+  if (n === 'Acciones') { const f = WZ.tplFab || C.ejemplo || {}; return Object.fromEntries((C.varios || []).map(a => [a, numTxt(f[a] ?? 0)])); }
+  if (n === 'FIBRAs') { const p = C.pesos || {}; return Object.fromEntries((C.varios || []).map(a => [a, p[a] != null ? numTxt(p[a]) : ''])); }
+  return Object.fromEntries((C.varios || []).map(a => [a, '']));
+}
+function pesosHtml(n, list, txt) {
+  return `<div class="mt-w">${list.map(a => { const i = itemOf(a);
+    return `<label class="mt-wrow"><span class="mt-wn"><b>${esc(a)}</b><small>${esc(txt ? txt(i) : (i.descripcion || ''))}</small></span>
+      <span class="mt-wi"><input type="number" min="0" max="100" step="0.5" inputmode="decimal" data-w="${esc(a)}" value="${WZ.rep[n][a] ?? ''}" aria-label="Peso de ${esc(a)} dentro de ${esc(n)}">%</span></label>`; }).join('')}
+    <p class="foot" style="margin:0" id="mtWsum"></p></div>`;
+}
+// ---------- ventanas ----------
+function stepHtml() {
+  const s = wzSteps(), i = s.indexOf(WZ.step), total = s.length, plant = raw.plantillas || [];
+  const head = (t, sub) => `<p class="wz-k">Paso ${i + 1} de ${total}</p><h3 class="wz-t">${t}</h3>${sub ? `<p class="muted" style="margin:0">${sub}</p>` : ''}`;
+  const opt = (name, v, t, body, on) => `<label class="mt-opt wz-opt"><input type="radio" name="${name}" value="${esc(v)}" autocomplete="off"${on ? ' checked' : ''}><span><b>${t}</b>${body}</span></label>`;
+  if (WZ.step === 'inicio') {
+    const tplTxt = t => GRUPOS.map(([n, k], j) => `${CLS[k].scene} ${t.pct[j]}%`).join(' · ') + (t.fabricas ? `<br>Fábricas con tres instrumentos: ${Object.entries(t.fabricas).map(([a, v]) => `${a} ${v}%`).join(' · ')}` : '');
+    return head('¿Desde dónde quieres empezar?', 'Puedes copiar los porcentajes de una estrategia conocida y cambiarlos en el siguiente paso, o empezar en blanco.')
+      + `<div class="mt-pick">${plant.map(t => opt('wzIni', t.id, esc(t.nombre), `<small>${tplTxt(t)}</small>`, WZ.origin === t.id)).join('')}
+        ${opt('wzIni', 'blanco', 'Empezar en blanco', '<small>Los cuatro barrios en 0%: tú escribes tus porcentajes.</small>', WZ.origin === 'blanco')}</div>`;
+  }
+  if (WZ.step === 'pct') {
+    return head('¿Qué parte de tu tesoro quieres en cada barrio?', 'Los cuatro barrios deben sumar 100%. Los barrios en 0% se saltan en los siguientes pasos.')
+      + `<div class="wz-pct">${GRUPOS.map(([n, k]) => { const h = model.total ? model.classes[k].valor / model.total * 100 : null;
+        return `<label class="wz-prow" style="--c:${CLS[k].color}"><span class="mt-name"><span class="dot"></span><b>${CLS[k].scene}</b><small>${esc(n)}${h != null ? ' · hoy ' + pct1(h) : ''}</small></span>
+          <span class="mt-wi"><input type="number" min="0" max="100" step="0.5" inputmode="decimal" data-g="${esc(n)}" value="${WZ.pct[n]}" aria-label="Meta de ${esc(CLS[k].scene)} en %">%</span></label>`; }).join('')}
+        <p class="foot" style="margin:0" id="mtGsum"></p></div>`;
+  }
+  if (WZ.step === 'Acciones') {
+    const C = MC('Acciones'), varios = WZ.modo.Acciones === 'varios';
+    return head('Fábricas: ¿cómo quieres cubrirlas?', `Tu meta para Fábricas es ${pct1(num(WZ.pct.Acciones, 0))} del tesoro.`)
+      + `<div class="wz-modes">${opt('wzModo', 'uno', 'Versión fácil · un instrumento', `<small>${esc(C.uno)} cubre automáticamente el 100% de Fábricas.</small>${fichaHtml([C.uno])}`, WZ.modo.Acciones === 'uno')}
+        ${opt('wzModo', 'varios', 'Versión divertida · tres instrumentos', `<small>Repartes Fábricas entre ${C.varios.join(', ')}.</small>${fichaHtml(C.varios)}`, varios)}</div>`
+      + (varios ? `<p class="wz-k" style="margin-top:6px">Reparto dentro de Fábricas</p><p class="foot" style="margin:0">${WZ.tplFab ? 'Reparto de la plantilla que elegiste' : `Reparto inicial ${C.varios.map(a => (C.ejemplo || {})[a] + '% ' + a).join(', ')}, igual para todos los usuarios, tomado de las proporciones del esquema Swensen`}. No considera tu situación: cámbialo como quieras.</p>${pesosHtml('Acciones', C.varios)}` : '');
+  }
+  if (WZ.step === 'FIBRAs') {
+    const C = MC('FIBRAs'), varios = WZ.modo.FIBRAs === 'varios', u = itemOf(C.uno);
+    const costo = u.costo_pct != null && u.costo_pct !== '' ? u.costo_pct + '%' : 'su costo anual';
+    return head('Inmuebles: ¿cómo quieres cubrirlos?', `Tu meta para Inmuebles es ${pct1(num(WZ.pct.FIBRAs, 0))} del tesoro.`)
+      + `<div class="wz-modes">${C.uno ? opt('wzModo', 'uno', 'Versión fácil · un ETF de FIBRAs', `<small>${esc(C.uno)} cubre automáticamente el 100% de Inmuebles.</small>${fichaHtml([C.uno])}
+          <p class="wz-note">Lo que dejas de lado: además de lo que cobra cada FIBRA, el ETF cobra ${esc(costo)} al año. Y la exención de ISR para personas físicas al vender en bolsa es para los certificados de FIBRAs (art. 188, fr. X, LISR); un ETF tiene otro tratamiento fiscal. Confírmalo con tu contador.</p>`, WZ.modo.FIBRAs === 'uno') : ''}
+        ${opt('wzModo', 'varios', 'Versión divertida · FIBRAs una por una', `<small>Tienes cada FIBRA directamente y repartes Inmuebles entre ellas.</small>
+          <p class="wz-note">Recibes las distribuciones de cada FIBRA, y como persona física residente en México la ganancia por venderlas en bolsa está exenta de ISR (art. 188, fr. X, LISR). Rebalanceas ${C.varios.length} instrumentos.</p>`, varios)}</div>`
+      + (varios ? `<p class="wz-k" style="margin-top:6px">Reparto dentro de Inmuebles</p><p class="foot" style="margin:0">Los pesos iniciales son los mismos para todos los usuarios. Cámbialos como quieras; deben sumar 100%.</p>${pesosHtml('FIBRAs', C.varios)}` : '');
+  }
+  if (WZ.step === 'Renta fija') {
+    const C = MC('Renta fija');
+    return head('Obras públicas: ¿cómo repartes tu renta fija?', `Tu meta para Obras públicas es ${pct1(num(WZ.pct['Renta fija'], 0))} del tesoro. Decide qué parte va a cada opción; deben sumar 100%.`)
+      + pesosHtml('Renta fija', C.varios, i => (RF_TXT[i.activo] || i.descripcion || '') + (i.tasa != null && i.tasa !== '' ? ` Tasa en tu hoja: ${i.tasa}% anual.` : ''));
+  }
+  if (WZ.step === 'Cripto') {
+    const C = MC('Cripto');
+    return head('Oro virtual', `Tu meta para Oro virtual es ${pct1(num(WZ.pct.Cripto, 0))} del tesoro. Este barrio se cubre solo con ${esc(C.uno)}.`) + fichaHtml([C.uno]);
+  }
+  return head('Revisa y guarda tus metas', 'Así quedan tus reglas. La ciudad calcula con ellas; nada cuenta hasta que pulses Guardar.') + resumenHtml(WZ);
+}
+// resumen (también es la vista cuando ya guardaste)
+function cubreTxt(n, modo, rep) {
+  const C = MC(n);
+  if (modo === 'uno') return esc(C.uno) + ' (100%)';
+  if (modo === 'varios') return Object.entries(rep || {}).filter(([, v]) => num(v, 0) > 0).map(([a, v]) => `${esc(a)} ${numTxt(v)}%`).join(' · ') || '—';
+  return '<span class="muted">sin elegir</span>';
+}
+function tolTxt(n, modo, rep) {
+  const C = MC(n);
+  if (n === 'Acciones') return modo === 'varios' ? Object.keys(rep || {}).filter(a => num(rep[a], 0) > 0).map(a => `${esc(a)} ±${C.tol_inst[a]}`).join(' · ') : `±${C.tol_uno}`;
+  return `±${C.tol}`;
+}
+function resumenHtml(w) {
+  return `<div class="tbl"><table class="wz-sum"><thead><tr><th>Barrio</th><th style="text-align:right">Tu meta</th><th>Cómo lo cubres</th><th>Tolerancia fija (pts)</th></tr></thead><tbody>
+    ${GRUPOS.map(([n, k]) => { const p = num(w.pct[n], 0);
+      return `<tr><td><span class="dot" style="--c:${CLS[k].color};margin-right:6px"></span><b>${CLS[k].scene}</b> <span class="muted">${esc(n)}</span></td><td class="n">${pct1(p)}</td><td>${p > 0 ? cubreTxt(n, w.modo[n], w.rep[n]) : '<span class="muted">—</span>'}</td><td class="muted">${p > 0 ? tolTxt(n, w.modo[n], w.rep[n]) : '—'}</td></tr>`; }).join('')}
+    </tbody></table></div>
+    <p class="foot" style="margin:0">La tolerancia es fija: cuántos puntos del tesoro total se puede alejar cada barrio (o cada instrumento de Fábricas en la versión de tres) antes de marcarlo en el semáforo. Los instrumentos que tengas y no estén aquí se quedan como están: cuentan en su barrio, pero el cálculo no compra ni vende de ellos.</p>`;
+}
+// ---------- validación de cada ventana ----------
+function wzCheck() {
+  if (WZ.step === 'inicio') return WZ.origin ? '' : 'Elige una opción para continuar.';
+  if (WZ.step === 'pct') { const s = sumObj(WZ.pct); return Math.abs(s - 100) > 0.05 ? `Las metas de tus barrios suman ${r2(s)}%. Deben sumar 100%.` : ''; }
+  if (GRUPOS.some(([n]) => n === WZ.step)) {
+    const n = WZ.step, C = MC(n), modo = n === 'Renta fija' ? 'varios' : n === 'Cripto' ? 'uno' : WZ.modo[n];
+    if (!modo) return `Elige cómo cubres ${CLS[GRUPOS.find(g => g[0] === n)[1]].scene}.`;
+    if (modo === 'varios') {
+      const vals = (C.varios || []).map(a => WZ.rep[n][a]);
+      if (vals.every(v => v === '' || v == null)) return 'Escribe el peso de cada opción (puede ser 0).';
+      const s = sumObj(WZ.rep[n]); if (Math.abs(s - 100) > 0.05) return `Los pesos dentro de ${CLS[GRUPOS.find(g => g[0] === n)[1]].scene} suman ${r2(s)}%. Deben sumar 100%.`;
+    }
+  }
+  return '';
 }
 function renderMetas() {
   const box = $('metas'); if (!box || !raw) return;
   GOV.limSync();
   const metas = metasList();
-  if (!metas.length || metasPicker) return renderPicker(box, metas);
-  const D = metasDraft(), I = MI0();
-  const hoyPct = k => model.total ? model.classes[k].valor / model.total * 100 : null;
-  const tolIn = (id, v, label) => `<label class="mt-tolr">Tolerancia<span><input type="number" min="0" max="20" step="0.25" inputmode="decimal" id="${id}" value="${numTxt(v)}" aria-label="Tolerancia de ${esc(label)} en puntos">pts</span></label>`;
-  const pctIn = (n, label) => `<label class="mt-pct">Tu meta<span><input type="number" min="0" max="100" step="0.5" inputmode="decimal" data-g="${esc(n)}" value="${D.pct[n]}" aria-label="Meta de ${esc(label)} en %">%</span></label>`;
-  const head = (k, n) => { const h = hoyPct(k); return `<div class="mt-name"><span class="dot"></span><b>${CLS[k].scene}</b><small>${esc(n)}${h != null ? ' · hoy ' + pct1(h) : ''}</small></div>`; };
-  // Fábricas
-  const fab = model.classes.ACCIONES.items.filter(i => !i.retirado);
-  const unoOk = fab.some(i => i.activo === I.uno);
-  let fabMode = '';
-  if (D.modo === 'uno') fabMode = `<div class="mt-sub">
-      <label class="mt-veh">Lo cubres con<select id="mtUnoVeh" autocomplete="off" aria-label="Instrumento para Fábricas"><option value="">— Elige —</option>${unoOk ? `<option value="${esc(I.uno)}">${esc(I.uno)}</option>` : ''}</select></label>
-      ${tolIn('mtUnoTol', D.unoTol, 'Fábricas')}
-      <p class="foot" style="margin:0;grid-column:1/-1">El instrumento que elijas cubre el 100% del barrio.${unoOk ? '' : ' ' + esc(I.uno) + ' no está en el catálogo todavía.'}</p></div>`;
-  else if (D.modo === 'tres') {
-    const ej = I.ejemplo_tres;
-    fabMode = `<div class="mt-ej"><p style="margin:0"><b>Reparto de ejemplo:</b> ${I.tres.map(a => `${esc(a)} ${ej[a]}%`).join(' · ')}</p>
-        <p class="foot" style="margin:4px 0 8px">Reparto de ejemplo, igual para todos los usuarios, tomado de las proporciones del esquema Swensen. No considera tu situación. Edita los números como quieras.</p>
-        <button type="button" class="ghost small" id="mtEj">Usar este reparto</button></div>
-      <div class="mt-tres">${I.tres.map(a => `<div class="mt-trow"><b>${esc(a)}</b>
-        <label class="mt-pct">Peso en Fábricas<span><input type="number" min="0" max="100" step="0.5" inputmode="decimal" data-w="${esc(a)}" value="${D.tres[a].peso}" aria-label="Peso de ${esc(a)} dentro de Fábricas">%</span></label>
-        ${tolIn('mtTol_' + a, D.tres[a].tol, a)}</div>`).join('')}
-        <p class="foot" style="margin:0" id="mtWsum"></p></div>`;
+  if (!metas.length || metasEdit) {
+    if (!WZ) WZ = wizardFrom(metas);
+    if (WZ.step === 'Renta fija') WZ.modo['Renta fija'] = 'varios';
+    if (WZ.step === 'Cripto') WZ.modo.Cripto = 'uno';
+    if (GRUPOS.some(g => g[0] === WZ.step) && WZ.modo[WZ.step] === 'varios' && !Object.values(WZ.rep[WZ.step] || {}).some(v => v !== '' && v != null)) WZ.rep[WZ.step] = repInicial(WZ.step);
+    const s = wzSteps(), i = s.indexOf(WZ.step), last = WZ.step === 'resumen';
+    box.classList.remove('collapsed');
+    box.innerHTML = `<div class="phead"><h2>Tus metas</h2><span class="pill hi">${metas.length ? 'Cambiando tus metas' : 'Pendiente'}</span></div>
+      <div class="wz-dots" aria-hidden="true">${s.map((x, j) => `<i class="${j < i ? 'done' : j === i ? 'on' : ''}"></i>`).join('')}</div>
+      <section class="wz" aria-live="polite">${stepHtml()}</section>
+      <div class="err" id="mtErr">${WZ.err || ''}</div>
+      <div class="simact">${i > 0 ? '<button type="button" class="ghost" id="wzBack">Atrás</button>' : ''}${last ? '<button type="button" id="mtSave">Guardar mis metas</button>' : '<button type="button" id="wzNext">Siguiente</button>'}${metas.length ? '<button type="button" class="ghost" id="wzCancel">Cancelar</button>' : ''}</div>`;
+    wireWizard(box);
+    return;
   }
-  const modeOpt = (v, t, acts) => `<label class="mt-mode"><input type="radio" name="mtModo" value="${v}" autocomplete="off"><span><b>${t}</b>${fichaHtml(acts)}</span></label>`;
-  const fabBlock = `<div class="mt-row mt-fab" style="--c:${CLS.ACCIONES.color}">${head('ACCIONES', 'Acciones')}${pctIn('Acciones', 'Fábricas')}
-      <div class="mt-modes" role="radiogroup" aria-label="Cómo cubres Fábricas"><p class="mt-q">¿Cómo cubres Fábricas?</p>${modeOpt('uno', 'Un instrumento', [I.uno])}${modeOpt('tres', 'Tres instrumentos', I.tres)}</div>
-      ${fabMode}</div>`;
-  // otros barrios
-  const rows = GRUPOS.filter(([n]) => n !== 'Acciones').map(([n, k]) => {
-    const opts = model.classes[k].items.filter(i => !i.retirado).slice().sort(byName);
-    return `<div class="mt-row" style="--c:${CLS[k].color}">${head(k, n)}${pctIn(n, CLS[k].scene)}
-      <label class="mt-veh">Lo cubres con<select data-v="${esc(n)}" autocomplete="off" aria-label="Instrumento para ${esc(n)}"><option value="">— Elige —</option>${opts.map(i => `<option value="${esc(i.activo)}">${esc(i.activo)}${i.descripcion ? ' · ' + esc(i.descripcion) : ''}</option>`).join('')}</select></label>
-      ${tolIn('mtTolG_' + k, D.tol[n], CLS[k].scene)}</div>`;
-  }).join('');
-  box.innerHTML = `<div class="phead"><h2>Tus metas</h2><span class="pill ok" id="mtSumPill"></span></div>
-    <p class="muted" style="margin:0">Estas son tus reglas: qué porcentaje del tesoro quieres en cada barrio, con qué lo cubres y cuántos puntos se puede alejar cada uno antes de marcarlo en el semáforo. La ciudad calcula con ellas y no elige por ti. Nada cuenta hasta que pulses <b>Guardar mis metas</b>.</p>
-    <div class="mt-rows">${fabBlock}${rows}</div>
-    <p class="foot" style="margin:0">La tolerancia se mide en puntos del tesoro total. Los valores que ves sin guardar son los iniciales, iguales para todos. ${origenTxt(metas[0].plantilla)} Los instrumentos que no elijas se quedan como están: cuentan en su barrio, pero el cálculo no compra ni vende de ellos.</p>
-    <div class="err" id="mtErr"></div>
-    <div class="simact"><button type="button" id="mtSave">Guardar mis metas</button><button type="button" class="ghost" id="mtRestart">Empezar de nuevo con una plantilla</button></div>`;
-  // valores elegidos: solo los que vienen del borrador (nunca se preselecciona nada)
-  box.querySelectorAll('input[name=mtModo]').forEach(r => { r.checked = r.value === D.modo; r.onchange = () => { D.modo = r.value; renderMetas(); }; });
-  box.querySelectorAll('select[data-v]').forEach(s => { s.value = D.veh[s.dataset.v] || ''; s.onchange = () => { D.veh[s.dataset.v] = s.value; }; });
-  if ($('mtUnoVeh')) { $('mtUnoVeh').value = D.unoVeh || ''; $('mtUnoVeh').onchange = e => { D.unoVeh = e.target.value; }; }
-  if ($('mtUnoTol')) $('mtUnoTol').oninput = e => { D.unoTol = e.target.value; };
-  GRUPOS.filter(([n]) => n !== 'Acciones').forEach(([n, k]) => { const el = $('mtTolG_' + k); if (el) el.oninput = () => { D.tol[n] = el.value; }; });
-  I.tres.forEach(a => { const el = $('mtTol_' + a); if (el) el.oninput = () => { D.tres[a].tol = el.value; }; });
-  const sumG = () => GRUPOS.reduce((s, [n]) => s + num(D.pct[n], 0), 0);
-  const sumW = () => I.tres.reduce((s, a) => s + num(D.tres[a].peso, 0), 0);
-  const showSum = () => {
-    const s = Math.round(sumG() * 100) / 100, ok = Math.abs(s - 100) <= 0.05, p = $('mtSumPill');
-    p.textContent = ok ? 'Barrios: suman 100%' : `Barrios: suman ${s}%`; p.className = 'pill ' + (ok ? 'ok' : 'lo');
-    const w = $('mtWsum'); if (w) { const t = Math.round(sumW() * 100) / 100; w.textContent = `Pesos dentro de Fábricas: suman ${t}%${Math.abs(t - 100) <= 0.05 ? '.' : ' (deben sumar 100%).'}`; }
+  // ya guardadas: resumen y botón para cambiarlas
+  const v = wizardFrom(metas);
+  box.innerHTML = `<div class="phead"><h2>Tus metas</h2><span class="pill ok">Guardadas</span></div>${resumenHtml(v)}
+    <p class="foot" style="margin:0">${origenTxt(metas[0].plantilla)}</p>
+    <div class="simact"><button type="button" class="ghost" id="mtEdit">Cambiar mis metas</button></div>`;
+  $('mtEdit').onclick = () => { metasEdit = true; WZ = wizardFrom(metas); renderMetas(); };
+  collapsible(box, 'metas', GRUPOS.map(([n, k]) => { const p = num(v.pct[n], 0); return p > 0 ? `${CLS[k].scene} <b>${pct1(p)}</b>` : ''; }).filter(Boolean).join(' · '), true);
+}
+function wireWizard(box) {
+  const showSums = () => {
+    const g = $('mtGsum'); if (g) { const s = r2(sumObj(WZ.pct)); g.textContent = `Suman ${s}%${Math.abs(s - 100) <= 0.05 ? '.' : ' (deben sumar 100%).'}`; g.className = 'foot ' + (Math.abs(s - 100) <= 0.05 ? 'pos' : 'neg'); }
+    const w = $('mtWsum'); if (w) { const s = r2(sumObj(WZ.rep[WZ.step])); w.textContent = `Suman ${s}%${Math.abs(s - 100) <= 0.05 ? '.' : ' (deben sumar 100%).'}`; w.className = 'foot ' + (Math.abs(s - 100) <= 0.05 ? 'pos' : 'neg'); }
   };
-  box.querySelectorAll('input[data-g]').forEach(i => i.addEventListener('input', () => { D.pct[i.dataset.g] = i.value; showSum(); }));
-  box.querySelectorAll('input[data-w]').forEach(i => i.addEventListener('input', () => { D.tres[i.dataset.w].peso = i.value; showSum(); }));
-  if ($('mtEj')) $('mtEj').onclick = () => { I.tres.forEach(a => { D.tres[a].peso = String(I.ejemplo_tres[a]); }); renderMetas(); };
-  showSum();
-  $('mtRestart').onclick = () => { metasPicker = true; renderMetas(); };
-  $('mtSave').onclick = async () => {
+  box.querySelectorAll('input[name=wzIni]').forEach(r => r.onchange = () => {
+    WZ.origin = r.value;
+    const t = (raw.plantillas || []).find(x => x.id === r.value);
+    GRUPOS.forEach(([n], j) => { WZ.pct[n] = String(t ? t.pct[j] : 0); });
+    WZ.tplFab = t && t.fabricas ? t.fabricas : null;
+    WZ.rep.Acciones = {};   // el reparto de Fábricas se vuelve a llenar con el de la plantilla al elegir la versión de tres
+    wzNext();
+  });
+  box.querySelectorAll('input[name=wzModo]').forEach(r => r.onchange = () => {
+    const n = WZ.step; WZ.modo[n] = r.value;
+    if (r.value === 'varios' && !Object.values(WZ.rep[n] || {}).some(v => v !== '' && v != null)) WZ.rep[n] = repInicial(n);
+    if (r.value === 'uno') wzNext(); else renderMetas();
+  });
+  box.querySelectorAll('input[data-g]').forEach(i => i.addEventListener('input', () => { WZ.pct[i.dataset.g] = i.value; showSums(); }));
+  box.querySelectorAll('input[data-w]').forEach(i => i.addEventListener('input', () => { WZ.rep[WZ.step][i.dataset.w] = i.value; showSums(); }));
+  showSums();
+  if ($('wzBack')) $('wzBack').onclick = wzBack;
+  if ($('wzCancel')) $('wzCancel').onclick = () => { metasEdit = false; WZ = null; renderMetas(); };
+  if ($('wzNext')) $('wzNext').onclick = () => { const e = wzCheck(); if (e) { WZ.err = e; $('mtErr').textContent = e; return; } wzNext(); };
+  if ($('mtSave')) $('mtSave').onclick = async () => {
     if (metasBusy) return;
-    const err = $('mtErr'); err.textContent = '';
-    const fail = m => { err.textContent = m; return true; };
-    const badTol = (v, quien) => { const t = num(v, NaN); return isNaN(t) || t < 0 || t > 20 ? fail(`La tolerancia de ${quien} debe ser un número entre 0 y 20.`) : false; };
-    const s = sumG();
-    if (Math.abs(s - 100) > 0.05) return fail(`Las metas de tus barrios suman ${Math.round(s * 100) / 100}%. Deben sumar 100%.`);
-    if (D.modo === 'tres') {
-      if (I.tres.some(a => D.tres[a].peso === '' || isNaN(num(D.tres[a].peso, NaN)))) return fail(`Escribe el peso de ${I.tres.join(', ')} o usa el reparto de ejemplo.`);
-      const w = sumW(); if (Math.abs(w - 100) > 0.05) return fail(`Los pesos de ${I.tres.join(', ')} suman ${Math.round(w * 100) / 100}%. Deben sumar 100% del barrio de Fábricas.`);
-      for (const a of I.tres) if (badTol(D.tres[a].tol, a)) return;
-    }
-    if (D.modo === 'uno' && badTol(D.unoTol, 'Fábricas')) return;
-    for (const [n, k] of GRUPOS) if (n !== 'Acciones' && badTol(D.tol[n], CLS[k].scene)) return;
-    const lista = GRUPOS.map(([n]) => n === 'Acciones'
-      ? { grupo: n, objetivo_pct: num(D.pct[n], 0), modo: D.modo, vehiculo: D.modo === 'uno' ? D.unoVeh : '', tolerancia_pts: D.modo === 'uno' ? num(D.unoTol, NaN) : null,
-          reparto: D.modo === 'tres' ? I.tres.map(a => ({ activo: a, peso_pct: num(D.tres[a].peso, NaN), tolerancia_pts: num(D.tres[a].tol, NaN) })) : [] }
-      : { grupo: n, objetivo_pct: num(D.pct[n], 0), vehiculo: D.veh[n] || '', tolerancia_pts: num(D.tol[n], NaN) });
-    const falta = [];
-    if (num(D.pct.Acciones, 0) > 0 && !D.modo) falta.push('Fábricas (elige un instrumento o tres)');
-    if (num(D.pct.Acciones, 0) > 0 && D.modo === 'uno' && !D.unoVeh) falta.push('Fábricas');
-    GRUPOS.forEach(([n, k]) => { if (n !== 'Acciones' && num(D.pct[n], 0) > 0 && !D.veh[n]) falta.push(CLS[k].scene); });
+    for (const st of wzSteps().slice(0, -1)) { const keep = WZ.step; WZ.step = st; const e = wzCheck(); WZ.step = keep; if (e) { $('mtErr').textContent = e; return; } }
+    const lista = GRUPOS.map(([n]) => { const p = num(WZ.pct[n], 0), modo = p > 0 ? WZ.modo[n] : '';
+      return { grupo: n, objetivo_pct: p, modo, reparto: modo === 'varios' ? Object.entries(WZ.rep[n] || {}).map(([a, v]) => ({ activo: a, peso_pct: num(v, 0) })) : [] }; });
     metasBusy = true; $('mtSave').disabled = true;
     try {
-      const r = await api('guardar_metas', { metas: lista });
-      MD = null; raw.metas = r.metas; apply(raw);
-      celebrate(falta.length ? `Metas guardadas. Falta elegir cómo cubres ${falta.join(', ')}: mientras tanto, su parte queda sin asignar.` : 'Metas guardadas. La ciudad ya calcula con ellas.');
-    } catch (e) { err.textContent = e.message; }
+      const r = await api('guardar_metas', { metas: lista, plantilla: WZ.origin || '' });
+      metasEdit = false; WZ = null; raw.metas = r.metas; apply(raw);
+      celebrate('Metas guardadas. La ciudad ya calcula con ellas.');
+    } catch (e) { $('mtErr').textContent = e.message; }
     metasBusy = false; const b = $('mtSave'); if (b) b.disabled = false;
   };
-  // se abre sola mientras falte algo por guardar
-  const F = metas.find(x => x.grupo === 'Acciones') || {};
-  const listo = hasMetas() && metas.every(m => m.grupo === 'Acciones' ? (!(+m.objetivo_pct > 0) || (m.modo === 'uno' ? m.vehiculo && m.tolerancia_pts != null : m.modo === 'tres'))
-    : (m.tolerancia_pts != null && (!(+m.objetivo_pct > 0) || m.vehiculo)));
-  collapsible(box, 'metas', GRUPOS.map(([n, k]) => { const m = metas.find(x => x.grupo === n); const v = n === 'Acciones' ? (F.modo === 'tres' ? (F.reparto || []).map(x => x.activo).join('/') : F.vehiculo) : m && m.vehiculo; return `${CLS[k].scene} <b>${m ? +m.objetivo_pct : 0}%</b>${v ? ' (' + esc(v) + ')' : ''}`; }).join(' · '), listo);
-  if (!listo) { box.classList.remove('collapsed'); const b = box.querySelector('.phead button'); if (b) { b.textContent = 'Minimizar'; b.setAttribute('aria-expanded', 'true'); } }
 }
 
 // [módulos del pueblo]
