@@ -683,9 +683,9 @@ let demoHist = (() => {
   return rows;
 })();
 const DEMO_PLANT = [
-  { id: 'P1', nombre: 'Mayoría renta fija', pct: [20, 10, 70, 0], version: '1', fecha: '2026-10-30' },
-  { id: 'S1', nombre: 'Esquema Swensen', pct: [50, 20, 30, 0], version: '1', fecha: '2026-10-30', fabricas: { VUAA: 60, VEA: 30, VWO: 10 } },
-  { id: 'S2', nombre: 'Esquema Swensen con bitcoin', pct: [45, 20, 30, 5], version: '1', fecha: '2026-10-30', fabricas: { VUAA: 55.56, VEA: 33.33, VWO: 11.11 } }];
+  { id: 'P1', nombre: 'Estrategia de renta fija', pct: [20, 10, 70, 0], version: '1', fecha: '2026-10-30' },
+  { id: 'S1', nombre: 'Estrategia Swensen', pct: [50, 20, 30, 0], version: '1', fecha: '2026-10-30', fabricas: { VUAA: 60, VEA: 30, VWO: 10 } },
+  { id: 'S2', nombre: 'Estrategia Swensen con bitcoin', pct: [45, 20, 30, 5], version: '1', fecha: '2026-10-30', fabricas: { VUAA: 55.56, VEA: 33.33, VWO: 11.11 } }];
 let demoMetas = [];
 const DEMO_FICHAS = {
   VT: ['FTSE Global All Cap Index: empresas de todo el mundo, incluido Estados Unidos.', 0.06, 'https://fund-docs.vanguard.com/F3141.pdf', 'USD', '2026-09-30'],
@@ -699,7 +699,7 @@ if (!DEMO_CATALOGO.some(c => c.activo === 'FIBRATC14')) DEMO_CATALOGO.push({ act
 DEMO_CATALOGO.forEach(c => { const f = DEMO_FICHAS[c.activo]; if (f) Object.assign(c, { indice: f[0], costo_pct: f[1], costo_url: f[2], moneda: f[3], costo_fecha: f[4] }); });
 const DEMO_CONF = { 'Acciones': { uno: 'VT', varios: ['VUAA', 'VEA', 'VWO'], ejemplo: { VUAA: 60, VEA: 30, VWO: 10 }, tol_uno: 7.5, tol_inst: { VUAA: 5, VEA: 3.5, VWO: 1.25 } },
   'FIBRAs': { uno: 'FIBRATC14', varios: ['FUNO11', 'FIBRAPL14', 'DANHOS13', 'FNOVA17', 'FMTY14', 'NEXT23'], pesos: { FUNO11: 25, FIBRAPL14: 20, DANHOS13: 15, FNOVA17: 15, FMTY14: 10, NEXT23: 15 }, tol: 5 },
-  'Renta fija': { varios: ['Bondia', 'Cetes 91 días', 'Cetes 182 días', 'Udibonos'], tol: 5 }, 'Cripto': { uno: 'Bitcoin', tol: 1.25 } };
+  'Renta fija': { varios: ['Bondia', 'Cetes 91 días', 'Cetes 182 días', 'Cetes 364 días', 'Udibonos'], pesos: { 'Bondia': 20, 'Cetes 91 días': 20, 'Cetes 182 días': 20, 'Cetes 364 días': 20, 'Udibonos': 20 }, tol: 5 }, 'Cripto': { uno: 'Bitcoin', tol: 1.25 } };
 function demoApi(accion, data) {
   if (accion === 'metas_plantilla') {
     const t = DEMO_PLANT.find(x => x.id === data.plantilla);
@@ -2954,11 +2954,11 @@ GOV.limInput('simLim', 'cm_lim_compra', () => { if (model) renderSim(); });   //
 const METAS_CONF_DEF = {
   'Acciones': { uno: 'VT', varios: ['VUAA', 'VEA', 'VWO'], ejemplo: { VUAA: 60, VEA: 30, VWO: 10 }, tol_uno: 7.5, tol_inst: { VUAA: 5, VEA: 3.5, VWO: 1.25 } },
   'FIBRAs': { uno: 'FIBRATC14', varios: ['FUNO11', 'FIBRAPL14', 'DANHOS13', 'FNOVA17', 'FMTY14', 'NEXT23'], pesos: {}, tol: 5 },
-  'Renta fija': { varios: ['Bondia', 'Cetes 91 días', 'Cetes 182 días', 'Udibonos'], tol: 5 },
+  'Renta fija': { varios: ['Bondia', 'Cetes 91 días', 'Cetes 182 días', 'Cetes 364 días', 'Udibonos'], pesos: { 'Bondia': 20, 'Cetes 91 días': 20, 'Cetes 182 días': 20, 'Cetes 364 días': 20, 'Udibonos': 20 }, tol: 5 },
   'Cripto': { uno: 'Bitcoin', tol: 1.25 }
 };
 const MC = n => { const c = raw && raw.metas_inicial; return (c && c[n] && typeof c[n] === 'object') ? c[n] : (METAS_CONF_DEF[n] || {}); };   // si el servidor es de otra versión, usa los valores de la página
-const RF_TXT = { 'Bondia': 'Dinero líquido: disponible al día siguiente.', 'Cetes 91 días': 'Préstamo al gobierno a 3 meses.', 'Cetes 182 días': 'Préstamo al gobierno a 6 meses.',
+const RF_TXT = { 'Bondia': 'Dinero líquido: disponible al día siguiente.', 'Cetes 91 días': 'Préstamo al gobierno a 3 meses.', 'Cetes 182 días': 'Préstamo al gobierno a 6 meses.', 'Cetes 364 días': 'Préstamo al gobierno a 1 año.',
   'Udibonos': 'Su valor sube con la inflación (se miden en UDIS) y además pagan intereses.' };
 const numTxt = v => v == null || v === '' || isNaN(v) ? '' : String(+v);
 const itemOf = a => (model && model.items || []).find(i => i.activo === a) || { activo: a };
@@ -2984,7 +2984,7 @@ function fichaHtml(acts, n) {
 }
 // ---------- estado del asistente ----------
 function wizardFrom(metas) {
-  const w = { step: metas.length ? 'pct' : 'inicio', origin: '', tplFab: null, pct: {}, modo: {}, rep: {} };
+  const w = { step: 'inicio', origin: '', tplFab: null, pct: {}, modo: {}, rep: {} };
   GRUPOS.forEach(([n]) => {
     const m = metas.find(x => x.grupo === n) || {};
     w.pct[n] = numTxt(m.objetivo_pct ?? 0) || '0';
@@ -3001,7 +3001,7 @@ function wzBack() { const s = wzSteps(), i = s.indexOf(WZ.step); wzGo(s[Math.max
 function repInicial(n) {
   const C = MC(n);
   if (n === 'Acciones') { const f = WZ.tplFab || C.ejemplo || {}; return Object.fromEntries((C.varios || []).map(a => [a, numTxt(f[a] ?? 0)])); }
-  if (n === 'FIBRAs') { const p = C.pesos || {}; return Object.fromEntries((C.varios || []).map(a => [a, p[a] != null ? numTxt(p[a]) : ''])); }
+  if (n === 'FIBRAs' || n === 'Renta fija') { const p = C.pesos || {}; return Object.fromEntries((C.varios || []).map(a => [a, p[a] != null ? numTxt(p[a]) : ''])); }
   return Object.fromEntries((C.varios || []).map(a => [a, '']));
 }
 function pesosHtml(n, list, txt) {
@@ -3017,9 +3017,10 @@ function stepHtml() {
   const opt = (name, v, t, body, on) => `<label class="mt-opt wz-opt"><input type="radio" name="${name}" value="${esc(v)}" autocomplete="off"${on ? ' checked' : ''}><span><b>${t}</b>${body}</span></label>`;
   if (WZ.step === 'inicio') {
     const tplTxt = t => GRUPOS.map(([n, k], j) => `${CLS[k].scene} ${t.pct[j]}%`).join(' · ') + (t.fabricas ? `<br>Fábricas con tres instrumentos: ${Object.entries(t.fabricas).map(([a, v]) => `${a} ${v}%`).join(' · ')}` : '');
-    return head('¿Desde dónde quieres empezar?', 'Puedes copiar los porcentajes de una estrategia conocida y cambiarlos en el siguiente paso, o empezar en blanco.')
+    return head('¿Con qué estrategia quieres empezar?', 'Puedes copiar los porcentajes de una estrategia y cambiarlos en el siguiente paso, o empezar en blanco y escribir los tuyos.')
       + `<div class="mt-pick">${plant.map(t => opt('wzIni', t.id, esc(t.nombre), `<small>${tplTxt(t)}</small>`, WZ.origin === t.id)).join('')}
-        ${opt('wzIni', 'blanco', 'Empezar en blanco', '<small>Los cuatro barrios en 0%: tú escribes tus porcentajes.</small>', WZ.origin === 'blanco')}</div>`;
+        ${opt('wzIni', 'blanco', 'Estrategia en blanco', '<small>Los cuatro barrios en 0%: tú escribes tus porcentajes.</small>', WZ.origin === 'blanco')}
+        ${metasList().length ? opt('wzIni', 'actual', 'Seguir con mis metas actuales', '<small>Parte de lo que ya tienes guardado y cámbialo en los siguientes pasos.</small>', WZ.origin === 'actual') : ''}</div>`;
   }
   if (WZ.step === 'pct') {
     return head('¿Qué parte de tu tesoro quieres en cada barrio?', 'Los cuatro barrios deben sumar 100%. Los barrios en 0% se saltan en los siguientes pasos.')
@@ -3048,7 +3049,7 @@ function stepHtml() {
   if (WZ.step === 'Renta fija') {
     const C = MC('Renta fija');
     return head('Obras públicas: ¿cómo repartes tu renta fija?', `Tu meta para Obras públicas es ${pct1(num(WZ.pct['Renta fija'], 0))} del tesoro. Decide qué parte va a cada opción; deben sumar 100%.`)
-      + pesosHtml('Renta fija', C.varios, i => (RF_TXT[i.activo] || i.descripcion || '') + (i.tasa != null && i.tasa !== '' ? ` Tasa en tu hoja: ${i.tasa}% anual.` : ''));
+      + `<p class="foot" style="margin:0">Los pesos iniciales son los mismos para todos los usuarios. Cámbialos como quieras.</p>` + pesosHtml('Renta fija', C.varios, i => (RF_TXT[i.activo] || i.descripcion || '') + (i.tasa != null && i.tasa !== '' ? ` Tasa en tu hoja: ${i.tasa}% anual.` : ''));
   }
   if (WZ.step === 'Cripto') {
     const C = MC('Cripto');
@@ -3132,6 +3133,7 @@ function wireWizard(box) {
     const w = $('mtWsum'); if (w) { const s = r2(sumObj(WZ.rep[WZ.step])); w.textContent = `Suman ${s}%${Math.abs(s - 100) <= 0.05 ? '.' : ' (deben sumar 100%).'}`; w.className = 'foot ' + (Math.abs(s - 100) <= 0.05 ? 'pos' : 'neg'); }
   };
   box.querySelectorAll('input[name=wzIni]').forEach(r => r.onchange = () => {
+    if (r.value === 'actual') { WZ = wizardFrom(metasList()); WZ.origin = 'actual'; wzNext(); return; }
     WZ.origin = r.value;
     const t = (raw.plantillas || []).find(x => x.id === r.value);
     GRUPOS.forEach(([n], j) => { WZ.pct[n] = String(t ? t.pct[j] : 0); });
@@ -3152,12 +3154,12 @@ function wireWizard(box) {
   if ($('wzNext')) $('wzNext').onclick = () => { const e = wzCheck(); if (e) { WZ.err = e; $('mtErr').textContent = e; return; } wzNext(); };
   if ($('mtSave')) $('mtSave').onclick = async () => {
     if (metasBusy) return;
-    for (const st of wzSteps().slice(0, -1)) { const keep = WZ.step; WZ.step = st; const e = wzCheck(); WZ.step = keep; if (e) { $('mtErr').textContent = e; return; } }
+    for (const st of wzSteps().slice(1, -1)) { const keep = WZ.step; WZ.step = st; const e = wzCheck(); WZ.step = keep; if (e) { $('mtErr').textContent = e; return; } }
     const lista = GRUPOS.map(([n]) => { const p = num(WZ.pct[n], 0), modo = p > 0 ? WZ.modo[n] : '';
       return { grupo: n, objetivo_pct: p, modo, reparto: modo === 'varios' ? Object.entries(WZ.rep[n] || {}).map(([a, v]) => ({ activo: a, peso_pct: num(v, 0) })) : [] }; });
     metasBusy = true; $('mtSave').disabled = true;
     try {
-      const r = await api('guardar_metas', { metas: lista, plantilla: WZ.origin || '' });
+      const r = await api('guardar_metas', { metas: lista, plantilla: WZ.origin === 'actual' ? '' : (WZ.origin || '') });
       metasEdit = false; WZ = null; raw.metas = r.metas; apply(raw);
       celebrate('Metas guardadas. La ciudad ya calcula con ellas.');
     } catch (e) { $('mtErr').textContent = e.message; }
