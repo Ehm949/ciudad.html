@@ -697,6 +697,7 @@ const DEMO_FICHAS = {
 if (!DEMO_CATALOGO.some(c => c.activo === 'VT')) DEMO_CATALOGO.splice(1, 0, { activo: 'VT', clase: 'ACCIONES', subclase: 'Global', descripcion: 'Acciones de empresas de todo el mundo', precio_mxn: 2580, cambio_dia: 0.4 });
 if (!DEMO_CATALOGO.some(c => c.activo === 'FIBRATC14')) DEMO_CATALOGO.push({ activo: 'FIBRATC14', clase: 'FIBRAS', subclase: 'ETF de FIBRAs', descripcion: 'ETF que replica el índice S&P/BMV FIBRAS', precio_mxn: 27.75, cambio_dia: 0.5 });
 DEMO_CATALOGO.forEach(c => { const f = DEMO_FICHAS[c.activo]; if (f) Object.assign(c, { indice: f[0], costo_pct: f[1], costo_url: f[2], moneda: f[3], costo_fecha: f[4] }); });
+DEMO_CATALOGO.forEach(c => { const cc = { VUAA: 'EE.UU.', VTI: 'EE.UU.', IVVPESO: 'EE.UU.', VIG: 'EE.UU.', VEA: 'Desarrollados', VWO: 'Emergentes' }[c.activo]; if (cc) c.cuenta_como = cc; });
 const DEMO_CONF = { 'Acciones': { uno: 'VT', varios: ['VUAA', 'VEA', 'VWO'], ejemplo: { VUAA: 60, VEA: 30, VWO: 10 }, tol_uno: 7.5, tol_inst: { VUAA: 5, VEA: 3.5, VWO: 1.25 } },
   'FIBRAs': { uno: 'FIBRATC14', varios: ['FUNO11', 'FIBRAPL14', 'DANHOS13', 'FNOVA17', 'FMTY14', 'NEXT23'], pesos: { FUNO11: 25, FIBRAPL14: 20, DANHOS13: 15, FNOVA17: 15, FMTY14: 10, NEXT23: 15 }, tol: 5 },
   'Renta fija': { varios: ['Bondia', 'Cetes 91 días', 'Cetes 182 días', 'Cetes 364 días', 'Udibonos'], pesos: { 'Bondia': 20, 'Cetes 91 días': 20, 'Cetes 182 días': 20, 'Cetes 364 días': 20, 'Udibonos': 20 }, tol: 5 }, 'Cripto': { uno: 'Bitcoin', tol: 1.25 } };
@@ -809,22 +810,37 @@ function resolveMembers(M, txt) {
 //  Cada barrio (o cada instrumento en el modo de tres) tiene su propia tolerancia; vacía = todavía no la guarda.
 function applyStrategy(M) {
   M.groups = [];
-  M.items.forEach(i => { i.hold = false; i.cw = 0; i.objetivo = 0; i.tol = null; });
+  M.items.forEach(i => { i.hold = false; i.cw = 0; i.objetivo = 0; i.tol = null; i.slot = null; });
   const metas = metasList(), ok = hasMetas();
+  const SLOT_DEF = { VUAA: 'EE.UU.', VEA: 'Desarrollados', VWO: 'Emergentes' };
   GRUPOS.forEach(([name, k]) => {
     const m = metas.find(x => x.grupo === name), members = M.classes[k].items;
     if (!m || !members.length) return;
     const tG = ok ? Math.max(0, num(m.objetivo_pct, 0)) : 0, varios = m.modo === 'varios' || m.modo === 'tres';
-    const tres = k === 'ACCIONES' && varios;   // solo Fábricas mide cada instrumento en el semáforo
+    const tres = k === 'ACCIONES' && varios;   // solo Fábricas mide cada parte en el semáforo
     let parts = [];
     if (varios) parts = (m.reparto || []).map(x => ({ i: members.find(it => !it.retirado && it.activo === x.activo), w: num(x.peso_pct, 0) / 100, tol: x.tolerancia_pts })).filter(x => x.i && x.w > 0);
     else if (m.modo === 'uno' || (k !== 'ACCIONES' && m.vehiculo)) { const v = members.find(i => !i.retirado && i.activo === m.vehiculo); if (v) parts = [{ i: v, w: 1, tol: m.tolerancia_pts }]; }
-    const tset = new Set(parts.map(x => x.i)), holds = members.filter(i => !tset.has(i)), holdPct = holds.reduce((a, i) => a + i.pct, 0);
+    // Fábricas de tres: cada parte (EE.UU., Desarrollados, Emergentes) suma todo lo que en Config tenga ese "cuenta_como";
+    // se compra con el instrumento elegido (VUAA, VEA o VWO) y los demás cuentan pero no se compran
+    parts.forEach(x => {
+      x.slot = tres ? (x.i.cuenta_como || SLOT_DEF[x.i.activo] || x.i.activo) : null;
+      x.members = tres ? members.filter(it => it === x.i || (x.slot && it.cuenta_como === x.slot)) : [x.i];
+      x.valor = x.members.reduce((a, it) => a + it.valor, 0);
+    });
+    const inPart = new Set(parts.flatMap(x => x.members)), buy = new Set(parts.map(x => x.i));
+    const holds = members.filter(i => !buy.has(i)), holdPct = members.filter(i => !inPart.has(i)).reduce((a, i) => a + i.pct, 0);
     holds.forEach(i => { i.objetivo = i.pct; i.hold = true; });
     const wsum = parts.reduce((a, x) => a + x.w, 0) || 1;
-    parts.forEach(x => { x.sh = x.w / wsum; x.t = tG * x.sh; x.i.objetivo = Math.max(0, tG - holdPct) * x.sh; x.i.cw = x.t; x.i.tol = x.tol; });
+    parts.forEach(x => {
+      x.sh = x.w / wsum; x.t = tG * x.sh;
+      const otros = x.members.filter(it => it !== x.i).reduce((a, it) => a + it.pct, 0);
+      x.members.forEach(it => { if (it !== x.i) it.slot = x.slot; });
+      x.i.objetivo = tres ? Math.max(0, x.t - otros) : Math.max(0, tG - holdPct) * x.sh; x.i.cw = x.t; x.i.tol = x.tol; x.i.slot = x.slot;
+    });
     M.groups.push({ name, key: k, tG, modo: k === 'ACCIONES' ? (m.modo || '') : '', tres, tol: tres ? null : m.tolerancia_pts, veh: parts.length === 1 ? parts[0].i : null, members, holds,
-      traders: parts.map(x => ({ i: x.i, w: x.w, sh: x.sh, t: x.t, tol: x.tol })), valor: members.reduce((a, i) => a + i.valor, 0), holdValor: holds.reduce((a, i) => a + i.valor, 0) });
+      traders: parts.map(x => ({ i: x.i, w: x.w, sh: x.sh, t: x.t, tol: x.tol, slot: x.slot, members: x.members, valor: x.valor })),
+      valor: members.reduce((a, i) => a + i.valor, 0), holdValor: holds.reduce((a, i) => a + i.valor, 0) });
   });
   ORDER.forEach(k => { const c = M.classes[k], g = M.groups.find(x => x.key === k); c.objetivo = ok && g ? g.tG : 0; c.diff = ok ? c.pct - c.objetivo : 0; });
 }
@@ -848,7 +864,7 @@ function bandsInfo(M) {
   };
   const out = [];
   M.groups.forEach(g => {
-    if (g.tres) g.traders.forEach(t => out.push(row(g.name + ' · ' + t.i.activo, [t.i], t.i.valor / M.total * 100, t.t, t.tol)));
+    if (g.tres) g.traders.forEach(t => out.push(row(g.name + ' · ' + t.slot + ' (' + t.members.map(i => i.activo).join(', ') + ')', t.members, t.valor / M.total * 100, t.t, t.tol)));
     else out.push(row(g.name, g.members, g.valor / M.total * 100, g.tG, g.tol));
   });
   return out.filter(b => b.target > 0 || b.actual > 0);
@@ -1220,7 +1236,7 @@ function renderForm() {
                   : `<div class="frow"><span></span><span class="fhead">Títulos</span><span class="fhead">Precio promedio</span></div>`;
     its.forEach(it => {
       const p = it.pos || {}, id = idOf(it.activo);
-      const name = `<div class="fname"><b>${esc(it.activo)}${it.retirado ? ' <span class="empty-lot">ya no en el plan</span>' : ''}${it.privado ? ' <span class="empty-lot" style="color:var(--ren)">solo tú</span>' : ''}${it.hold ? ' <span class="empty-lot" style="color:var(--muted)">se mantiene</span>' : ''}</b><span>${esc(it.descripcion || '')}</span></div>`;
+      const name = `<div class="fname"><b>${esc(it.activo)}${it.retirado ? ' <span class="empty-lot">ya no en el plan</span>' : ''}${it.privado ? ' <span class="empty-lot" style="color:var(--ren)">solo tú</span>' : ''}${it.hold && it.valor > 0 ? ' <span class="empty-lot" style="color:var(--muted)">' + (it.slot ? 'cuenta como ' + esc(it.slot) : 'cuenta, no se compra') + '</span>' : ''}</b><span>${esc(it.descripcion || '')}</span></div>`;
       html += renta
         ? `<div class="frow renta">${name}<input id="${id}_s" type="number" min="0" step="any" inputmode="decimal" placeholder="0" value="${p.saldo ?? ''}" aria-label="Saldo de ${esc(it.activo)}"></div>`
         : `<div class="frow">${name}<input id="${id}_t" type="number" min="0" step="any" inputmode="decimal" placeholder="0" value="${p.titulos ?? ''}" aria-label="Títulos de ${esc(it.activo)}"><input id="${id}_p" type="number" min="0" step="any" inputmode="decimal" placeholder="0.00" value="${p.precio_promedio ?? ''}" aria-label="Precio promedio de ${esc(it.activo)}"></div>`;
@@ -1283,7 +1299,7 @@ function renderSim() {
       return;
     }
     // dentro del barrio, con los pesos que definiste (en el modo de tres)
-    const parts = g.traders.length === 1 ? [a] : levelFill(g.traders.map(t => ({ t: t.sh, v: t.i.valor })), g.traders.reduce((s2, t) => s2 + t.i.valor, 0) + a, a);
+    const parts = g.traders.length === 1 ? [a] : levelFill(g.traders.map(t => ({ t: t.sh, v: t.valor })), g.traders.reduce((s2, t) => s2 + t.valor, 0) + a, a);
     g.traders.forEach((t, k) => {
       const v = t.i, b = parts[k], x = { g, gi, i: v, ideal: b, amt: 0, units: null, free: 0, meta: g.traders.length > 1 ? t.t : null };
       if (isUnit(v)) {
@@ -1356,7 +1372,7 @@ function renderZoom() {
       return `<div class="zrow" tabindex="0" role="option" aria-selected="${selected === it.activo}" data-a="${esc(it.activo)}">
         <div style="min-width:0"><b>${esc(it.activo)}${it.key === 'RENTA_FIJA' ? ' · ' + OBRA[kindOf(k, it)] : ''}</b><span class="zd">${it.valor > 0 ? esc(it.descripcion || '') : (it.objetivo > 0 ? '<span class="empty-lot">Lote por construir · el instrumento que elegiste</span>' : '<span class="empty-lot">Sin títulos</span>')}</span></div>
         <div class="n ${chgCls}">${chg}${it.valor > 0 && it.key !== 'RENTA_FIJA' ? `<br><span class="${it.hoy >= 0 ? 'pos' : 'neg'}">${signed2(it.hoy)}</span>` : ''}</div>
-        <div class="n">${mxn.format(it.valor)}<br><span class="muted">${it.hold ? pct1(it.pct) + ' · se mantiene' : pct1(it.pct) + ' · tu meta ' + pct1(it.objetivo)}</span></div>
+        <div class="n">${mxn.format(it.valor)}<br><span class="muted">${it.hold ? pct1(it.pct) + (it.slot ? ' · cuenta como ' + esc(it.slot) : ' · cuenta, no se compra') : pct1(it.pct) + ' · tu meta ' + pct1(it.objetivo)}</span></div>
       </div>`;
     }).join('')}</div>`;
   box.querySelectorAll('.zrow').forEach(r => {
@@ -2964,6 +2980,21 @@ const numTxt = v => v == null || v === '' || isNaN(v) ? '' : String(+v);
 const itemOf = a => (model && model.items || []).find(i => i.activo === a) || { activo: a };
 const sumObj = o => Object.values(o || {}).reduce((s, v) => s + num(v, 0), 0);
 const r2 = v => Math.round(v * 100) / 100;
+// qué más cuenta en cada parte (columna cuenta_como de Config; cripto: todas las que ves)
+const SLOT_DEF = { VUAA: 'EE.UU.', VEA: 'Desarrollados', VWO: 'Emergentes' };
+function cuentanTxt(n, veh) {
+  if (!model) return '';
+  if (n === 'Acciones') {
+    const vis = model.classes.ACCIONES.items.filter(i => !i.retirado || i.valor > 0);
+    return (veh || []).map(a => { const sl = itemOf(a).cuenta_como || SLOT_DEF[a]; const o = vis.filter(i => i.activo !== a && sl && i.cuenta_como === sl).map(i => i.activo);
+      return o.length ? `En ${esc(sl)} también cuentan ${o.map(esc).join(', ')}; lo que falte se compra con ${esc(a)}.` : ''; }).filter(Boolean).join(' ');
+  }
+  if (n === 'Cripto') {
+    const o = model.classes.BITCOIN.items.filter(i => (!i.retirado || i.valor > 0) && i.activo !== veh).map(i => i.activo);
+    return o.length ? `También cuentan ${o.map(esc).join(', ')}; lo que falte se compra con ${esc(veh)}.` : '';
+  }
+  return '';
+}
 function origenTxt(tag) {
   if (!tag) return '';
   if (tag === 'en blanco') return 'Empezaste en blanco.';
@@ -3034,7 +3065,7 @@ function stepHtml() {
     return head('Fábricas: ¿cómo quieres cubrirlas?', `Tu meta para Fábricas es ${pct1(num(WZ.pct.Acciones, 0))} del tesoro.`)
       + `<div class="wz-modes">${opt('wzModo', 'uno', 'Versión fácil · un instrumento', `<small>${esc(C.uno)} cubre automáticamente el 100% de Fábricas.</small>${fichaHtml([C.uno])}`, WZ.modo.Acciones === 'uno')}
         ${opt('wzModo', 'varios', 'Versión divertida · tres instrumentos', `<small>Repartes Fábricas entre ${C.varios.join(', ')}.</small>${fichaHtml(C.varios)}`, varios)}</div>`
-      + (varios ? `<p class="wz-k" style="margin-top:6px">Reparto dentro de Fábricas</p><p class="foot" style="margin:0">${WZ.tplFab ? 'Reparto de la plantilla que elegiste' : `Reparto inicial ${C.varios.map(a => (C.ejemplo || {})[a] + '% ' + a).join(', ')}, igual para todos los usuarios, tomado de las proporciones del esquema Swensen`}. No considera tu situación: cámbialo como quieras.</p>${pesosHtml('Acciones', C.varios)}` : '');
+      + (varios ? `<p class="wz-k" style="margin-top:6px">Reparto dentro de Fábricas</p><p class="foot" style="margin:0">${WZ.tplFab ? 'Reparto de la plantilla que elegiste' : `Reparto inicial ${C.varios.map(a => (C.ejemplo || {})[a] + '% ' + a).join(', ')}, igual para todos los usuarios, tomado de las proporciones del esquema Swensen`}. No considera tu situación: cámbialo como quieras.</p>${pesosHtml('Acciones', C.varios, i => (SLOT_DEF[i.activo] ? (i.cuenta_como || SLOT_DEF[i.activo]) + ' · ' : '') + (i.descripcion || ''))}${cuentanTxt('Acciones', C.varios) ? `<p class="wz-note">${cuentanTxt('Acciones', C.varios)}</p>` : ''}` : '');
   }
   if (WZ.step === 'FIBRAs') {
     const C = MC('FIBRAs'), varios = WZ.modo.FIBRAs === 'varios', u = itemOf(C.uno);
@@ -3053,15 +3084,16 @@ function stepHtml() {
   }
   if (WZ.step === 'Cripto') {
     const C = MC('Cripto');
-    return head('Oro virtual', `Tu meta para Oro virtual es ${pct1(num(WZ.pct.Cripto, 0))} del tesoro. Este barrio se cubre solo con ${esc(C.uno)}.`) + fichaHtml([C.uno]);
+    return head('Oro virtual', `Tu meta para Oro virtual es ${pct1(num(WZ.pct.Cripto, 0))} del tesoro. Este barrio se cubre solo con ${esc(C.uno)}.`) + fichaHtml([C.uno]) + (cuentanTxt('Cripto', C.uno) ? `<p class="wz-note">${cuentanTxt('Cripto', C.uno)}</p>` : '');
   }
   return head('Revisa y guarda tus metas', 'Así quedan tus reglas. La ciudad calcula con ellas; nada cuenta hasta que pulses Guardar.') + resumenHtml(WZ);
 }
 // resumen (también es la vista cuando ya guardaste)
 function cubreTxt(n, modo, rep) {
   const C = MC(n);
-  if (modo === 'uno') return esc(C.uno) + ' (100%)';
-  if (modo === 'varios') return Object.entries(rep || {}).filter(([, v]) => num(v, 0) > 0).map(([a, v]) => `${esc(a)} ${numTxt(v)}%`).join(' · ') || '—';
+  if (modo === 'uno') { const c = n === 'Cripto' ? cuentanTxt(n, C.uno) : ''; return esc(C.uno) + ' (100%)' + (c ? `<br><small class="muted">${c}</small>` : ''); }
+  if (modo === 'varios') { const on = Object.entries(rep || {}).filter(([, v]) => num(v, 0) > 0), c = n === 'Acciones' ? cuentanTxt(n, on.map(x => x[0])) : '';
+    return (on.map(([a, v]) => `${esc(a)} ${numTxt(v)}%`).join(' · ') || '—') + (c ? `<br><small class="muted">${c}</small>` : ''); }
   return '<span class="muted">sin elegir</span>';
 }
 function tolTxt(n, modo, rep) {
