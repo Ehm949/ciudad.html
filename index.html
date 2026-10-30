@@ -1286,32 +1286,64 @@ function renderSim() {
   const groups = (M.groups || []).filter(g => g.tG > 0);
   if (!amt || !groups.length) { out.innerHTML = ''; SIM = null; return; }
   const NT = M.total + amt;
-  // 1) entre barrios, con tus metas
-  const gAlloc = levelFill(groups.map(g => ({ t: g.tG / 100, v: g.valor })), NT, amt);
-  // 2) cada barrio va completo al instrumento que elegiste. Se compran títulos completos;
-  //    lo que no alcanza para uno más se queda SIN ASIGNAR (no se manda a otro barrio).
-  const plan = [], avisos = [];
+  // Reparto que usa todo el dinero: en cada paso se compra lo que más lejos está de su meta (en proporción a la meta).
+  // Acciones y FIBRAs van por título completo; renta fija y cripto aceptan cualquier monto, así que reciben lo que no completa un título.
+  const flexK = i => i.key === 'RENTA_FIJA' || (i.key === 'BITCOIN' && +i.precio_mxn > 0);
+  const C = [], avisos = [];
   groups.forEach((g, gi) => {
-    const a = gAlloc[gi];
-    if (!g.traders.length) {
-      plan.push({ g, gi, i: null, ideal: a, amt: 0, units: null, free: a, meta: null });
-      if (a >= 1) avisos.push(`Elige en Tus metas cómo cubres ${esc(CLS[g.key].scene)}: mientras tanto, sus ${mxn.format(a)} quedan sin asignar.`);
-      return;
-    }
-    // dentro del barrio, con los pesos que definiste (en el modo de tres)
-    const parts = g.traders.length === 1 ? [a] : levelFill(g.traders.map(t => ({ t: t.sh, v: t.valor })), g.traders.reduce((s2, t) => s2 + t.valor, 0) + a, a);
-    g.traders.forEach((t, k) => {
-      const v = t.i, b = parts[k], x = { g, gi, i: v, ideal: b, amt: 0, units: null, free: 0, meta: g.traders.length > 1 ? t.t : null };
-      if (isUnit(v)) {
-        const p = +v.precio_mxn; x.units = Math.floor(b / p); x.amt = x.units * p; x.free = b - x.amt;
-        if (b >= 1 && x.units === 0) avisos.push(`Este mes no alcanza para un título de ${esc(v.activo)} (${mxn.format(p)} cada uno).`);
-      } else if (v.key !== 'RENTA_FIJA' && v.key !== 'BITCOIN') { x.free = b; if (b >= 1) avisos.push(`No hay precio de hoy para ${esc(v.activo)}: sus ${mxn.format(b)} quedan sin asignar.`); }
-      else x.amt = b;   // renta fija y cripto aceptan montos libres
-      plan.push(x);
+    const Tg = NT * g.tG / 100, inT = new Set(g.traders.flatMap(t => t.members || [t.i]));
+    const H = g.members.filter(i => !inT.has(i)).reduce((a, i) => a + i.valor, 0);
+    if (!g.traders.length) { if (Tg - g.valor >= 1) avisos.push(`Elige en Tus metas cómo cubres ${esc(CLS[g.key].scene)}; mientras tanto, su parte se reparte en los demás barrios.`); return; }
+    g.traders.forEach(t => {
+      const otros = (t.members || [t.i]).filter(i => i !== t.i).reduce((a, i) => a + i.valor, 0);
+      const target = Math.max(0, g.tres ? NT * t.t / 100 - otros : (Tg - H) * t.sh);
+      const unit = isUnit(t.i), flex = !unit && flexK(t.i);
+      if (!unit && !flex) { if (target - t.i.valor >= 1) avisos.push(`No hay precio de hoy para ${esc(t.i.activo)}: no se incluyó en el cálculo.`); return; }
+      C.push({ g, gi, t, i: t.i, target, cur: t.i.valor, p: unit ? +t.i.precio_mxn : 0, flex, add: 0, units: unit ? 0 : null, meta: g.traders.length > 1 ? t.t : null });
     });
   });
-  const spent = plan.reduce((a, x) => a + x.amt, 0), rest = Math.max(0, amt - spent);
-  const restTit = plan.filter(x => x.i && isUnit(x.i)).reduce((a, x) => a + x.free, 0);   // lo que sobra por comprar títulos completos
+  const unitsC = C.filter(c => c.p > 0), flexC = C.filter(c => c.flex), step = Math.max(1, amt / 3000);
+  const gapOf = c => c.target - c.cur - c.add;
+  // primero el barrio que más le falta para su meta; dentro de él, el instrumento que más le falta
+  const bar = groups.map((g, gi) => ({ g, gi, T: NT * g.tG / 100, cs: C.filter(c => c.gi === gi) })).filter(x => x.cs.length && x.T > 0);
+  const barRel = x => (x.T - x.g.valor - x.cs.reduce((a, c) => a + c.add, 0)) / x.T;
+  const pick = (x, cash, soloFaltan) => {
+    let bu = null, su = -Infinity, bf = null, sf = -Infinity;
+    x.cs.forEach(c => {
+      const gp = gapOf(c), sc = c.target > 0 ? gp / c.target : -Infinity;
+      if (c.p > 0) { if (c.p <= cash + 1e-9 && (!soloFaltan || gp >= c.p / 2) && sc > su) { su = sc; bu = c; } }
+      else if ((!soloFaltan || gp > 0.005) && sc > sf) { sf = sc; bf = c; }
+    });
+    if (bu && (!bf || su >= sf)) return { c: bu, d: bu.p };
+    if (bf) { const gb = x.T - x.g.valor - x.cs.reduce((a, c) => a + c.add, 0); const d = soloFaltan ? Math.min(cash, step, Math.max(0.01, gapOf(bf)), Math.max(0.01, gb)) : Math.min(cash, step); return { c: bf, d }; }
+    return null;
+  };
+  let cash = amt;
+  // 1) solo a lo que le falta: barrio por barrio, del que más falta al que menos
+  for (let guard = 0; guard < 40000 && cash > 0.005; guard++) {
+    let hecho = false;
+    for (const x of bar.slice().sort((p1, p2) => barRel(p2) - barRel(p1))) {
+      if (barRel(x) <= 0) break;
+      const r2 = pick(x, cash, true); if (!r2) continue;
+      r2.c.add += r2.d; if (r2.c.p > 0) r2.c.units++; cash -= r2.d; hecho = true; break;
+    }
+    if (!hecho) break;
+  }
+  // 2) lo que sobra: a los montos libres del barrio que menos se pasa de su meta; si no hay, el título que menos se pase
+  for (let guard = 0; guard < 40000 && cash > 0.5; guard++) {
+    const conFlex = bar.filter(x => x.cs.some(c => c.flex)).sort((p1, p2) => barRel(p2) - barRel(p1));
+    if (conFlex.length) { const r2 = pick(conFlex[0], cash, false); if (r2) { r2.c.add += r2.d; cash -= r2.d; continue; } }
+    let b2 = null, bs = Infinity;
+    unitsC.forEach(c => { if (c.p > cash + 1e-9) return; const over = (c.cur + c.add + c.p - c.target) / (c.target || 1); if (over < bs) { bs = over; b2 = c; } });
+    if (!b2) break; b2.add += b2.p; b2.units++; cash -= b2.p;
+  }
+  // centavos: los montos libres se redondean a pesos y la diferencia va al más grande
+  if (flexC.length) { let dif = 0; flexC.forEach(c => { const r = Math.round(c.add); dif += c.add - r; c.add = r; }); const big = flexC.slice().sort((x, y) => y.add - x.add)[0]; big.add = Math.max(0, big.add + Math.round(dif + cash)); cash = Math.max(0, cash - Math.round(cash)); }
+  const caros = unitsC.filter(c => !c.units && c.p > amt && gapOf(c) >= c.p / 2);
+  if (caros.length) avisos.push(`Con ${mxn.format(amt)} no alcanza para un título de ${caros.map(c => esc(c.i.activo) + ' (' + mxn.format(c.p) + ')').join(', ')}; el dinero se usó en lo que sí alcanzaba.`);
+  const plan = C.map(c => ({ g: c.g, gi: c.gi, i: c.i, ideal: c.target - c.cur, amt: c.add, units: c.units, free: 0, meta: c.meta,
+    slot: c.g.tres && c.t.slot ? c.t.slot : null, otros: c.g.tres ? (c.t.members || []).filter(i => i !== c.i) : [], base: c.g.tres ? c.t.valor : c.i.valor }));
+  const spent = plan.reduce((a, x) => a + x.amt, 0), rest = Math.max(0, amt - spent), restTit = rest;
   const sinHoy = !M.total;
   const pctNow = v => M.total ? v / M.total * 100 : null, pctAfter = v => v / NT * 100;
   const rowsG = groups.map((g, gi) => {
@@ -1334,14 +1366,15 @@ function renderSim() {
     rows += `<tr style="background:var(--panel2);${on ? '' : 'opacity:.6'}"><td class="n"><b>${n + 1}</b></td><td><span class="dot" style="--c:${col};margin-right:6px"></span><b>${esc(CLS[r.g.key].scene)}</b> <span class="muted">${esc(r.g.name)}</span></td>${hoyTd(r.now)}<td class="n muted">${pc(r.g.tG)}</td><td class="n">${pc(r.after)}</td><td class="n ${on ? 'pos' : 'muted'}"><b>${mxn.format(r.inv)}</b></td><td></td></tr>`;
     if (!on) return;
     r.items.filter(x => x.amt >= 1).forEach(x => {
-      rows += `<tr><td></td><td style="padding-left:26px">${esc(x.i.activo)}</td>${hoyTd(pctNow(x.i.valor))}<td class="n muted">${x.meta == null ? '—' : pc(x.meta)}</td><td class="n muted">${pc(pctAfter(x.i.valor + x.amt))}</td><td class="n pos">${mxn.format(x.amt)}</td><td class="n muted">${u(x)}${GOV.objTxt(x.i)}</td></tr>`;
+      rows += `<tr><td></td><td style="padding-left:26px">${esc(x.i.activo)}${x.slot ? `<br><small class="muted">${esc(x.slot)}${x.otros.length ? ' · con ' + x.otros.map(i => esc(i.activo)).join(', ') : ''}</small>` : ''}</td>${hoyTd(pctNow(x.base))}<td class="n muted">${x.meta == null ? '—' : pc(x.meta)}</td><td class="n muted">${pc(pctAfter(x.base + x.amt))}</td><td class="n pos">${mxn.format(x.amt)}</td><td class="n muted">${u(x)}${GOV.objTxt(x.i)}</td></tr>`;
     });
   });
-  if (rest >= 1) rows += `<tr><td></td><td><b>Sin asignar</b> <span class="muted">${restTit >= 1 && rest - restTit < 1 ? 'no alcanza para un título completo' : 'ver la nota de abajo'}</span></td>${hoyTd(null)}<td></td><td></td><td class="n"><b>${mxn.format(rest)}</b></td><td></td></tr>`;
+  if (rest >= 1) rows += `<tr><td></td><td><b>Sin asignar</b> <span class="muted">no alcanza para otro título</span></td>${hoyTd(null)}<td></td><td></td><td class="n"><b>${mxn.format(rest)}</b></td><td></td></tr>`;
   SIM = { amt, plan, rowsG, rest, restTit, NT, spent, avisos };
   out.innerHTML = `<div class="tbl"><table><thead><tr><th>#</th><th>Barrio / obra</th><th style="text-align:right">Hoy</th><th style="text-align:right">Tu meta</th><th style="text-align:right">Después</th><th style="text-align:right">Monto según tus metas</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${rows}</tbody></table></div>
     ${avisos.map(a => `<p class="foot" style="margin-top:6px">${a}</p>`).join('')}
-    ${restTit >= 1 ? `<p class="foot" style="margin-top:6px">${mxn.format(restTit)} quedan sin asignar porque no alcanzan para un título completo del instrumento que elegiste. No se mandan a otro barrio.</p>` : ''}
+    ${rest >= 1 ? `<p class="foot" style="margin-top:6px">Quedan ${mxn.format(rest)} sin asignar: no alcanzan para otro título y no elegiste instrumentos de monto libre (renta fija o cripto).</p>` : ''}
+    <p class="foot" style="margin-top:6px">Cómo se reparte: título por título, primero lo que más lejos está de tu meta; lo que no completa un título va a los instrumentos que aceptan cualquier monto (renta fija y cripto). Así se usa toda tu aportación.</p>
     <p class="foot" style="margin-top:6px">${GOV.pie()}</p>${GOV.simButtons()}`;
   GOV.wire();
 }
@@ -2238,7 +2271,8 @@ const GOV = (() => {
     const notes = [];
     if (S.spent - spentT >= 1) notes.push(`A precio de hoy serían ${mxn.format(S.spent)}; si las órdenes se llenan a tu precio límite, serían unos ${mxn.format(spentT)}.`);
     (S.avisos || []).forEach(a => notes.push(a.replace(/<[^>]+>/g, '')));
-    if (S.restTit >= 1) notes.push(`${mxn.format(S.restTit)} quedan sin asignar porque no alcanzan para un título completo del instrumento que elegiste. No se mandan a otro barrio.`);
+    if (S.rest >= 1) notes.push(`Quedan ${mxn.format(S.rest)} sin asignar: no alcanzan para otro título.`);
+    notes.push('Cómo se reparte: título por título, primero lo que más lejos está de tu meta; lo que no completa un título va a los instrumentos que aceptan cualquier monto (renta fija y cripto).');
     notes.push(`Tu precio límite: ${dp}% abajo del precio de hoy (lo definiste tú; 0% es el precio de hoy). Si el precio no llega a ese nivel, la orden no se ejecuta. Las obras públicas (Cetes, Udibonos y similares) se compran por monto, a la tasa vigente.`);
     notes.push(pie());
     return { now, amt: S.amt, spent: S.spent, spentT, rest: S.rest, groups, total: M.total, lvl: lv.name, next: lv.next,
@@ -2246,7 +2280,7 @@ const GOV = (() => {
       sub: 'Aportación del mes', dir: 'abajo', totalLbl: 'Total según tus metas',
       cols: ['OBRA / ACTIVO', 'TÍTULOS', 'PRECIO HOY', 'TU PRECIO\nLÍMITE', 'MONTO SEGÚN\nTUS METAS'],
       boxes: [['LO QUE APORTAS', mxn.format(S.amt), 'tu aportación de este mes'],
-        ['SIN ASIGNAR', mxn.format(S.rest), S.rest < 1 ? 'todo quedó asignado' : S.rest - (S.restTit || 0) < 1 ? 'no alcanza para un título completo' : 'ver las notas de la carta'],
+        ['SIN ASIGNAR', mxn.format(S.rest), S.rest < 1 ? 'se usó toda tu aportación' : 'no alcanza para otro título'],
         ['TESORO DEL PUEBLO', mxn.format(M.total), lv.next ? `faltan ${short(lv.next[0] - M.total)} para ${lv.next[1]}` : 'nivel máximo']],
       gline: g => `${g.now == null ? 'Captura tu portafolio para ver cómo está hoy' : 'Hoy ocupa ' + pct1(g.now) + ' del pueblo'}  ·  con esta compra ${pct1(g.after)}  ·  tu meta ${pct1(g.ideal)}`,
       file: 'Carta-de-aportacion-' + ymd(now) + '.pdf' };
