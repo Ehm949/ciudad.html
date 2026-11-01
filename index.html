@@ -500,6 +500,198 @@ table.pf tr.sub td{color:var(--muted);font-size:12px}
   .ed-a{width:100%;justify-content:flex-start}
   .mn-bars div{grid-template-columns:84px 1fr 48px}
 }
+/* ---------- Ciudad Marea: menú lateral y pantallas nuevas ---------- */
+body.marea .mnav,body.marea .sec{display:none!important}
+.mside{display:none}
+body.marea.m-on .mside{display:flex}
+body.marea.m-on{padding-left:92px}
+.mside{position:fixed;left:12px;top:12px;bottom:12px;width:68px;z-index:60;flex-direction:column;align-items:center;gap:10px;padding:12px 0;border-radius:22px;background:linear-gradient(180deg,#141b33,#10172c);border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.mlogo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#f8a43c,#ef7b6c);flex:none}
+.mlogo svg{width:24px;height:24px;fill:none;stroke:#1a1206;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mnav2{display:flex;flex-direction:column;gap:4px;flex:1;overflow-y:auto;scrollbar-width:none;width:100%;align-items:center;padding:4px 0}
+.mnav2::-webkit-scrollbar{display:none}
+.mtab{position:relative;width:54px;min-height:52px;border:0;border-radius:15px;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 2px;font:inherit;cursor:pointer;flex:none}
+.mtab .mi{width:22px;height:22px}
+.mtab .ml{display:none}
+.mtab .ms{font-size:9.5px;font-weight:700;letter-spacing:.02em;line-height:1.1}
+.mtab:hover{color:var(--fg);background:var(--panel2)}
+.mtab[aria-current=page]{color:#1a1206;background:linear-gradient(135deg,#ffc46b,#f8a43c);box-shadow:0 6px 18px rgba(248,164,60,.35)}
+.mtab:focus-visible{outline:2px solid #ffc46b;outline-offset:2px}
+.mdot{position:absolute;top:6px;right:8px;width:7px;height:7px;border-radius:50%;background:#ff7a7a;box-shadow:0 0 0 2px #121a30}
+.mtab[aria-current=page] .mdot{box-shadow:0 0 0 2px #f8a43c}
+.mfoot{font-size:9px;color:#5d6890;text-align:center;line-height:1.3;text-transform:uppercase;letter-spacing:.08em}
+.mi{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* encabezado: créditos, racha y pendientes */
+body.marea header.top{position:relative}
+.mtop{display:flex;align-items:center;gap:8px;flex-wrap:wrap;order:2;width:100%}
+body.marea header.top .who{order:1}
+.mstat{display:flex;align-items:center;gap:9px;padding:7px 14px 7px 8px;border-radius:999px;background:var(--panel);border:1px solid var(--line)}
+.mstat small{display:block;font-size:10.5px;color:var(--muted);line-height:1.1;letter-spacing:.04em;text-transform:uppercase}
+.mstat b{font-family:var(--f-data);font-size:15px;line-height:1.2}
+.msi{width:30px;height:30px;border-radius:50%;display:grid;place-items:center}
+.mcred .msi{background:rgba(248,164,60,.18);color:#ffc46b}.mracha .msi{background:rgba(255,122,106,.18);color:#ff8a6a}
+.mcred.bump{animation:mbump .6s ease}
+@keyframes mbump{40%{transform:scale(1.08);border-color:#f8a43c}}
+.mbell{position:relative;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--fg);display:grid;place-items:center;cursor:pointer}
+.mbell span{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;border-radius:9px;background:#ff7a7a;color:#2a0c0c;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 4px}
+.mbell span[hidden]{display:none}
+.mlink{background:none;border:0;color:#8ab4ff;font:inherit;font-size:13.5px;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 4px}
+
+/* pantallas */
+.mscr{display:flex;flex-direction:column;gap:16px;min-width:0}
+.mscr[hidden]{display:none}
+.mbox{display:flex;flex-direction:column;gap:14px;min-width:0}
+.mbox:empty{display:none}
+.mhelp{background:rgba(138,180,255,.07);border:1px solid rgba(138,180,255,.25);border-radius:14px;padding:4px 14px}
+.mhelp summary{cursor:pointer;color:#a9c6ff;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;padding:8px 0;list-style:none}
+.mhelp summary::-webkit-details-marker{display:none}
+.mhelp p{margin:0 0 10px;color:var(--fg);font-size:14.5px;max-width:75ch}
+.mlead h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:22px;letter-spacing:.02em}
+.mlead p{margin:4px 0 0;color:var(--muted);max-width:70ch}
+.mlead-row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.mcard{--c:#8ab4ff;position:relative;background:linear-gradient(160deg,color-mix(in srgb,var(--c) 10%,var(--panel)) 0%,var(--panel) 55%);border:1px solid color-mix(in srgb,var(--c) 28%,var(--line));border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.mcard.hl{border-color:var(--c);box-shadow:0 0 0 1px var(--c),0 10px 30px color-mix(in srgb,var(--c) 18%,transparent)}
+.mcard h3{margin:0;font-size:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mcard p{margin:0}
+.mcard .foot,.mbox .foot{margin:0;font-size:13px;color:var(--muted)}
+.mrow-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.mrow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px;padding:3px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
+.mrow:last-child{border-bottom:0}
+.mrow b{font-family:var(--f-data);font-weight:600;text-align:right}
+.mbadge{width:32px;height:32px;border-radius:10px;display:inline-grid;place-items:center;background:color-mix(in srgb,var(--c) 22%,transparent);color:var(--c);flex:none}
+.mbadge.big{width:44px;height:44px;border-radius:14px}
+.mbadge.big .mi{width:24px;height:24px}
+.mpill{--c:var(--muted);display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c);border:1px solid color-mix(in srgb,var(--c) 35%,transparent);white-space:nowrap;width:fit-content}
+.mbig{display:block;font-family:var(--f-data);font-size:26px;line-height:1.2}
+.mbig small{font-size:14px;color:var(--muted)}
+.mbtns{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.mbtn{display:inline-flex;align-items:center;gap:8px;justify-content:center;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);font:inherit;font-size:14px;font-weight:700;padding:10px 14px;cursor:pointer;min-height:42px}
+.mbtn:hover:not(:disabled){border-color:#8ab4ff}
+.mbtn:disabled{opacity:.55;cursor:default}
+.mbtn small{font-family:var(--f-data);font-size:12px;padding:2px 7px;border-radius:999px;background:rgba(248,164,60,.2);color:#ffc46b}
+.mbtn.pri{background:linear-gradient(135deg,#ffc46b,#f8a43c);color:#1a1206;border-color:transparent}
+.mbtn.pri small{background:rgba(26,18,6,.15);color:#1a1206}
+.mbtn.ok{border-color:var(--ok);color:var(--ok)}.mbtn.no{border-color:var(--bad);color:var(--bad)}
+.mbtn:focus-visible,.mlink:focus-visible,.msw:focus-visible,.mterm:focus-visible,.mseg button:focus-visible{outline:2px solid #ffc46b;outline-offset:2px}
+.mterm{background:none;border:0;padding:0;font:inherit;color:inherit;text-decoration:underline dotted;text-decoration-color:#8ab4ff;text-underline-offset:3px;cursor:help}
+
+/* interruptor */
+.msw{width:46px;height:26px;border-radius:13px;border:1px solid var(--line);background:#26304f;position:relative;cursor:pointer;flex:none;padding:0}
+.msw i{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#9ba6c6;transition:transform .2s,background .2s}
+.msw[aria-checked=true]{background:color-mix(in srgb,var(--c) 45%,#26304f);border-color:var(--c)}
+.msw[aria-checked=true] i{transform:translateX(20px);background:#fff}
+.msw:disabled{cursor:default}
+
+/* rendimiento */
+.mseg{display:flex;gap:2px;padding:3px;border-radius:12px;background:#10172c;border:1px solid var(--line);flex-wrap:wrap}
+.mseg button{border:0;background:none;color:var(--muted);font:inherit;font-size:12.5px;font-weight:700;padding:6px 9px;border-radius:9px;cursor:pointer;font-family:var(--f-data)}
+.mseg button[aria-pressed=true]{background:#5b8cff;color:#fff}
+.mseg button:disabled{opacity:.35;cursor:not-allowed}
+.mperf{display:grid;grid-template-columns:minmax(200px,260px) 1fr;gap:18px;align-items:center}
+.mperf-big{display:flex;flex-direction:column;gap:2px}
+.mperf-big>b{font-family:var(--f-data);font-size:34px;line-height:1.1}
+.mperf-big>span{font-family:var(--f-data);font-size:15px;margin-bottom:6px}
+.mchart{width:100%;height:auto;display:block}
+
+/* Fundación */
+.mfbar{position:relative;height:12px;border-radius:6px;background:#10172c;overflow:visible;margin-top:4px}
+.mfbar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#4fc3b0,#f2b544,#f7931a)}
+.mfbar u{position:absolute;top:-3px;bottom:-3px;width:2px;background:#fff;opacity:.6}
+.mfsteps{display:flex;justify-content:space-between;gap:6px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.mfsteps .on{color:#ffc46b;font-weight:700}.mfsteps .ok{color:var(--ok)}
+.mfsteps .ok::before{content:"✓ "}
+.mladder{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.mladder li{--c:#8ab4ff;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.mladder li.cur{border-color:var(--c);box-shadow:0 0 0 1px var(--c);background:linear-gradient(160deg,color-mix(in srgb,var(--c) 12%,var(--panel)),var(--panel) 60%)}
+.mladder li.lock{opacity:.6}
+.mladder li p{margin:0}
+.mlh{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mln{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:color-mix(in srgb,var(--c) 25%,transparent);color:var(--c);flex:none;font-family:var(--f-data)}
+.mladder li.done .mln{background:var(--c);color:#10172c}
+.mlt{flex:1;min-width:140px;display:flex;flex-direction:column}
+.mlt small{color:var(--muted)}
+.mriesgo{display:inline-flex;gap:3px}
+.mriesgo i{width:8px;height:14px;border-radius:2px;background:#2a3560}
+.mriesgo i.on{background:linear-gradient(180deg,#ffc46b,#ef7b6c)}
+.mwhy{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.mwhy>div{background:rgba(0,0,0,.18);border-radius:12px;padding:10px 12px}
+.mwhy b{font-size:13px;color:#ffc46b}
+.mwhy p{font-size:14px;margin-top:2px!important}
+.mlv{height:8px;border-radius:4px;background:#10172c;overflow:hidden}
+.mlv i{display:block;height:100%;background:var(--c);border-radius:4px}
+
+/* plano */
+.mbar{position:relative;height:16px;border-radius:8px;background:#10172c;margin-top:6px}
+.mbar .band{position:absolute;top:0;bottom:0;background:color-mix(in srgb,var(--c) 30%,transparent);border-radius:8px}
+.mbar .goal{position:absolute;top:-3px;bottom:-3px;width:2px;background:#fff;opacity:.8}
+.mbar .now{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--c);border:2px solid #fff}
+.mscale{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:var(--f-data)}
+
+/* tablas y fórmulas */
+.mtbl{overflow-x:auto;border-radius:12px;border:1px solid var(--line)}
+.mtbl table{width:100%;border-collapse:collapse;font-size:13.5px}
+.mtbl th,.mtbl td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.mtbl th{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:#121a30}
+.mtbl td.n,.mtbl th.n{text-align:right;font-family:var(--f-data)}
+.mtbl tr:last-child td{border-bottom:0}
+.mform{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.mform>div{background:rgba(0,0,0,.2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.mform span{font-family:var(--f-data);font-size:12.5px;color:var(--muted)}
+
+/* infraestructura */
+.mlot{display:flex;gap:12px;align-items:center}
+.mlot canvas{width:44px;height:64px;image-rendering:pixelated;background:linear-gradient(180deg,#0b1020,#151d35);border-radius:10px;flex:none}
+.mst{font-size:12.5px;font-weight:700}
+
+/* bitácora */
+.mlog{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.mlog li{display:grid;grid-template-columns:62px 1fr auto;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.07);font-size:14px}
+.mlog time{color:var(--muted);font-family:var(--f-data);font-size:12.5px}
+.mlog b{font-family:var(--f-data);color:#ffc46b}
+.mlog b.neg{color:var(--muted)}
+
+/* modal, glosario y avisos */
+#mModal{position:fixed;inset:0;z-index:200;background:rgba(5,8,18,.7);display:grid;place-items:center;padding:16px}
+#mModal[hidden]{display:none}
+.mmbox{width:min(720px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.mmbox h2{margin:0;font-size:20px}
+.mmbox h3{margin:6px 0 0;font-size:15px}
+.mmbox p{margin:0}
+.mmhead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.mmhead small{color:var(--muted)}
+.mguia{font-size:16px;line-height:1.6}
+.mquiz{display:flex;flex-direction:column;gap:8px}
+.mquiz .mbtn{justify-content:flex-start;text-align:left}
+.mpend{justify-content:flex-start;width:100%}
+.mmbox input[type=range]{width:100%;accent-color:#f8a43c}
+#mGloss{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:210;width:min(460px,calc(100vw - 32px));background:#1c2646;border:1px solid #8ab4ff;border-radius:16px;padding:14px 16px;display:flex;gap:12px;align-items:flex-end;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+#mGloss[hidden]{display:none}
+#mGloss p{margin:4px 0 0;font-size:14px}
+#mToasts{position:fixed;right:16px;bottom:24px;z-index:220;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.mtoast{background:#1c2646;border:1px solid #f8a43c;color:var(--fg);border-radius:12px;padding:10px 14px;font-size:14px;box-shadow:0 10px 24px rgba(0,0,0,.4);animation:mtin .25s ease}
+.mtoast b{color:#ffc46b;font-family:var(--f-data)}
+@keyframes mtin{from{opacity:0;transform:translateY(-6px)}}
+@media (prefers-reduced-motion:reduce){.mtoast,.mcred.bump{animation:none}.msw i{transition:none}}
+
+/* teléfono: barra abajo */
+@media (max-width:900px){
+  body.marea.m-on{padding-left:0;padding-bottom:calc(74px + env(safe-area-inset-bottom,0px))}
+  .mside{left:0;right:0;top:auto;bottom:0;width:auto;height:auto;border-radius:18px 18px 0 0;flex-direction:row;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));gap:0}
+  .mlogo,.mfoot{display:none}
+  .mnav2{flex-direction:row;overflow-x:auto;overflow-y:hidden;padding:0;justify-content:flex-start}
+  .mtab{width:auto;min-width:62px;flex:1 0 62px;min-height:56px}
+  .mperf{grid-template-columns:1fr}
+  #mToasts{top:auto;bottom:90px;left:16px;right:16px;align-items:center}
+  #mGloss{bottom:90px}
+}
+@media (max-width:480px){
+  .mtab{min-width:0;flex:1 1 0;padding:6px 0}.mtab .ms{font-size:8.5px}.mtab .mi{width:20px;height:20px}
+  .mstat{padding:5px 10px 5px 6px}.msi{width:26px;height:26px}.mstat b{font-size:14px}
+  .mlink{font-size:12.5px}
+  .mgrid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -1775,6 +1967,7 @@ async function logout(expired) {
 function resetState() {
   raw = null; model = null; view = null; zones = {}; travelYears = 0; focus = null; selected = null;
   firstApply = true; liveShown = 0; MI = null; CE = null; ST = null; EV = null;
+  if (window.MAREA) MAREA.reset();
   clearInterval(setTravel._p);
 }
 function showApp() { $('login').hidden = true; $('app').hidden = false; sessionStart = performance.now(); setView(viewMode, false); }
@@ -1857,6 +2050,7 @@ function renderAll() {
   renderLive(); GOV.renderGaceta(); renderMetas(); GOV.sellHint(); renderBands(); renderMission(); renderStreak(); renderCeremony();
   renderForm(); renderSim(); renderZoom(); renderTm(); renderCalc();
   if (window.MENU) MENU.render();
+  if (window.MAREA) MAREA.render();
 }
 
 const colState = {};
@@ -4026,6 +4220,7 @@ window.MENU = (() => {
     $('mnBar').style.width = Math.max(0, r.left + r.width / 2 - l.left + list.scrollLeft) + 'px';
   }
   function show(sec, push) {
+    if (window.MAREA && MAREA.fromOld) { MAREA.fromOld(sec); return; }
     if (!box[sec]) sec = 'ciudad';
     cur = sec;
     SECS.forEach(s => { box[s.id].hidden = s.id !== sec; });
@@ -4226,6 +4421,542 @@ window.MENU = (() => {
   if (simPanel) { const b = $('btnSim'); if (b) b.addEventListener('click', () => setTimeout(renderCierre, 0)); }
   show((location.hash || '').slice(1) || 'ciudad', false);
   return { render, show, go };
+})();
+
+
+// ================= Ciudad Marea: menú lateral, Fundación, Ronda del mercado y Créditos de Marea =================
+// Va encima de la ciudad que ya existe (la escena no cambia). Reacomoda los paneles en pantallas nuevas.
+// Los créditos se guardan en el USUARIO (Marea.gs); el servidor decide cuánto vale cada acción.
+window.MAREA = (() => {
+  const wrap = $('app').querySelector('.wrap'), header = wrap.querySelector('header.top');
+  const mk = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+  const money = v => mxn.format(v);
+  const pc = (v, d = 1) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toLocaleString('es-MX', { minimumFractionDigits: d, maximumFractionDigits: d }) + '%';
+  const has = () => typeof model !== 'undefined' && model && model.items;
+  const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const mesActual = () => ymd(new Date()).slice(0, 7);
+  const lunes = () => { const d = new Date(); d.setHours(12); const w = d.getDay() || 7; d.setDate(d.getDate() - (w - 1)); return ymd(d); };
+
+  // ---------- íconos ----------
+  const ICON = {
+    fundacion: '<path d="M12 21v-9"/><path d="M12 12C12 7.5 8.6 4.5 4 4.5c0 4.8 3.4 7.5 8 7.5zM12 14.5c0-4 3-7 8-7 0 4-3 7-8 7z"/>',
+    mercado: '<path d="M6 3v18M12 5v14M18 3v18"/><rect x="4" y="7" width="4" height="7" rx="1"/><rect x="10" y="9" width="4" height="5" rx="1"/><rect x="16" y="10" width="4" height="7" rx="1"/>',
+    plano: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
+    tesoreria: '<ellipse cx="12" cy="6" rx="7" ry="2.8"/><path d="M5 6v4c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8V6M5 10v4c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8v-4M5 14v4c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8v-4"/>',
+    ingresos: '<path d="M12 3v11M7.5 9.5 12 14l4.5-4.5"/><path d="M4 15v5h16v-5"/>',
+    infra: '<path d="M6 21V4h1.5M6 4h13l-3 4M7.5 4l4 4M16 8v4"/><rect x="14" y="12" width="4" height="3"/><path d="M3 21h11"/>',
+    ayto: '<path d="M3 10 12 4l9 6M5.5 10v8M10 10v8M14 10v8M18.5 10v8M3 20.5h18"/>',
+    bitacora: '<rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+    ACCIONES: '<path d="M3 20V10l5 3V10l5 3V6h3v-2h3v16z"/>', FIBRAS: '<rect x="5" y="3" width="9" height="18" rx="1"/><path d="M14 9h5v12h-5M8 7h1M11 7h1M8 11h1M11 11h1M8 15h1M11 15h1"/>',
+    RENTA_FIJA: '<path d="M3 10 12 4l9 6M5.5 10v8M10 10v8M14 10v8M18.5 10v8M3 20.5h18"/>', BITCOIN: '<circle cx="12" cy="12" r="8.5"/><path d="M10 7.5v9M13 7.5v9M9 8.5h4.5a2 2 0 0 1 0 4H9h5a2 2 0 0 1 0 4H9"/>',
+    BOLSA: '<path d="M4 20h16M6 20V10M18 20V10M12 20v-6M3 10l9-6 9 6z"/>',
+    coin: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7v10M9.5 9.5c0-1 1.1-1.6 2.5-1.6s2.5.7 2.5 1.7-1.1 1.5-2.5 1.8-2.5.8-2.5 1.8 1.1 1.7 2.5 1.7 2.5-.6 2.5-1.6"/>',
+    flame: '<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.4 2.5-5.3 3.6-8.3.4 2 1.6 3.1 2.6 3.6.2-2.6 1.4-4.9 3.4-6.6-.3 3 2 5 2.9 7.6.4 1 .5 2 .5 3.1 0 4.1-2.6 6.8-6.5 6.8z"/>',
+    bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+    ayuda: '<circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .9-1 1.6v.6M12 17.2v.1"/>'
+  };
+  const ico = k => `<svg class="mi" viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>`;
+
+  // ---------- glosario: palabras que se tocan ----------
+  const GLOS = {
+    ETF: ['ETF', 'Un fondo que compra muchas empresas a la vez. Con uno solo, como VUAA, tienes un pedacito de las 500 empresas más grandes de EE.UU.'],
+    FIBRA: ['FIBRA', 'Un fideicomiso dueño de edificios que se rentan: oficinas, plazas, naves. Al comprarla te vuelves socio y recibes parte de las rentas.'],
+    CETE: ['CETE', 'Un préstamo de corto plazo al gobierno de México. Lo compras con descuento y al final recibes su valor completo; la diferencia es tu interés.'],
+    Udibono: ['Udibono', 'Un préstamo al gobierno que se ajusta con la inflación (se mide en UDIS), para que tu dinero no pierda poder de compra.'],
+    UDI: ['UDI', 'Una unidad del Banco de México que sube cada día con la inflación. Los Udibonos se miden en UDIS.'],
+    Meta: ['Meta', 'La parte de tu dinero que tú decidiste poner en cada tipo de inversión. Por ejemplo, 45% en acciones.'],
+    Banda: ['Banda', 'El margen que aceptas alrededor de tu meta antes de mover dinero. Con meta de 45% y banda de 5, todo entre 40% y 50% está bien.'],
+    Dividendo: ['Dividendo', 'La parte de sus ganancias que una empresa reparte a sus dueños.'],
+    Rentas: ['Rentas de una FIBRA', 'Lo que una FIBRA reparte a sus socios de lo que cobra de renta. Normalmente cada trimestre.'],
+    Reordenar: ['Reordenar', 'Mover dinero entre barrios para volver a tu plan. También se le dice rebalancear.'],
+    TasaReal: ['Tasa real', 'Lo que de verdad ganas después de la inflación: la tasa menos la inflación.'],
+    Racha: ['Racha', 'Los meses seguidos en que aportaste dinero nuevo a tu ciudad. Cualquier monto cuenta.'],
+    Rendimiento: ['Rendimiento', 'Cuánto ganó o perdió tu ciudad en el periodo, sin contar el dinero nuevo que aportaste.']
+  };
+  const term = (k, l) => `<button type="button" class="mterm" data-g="${k}">${l || GLOS[k][0]}</button>`;
+
+  // ---------- la escalera de la Fundación: de lo más seguro a lo más arriesgado ----------
+  const PASOS = [
+    { k: 'CETES', g: 'RENTA_FIJA', share: .7, riesgo: 1, n: 'CETES', ed: 'Banco de CETES', has: M => M.classes.RENTA_FIJA.items.some(i => i.valor > 0 && /cetes|bondia/i.test(i.activo)),
+      por: 'Le prestas al gobierno de México por poco tiempo y sabes desde el primer día cuánto vas a ganar. Es la base más segura de tu ciudad.', pasa: 'Riesgo muy bajo. Si la inflación sube mucho, lo que ganas de verdad puede quedar cerca de cero.', donde: 'En Cetesdirecto o en tu casa de bolsa, desde montos pequeños.' },
+    { k: 'UDI', g: 'RENTA_FIJA', share: .3, riesgo: 2, n: 'Udibonos', ed: 'Muralla contra la inflación', has: M => M.classes.RENTA_FIJA.items.some(i => i.valor > 0 && /udi/i.test(i.activo)),
+      por: 'Su valor sube con la inflación, así que protege lo que tu dinero puede comprar.', pasa: 'Riesgo bajo. Si lo vendes antes de que venza, su precio puede subir o bajar.', donde: 'En Cetesdirecto o en tu casa de bolsa.' },
+    { k: 'ETF', g: 'ACCIONES', share: 1, riesgo: 4, n: 'Acciones (ETF)', ed: 'Fábricas', has: M => M.classes.ACCIONES.valor > 0,
+      por: 'Te hace socio de cientos de empresas a la vez. En plazos largos las acciones han crecido más que la renta fija, aunque sin garantía, y un solo fondo reparte el riesgo.', pasa: 'Riesgo medio-alto. En un mal año puede caer 20% o más; es para dinero que no vas a necesitar en varios años.', donde: 'En tu casa de bolsa; muchas venden fracciones.' },
+    { k: 'FIBRA', g: 'FIBRAS', share: 1, riesgo: 4, n: 'FIBRAs', ed: 'Inmuebles', has: M => M.classes.FIBRAS.valor > 0,
+      por: 'Te vuelves socio de edificios que se rentan y recibes parte de esas rentas, normalmente cada trimestre. Diversifica fuera de las empresas.', pasa: 'Riesgo medio-alto. Su precio sube y baja como una acción y las rentas pueden bajar.', donde: 'En tu casa de bolsa, como una acción.' },
+    { k: 'BTC', g: 'BITCOIN', share: 1, riesgo: 5, n: 'Bitcoin', ed: 'Oro virtual', opcional: true, has: M => M.classes.BITCOIN.valor > 0,
+      por: 'Algunas personas tienen una parte muy pequeña porque no depende de ningún gobierno ni empresa. Es opcional.', pasa: 'Riesgo muy alto. Varias veces ha perdido más de la mitad de su valor; pon solo lo que estarías dispuesto a perder.', donde: 'En una plataforma de criptomonedas regulada.' }
+  ];
+  const POR_QUE = k => (PASOS.find(p => p.g === k) || PASOS[0]).por;
+  const META1 = 10000, META2 = 20000;
+  const NIVELES = [[10000, 'Nivel 1'], [20000, 'Nivel 2'], [50000, 'Nivel 3'], [100000, 'Nivel 4'], [250000, 'Nivel 5'], [500000, 'Nivel 6'], [1000000, 'Nivel 7']];
+  const RANGOS = [[0, 'Aprendiz'], [3, 'Administrador'], [6, 'Tesorero'], [12, 'Gobernador'], [24, 'Gobernador de la Marea'], [36, 'Leyenda de la Marea']];
+  const INFRA = [
+    { id: 'BOLSA', n: 'Bolsa de valores', c: 0, label: 'BOLSA', type: 'tiered', theme: 'gold', h: 74, abre: 'Tablero del día: cómo se movió cada edificio.' },
+    { id: 'DATOS', n: 'Centro de datos', c: 100, label: 'DATOS', type: 'modules', theme: 'cyan', h: 60, abre: 'Historial y reportes de tu ciudad mes a mes.' },
+    { id: 'INST', n: 'Instituto de investigación', c: 150, label: 'INSTITUTO', type: 'stepped', theme: 'blue', h: 82, abre: 'Ficha de cada instrumento y una lección al día (+2 créditos).' },
+    { id: 'TESORO', n: 'Banco del tesoro', c: 250, label: 'TESORO', type: 'lowrise', theme: 'mint', h: 40, abre: 'Escalera de plazos: tasa, intereses y cuánto vale hoy tu renta fija.' },
+    { id: 'OBS', n: 'Observatorio económico', c: 350, label: 'OBSERVA', type: 'needle', theme: 'blue', h: 104, abre: 'Tasa real (tasa menos inflación) y qué parte de tu ciudad está en dólares.' },
+    { id: 'RIESGO', n: 'Centro de análisis de riesgos', c: 500, req: { cer: 1 }, label: 'RIESGOS', type: 'tower', theme: 'red', h: 88, abre: 'Concentración, distancia a tus bandas y prueba de tormenta, solo de lectura.' },
+    { id: 'ARCHIVO', n: 'Archivo histórico', c: 700, req: { racha: 6 }, label: 'ARCHIVO', type: 'chamfer', theme: 'pink', h: 96, abre: 'Archivo de mercados: escenarios y carteras hipotéticas (próximamente).' },
+    { id: 'GLOBAL', n: 'Centro de operaciones globales', c: 1000, req: { cer: 2 }, label: 'GLOBAL', type: 'capsule', theme: 'cyan', h: 116, abre: 'Tu exposición por región y por moneda.' }
+  ];
+  const LECCIONES = [
+    ['¿Qué hace un fondo de acumulación, como VUAA, con los dividendos?', ['Los reinvierte dentro del fondo', 'Te los deposita cada mes', 'Los dona'], 0],
+    ['¿Cómo te paga un CETE?', ['Lo compras con descuento y al vencer recibes su valor completo', 'Te paga rentas cada trimestre', 'Sube y baja como una acción'], 0],
+    ['¿De dónde salen las distribuciones de una FIBRA?', ['De las rentas de sus inmuebles', 'De vender sus edificios cada año', 'De los intereses de CETES'], 0],
+    ['¿Contra qué te protege un Udibono?', ['Contra la inflación', 'Contra las caídas de la bolsa', 'Contra el tipo de cambio'], 0],
+    ['¿Qué es la banda de una meta?', ['El margen que aceptas antes de reordenar', 'La ganancia mínima del mes', 'El costo del fondo'], 0],
+    ['Si un CETE paga 7.2% y la inflación es 4%, ¿cuánto es la tasa real aproximada?', ['3.2%', '11.2%', '7.2%'], 0],
+    ['¿Para qué sirve reordenar dos veces al año?', ['Para volver al nivel de riesgo que elegiste', 'Para ganar más que el mercado', 'Para pagar menos comisiones'], 0]
+  ];
+  const AYUDA = {
+    fundacion: 'Así se funda tu ciudad: primero lo más seguro y al final lo más arriesgado. Cada paso te explica por qué se invierte ahí y qué puede pasar. Tú decides: puedes saltar lo que no esté en tu plan y ganas los mismos créditos.',
+    mercado: 'Aquí ves cómo se movieron tus inversiones. Cada barrio es un tipo de inversión: si sube se encienden sus luces y si baja llueve. Es normal que el mercado suba y baje; lo importante es seguir tu plan.',
+    plano: 'Tu plan dice qué parte de tu dinero va en cada tipo de inversión. La franja es el margen que aceptas. Si un barrio se sale de su franja, lo acomodas en la siguiente ceremonia.',
+    tesoreria: 'Cada mes registras lo que tienes y aportas algo nuevo. La misión te dice dónde conviene poner la aportación para acercarte a tu plan. Cualquier monto cuenta para tu racha.',
+    ingresos: 'Tus inversiones también te pagan: los CETES dan intereses, las FIBRAs reparten rentas y algunos ETFs dan dividendos. Aquí ves un estimado de cuánto produce tu ciudad.',
+    infra: 'Con los Créditos de Marea construyes edificios que te dan herramientas para entender mejor tus inversiones. Los créditos se ganan con constancia, nunca con ganancias.',
+    ayto: 'Tus metas, el cierre del mes y, en marzo y septiembre, la ceremonia de reordenamiento.',
+    bitacora: 'Tus créditos y los reportes de tu ciudad mes a mes.'
+  };
+  const SCR = [['fundacion', 'Fundación', 'Fundar'], ['mercado', 'Mercado', 'Mercado'], ['plano', 'Plano', 'Plano'], ['tesoreria', 'Tesorería', 'Tesorería'], ['ingresos', 'Ingresos', 'Ingresos'],
+    ['infra', 'Infraestructura', 'Obras'], ['ayto', 'Ayuntamiento', 'Cabildo'], ['bitacora', 'Bitácora', 'Bitácora']];
+  const OLD = { ciudad: 'mercado', portafolio: 'mercado', edificios: 'tesoreria', produccion: 'ingresos', misiones: 'tesoreria', reportes: 'bitacora', ayuntamiento: 'ayto' };
+
+  // ---------- estructura: menú lateral, encabezado y pantallas ----------
+  document.body.classList.add('marea');
+  const side = mk('aside', 'mside', `<div class="mlogo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5.5 9.5V20h13V9.5"/><circle cx="12" cy="15" r="1.6"/></svg></div>
+    <nav class="mnav2" id="mNav" aria-label="Pantallas"></nav><div class="mfoot" aria-hidden="true">Paciencia<br>que paga</div>`);
+  document.body.appendChild(side);
+  const top = mk('div', 'mtop', `<div class="mstat mcred"><span class="msi">${ico('coin')}</span><div><small>Créditos de Marea</small><b id="mCred">—</b></div></div>
+    <div class="mstat mracha"><span class="msi">${ico('flame')}</span><div><small>Racha</small><b id="mRacha">—</b></div></div>
+    <button type="button" class="mbell" id="mBell" aria-label="Pendientes">${ico('bell')}<span id="mBellN" hidden></span></button>
+    <button type="button" class="mlink" id="mGuia">¿Cómo se juega?</button>`);
+  header.appendChild(top);
+  const S = {};
+  SCR.forEach(([id]) => { S[id] = mk('div', 'mscr'); S[id].dataset.scr = id; S[id].hidden = true; });
+  const foot = wrap.querySelector(':scope > p.foot');
+  SCR.forEach(([id]) => wrap.insertBefore(S[id], foot));
+  const help = id => { const d = mk('details', 'mhelp', `<summary>${ico('ayuda')} ¿Qué es esto?</summary><p>${AYUDA[id]}</p>`); let cerr = false; try { cerr = localStorage.getItem('mh_' + id) === '1'; } catch (_) {} d.open = !cerr; d.addEventListener('toggle', () => { try { localStorage.setItem('mh_' + id, d.open ? '0' : '1'); } catch (_) {} }); return d; };
+  const put = (id, ...els) => els.filter(Boolean).forEach(e => S[id].appendChild(e));
+  const box = id => { const e = mk('div', 'mbox'); e.id = id; return e; };
+  const B = { fund: box('mFund'), perf: box('mPerf'), ronda: box('mRonda'), plano: box('mPlano'), tes: box('mTes'), ing: box('mIng'), infra: box('mInfra'), ayto: box('mAyto'), log: box('mLog') };
+  put('fundacion', help('fundacion'), B.fund);
+  put('mercado', help('mercado'), $('stage'), $('zoominfo'), $('events'), wrap.querySelector('.live'), B.perf, B.ronda, $('gaceta'), wrap.querySelector('.hud'), wrap.querySelector('.under'), $('pfView'), $('districts'));
+  put('plano', help('plano'), B.plano, $('bands'));
+  put('tesoreria', help('tesoreria'), B.tes, wrap.querySelector('.two'), $('edSearch'), $('portafolio'));
+  put('ingresos', help('ingresos'), B.ing, $('prodView'));
+  put('infra', help('infra'), B.infra);
+  put('ayto', help('ayto'), B.ayto, $('ceremony'), $('metas'), $('cierrePanel'), $('simPanel'), $('sellPanel'));
+  put('bitacora', help('bitacora'), B.log, $('repView'));
+  let cur = 'mercado';
+  const nav = $('mNav');
+
+  // ---------- estado de créditos (del servidor, por usuario) ----------
+  let E = null, cargado = null, ocupado = false;
+  const DEMO_E = { creditos: 0, claves: [], construidos: ['BOLSA'], ceremonias: 0, movimientos: [], fund: {}, udi: { hoy: 8.64, por_fecha: {} }, udibono_tasa_real: 4, banxico_actualizado: '' };
+  const VAL = k => { let m; if ((m = k.match(/^ronda:/))) return [1, 'Revisaste un distrito']; if (k.startsWith('leccion:')) return [2, 'Lección del día']; if (k.startsWith('plano:')) return [10, 'Revisaste el Plano'];
+    if (k.startsWith('tesoreria:')) return [20, 'Actualizaste la Tesorería']; if (k.startsWith('mision:')) return [30, 'Cumpliste la misión']; if (k.startsWith('ingresos:')) return [10, 'Revisaste tus ingresos'];
+    if (k.startsWith('cer-rev:')) return [20, 'Revisaste el plan de reordenamiento']; if (k.startsWith('cer-ok:')) return [80, 'Completaste la ceremonia']; if (k === 'plan') return [10, 'Definiste tu plan'];
+    if (k.startsWith('paso:')) return [15, 'Decidiste un paso de la Fundación']; if (k === 'etapa1') return [50, 'Terminaste la Etapa 1']; if (k.startsWith('nv2:')) return [20, 'Un barrio subió a nivel 2']; if (k === 'etapa2') return [80, 'Terminaste la Etapa 2']; return null; };
+  const fechasUdi = () => has() ? model.items.filter(i => i.key === 'RENTA_FIJA' && /udi/i.test(i.activo) && i.pos && i.pos.actualizado).map(i => i.pos.actualizado) : [];
+  async function mapi(accion, data = {}) {
+    data = Object.assign({ fechas: fechasUdi() }, data);
+    if (!DEMO) return api(accion, data);
+    await new Promise(r => setTimeout(r, 120));
+    const D = DEMO_E;
+    if (accion === 'marea_dar') { const g = []; (data.claves || [data.clave]).forEach(k => { const v = VAL(k); if (!v || D.claves.includes(k)) return; D.claves.push(k); D.creditos += v[0]; D.movimientos.unshift({ fecha: new Date().toISOString(), creditos: v[0], motivo: v[1] }); g.push({ creditos: v[0], motivo: v[1] }); }); return { ok: true, ...JSON.parse(JSON.stringify(D)), nuevo: g.reduce((a, x) => a + x.creditos, 0), ganados: g }; }
+    if (accion === 'marea_construir') { const b = INFRA.find(x => x.id === data.id); if (D.creditos < b.c) throw new Error('Te faltan ' + (b.c - D.creditos) + ' créditos.'); D.creditos -= b.c; D.construidos.push(b.id); D.movimientos.unshift({ fecha: new Date().toISOString(), creditos: -b.c, motivo: 'Construiste ' + b.n }); }
+    if (accion === 'marea_guardar') D.fund = data.fund;
+    return { ok: true, ...JSON.parse(JSON.stringify(D)) };
+  }
+  const claimed = k => !!E && E.claves.includes(k);
+  function mtoast(html) { let t = $('mToasts'); if (!t) { t = mk('div', ''); t.id = 'mToasts'; t.setAttribute('aria-live', 'polite'); document.body.appendChild(t); } const e = mk('div', 'mtoast', html); t.appendChild(e); setTimeout(() => e.remove(), 3200); while (t.children.length > 3) t.firstChild.remove(); }
+  async function cargar() {
+    if (ocupado || !has()) return; ocupado = true;
+    try {
+      E = await mapi('marea_estado'); cargado = token || 'demo';
+    } catch (e) { E = E || null; console.warn(e); }
+    ocupado = false; pintar(); auto();
+  }
+  async function dar(claves, extra = {}) {
+    if (!E) return;
+    claves = (Array.isArray(claves) ? claves : [claves]).filter(k => !claimed(k));
+    if (!claves.length) return;
+    try {
+      const r = await mapi('marea_dar', { claves, racha: ST ? ST.s : 0, ...extra });
+      E = r; (r.ganados || []).forEach(g => mtoast(`<b>+${g.creditos}</b> ${esc(g.motivo)}`));
+      const st = document.querySelector('.mcred'); if (st && r.nuevo) { st.classList.remove('bump'); void st.offsetWidth; st.classList.add('bump'); }
+    } catch (e) { mtoast(esc(e.message)); }
+    pintar();
+  }
+  // lo que se detecta solo al cargar: Fundación, Tesorería del mes, misión y ceremonia
+  function auto() {
+    if (!E || !has()) return;
+    const ks = [], mes = mesActual(), F = fundInfo();
+    if (hasMetas()) ks.push('plan');
+    PASOS.forEach(p => { if (F.hechos[p.k]) ks.push('paso:' + p.k); });
+    if (F.etapa >= 2) ks.push('etapa1');
+    F.niveles.filter(n => n.nv2).forEach(n => ks.push('nv2:' + n.k));
+    if (F.etapa >= 3) ks.push('etapa2');
+    if (ST && ST.savedThisMonth) ks.push('tesoreria:' + mes);
+    if (MI && MI.done && MI.type === 'obra') ks.push('mision:' + mes);
+    if (CE && CE.active && CE.done) ks.push('cer-ok:' + mes);
+    dar(ks);
+  }
+
+  // ---------- Fundación (detecta lo que ya invertiste) ----------
+  function fundInfo() {
+    const M = model, saltos = (E && E.fund && E.fund.saltos) || {}, hechos = {};
+    PASOS.forEach(p => { hechos[p.k] = p.has(M) ? 'comprado' : saltos[p.k] ? 'saltado' : null; });
+    const metaPct = k => M.classes[k].objetivo || 0;
+    const niveles = ORDER.filter(k => metaPct(k) > 0).map(k => { const obj = META2 * metaPct(k) / 100; return { k, obj, valor: M.classes[k].valor, nv2: M.classes[k].valor >= obj * .95 }; });
+    const todos = PASOS.every(p => hechos[p.k]);
+    const etapa = !hasMetas() || !todos || M.total < META1 - 1 ? 1 : M.total < META2 - 1 || !niveles.every(n => n.nv2) ? 2 : 3;
+    return { hechos, niveles, etapa, metaPct, actual: hasMetas() ? PASOS.find(p => !hechos[p.k]) : null };
+  }
+  const monto = (p, F) => Math.round(META1 * F.metaPct(p.g) / 100 * p.share / 100) * 100;
+  const riesgo = n => `<span class="mriesgo" aria-label="Riesgo ${n} de 5" title="Riesgo ${n} de 5">${[1, 2, 3, 4, 5].map(k => `<i class="${k <= n ? 'on' : ''}"></i>`).join('')}</span>`;
+  function rFund() {
+    const F = fundInfo(), M = model, T = M.total, meta = F.etapa === 1 ? META1 : META2;
+    const nv = NIVELES.filter(([m]) => T >= m - 1).length;
+    const prog = `<article class="mcard" style="--c:#f8a43c"><div class="mrow-top"><div><small class="muted">${F.etapa === 1 ? 'Etapa 1 · Funda tu ciudad' : F.etapa === 2 ? 'Etapa 2 · Haz crecer tus barrios' : 'Ciudad fundada · ' + (NIVELES[nv - 1] || ['', 'Nivel 1'])[1]}</small>
+      <b class="mbig">${money(T)} <small>/ ${money(F.etapa === 3 ? (NIVELES[nv] || NIVELES[NIVELES.length - 1])[0] : meta)}</small></b></div></div>
+      <div class="mfbar"><i style="width:${Math.min(100, T / META2 * 100)}%"></i><u style="left:50%"></u></div>
+      <div class="mfsteps"><span class="${F.etapa > 1 ? 'ok' : 'on'}">Etapa 1 · ${money(META1)}</span><span class="${F.etapa > 2 ? 'ok' : F.etapa === 2 ? 'on' : ''}">Etapa 2 · ${money(META2)}</span><span class="${F.etapa === 3 ? 'on' : ''}">Ciudad fundada</span></div></article>`;
+    if (!hasMetas()) {
+      B.fund.innerHTML = prog + `<article class="mcard hl" style="--c:#f8a43c"><h3>Paso 0 · Elige tu plan</h3><p>Tu plan dice qué parte de tu dinero va en cada barrio. Con él sabrás cuánto poner en cada edificio. Puedes empezar con una plantilla (por ejemplo Mixta o Mayoría renta fija) y cambiarla cuando quieras.</p>
+        <button type="button" class="mbtn pri" data-go="ayto:metas">Elegir mi plan <small>+10</small></button></article>`;
+      return;
+    }
+    if (F.etapa === 1) {
+      const lad = PASOS.map((p, n) => {
+        const st = F.hechos[p.k], cur = F.actual === p, m = monto(p, F), col = CLS[p.g].color;
+        const estado = st === 'comprado' ? `<span class="mpill" style="--c:var(--ok)">Construido · ${money(M.classes[p.g].items.filter(i => i.valor > 0 && (p.k !== 'CETES' || /cetes|bondia/i.test(i.activo)) && (p.k !== 'UDI' || /udi/i.test(i.activo))).reduce((a, i) => a + i.valor, 0))}</span>`
+          : st === 'saltado' ? '<span class="mpill" style="--c:var(--muted)">No va en tu plan</span>' : cur ? '<span class="mpill" style="--c:#f8a43c">Sigue</span>' : '<span class="mpill" style="--c:var(--muted)">Bloqueado</span>';
+        const head = `<div class="mlh"><span class="mln" style="--c:${col}">${n + 1}</span><div class="mlt"><b>${p.n}${p.opcional ? ' <small class="muted">(opcional)</small>' : ''}</b><small>${p.ed}</small></div>${riesgo(p.riesgo)}${estado}</div>`;
+        if (!cur) return `<li class="${st ? 'done' : 'lock'}" style="--c:${col}">${head}</li>`;
+        return `<li class="cur" style="--c:${col}">${head}
+          <div class="mwhy"><div><b>¿Por qué se invierte aquí?</b><p>${p.por}</p></div><div><b>¿Qué puede pasar?</b><p>${p.pasa}</p></div><div><b>¿Dónde se compra?</b><p>${p.donde}</p></div></div>
+          ${m > 0 ? `<p>Según tu plan, para empezar: <b>${money(m)}</b>. Cuando compres, registra tus títulos o tu saldo en la Tesorería y este edificio aparecerá en tu ciudad.</p>
+            <div class="mbtns"><button type="button" class="mbtn pri" data-reg="${p.g}">Registrar mi compra en la Tesorería <small>+15</small></button><button type="button" class="mlink" data-salta="${p.k}">No va en mi plan por ahora (también da +15)</button></div>`
+          : `<p>Tu plan no incluye ${p.n.toLowerCase()}. Puedes seguir sin invertir aquí.</p><div class="mbtns"><button type="button" class="mbtn" data-salta="${p.k}">Entendido, sigo <small>+15</small></button></div>`}</li>`;
+      }).join('');
+      const falta = !F.actual && T < META1 - 1 ? `<article class="mcard hl" style="--c:#f8a43c"><h3>Te faltan ${money(META1 - T)} para terminar la Etapa 1</h3><p>Ya tienes un edificio en cada barrio de tu plan. Tu misión del mes te dice dónde conviene aportar.</p><button type="button" class="mbtn pri" data-go="tesoreria">Ver mi misión</button></article>` : '';
+      B.fund.innerHTML = `<div class="mlead"><h2>Funda tu ciudad</h2><p>Se construye de lo más seguro a lo más arriesgado. En cada paso te explicamos por qué se invierte ahí y tú decides. Cada decisión da los mismos créditos, compres o no.</p></div>${prog}${falta}<ol class="mladder">${lad}</ol>`;
+    } else if (F.etapa === 2) {
+      const top = F.niveles.slice().sort((a, b) => a.valor / a.obj - b.valor / b.obj)[0];
+      B.fund.innerHTML = `<div class="mlead"><h2>Haz crecer tus barrios</h2><p>Cada barrio sube a nivel 2 cuando llega a la parte que le toca en tu plan con una ciudad de ${money(META2)}. Sube primero el que va más atrás.</p></div>${prog}
+        <div class="mgrid">${F.niveles.map(n => { const r = Math.min(1, n.valor / n.obj), sug = top === n && !n.nv2, p = PASOS.find(q => q.g === n.k);
+          return `<article class="mcard ${sug ? 'hl' : ''}" style="--c:${CLS[n.k].color}"><div class="mrow-top"><span class="mbadge">${ico(n.k)}</span>${riesgo(n.k === 'RENTA_FIJA' ? 1 : p.riesgo)}</div>
+            <h3>${CLS[n.k].scene} <span class="mpill" style="--c:${n.nv2 ? 'var(--ok)' : CLS[n.k].color}">Nivel ${n.nv2 ? 2 : 1}</span></h3>
+            <div class="mrow"><span>${money(n.valor)} de ${money(n.obj)}</span><b>${Math.round(r * 100)}%</b></div><div class="mlv"><i style="width:${r * 100}%"></i></div>
+            ${n.nv2 ? '<p class="foot">Listo para esta etapa.</p>' : `${sug ? `<p class="foot"><b>Siguiente recomendado por tu plan.</b> ${POR_QUE(n.k)}</p>` : ''}<button type="button" class="mbtn ${sug ? 'pri' : ''}" data-reg="${n.k}">Registrar aportación</button>`}</article>`; }).join('')}</div>`;
+    } else {
+      B.fund.innerHTML = `<div class="mlead"><h2>Tu ciudad está fundada</h2><p>Los niveles de la ciudad cambian su aspecto; los créditos siguen saliendo de la constancia.</p></div>${prog}
+        <article class="mcard"><h3>Niveles de tu ciudad</h3>${NIVELES.map(([m, t], k) => `<div class="mrow"><span>${t}</span><b class="${k < nv ? 'pos' : 'muted'}">${money(m)}${k === nv - 1 ? ' · aquí estás' : ''}</b></div>`).join('')}</article>`;
+    }
+  }
+  async function saltar(k) {
+    const saltos = Object.assign({}, (E && E.fund && E.fund.saltos) || {}, { [k]: 1 });
+    try { E = await mapi('marea_guardar', { fund: Object.assign({}, E.fund || {}, { saltos }) }); } catch (e) { mtoast(esc(e.message)); return; }
+    await dar('paso:' + k); render(); auto();
+  }
+
+  // ---------- Mercado: cómo le ha ido a tu ciudad + Ronda ----------
+  const umbral = k => num(J.umbral_tormenta_pct, 2) * (k === 'BITCOIN' ? 2.5 : 1);
+  const REG = { EXP: ['Mercado expansivo', '#5dd39e', '▲'], LAT: ['Mercado lateral', '#9ba6c6', '■'], BAJ: ['Periodo bajista', '#ff9b6b', '▼'], TOR: ['Tormenta', '#ff7a7a', '⚡'], REC: ['Recuperación', '#ffc46b', '◢'], INT: ['Intereses del día', '#4fc3b0', '●'], HUB: ['Centro de mando', '#8ab4ff', '◆'], VAC: ['Terreno baldío', '#9ba6c6', '·'] };
+  // rendimiento mensual de cada barrio sin contar aportaciones, con las fotos del Historial
+  function serieMeses() {
+    const rows = hist(); if (!rows.length) return [];
+    const pts = rows.map(r => ({ mes: r.mes, valor: r.valor, costo: r.costo, det: r.detalle || {} }));
+    const cm = mesActual();
+    const det = {}; model.items.forEach(i => { if (i.valor || i.costo) det[i.activo] = [i.costo, i.valor]; });
+    if (pts[pts.length - 1].mes === cm) pts.pop();
+    pts.push({ mes: cm, valor: model.total, costo: model.costo, det, hoy: true });
+    return pts;
+  }
+  function rendDesde(pts, desde, k) {
+    // encadena (valor − valor anterior − aportación) ÷ valor anterior, mes a mes
+    let f = 1;
+    for (let j = Math.max(1, desde + 1); j < pts.length; j++) {
+      const a = pts[j - 1], b = pts[j];
+      const g = (p, which) => k ? Object.entries(p.det || {}).filter(([act]) => { const it = model.items.find(i => i.activo === act); return it && it.key === k; }).reduce((s, [, v]) => s + (+v[which] || 0), 0) : (which ? p.valor : p.costo);
+      const v0 = g(a, 1), v1 = g(b, 1), ap = g(b, 0) - g(a, 0);
+      if (v0 > 0) f *= 1 + (v1 - v0 - ap) / v0;
+    }
+    return (f - 1) * 100;
+  }
+  let per = '1M';
+  function rPerf() {
+    const pts = serieMeses(), n = pts.length, hoyP = model.total - model.hoy > 0 ? model.hoy / (model.total - model.hoy) * 100 : 0;
+    const year = mesActual().slice(0, 4), iY = pts.findIndex(p => p.mes.slice(0, 4) === year), dic = iY > 0 ? iY - 1 : 0;
+    const P = { '1D': ['1 día', null], '1S': ['1 semana', 'x'], '1M': ['1 mes', n - 2], '3M': ['3 meses', n - 4], '6M': ['6 meses', n - 7], 'YTD': ['En el año', dic], '1A': ['1 año', n - 13] };
+    const ok = k => k === '1D' || (k !== '1S' && P[k][1] != null && P[k][1] >= 0 && n >= 2);
+    if (!ok(per)) per = '1D';
+    const val = (k, cls) => k === '1D' ? (cls ? model.classes[cls].chg : hoyP) : rendDesde(pts, P[k][1], cls);
+    const r = val(per), gan = per === '1D' ? model.hoy : model.total - model.total / (1 + r / 100), col = r >= 0 ? 'var(--ok)' : 'var(--bad)';
+    // gráfica: rendimiento acumulado mes a mes dentro del periodo
+    let chart = '';
+    if (per !== '1D') {
+      const s = P[per][1], xs = []; for (let j = s; j < n; j++) xs.push({ mes: pts[j].mes, v: j === s ? 0 : rendDesde(pts.slice(0, j + 1), s) });
+      const lo = Math.min(0, ...xs.map(x => x.v)), hi = Math.max(0, ...xs.map(x => x.v)), Y = v => 12 + (hi - v) / ((hi - lo) || 1) * 100, X = j => 10 + j / Math.max(1, xs.length - 1) * 580;
+      const L = xs.map((x, j) => `${X(j).toFixed(1)},${Y(x.v).toFixed(1)}`).join(' ');
+      chart = `<svg viewBox="0 0 600 136" class="mchart" role="img" aria-label="Rendimiento acumulado ${pc(r, 2)}"><line x1="10" x2="590" y1="${Y(0)}" y2="${Y(0)}" stroke="#3a4670" stroke-dasharray="3 4"/><polygon points="10,${Y(0)} ${L} 590,${Y(0)}" fill="${col}" fill-opacity=".12"/><polyline points="${L}" fill="none" stroke="${col}" stroke-width="2"/>${xs.map((x, j) => `<circle cx="${X(j)}" cy="${Y(x.v)}" r="3" fill="${col}"/>`).join('')}<text x="10" y="132" font-size="11" fill="#9ba6c6">${MESES[+xs[0].mes.slice(5) - 1].slice(0, 3)} ${xs[0].mes.slice(2, 4)}</text><text x="590" y="132" font-size="11" fill="#9ba6c6" text-anchor="end">hoy</text></svg>`;
+    }
+    B.perf.innerHTML = `<article class="mcard" style="--c:#5b8cff"><div class="mrow-top"><div><h3>Cómo le ha ido a tu ciudad</h3><p class="foot">${term('Rendimiento')} sin contar el dinero nuevo que aportaste.</p></div>
+      <div class="mseg" role="group" aria-label="Periodo">${Object.keys(P).map(k => `<button type="button" data-per="${k}" aria-pressed="${per === k}" ${ok(k) ? '' : 'disabled'} title="${P[k][0]}${ok(k) ? '' : ' · se necesita más historial'}">${k === 'YTD' ? 'Año' : k}</button>`).join('')}</div></div>
+      <div class="mperf"><div class="mperf-big"><small class="muted">${P[per][0]}</small><b style="color:${col}">${pc(r, 2)}</b><span class="${gan >= 0 ? 'pos' : 'neg'}">${gan >= 0 ? '+' : '−'}${money(Math.abs(gan))}</span>
+        ${ORDER.filter(k => model.classes[k].valor > 0).map(k => { const v = val(per, k); return `<div class="mrow"><span><span style="color:${CLS[k].color}">●</span> ${CLS[k].scene}</span><b class="${v >= 0 ? 'pos' : 'neg'}">${pc(v, 1)}</b></div>`; }).join('')}</div>${chart || '<p class="foot">El día de hoy: el cambio de precio de cada edificio desde el cierre de ayer.</p>'}</div>
+      <p class="foot">Los periodos de un mes o más usan las fotos mensuales de tu Historial. "1 semana" se activa cuando la ciudad guarde un historial diario de precios.</p></article>`;
+  }
+  function regimen(k) {
+    if (k === 'BOLSA') return 'HUB'; if (!(model.classes[k].valor > 0)) return 'VAC'; if (k === 'RENTA_FIJA') return 'INT';
+    const t = model.classes[k].chg, pts = serieMeses(), m = pts.length >= 2 ? rendDesde(pts, pts.length - 2, k) : 0, prev = pts.length >= 3 ? rendDesde(pts.slice(0, -1), pts.length - 3, k) : 0;
+    if (t <= -umbral(k)) return 'TOR'; if (t <= -1 || m <= -5) return 'BAJ'; if (prev <= -3 && m > 0 && t >= 0) return 'REC'; if (t >= 1 || m >= 3) return 'EXP'; return 'LAT';
+  }
+  function rRonda() {
+    const hoy = ymd(new Date()), ks = ['BOLSA', ...ORDER], hechos = ks.filter(k => claimed(`ronda:${k}:${hoy}`)).length;
+    B.ronda.innerHTML = `<div class="mlead mlead-row"><div><h2>Ronda del mercado</h2><p>Revisa cada distrito: 1 crédito al día por distrito, sin importar si subió o bajó.</p></div><span class="mpill" style="--c:#f8a43c">${hechos} de ${ks.length} revisados</span></div>
+      <div class="mgrid">${ks.map(k => {
+        const g = REG[regimen(k)], ins = claimed(`ronda:${k}:${hoy}`), c = k === 'BOLSA' ? null : model.classes[k];
+        const ch = k === 'BOLSA' ? (model.total - model.hoy > 0 ? model.hoy / (model.total - model.hoy) * 100 : 0) : c.chg;
+        const nombre = k === 'BOLSA' ? 'Distrito bursátil' : { ACCIONES: 'Distrito industrial', FIBRAS: 'Distrito inmobiliario', RENTA_FIJA: 'Distrito gubernamental', BITCOIN: 'Distrito de reservas' }[k];
+        const col = k === 'BOLSA' ? '#8ab4ff' : CLS[k].color, que = { BOLSA: 'Toda tu ciudad', ACCIONES: `Acciones y ${term('ETF', 'ETFs')}`, FIBRAS: term('FIBRA', 'FIBRAs'), RENTA_FIJA: `${term('CETE', 'CETES')} y ${term('Udibono', 'Udibonos')}`, BITCOIN: 'Bitcoin y cripto' }[k];
+        const its = k === 'BOLSA' ? model.items.filter(i => i.valor > 0 && i.key !== 'RENTA_FIJA').sort((a, b) => b.cambio_dia - a.cambio_dia) : c.items.filter(i => i.valor > 0);
+        const body = k === 'BOLSA' ? (its.length ? `<div class="mrow"><span>Mejor del día</span><b>${esc(its[0].activo)} <span class="pos">${pc(its[0].cambio_dia, 2)}</span></b></div><div class="mrow"><span>Peor del día</span><b>${esc(its[its.length - 1].activo)} <span class="neg">${pc(its[its.length - 1].cambio_dia, 2)}</span></b></div>` : '')
+          : its.length ? its.map(i => `<div class="mrow"><span>${esc(i.activo)}</span><b>${k === 'RENTA_FIJA' ? `<span class="muted">${num(i.tasa, rateOf(i))}% anual</span>` : `<span class="${i.cambio_dia >= 0 ? 'pos' : 'neg'}">${pc(i.cambio_dia, 2)}</span>`} · ${money(i.valor)}</b></div>`).join('') : '<p class="foot">Terreno baldío: todavía no inviertes en este barrio.</p>';
+        return `<article class="mcard" style="--c:${col}"><div class="mrow-top"><span class="mbadge big">${ico(k)}</span><button type="button" class="msw" role="switch" aria-checked="${ins}" ${ins ? 'disabled' : `data-ronda="${k}"`} aria-label="${ins ? 'Revisado' : 'Revisar ' + nombre + ', 1 crédito'}"><i></i></button></div>
+          <h3>${nombre}</h3><div class="mrow"><span class="muted">${que}</span><b class="${k === 'RENTA_FIJA' ? '' : ch >= 0 ? 'pos' : 'neg'}" style="font-size:18px">${k === 'RENTA_FIJA' ? 'intereses' : pc(ch, 2)}</b></div>
+          <span class="mpill" style="--c:${g[1]}">${g[2]} ${g[0]}</span>${ins ? body : '<p class="foot">Activa el interruptor para revisarlo (+1).</p>'}</article>`;
+      }).join('')}</div>`;
+  }
+
+  // ---------- Plano ----------
+  function rPlano() {
+    const w = lunes(), hecho = claimed('plano:' + w);
+    if (!hasMetas()) { B.plano.innerHTML = `<article class="mcard"><h3>Primero define tu plan</h3><p>Aquí verás cada barrio contra su meta.</p><button type="button" class="mbtn pri" data-go="ayto:metas">Definir mis metas</button></article>`; return; }
+    B.plano.innerHTML = `<div class="mlead mlead-row"><div><h2>Plano de tu ciudad</h2><p>Cada barrio contra la ${term('Meta', 'meta')} que tú pusiste. La franja es tu ${term('Banda', 'banda')}: mientras el punto esté dentro, no hay que mover nada.</p></div>
+      <button type="button" class="mbtn pri" data-plano="1" ${hecho ? 'disabled' : ''}>${hecho ? 'Revisado esta semana' : 'Confirmar revisión semanal'} <small>${hecho ? '' : '+10'}</small></button></div>
+      <div class="mgrid">${ORDER.filter(k => model.classes[k].objetivo > 0 || model.classes[k].valor > 0).map(k => {
+        const c = model.classes[k], g = (model.groups || []).find(x => x.key === k), tol = g && g.tol != null ? +g.tol : BAND(), lo = Math.max(0, c.objetivo - tol), hi = c.objetivo + tol;
+        const mx = Math.max(60, Math.ceil((Math.max(c.pct, hi) + 5) / 10) * 10), ok = Math.abs(c.pct - c.objetivo) <= tol + 1e-9;
+        const est = ok ? ['En banda', 'var(--ok)'] : c.pct > hi ? ['Arriba de su banda', 'var(--warn)'] : ['Abajo de su banda', 'var(--warn)'];
+        return `<article class="mcard" style="--c:${CLS[k].color}"><h3><span class="mbadge">${ico(k)}</span>${CLS[k].scene} <span class="mpill" style="--c:${est[1]}">${est[0]}</span></h3>
+          <div class="mrow"><span>Hoy ${pct1(c.pct)} · meta ${pct1(c.objetivo)} ± ${tol}</span><b>${money(c.valor)}</b></div>
+          <div class="mbar" role="img" aria-label="${CLS[k].scene}: ${pct1(c.pct)} contra meta ${pct1(c.objetivo)}"><div class="band" style="left:${lo / mx * 100}%;width:${(hi - lo) / mx * 100}%"></div><div class="goal" style="left:${c.objetivo / mx * 100}%"></div><div class="now" style="left:${Math.min(100, c.pct / mx * 100)}%"></div></div>
+          <div class="mscale"><span>0%</span><span>${mx}%</span></div></article>`;
+      }).join('')}</div><p class="foot">Abajo está el semáforo detallado de tus metas, instrumento por instrumento.</p>`;
+  }
+
+  // ---------- Tesorería: misión con su porqué y renta fija valuada hoy ----------
+  const dias = d => d ? Math.max(0, Math.round((Date.now() - new Date(d + 'T12:00:00').getTime()) / 864e5)) : 0;
+  function rfFilas() {
+    const real = E && E.udibono_tasa_real != null ? +E.udibono_tasa_real : 4, U = E && E.udi || {};
+    return model.classes.RENTA_FIJA.items.filter(i => i.valor > 0).map(i => {
+      const fecha = i.pos && i.pos.actualizado, d = dias(fecha), saldo = i.valor, udi = /udi/i.test(i.activo), tasa = num(i.tasa, rateOf(i));
+      let est, inf = null;
+      if (udi && U.hoy && fecha && U.por_fecha && U.por_fecha[fecha]) { inf = (U.hoy / U.por_fecha[fecha] - 1) * 100; est = saldo * (U.hoy / U.por_fecha[fecha]) * (1 + real / 100 * d / 360); }
+      else est = saldo * (1 + (udi ? (real + num(J.inflacion_pct, 4)) : tasa) / 100 * d / 360);
+      return { i, fecha, d, saldo, udi, tasa: udi ? real : tasa, inf, est };
+    });
+  }
+  function rfCard() {
+    const F = rfFilas(); if (!F.length) return '';
+    return `<article class="mcard" style="--c:#4fc3b0"><h3><span class="mbadge">${ico('RENTA_FIJA')}</span>Renta fija: cuánto vale hoy (aprox.)</h3>
+      <p class="foot">Con lo que capturaste en la Tesorería, los días que han pasado y la tasa de la semana. El Udibono además sube con la inflación a través de la ${term('UDI')}.</p>
+      <div class="mtbl"><table><thead><tr><th>Instrumento</th><th>Capturado</th><th class="n">Saldo</th><th class="n">Tasa</th><th class="n">Días</th><th class="n">Por inflación</th><th class="n">Vale hoy</th></tr></thead><tbody>
+      ${F.map(f => `<tr><td>${esc(f.i.activo)}</td><td>${f.fecha ? f.fecha.split('-').reverse().slice(0, 2).join('/') : '—'}</td><td class="n">${money(f.saldo)}</td><td class="n">${f.tasa.toFixed(2)}%${f.udi ? ' real' : ''}</td><td class="n">${f.d}</td><td class="n">${f.inf == null ? '—' : pc(f.inf, 2)}</td><td class="n"><b>${money(f.est)}</b> <span class="pos">+${money(f.est - f.saldo)}</span></td></tr>`).join('')}</tbody></table></div>
+      <div class="mform"><div><b>CETES y Bondia</b><span>saldo × (1 + tasa × días ÷ 360)</span></div><div><b>Udibono</b><span>saldo × (UDI hoy ÷ UDI al capturar) × (1 + tasa real × días ÷ 360)</span></div></div>
+      <p class="foot">${E && E.banxico_actualizado ? 'Tasas de CETES y UDI del Banco de México, actualizadas el ' + esc(String(E.banxico_actualizado)) + '.' : 'Cuando conectes el token del Banco de México, las tasas de CETES y la UDI se actualizarán solas cada semana.'} Al actualizar la Tesorería, el saldo capturado vuelve a empezar.</p></article>`;
+  }
+  function rTes() {
+    const mes = mesActual(), tes = claimed('tesoreria:' + mes), mis = claimed('mision:' + mes);
+    let mision = '';
+    if (MI && MI.type === 'obra' && MI.it) mision = `<article class="mcard hl" style="--c:${CLS[MI.it.key].color}"><h3><span class="mbadge">${ico(MI.it.key)}</span>Misión de aportación</h3>
+      <p>Tus metas piden <b>${esc(MI.it.activo)}</b>: aporta unos <b>${money(MI.amt)}</b>.</p><p class="foot"><b>¿Por qué se invierte aquí?</b> ${POR_QUE(MI.it.key)}</p>
+      <div class="mrow"><span>Estado</span><b class="${MI.done ? 'pos' : 'muted'}">${MI.done ? 'Cumplida' + (mis ? ' · créditos cobrados' : '') : 'Pendiente'}</b></div>
+      <p class="foot">Se cumple sola cuando registras tu compra en la Tesorería: +${30 + 2 * Math.min(12, ST ? ST.s : 0)} créditos.</p></article>`;
+    B.tes.innerHTML = `<div class="mgrid">${mision}<article class="mcard" style="--c:#ff8a6a"><h3><span class="mbadge">${ico('flame')}</span>${term('Racha')} y Tesorería</h3>
+      <div class="mrow"><span>Racha actual</span><b>${ST ? ST.s : 0} ${ST && ST.s === 1 ? 'mes' : 'meses'}</b></div><div class="mrow"><span>Récord</span><b>${ST ? ST.best : 0}</b></div>
+      <div class="mrow"><span>Tesorería de ${MESES[new Date().getMonth()]}</span><b class="${ST && ST.savedThisMonth ? 'pos' : 'muted'}">${ST && ST.savedThisMonth ? 'Al día' + (tes ? ' · +20 cobrados' : '') : 'Pendiente (+20)'}</b></div>
+      <button type="button" class="mbtn pri" data-reg="">Registrar títulos y saldos</button></article></div>${rfCard()}`;
+  }
+
+  // ---------- Ingresos ----------
+  function rIng() {
+    const mes = mesActual(), hecho = claimed('ingresos:' + mes);
+    const cetes = model.classes.RENTA_FIJA.items.filter(i => /cetes/i.test(i.activo) && i.tasa != null && i.tasa !== '').sort((a, b) => (parseInt(a.activo.match(/\d+/)) || 0) - (parseInt(b.activo.match(/\d+/)) || 0));
+    B.ing.innerHTML = `<div class="mlead mlead-row"><div><h2>Ingresos de la ciudad</h2><p>Un estimado automático de lo que producen tus inversiones: ${term('CETE', 'CETES')} con las tasas de la semana, ${term('Rentas', 'rentas')} de FIBRAs y ${term('Dividendo', 'dividendos')}.</p></div>
+      <button type="button" class="mbtn pri" data-ing="1" ${hecho ? 'disabled' : ''}>${hecho ? 'Ingresos del mes revisados' : 'Revisar los ingresos del mes'} <small>${hecho ? '' : '+10'}</small></button></div>
+      <div class="mgrid"><article class="mcard" style="--c:#4fc3b0"><h3>Tasas de esta semana</h3>${cetes.map(i => `<div class="mrow"><span>${esc(i.activo)}</span><b>${(+i.tasa).toFixed(2)}%</b></div>`).join('') || '<p class="foot">Sin tasas de CETES en tu catálogo.</p>'}
+        <div class="mrow"><span>Udibono 3 años (${term('TasaReal', 'tasa real')})</span><b>${E && E.udibono_tasa_real != null ? (+E.udibono_tasa_real).toFixed(2) + '%' : '—'}</b></div>
+        <p class="foot">${E && E.banxico_actualizado ? 'Del Banco de México, ' + esc(String(E.banxico_actualizado)) + '.' : 'Se actualizan solas cada semana cuando conectes el Banco de México.'}</p></article></div>${rfCard()}`;
+  }
+
+  // ---------- Infraestructura ----------
+  function estadoInfra(b) {
+    const hecho = E && E.construidos.includes(b.id); if (hecho) return ['hecho', 'Construido'];
+    const i = INFRA.indexOf(b); if (i > 0 && !(E && E.construidos.includes(INFRA[i - 1].id))) return ['lock', 'Primero: ' + INFRA[i - 1].n];
+    if (b.req && b.req.cer && (!E || E.ceremonias < b.req.cer)) return ['lock', `Requiere ${b.req.cer} ${b.req.cer === 1 ? 'ceremonia completada' : 'ceremonias completadas'}`];
+    if (b.req && b.req.racha && (!ST || ST.best < b.req.racha)) return ['lock', `Requiere racha de ${b.req.racha} meses`];
+    return ['disp', E && E.creditos >= b.c ? 'Disponible' : `Faltan ${b.c - (E ? E.creditos : 0)} créditos`];
+  }
+  function rInfra() {
+    B.infra.innerHTML = `<div class="mlead mlead-row"><div><h2>Infraestructura financiera</h2><p>Se construye en orden con Créditos de Marea. Cada edificio abre una herramienta; ninguno depende de tus rendimientos.</p></div><span class="mpill" style="--c:#f8a43c">${E ? E.creditos.toLocaleString('es-MX') : '—'} créditos</span></div>
+      <div class="mgrid">${INFRA.map(b => { const [k, t] = estadoInfra(b), can = k === 'disp' && E && E.creditos >= b.c;
+        return `<article class="mcard ${can ? 'hl' : ''}" style="--c:#f8a43c"><div class="mlot"><canvas data-lot="${b.id}" width="44" height="64"></canvas><div><h3>${b.n}</h3><small class="mst" style="color:${k === 'hecho' ? 'var(--ok)' : k === 'lock' ? 'var(--muted)' : '#f8a43c'}">${t}</small></div></div>
+          <p class="foot">${b.abre}</p>${k === 'hecho' ? `<button type="button" class="mbtn" data-tool="${b.id}">Abrir</button>` : `<button type="button" class="mbtn ${can ? 'pri' : ''}" data-build="${b.id}" ${can ? '' : 'disabled'}>Construir · ${b.c}</button>`}</article>`; }).join('')}</div>`;
+    B.infra.querySelectorAll('canvas[data-lot]').forEach(cv => {
+      const g = cv.getContext('2d'), b = INFRA.find(x => x.id === cv.dataset.lot); g.imageSmoothingEnabled = false; g.clearRect(0, 0, 44, 64);
+      if (E && E.construidos.includes(b.id) && window.EdificiosNeon) { try { const bd = EdificiosNeon.building('infra-' + b.id, { type: b.type, label: b.label, hMul: 1, themes: [b.theme], signTheme: b.theme, signFit: true }), c = EdificiosNeon.toCanvas(bd), s = Math.min(1, 60 / bd.h, 40 / bd.w); g.drawImage(c, (44 - bd.w * s) / 2, 64 - bd.h * s, bd.w * s, bd.h * s); } catch (e) {} }
+      else { g.fillStyle = '#5a4a2a'; for (let x = 8; x <= 36; x += 7) g.fillRect(x, 30, 1, 34); g.fillStyle = '#6a5630'; for (let y = 30; y < 64; y += 6) g.fillRect(8, y, 29, 1); g.fillStyle = '#8a6a2a'; g.fillRect(14, 22, 16, 6); }
+    });
+  }
+  async function construir(id) {
+    try { const r = await mapi('marea_construir', { id, racha: ST ? ST.best : 0 }); E = r; const b = INFRA.find(x => x.id === id); mtoast(`Inauguraste <b>${esc(b.n)}</b>`); if (typeof celebrate === 'function') celebrate('¡Se inauguró ' + b.n + '!'); }
+    catch (e) { mtoast(esc(e.message)); }
+    pintar(); render();
+  }
+  function modal(html) {
+    let m = $('mModal'); if (!m) { m = mk('div', ''); m.id = 'mModal'; m.addEventListener('click', e => { if (e.target === m) cerrar(); }); document.body.appendChild(m); }
+    m.innerHTML = `<div class="mmbox" role="dialog" aria-modal="true">${html}</div>`; m.hidden = false;
+    m.querySelectorAll('[data-close]').forEach(b => b.onclick = cerrar); const f = m.querySelector('button'); if (f) f.focus();
+  }
+  function cerrar() { const m = $('mModal'); if (m) { m.hidden = true; m.innerHTML = ''; } }
+  function herramienta(id) {
+    const b = INFRA.find(x => x.id === id), head = sub => `<div class="mmhead"><div><h2>${b.n}</h2><small>${sub}</small></div><button type="button" class="mbtn" data-close>Cerrar</button></div>`, T = model.total;
+    if (id === 'DATOS') { cerrar(); go('bitacora'); return; }
+    if (id === 'BOLSA') { const L = model.items.filter(i => i.valor > 0 && i.key !== 'RENTA_FIJA').sort((a, c) => c.cambio_dia - a.cambio_dia);
+      return modal(head('Tablero del día') + `<div class="mtbl"><table><thead><tr><th>Edificio</th><th>Barrio</th><th class="n">Hoy</th><th class="n">Valor</th></tr></thead><tbody>${L.map(i => `<tr><td>${esc(i.activo)}</td><td>${CLS[i.key].scene}</td><td class="n ${i.cambio_dia >= 0 ? 'pos' : 'neg'}">${pc(i.cambio_dia, 2)}</td><td class="n">${money(i.valor)}</td></tr>`).join('')}</tbody></table></div>`); }
+    if (id === 'INST') {
+      const d0 = ymd(new Date()), L = LECCIONES[Math.floor(Date.now() / 864e5) % LECCIONES.length], done = claimed('leccion:' + d0);
+      modal(head('Fichas y lección del día') + `<div class="mcard hl" style="--c:#8ab4ff"><h3>Lección del día</h3><p>${esc(L[0])}</p><div class="mquiz">${L[1].map((a, k) => `<button type="button" class="mbtn" data-q="${k}" ${done ? 'disabled' : ''}>${esc(a)}</button>`).join('')}</div><p class="foot" id="mQres">${done ? 'Ya hiciste la lección de hoy.' : 'Responde bien para ganar 2 créditos.'}</p></div>
+        <div class="mtbl"><table><thead><tr><th>Edificio</th><th>Qué es</th><th>Moneda</th><th class="n">Costo anual</th></tr></thead><tbody>${model.items.filter(i => i.valor > 0).map(i => `<tr><td>${esc(i.activo)}</td><td>${esc(i.descripcion || '')}${i.indice ? ` <span class="muted">Índice: ${esc(i.indice)}</span>` : ''}</td><td>${esc(i.moneda || '')}</td><td class="n">${i.costo_pct != null && i.costo_pct !== '' ? (i.costo_url ? `<a href="${esc(i.costo_url)}" target="_blank" rel="noopener">${(+i.costo_pct).toFixed(2)}%</a>` : (+i.costo_pct).toFixed(2) + '%') : '—'}</td></tr>`).join('')}</tbody></table></div>`);
+      $('mModal').querySelectorAll('[data-q]').forEach(btn => btn.onclick = () => { const k = +btn.dataset.q; $('mModal').querySelectorAll('[data-q]').forEach(x => x.disabled = true);
+        if (k === L[2]) { btn.classList.add('ok'); $('mQres').textContent = 'Correcto.'; dar('leccion:' + d0); } else { btn.classList.add('no'); $('mModal').querySelector(`[data-q="${L[2]}"]`).classList.add('ok'); $('mQres').textContent = 'Casi. Mañana hay otra lección.'; } });
+      return;
+    }
+    if (id === 'TESORO') { const F = rfFilas(); return modal(head('Escalera de plazos') + `<div class="mtbl"><table><thead><tr><th>Instrumento</th><th class="n">Tasa</th><th class="n">Saldo</th><th class="n">Intereses al día</th><th class="n">Al mes</th><th class="n">Vale hoy</th></tr></thead><tbody>${F.map(f => `<tr><td>${esc(f.i.activo)}</td><td class="n">${f.tasa.toFixed(2)}%${f.udi ? ' real' : ''}</td><td class="n">${money(f.saldo)}</td><td class="n">${money(f.saldo * num(f.i.tasa, rateOf(f.i)) / 100 / 365)}</td><td class="n">${money(f.saldo * num(f.i.tasa, rateOf(f.i)) / 100 / 12)}</td><td class="n">${money(f.est)}</td></tr>`).join('')}</tbody></table></div>`); }
+    if (id === 'OBS') { const inf = num(J.inflacion_pct, 4), usd = T ? model.items.filter(i => i.moneda === 'USD').reduce((a, i) => a + i.valor, 0) / T * 100 : 0;
+      return modal(head(`Inflación de tu hoja: ${inf}% al año`) + `<p>${term('TasaReal', 'La tasa real')} es lo que de verdad ganas después de la inflación.</p><div class="mtbl"><table><thead><tr><th>Instrumento</th><th class="n">Tasa</th><th class="n">Tasa real</th></tr></thead><tbody>${model.classes.RENTA_FIJA.items.filter(i => i.valor > 0).map(i => { const t = num(i.tasa, rateOf(i)); return `<tr><td>${esc(i.activo)}</td><td class="n">${t.toFixed(2)}%</td><td class="n ${t - inf >= 0 ? 'pos' : 'neg'}">${pc(t - inf, 2)}</td></tr>`; }).join('')}</tbody></table></div>
+        <div class="mrow"><span>Parte de tu ciudad en dólares</span><b>${pct1(usd)}</b></div><p class="foot">Si el dólar sube contra el peso, esta parte vale más en pesos, y al revés.</p>`); }
+    if (id === 'RIESGO') { const L = model.items.filter(i => i.valor > 0).sort((a, c) => c.valor - a.valor), top3 = L.slice(0, 3).reduce((a, i) => a + i.valor, 0) / (T || 1) * 100;
+      modal(head('Solo lectura: nada aquí cambia tu ciudad') + `<div class="mrow"><span>Edificio más grande</span><b>${L[0] ? esc(L[0].activo) + ' · ' + pct1(L[0].pct) : '—'}</b></div><div class="mrow"><span>Los 3 más grandes</span><b>${pct1(top3)}</b></div>
+        <h3>Prueba de tormenta</h3><label class="mrow" for="mShock">Caída de acciones <b id="mShv">−20%</b></label><input id="mShock" type="range" min="0" max="50" value="20"><div id="mShr"></div>`);
+      const upd = () => { const v = +$('mShock').value, c = model.classes, loss = c.ACCIONES.valor * v / 100 + c.FIBRAS.valor * v / 200 + c.BITCOIN.valor * Math.min(100, v * 2) / 100; $('mShv').textContent = '−' + v + '%'; $('mShr').innerHTML = `<p class="foot">FIBRAs caen la mitad y cripto el doble.</p><div class="mrow"><span>Tu ciudad perdería</span><b class="neg">${money(loss)} · ${pct1(loss / (T || 1) * 100)}</b></div><div class="mrow"><span>La renta fija sigue en</span><b>${money(c.RENTA_FIJA.valor)}</b></div>`; };
+      $('mShock').oninput = upd; upd(); return; }
+    if (id === 'ARCHIVO') return modal(head('Archivo de mercados · próximamente') + `<p>Escenarios que se documentarán con fuentes antes de mostrarse:</p><div class="mrow"><span>Crisis financiera de 2008</span></div><div class="mrow"><span>Caída de los mercados de marzo de 2020</span></div><div class="mrow"><span>Crisis inflacionaria de 2022</span></div><div class="mrow"><span>Periodos de recuperación y expansión</span></div>`);
+    if (id === 'GLOBAL') { const R = {}; model.items.filter(i => i.valor > 0).forEach(i => { const r = i.key === 'ACCIONES' ? (i.cuenta_como || i.subclase || 'Acciones') : i.key === 'BITCOIN' ? 'Cripto (sin país)' : 'México'; R[r] = (R[r] || 0) + i.valor; });
+      return modal(head('Tu exposición por región') + Object.entries(R).sort((a, c) => c[1] - a[1]).map(([k, v]) => `<div class="mrow"><span>${esc(k)}</span><b>${pct1(v / (T || 1) * 100)}</b></div><div class="mlv" style="--c:#8ab4ff"><i style="width:${v / (T || 1) * 100}%"></i></div>`).join('')); }
+  }
+
+  // ---------- Ayuntamiento y Bitácora ----------
+  function rAyto() {
+    const mes = mesActual(), meses = ST && ST.contribMonths ? ST.contribMonths.size : 0, rg = RANGOS.filter(r => meses >= r[0]).pop()[1];
+    const cer = CE && CE.active ? `<article class="mcard hl" style="--c:#f8a43c"><h3>Ceremonia de ${MESES[new Date().getMonth()]}</h3><p>Revisa el plan de reordenamiento de abajo y deja cada barrio dentro de su banda. Se completa sola cuando todos están en banda y actualizaste la Tesorería del mes.</p>
+      <div class="mbtns"><button type="button" class="mbtn pri" data-cer="1" ${claimed('cer-rev:' + mes) ? 'disabled' : ''}>${claimed('cer-rev:' + mes) ? 'Plan revisado' : 'Revisé el plan'} <small>+20</small></button><span class="mpill" style="--c:${CE.done ? 'var(--ok)' : 'var(--muted)'}">${CE.done ? 'Completada · +80' : 'Al completarla: +80'}</span></div></article>` : '';
+    B.ayto.innerHTML = `<div class="mgrid">${cer}<article class="mcard" style="--c:#8a5cff"><h3>Tu rango: ${rg}</h3><p class="foot">Sube con meses de aportación, nunca con rendimiento. Llevas ${meses} ${meses === 1 ? 'mes' : 'meses'}.</p>${RANGOS.map(([n, t]) => `<div class="mrow"><span>${t}</span><b class="${meses >= n ? 'pos' : 'muted'}">${n} meses</b></div>`).join('')}</article></div>`;
+  }
+  function rLog() {
+    B.log.innerHTML = `<article class="mcard" style="--c:#f8a43c"><h3><span class="mbadge">${ico('coin')}</span>Créditos de Marea · ${E ? E.creditos.toLocaleString('es-MX') : '—'}</h3>
+      <p class="foot">Se guardan en tu usuario: valen en cualquier dispositivo. No se compran, no se venden y no se transfieren.</p>
+      <ul class="mlog">${E && E.movimientos.length ? E.movimientos.map(m => `<li><time>${new Date(m.fecha).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })}</time><span>${esc(m.motivo)}</span><b class="${m.creditos >= 0 ? '' : 'neg'}">${m.creditos > 0 ? '+' : ''}${m.creditos}</b></li>`).join('') : '<li><span class="muted">Todavía no ganas créditos. Empieza por la Ronda del mercado.</span></li>'}</ul></article>`;
+  }
+
+  // ---------- navegación ----------
+  function pendientes() {
+    if (!has()) return {};
+    const mes = mesActual(), hoy = ymd(new Date()), F = fundInfo();
+    return {
+      fundacion: F.etapa < 3, mercado: ['BOLSA', ...ORDER].some(k => !claimed(`ronda:${k}:${hoy}`)), plano: hasMetas() && !claimed('plano:' + lunes()),
+      tesoreria: !(ST && ST.savedThisMonth) || (MI && MI.type === 'obra' && !MI.done), ingresos: !claimed('ingresos:' + mes),
+      infra: INFRA.some(b => estadoInfra(b)[0] === 'disp' && E && E.creditos >= b.c), ayto: !!(CE && CE.active && !CE.done) || !hasMetas()
+    };
+  }
+  function pintar() {
+    if (!has()) return;
+    const P = pendientes(), F = fundInfo(), list = SCR.filter(([id]) => id !== 'fundacion' || F.etapa < 3);
+    if (cur === 'fundacion' && F.etapa >= 3) cur = 'mercado';
+    nav.innerHTML = list.map(([id, n, s]) => `<button type="button" class="mtab" data-scr="${id}" aria-current="${cur === id ? 'page' : 'false'}" title="${n}">${ico(id)}<span class="ml">${n}</span><span class="ms">${s}</span>${P[id] ? '<i class="mdot" aria-label="pendiente"></i>' : ''}</button>`).join('');
+    nav.querySelectorAll('.mtab').forEach(b => b.onclick = () => go(b.dataset.scr));
+    $('mCred').textContent = E ? E.creditos.toLocaleString('es-MX') : '—';
+    $('mRacha').textContent = ST ? `${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}` : '—';
+    const n = Object.values(P).filter(Boolean).length; $('mBellN').textContent = n; $('mBellN').hidden = !n;
+  }
+  let elegido = !!(location.hash || '').slice(1), guiado = false;
+  function render() {
+    onOff();
+    if (!has()) return;
+    if (!guiado) { guiado = true; let v = null; try { v = localStorage.getItem('cm_guia'); } catch (_) {} if (!v) setTimeout(() => guia(0), 700); }
+    if (!elegido) { elegido = true; if (fundInfo().etapa < 3 && cur === 'mercado') { go('fundacion'); return; } }
+    if (cargado !== (token || 'demo')) { cargado = token || 'demo'; cargar(); } else if (E) auto();
+    try {
+      pintar();
+      ({ fundacion: rFund, mercado: () => { rPerf(); rRonda(); }, plano: rPlano, tesoreria: rTes, ingresos: rIng, infra: rInfra, ayto: rAyto, bitacora: rLog })[cur]();
+    } catch (e) { console.error(e); }
+  }
+  function go(id, sub) {
+    if (!S[id]) id = 'mercado';
+    cur = id; SCR.forEach(([k]) => { S[k].hidden = k !== id; });
+    try { if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id); } catch (_) {}
+    render();
+    if (id === 'mercado') requestAnimationFrame(() => resize());
+    const el = sub ? $(sub) : null;
+    if (el && el.classList.contains('collapsed')) { const b = el.querySelector('.phead button'); if (b) b.click(); }
+    requestAnimationFrame(() => { const t = el || S[id]; const y = t.getBoundingClientRect().top + window.scrollY - 12; window.scrollTo({ top: Math.max(0, el ? y : Math.min(y, window.scrollY)), behavior: 'auto' }); });
+  }
+  // clics dentro de las pantallas nuevas
+  document.addEventListener('click', e => {
+    const t = e.target.closest('button, a'); if (!t) { const g = $('mGloss'); if (g && !g.hidden && !e.target.closest('#mGloss')) g.hidden = true; return; }
+    const d = t.dataset;
+    if (t.classList.contains('mterm')) { let g = $('mGloss'); if (!g) { g = mk('div', ''); g.id = 'mGloss'; document.body.appendChild(g); } const [ti, de] = GLOS[d.g]; g.innerHTML = `<div><b>${esc(ti)}</b><p>${esc(de)}</p></div><button type="button" class="mbtn" id="mGlossX">Entendido</button>`; g.hidden = false; $('mGlossX').onclick = () => g.hidden = true; e.preventDefault(); return; }
+    if (d.ronda) { t.setAttribute('aria-checked', 'true'); dar(`ronda:${d.ronda}:${ymd(new Date())}`).then(render); }
+    else if (d.plano) dar('plano:' + lunes()).then(render);
+    else if (d.ing) dar('ingresos:' + mesActual()).then(render);
+    else if (d.cer) dar('cer-rev:' + mesActual()).then(render);
+    else if (d.salta) saltar(d.salta);
+    else if (d.build) construir(d.build);
+    else if (d.tool) herramienta(d.tool);
+    else if (d.per && !t.disabled) { per = d.per; rPerf(); }
+    else if (d.go) { const [s, sub] = d.go.split(':'); go(s, sub); }
+    else if (d.reg !== undefined && t.classList.contains('mbtn')) { go('tesoreria', 'portafolio'); if (typeof GOV !== 'undefined' && GOV.openTesoreria) GOV.openTesoreria(); }
+  });
+  $('mBell').onclick = () => {
+    const P = pendientes(), T = { fundacion: 'Sigue fundando tu ciudad', mercado: 'Termina la Ronda del mercado de hoy', plano: 'Revisa el Plano de esta semana', tesoreria: 'Actualiza la Tesorería y cumple tu misión del mes', ingresos: 'Revisa los ingresos del mes', infra: 'Ya te alcanza para una obra nueva', ayto: hasMetas() ? 'Completa la ceremonia de reordenamiento' : 'Define tus metas' };
+    const L = Object.keys(T).filter(k => P[k]);
+    modal(`<div class="mmhead"><div><h2>Pendientes</h2><small>Lo que te da créditos ahora</small></div><button type="button" class="mbtn" data-close>Cerrar</button></div>${L.length ? L.map(k => `<button type="button" class="mbtn mpend" data-go="${k}">${ico(k)}<span>${T[k]}</span></button>`).join('') : '<p>Todo al día.</p>'}`);
+    $('mModal').querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', cerrar));
+  };
+  const GUIA = [
+    ['Tu ciudad es tu dinero', 'Cada edificio es una inversión que tienes: mientras más dinero tiene, más alto es. Si empiezas de cero, construyes de lo más seguro a lo más arriesgado en la Fundación.'],
+    ['Cuatro barrios y la Bolsa', `<b style="color:${CLS.ACCIONES.color}">Fábricas:</b> acciones y ${term('ETF', 'ETFs')}. <b style="color:${CLS.FIBRAS.color}">Inmuebles:</b> ${term('FIBRA', 'FIBRAs')}. <b style="color:${CLS.RENTA_FIJA.color}">Obras públicas:</b> ${term('CETE', 'CETES')} y bonos. <b style="color:${CLS.BITCOIN.color}">Oro virtual:</b> bitcoin. La Bolsa resume el día de toda tu ciudad.`],
+    ['El clima es el mercado', 'Si un barrio sube se encienden sus luces; si baja, llueve; si cae fuerte, hay tormenta. Nada se destruye: las caídas son parte de invertir.'],
+    ['Ganas por constancia', 'Revisa tu ciudad, aporta cada mes y sigue tu plan. Eso te da Créditos de Marea, que se guardan en tu usuario, para construir infraestructura con herramientas nuevas. Ganar o perder dinero no cambia tus créditos.']
+  ];
+  function guia(i = 0) {
+    modal(`<div class="mmhead"><div><small>Cómo se juega · ${i + 1} de ${GUIA.length}</small><h2>${GUIA[i][0]}</h2></div><button type="button" class="mbtn" data-close>Cerrar</button></div><p class="mguia">${GUIA[i][1]}</p>
+      <div class="mbtns" style="justify-content:space-between">${i ? '<button type="button" class="mbtn" id="mGp">Atrás</button>' : '<span></span>'}<button type="button" class="mbtn pri" id="mGn">${i < GUIA.length - 1 ? 'Siguiente' : 'Empezar'}</button></div>`);
+    try { localStorage.setItem('cm_guia', '1'); } catch (_) {}
+    if (i) $('mGp').onclick = () => guia(i - 1);
+    $('mGn').onclick = () => i < GUIA.length - 1 ? guia(i + 1) : cerrar();
+  }
+  $('mGuia').onclick = () => guia(0);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrar(); const g = $('mGloss'); if (g) g.hidden = true; } });
+  // los saltos que hacía el menú anterior ahora llevan a las pantallas nuevas
+  window.goSec = (sec, elId) => go(OLD[sec] || sec, elId);
+  function fromOld(sec) { go(OLD[sec] || 'mercado'); }
+  function inicio() {
+    const h = (location.hash || '').slice(1), F = has() ? fundInfo() : { etapa: 3 };
+    go(S[h] ? h : OLD[h] || (F.etapa < 3 ? 'fundacion' : 'mercado'));
+  }
+  function reset() { E = null; cargado = null; elegido = false; cur = 'mercado'; }
+  function onOff() { document.body.classList.toggle('m-on', !$('app').hidden); }
+  new MutationObserver(onOff).observe($('app'), { attributes: true, attributeFilter: ['hidden'] });
+  inicio();
+  return { render, go, fromOld, reset, inicio };
 })();
 
 </script>
