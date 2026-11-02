@@ -226,8 +226,6 @@ ul.gz li i{font-style:normal;font-weight:700}
 ul.gz li em{font-style:normal;font-weight:800;color:var(--acc)}
 .simact{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 small.obj{color:var(--ok);font-size:11px;white-space:nowrap}
-a.casino-lk{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#f2c14e;text-decoration:none;border:1px solid #6b5a2a;border-radius:8px;padding:6px 10px;background:rgba(242,193,78,.08)}
-a.casino-lk::before{content:"";width:12px;height:12px;border-radius:50%;background:repeating-conic-gradient(#f2c14e 0 45deg,#b7212f 45deg 90deg)}
 /* ---------- carta para imprimir ---------- */
 #govPrint{display:none}
 @media print{
@@ -286,7 +284,6 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
   header.top h1{font-size:28px}
   .who{gap:8px;font-size:13px;width:100%;justify-content:space-between}
   #whoName{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  a.casino-lk{padding:5px 9px;font-size:12px;white-space:nowrap}
 }
 .gz-track{will-change:transform}
 .gz-band{contain:layout paint}
@@ -647,7 +644,7 @@ body.marea header.top .who{order:1}
   <div class="wrap">
     <header class="top">
       <h1>Ciudad <span>Marea</span></h1>
-      <div class="who"><span id="whoName"></span><a class="casino-lk" id="casinoLk" href="#" hidden>Casino del pueblo</a><button class="ghost small" id="btnPw" type="button">Contraseña</button><button class="ghost small" id="btnOut" type="button">Salir</button></div>
+      <div class="who"><span id="whoName"></span><button class="ghost small" id="btnPw" type="button">Contraseña</button><button class="ghost small" id="btnOut" type="button">Salir</button></div>
     </header>
 
     <div class="stage" id="stage">
@@ -1412,9 +1409,7 @@ window.SP={"torres": {"src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAi4A
 const CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbwQ27XpCTCNOmOPxSGCu7gB8UJx40QPaoAlyXx2rvORM31OER6X9GQABBMS88Do-wCGIw/exec'   // URL /exec de tu Apps Script. Vacío = modo demostración
 };
-CONFIG.AVISO_URL = CONFIG.AVISO_URL || 'aviso-privacidad.html';
-CONFIG.CASINO_URL = CONFIG.CASINO_URL || '';   // dirección del casino (su propio sitio). Vacío = sin enlace
-if (CONFIG.CASINO_URL) { $('casinoLk').href = CONFIG.CASINO_URL; $('casinoLk').hidden = false; }   // tu aviso de privacidad (archivo en el mismo sitio o liga completa)
+CONFIG.AVISO_URL = CONFIG.AVISO_URL || 'aviso-privacidad.html';   // tu aviso de privacidad (archivo en el mismo sitio o liga completa)
 const DEMO = !CONFIG.API_URL;
 
 // Valores por defecto; los reales vienen de la pestaña Juego de tu hoja
@@ -4018,13 +4013,13 @@ function wireWizard(box) {
     for (const st of wzSteps().slice(1, -1)) { const keep = WZ.step; WZ.step = st; const e = wzCheck(); WZ.step = keep; if (e) { $('mtErr').textContent = e; return; } }
     const lista = GRUPOS.map(([n]) => { const p = num(WZ.pct[n], 0), modo = p > 0 ? WZ.modo[n] : '';
       return { grupo: n, objetivo_pct: p, modo, reparto: modo === 'varios' ? Object.entries(WZ.rep[n] || {}).map(([a, v]) => ({ activo: a, peso_pct: num(v, 0) })) : [] }; });
-    metasBusy = true; $('mtSave').disabled = true;
+    metasBusy = true; $('mtSave').disabled = true; $('mtSave').dataset.t = $('mtSave').textContent; $('mtSave').textContent = 'Guardando…';
     try {
       const r = await api('guardar_metas', { metas: lista, plantilla: WZ.origin === 'actual' ? '' : (WZ.origin || '') });
       metasEdit = false; WZ = null; raw.metas = r.metas; apply(raw);
       celebrate('Metas guardadas. La ciudad ya calcula con ellas.');
     } catch (e) { $('mtErr').textContent = e.message; }
-    metasBusy = false; const b = $('mtSave'); if (b) b.disabled = false;
+    metasBusy = false; const b = $('mtSave'); if (b) { b.disabled = false; if (b.dataset.t) b.textContent = b.dataset.t; }
   };
 }
 
@@ -4051,7 +4046,6 @@ function wireWizard(box) {
     $('btnResume').disabled = false;
   };
   $('btnSwitch').onclick = () => logout(false);
-  if (CONFIG.CASINO_URL && document.referrer.indexOf(CONFIG.CASINO_URL) === 0) $('btnResume').click();   // de regreso del casino: entra directo
 })();
 
 // ================= Vistas de consulta: portafolio, buscador, producción, reportes y cierre del mes =================
@@ -4376,47 +4370,46 @@ window.MAREA = (() => {
   function tomarDeDatos() {
     if (!raw || raw === rawVisto || raw.marea === undefined) return;
     rawVisto = raw;
-    if (raw.marea) { E = raw.marea; cola.forEach(k => { if (!E.claves.includes(k)) { E.claves.push(k); E.creditos += 1; } }); }
+    if (raw.marea) fusionar(raw.marea);
     else E = null;
   }
-  // La Ronda vale 1 crédito por distrito: se anota al momento en pantalla y se manda junta al servidor
-  // (1.5 s después del último interruptor, o al salir de la página), así 5 interruptores son 1 sola llamada.
-  let cola = [], tCola = 0;
-  const enCurso = new Set();
-  function anotarRonda(k) {
-    if (!E || claimed(k) || cola.includes(k)) return;
-    cola.push(k); E.claves.push(k); E.creditos += 1; E.movimientos.unshift({ fecha: new Date().toISOString(), creditos: 1, motivo: 'Revisaste un distrito' });
-    mtoast('<b>+1</b> Revisaste un distrito');
-    bump(); pintar();
-    clearTimeout(tCola); tCola = setTimeout(() => dar([]), 1500);
+  // Cada botón responde al instante: el crédito se anota en pantalla y se escribe en el Excel en ese mismo momento
+  // (una llamada por botón, sin esperas). Si el servidor lo rechaza, se deshace y se avisa.
+  const enCurso = new Map();   // clave → créditos anotados en pantalla mientras llega la respuesta
+  const valorDe = k => k.startsWith('mision:') ? [30 + 2 * Math.min(12, ST ? ST.s : 0), 'Cumpliste la misión de aportación'] : (VAL(k) || [0, '']);
+  function anotar(k, n, motivo) {
+    enCurso.set(k, n); E.claves.push(k); E.creditos += n;
+    if (k.startsWith('obra:')) E.construidos.push(k.slice(5));
+    E.movimientos.unshift({ fecha: new Date().toISOString(), creditos: n, motivo });
+  }
+  function deshacer(k) {
+    const n = enCurso.get(k) || 0; enCurso.delete(k);
+    const i = E.claves.indexOf(k); if (i < 0) return;
+    E.claves.splice(i, 1); E.creditos -= n;
+    if (k.startsWith('obra:')) E.construidos = E.construidos.filter(x => x !== k.slice(5));
+  }
+  // la respuesta del servidor manda, pero sin borrar lo que otros botones anotaron y todavía viaja
+  function fusionar(r) {
+    E = r;
+    enCurso.forEach((n, k) => { if (!E.claves.includes(k)) { E.claves.push(k); E.creditos += n; if (k.startsWith('obra:')) E.construidos.push(k.slice(5)); } });
   }
   // la copia de datos de la pestaña (entrada instantánea) se queda con los créditos al día
-  function copiaE() { if (!raw || raw.marea === undefined || !E) return; raw.marea = E; try { sessionStorage.setItem('cm_datos', JSON.stringify(raw)); } catch (_) {} }
+  function copiaE() { if (!raw || raw.marea === undefined || !E || enCurso.size) return; raw.marea = E; try { sessionStorage.setItem('cm_datos', JSON.stringify(raw)); } catch (_) {} }
   function bump() { const st = document.querySelector('.mcred'); if (st) { st.classList.remove('bump'); void st.offsetWidth; st.classList.add('bump'); } }
+  function repintar() { try { pintar(); PANT[cur](); } catch (e) { console.error(e); } }
   async function dar(claves, extra = {}) {
     if (!E) return;
-    claves = (Array.isArray(claves) ? claves : [claves]).filter(k => !claimed(k) && !enCurso.has(k));
-    const ronda = cola.splice(0); clearTimeout(tCola);
-    if (!claves.length && !ronda.length) return;
-    claves.forEach(k => enCurso.add(k));
+    claves = [].concat(claves).filter(k => !claimed(k) && !enCurso.has(k));
+    if (!claves.length) return;
+    claves.forEach(k => { const [n, m] = valorDe(k); anotar(k, n, m); if (n) mtoast(`<b>+${n}</b> ${esc(m)}`); });
+    bump(); repintar();
     try {
-      const r = await mapi('marea_dar', { claves: ronda.concat(claves), racha: ST ? ST.s : 0, ...extra });
-      E = r; (r.ganados || []).filter(g => g.creditos !== 1 || !/distrito|bursátil/i.test(g.motivo)).forEach(g => mtoast(`<b>${g.creditos > 0 ? '+' : ''}${g.creditos}</b> ${esc(g.motivo)}`));
-      if (claves.length && r.nuevo) bump();
-      copiaE();
-    } catch (e) { mtoast(esc(e.message)); }
-    claves.forEach(k => enCurso.delete(k));
-    pintar();
+      const r = await mapi('marea_dar', { claves, racha: ST ? ST.s : 0, ...extra });
+      claves.forEach(k => enCurso.delete(k));
+      fusionar(r); copiaE();
+    } catch (e) { claves.forEach(deshacer); mtoast(esc(e.message)); }
+    repintar();
   }
-  // si cierras o cambias de pestaña con revisiones sin mandar, se mandan sin esperar respuesta
-  function soltarCola() {
-    if (!cola.length || DEMO || !token) return;
-    const body = JSON.stringify({ accion: 'marea_dar', token, claves: cola.splice(0), racha: ST ? ST.s : 0 });
-    clearTimeout(tCola);
-    try { if (!(navigator.sendBeacon && navigator.sendBeacon(CONFIG.API_URL, body))) fetch(CONFIG.API_URL, { method: 'POST', body, keepalive: true }); } catch (_) {}
-  }
-  window.addEventListener('pagehide', soltarCola);
-  document.addEventListener('visibilitychange', () => { if (document.hidden) soltarCola(); });
   // lo que se detecta solo al cargar: Fundación, Tesorería del mes, misión y ceremonia
   function auto() {
     if (!E || !has()) return;
@@ -4485,9 +4478,13 @@ window.MAREA = (() => {
     }
   }
   async function saltar(k) {
-    const saltos = Object.assign({}, (E && E.fund && E.fund.saltos) || {}, { [k]: 1 });
-    try { E = await mapi('marea_guardar', { fund: Object.assign({}, E.fund || {}, { saltos }) }); copiaE(); } catch (e) { mtoast(esc(e.message)); return; }
-    await dar('paso:' + k); render(); auto();
+    if (!E) return;
+    const antes = E.fund || {}, fund = Object.assign({}, antes, { saltos: Object.assign({}, antes.saltos || {}, { [k]: 1 }) });
+    E.fund = fund;
+    const g = mapi('marea_guardar', { fund }).then(r => { const f = E.fund; fusionar(r); E.fund = f; copiaE(); })
+      .catch(e => { E.fund = antes; mtoast(esc(e.message)); repintar(); });
+    dar('paso:' + k);   // se anota y se pinta al momento; las dos escrituras van al Excel en paralelo
+    await g; repintar(); auto();
   }
 
   // ---------- Mercado: cómo le ha ido a tu ciudad + Ronda ----------
@@ -4641,9 +4638,14 @@ window.MAREA = (() => {
     });
   }
   async function construir(id) {
-    try { const r = await mapi('marea_construir', { id, racha: ST ? ST.best : 0 }); E = r; copiaE(); const b = INFRA.find(x => x.id === id); mtoast(`Inauguraste <b>${esc(b.n)}</b>`); if (typeof celebrate === 'function') celebrate('¡Se inauguró ' + b.n + '!'); }
-    catch (e) { mtoast(esc(e.message)); }
-    pintar(); render();
+    const b = INFRA.find(x => x.id === id), k = 'obra:' + id;
+    if (!E || E.construidos.includes(id) || enCurso.has(k)) return;
+    anotar(k, -b.c, 'Construiste ' + b.n);
+    mtoast(`Construyendo <b>${esc(b.n)}</b>…`);
+    repintar();
+    try { const r = await mapi('marea_construir', { id, racha: ST ? ST.best : 0 }); enCurso.delete(k); fusionar(r); copiaE(); if (typeof celebrate === 'function') celebrate('¡Se inauguró ' + b.n + '!'); }
+    catch (e) { deshacer(k); mtoast(esc(e.message)); }
+    repintar();
   }
   function modal(html) {
     let m = $('mModal'); if (!m) { m = mk('div', ''); m.id = 'mModal'; m.addEventListener('click', e => { if (e.target === m) cerrar(); }); document.body.appendChild(m); }
@@ -4711,6 +4713,7 @@ window.MAREA = (() => {
     $('mRacha').textContent = ST ? `${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}` : '—';
     const n = Object.values(P).filter(Boolean).length; $('mBellN').textContent = n; $('mBellN').hidden = !n;
   }
+  const PANT = { fundacion: () => rFund(), mercado: () => { rPerf(); rRonda(); }, plano: () => rPlano(), tesoreria: () => rTes(), ingresos: () => rIng(), infra: () => rInfra(), ayto: () => rAyto(), bitacora: () => rLog() };
   let elegido = !!(location.hash || '').slice(1), guiado = false;
   function render() {
     onOff();
@@ -4721,7 +4724,7 @@ window.MAREA = (() => {
     else { tomarDeDatos(); if (E) auto(); }
     try {
       pintar();
-      ({ fundacion: rFund, mercado: () => { rPerf(); rRonda(); }, plano: rPlano, tesoreria: rTes, ingresos: rIng, infra: rInfra, ayto: rAyto, bitacora: rLog })[cur]();
+      PANT[cur]();
       if (VISTA[cur] && window.MENU) MENU.render(VISTA[cur]);
     } catch (e) { console.error(e); }
   }
@@ -4740,10 +4743,10 @@ window.MAREA = (() => {
     const t = e.target.closest('button, a'); if (!t) { const g = $('mGloss'); if (g && !g.hidden && !e.target.closest('#mGloss')) g.hidden = true; return; }
     const d = t.dataset;
     if (t.classList.contains('mterm')) { let g = $('mGloss'); if (!g) { g = mk('div', ''); g.id = 'mGloss'; document.body.appendChild(g); } const [ti, de] = GLOS[d.g]; g.innerHTML = `<div><b>${esc(ti)}</b><p>${esc(de)}</p></div><button type="button" class="mbtn" id="mGlossX">Entendido</button>`; g.hidden = false; $('mGlossX').onclick = () => g.hidden = true; e.preventDefault(); return; }
-    if (d.ronda) { t.setAttribute('aria-checked', 'true'); t.disabled = true; anotarRonda(`ronda:${d.ronda}:${ymd(new Date())}`); rRonda(); }
-    else if (d.plano) dar('plano:' + lunes()).then(render);
-    else if (d.ing) dar('ingresos:' + mesActual()).then(render);
-    else if (d.cer) dar('cer-rev:' + mesActual()).then(render);
+    if (d.ronda) { t.setAttribute('aria-checked', 'true'); t.disabled = true; dar(`ronda:${d.ronda}:${ymd(new Date())}`); }
+    else if (d.plano) { t.disabled = true; dar('plano:' + lunes()); }
+    else if (d.ing) { t.disabled = true; dar('ingresos:' + mesActual()); }
+    else if (d.cer) { t.disabled = true; dar('cer-rev:' + mesActual()); }
     else if (d.salta) saltar(d.salta);
     else if (d.build) construir(d.build);
     else if (d.tool) herramienta(d.tool);
@@ -4779,7 +4782,7 @@ window.MAREA = (() => {
     const h = (location.hash || '').slice(1), F = has() ? fundInfo() : { etapa: 3 };
     go(S[h] ? h : OLD[h] || (F.etapa < 3 ? 'fundacion' : 'mercado'));
   }
-  function reset() { soltarCola(); E = null; cargado = null; rawVisto = null; elegido = false; cur = 'mercado'; }
+  function reset() { enCurso.clear(); E = null; cargado = null; rawVisto = null; elegido = false; cur = 'mercado'; }
   function onOff() { document.body.classList.toggle('m-on', !$('app').hidden); }
   new MutationObserver(onOff).observe($('app'), { attributes: true, attributeFilter: ['hidden'] });
   inicio();
