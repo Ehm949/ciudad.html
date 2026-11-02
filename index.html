@@ -695,7 +695,7 @@ body.marea header.top .who{order:1}
       <section class="panel">
         <h2>Aportación del mes</h2>
         <p class="muted" style="margin:0">Escribe cuánto vas a aportar este mes. La ciudad calcula cómo se repartiría entre tus barrios según las metas que tú definiste.</p>
-        <div class="sim"><input id="simAmt" type="number" min="0" step="500" value="10000" aria-label="Aportación del mes en pesos"><button id="btnSim" type="button">Calcular reparto</button></div>
+        <div class="sim"><input id="simAmt" type="number" min="0" step="any" inputmode="decimal" placeholder="¿Cuánto vas a aportar?" aria-label="Aportación del mes en pesos"><button id="btnSim" type="button">Calcular reparto</button></div>
         <label class="lim">Tu precio límite<span><input id="simLim" type="number" min="0" max="50" step="0.1" value="0" inputmode="decimal" aria-label="Tu precio límite de compra: porcentaje abajo del precio de hoy">% abajo del precio de hoy (0% = precio de hoy)</span></label>
         <div id="simOut"></div>
       </section>
@@ -703,7 +703,7 @@ body.marea header.top .who{order:1}
         <h2>Cosecha del tesoro</h2>
         <p class="muted" style="margin:0">El pueblo trabaja para ti. Sacar parte del tesoro para darte un gusto, un viaje o cumplir una meta es justo: es el fruto de tu esfuerzo. Escribe cuánto quieres sacar: la ciudad calcula de qué barrios saldría según las metas que tú definiste y prepara la carta con tu precio límite de venta.</p>
         <div class="viewsw" role="group" aria-label="¿Para qué es la venta?" style="width:max-content;max-width:100%;margin-top:10px"><button type="button" id="smJoy" aria-pressed="true">Para disfrutarlo</button><button type="button" id="smRe" aria-pressed="false">Para reordenar</button></div>
-        <div class="sim"><input id="sellAmt" type="number" min="0" step="500" aria-label="Cuánto quieres sacar, en pesos"><button id="btnSell" type="button">Calcular</button></div>
+        <div class="sim"><input id="sellAmt" type="number" min="0" step="any" inputmode="decimal" placeholder="¿Cuánto quieres sacar?" aria-label="Cuánto quieres sacar, en pesos"><button id="btnSell" type="button">Calcular</button></div>
         <label class="lim">Tu precio límite de venta<span><input id="sellLim" type="number" min="0" max="50" step="0.1" value="0" inputmode="decimal" aria-label="Tu precio límite de venta: porcentaje arriba del precio de hoy">% arriba del precio de hoy (0% = precio de hoy)</span></label>
         <div id="sellOut"></div>
       </section>
@@ -1415,7 +1415,7 @@ const DEMO = !CONFIG.API_URL;
 // Valores por defecto; los reales vienen de la pestaña Juego de tu hoja
 const JUEGO_DEF = {
   rend_acciones_pct: 8, rend_fibras_pct: 8, rend_bitcoin_pct: 10, inflacion_pct: 4,
-  dist_fibras_pct: 7, div_acciones_pct: 1.8, meses_rebalanceo: '3,9', banda_pct: 3,
+  meses_rebalanceo: '3,9', banda_pct: 3,
   umbral_tormenta_pct: 2, desc_acciones_pct: 0.5, desc_fibras_pct: 1, desc_cripto_pct: 2, mision_activo: '', mision_texto: '', ceremonia_prueba: 'NO'
 };
 let J = { ...JUEGO_DEF };
@@ -1745,7 +1745,8 @@ function incomePerDay(M) {
   let d = 0;
   M.items.forEach(it => {
     if (!it.valor) return;
-    const r = it.key === 'RENTA_FIJA' ? rateOf(it) : it.key === 'FIBRAS' ? num(J.dist_fibras_pct, 7) : it.key === 'ACCIONES' ? num(J.div_acciones_pct, 1.8) : 0;
+    // tasas reales: renta fija con su tasa; FIBRAs y acciones con lo que pagaron en 12 meses (sin dato = 0, no se inventa)
+    const r = it.key === 'RENTA_FIJA' ? (it.tasa != null && it.tasa !== '' ? +it.tasa || 0 : 0) : it.key === 'BITCOIN' ? 0 : (+it.div_pct || 0);
     d += it.valor * r / 100 / 365;
   });
   return d;
@@ -2245,6 +2246,7 @@ function renderSim() {
 }
 $('btnSim').addEventListener('click', renderSim);
 $('simAmt').addEventListener('keydown', e => { if (e.key === 'Enter') renderSim(); });
+let simTimer = 0; $('simAmt').addEventListener('input', () => { clearTimeout(simTimer); simTimer = setTimeout(renderSim, 350); });
 
 // ---------- nivel de la ciudad (la máquina del tiempo se quitó) ----------
 function setTravel(years, silent) { travelYears = 0; view = model; layout(); if (!silent) renderTm(); }
@@ -3366,8 +3368,8 @@ const GOV = (() => {
     const inp = $('sellAmt');
     if (inp) {
       inp.setAttribute('aria-label', sellMode === 'disfrutar' ? 'Cuánto quieres sacar, en pesos' : 'Monto a vender para reordenar, en pesos');
-      if (!sellTouched) { const sg = sellSuggest(); inp.value = sellMode === 'reordenar' && sg.amt ? sg.amt : ''; }
-      inp.placeholder = sellMode === 'disfrutar' ? '¿Cuánto quieres sacar?' : String(sellSuggest().amt || 0);
+      // no se sugiere ningún monto: la calculadora espera a que escribas el tuyo
+      inp.placeholder = sellMode === 'disfrutar' ? '¿Cuánto quieres sacar?' : '¿Cuánto quieres vender?';
     }
     renderSell();
   }
@@ -3508,7 +3510,6 @@ const GOV = (() => {
       return;
     }
     const inp = $('sellAmt'), out = $('sellOut'); if (!inp || !out || !model || !model.total) return;
-    if (!sellTouched) { const sg = sellSuggest(); inp.value = sellMode === 'reordenar' && sg.amt ? sg.amt : ''; }
     renderSell();
   }
   function openTesoreria() {
@@ -4058,7 +4059,16 @@ window.MENU = (() => {
   const mk = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
   const foot = wrap.querySelector(':scope > p.foot');
   const add = el => { wrap.insertBefore(el, foot); return el; };
-  const pfView = add(mk('section', 'panel', '')); pfView.id = 'pfView';
+  const pfView = add(mk('section', 'panel', '<div class="phead"><h2>Portafolio</h2></div><div id="pfIn"></div>')); pfView.id = 'pfView';
+  // Aportación del mes, Cosecha del tesoro y Portafolio se pueden desplegar o retraer (se recuerda en este dispositivo)
+  const sellPanel = $('sellPanel');
+  [[simPanel, 'aportacion', 'Escribe un monto y la ciudad calcula cómo repartirlo según tus metas. Toca <b>Mostrar</b> para abrir la calculadora.'],
+   [sellPanel, 'cosecha', 'Calcula de qué barrios sacar dinero según tus metas. Toca <b>Mostrar</b> para abrir la calculadora.'],
+   [pfView, 'portafolio_vista', 'Tus instrumentos, su valor y su ganancia. Toca <b>Mostrar</b> para ver la tabla.']].forEach(([el, k, t]) => {
+    if (!el) return;
+    if (!el.querySelector(':scope > .phead')) { const h = el.querySelector(':scope > h2'); if (h) { const d = mk('div', 'phead'); h.before(d); d.appendChild(h); } }
+    collapsible(el, k, t, false);
+  });
   const edSearch = add(mk('section', 'panel', `<h2>Buscar un edificio</h2>
     <p class="muted" style="margin:0">Escribe el nombre o la clave (por ejemplo VWO, FUNO o Cetes). Toca un edificio para verlo en la ciudad o para registrar sus títulos.</p>
     <input id="edQ" type="search" placeholder="Buscar edificio…" autocomplete="off" aria-label="Buscar edificio">
@@ -4095,11 +4105,10 @@ window.MENU = (() => {
           <td class="n"><span class="${it.ganancia >= 0 ? 'pos' : 'neg'}">${signed(it.ganancia)}</span><br><small class="muted">${renta ? '' : pct1(gp)}</small></td></tr>`;
       }).join('') + `<tr class="sub"><td>Total ${CLS[k].name}</td><td></td><td></td><td class="n"><b>${money(c.valor)}</b></td><td class="n">${pct1(c.pct)}</td><td class="n"><span class="${c.hoy >= 0 ? 'pos' : 'neg'}">${signed2(c.hoy)}</span></td><td class="n"><span class="${c.ganancia >= 0 ? 'pos' : 'neg'}">${signed(c.ganancia)}</span></td></tr>`;
     }).join('');
-    pfView.innerHTML = `<h2>Portafolio</h2>
-      ${tabs([['ALL', 'Todo'], ['ACCIONES', 'Acciones y ETFs'], ['FIBRAS', 'FIBRAs'], ['RENTA_FIJA', 'CETES y renta fija'], ['BITCOIN', 'Bitcoin']], pfFilter, 'data-pf')}
+    $('pfIn').innerHTML = `${tabs([['ALL', 'Todo'], ['ACCIONES', 'Acciones y ETFs'], ['FIBRAS', 'FIBRAs'], ['RENTA_FIJA', 'CETES y renta fija'], ['BITCOIN', 'Bitcoin']], pfFilter, 'data-pf')}
       <div class="tbl"><table class="pf"><thead><tr><th>Instrumento</th><th style="text-align:right">Títulos</th><th style="text-align:right">Precio hoy</th><th style="text-align:right">Valor</th><th style="text-align:right">% del tesoro</th><th style="text-align:right">Hoy</th><th style="text-align:right">Ganancia</th></tr></thead><tbody>${rows}</tbody></table></div>
       <p class="foot">Precios en pesos del último cierre de tu hoja (los ETFs en dólares, con tipo de cambio). Ganancia = valor de hoy − lo que pagaste.</p>`;
-    pfView.querySelectorAll('[data-pf]').forEach(b => b.onclick = () => { pfFilter = b.dataset.pf; renderPf(); });
+    $('pfIn').querySelectorAll('[data-pf]').forEach(b => b.onclick = () => { pfFilter = b.dataset.pf; renderPf(); });
   }
   function renderEd() {
     if (!has()) return;
@@ -4121,11 +4130,19 @@ window.MENU = (() => {
     });
   }
   const KIND = { RENTA_FIJA: ['Intereses', 'Obras públicas'], FIBRAS: ['Rentas', 'FIBRAs'], ACCIONES: ['Dividendos', 'Fábricas'] };
-  const rateY = it => it.key === 'RENTA_FIJA' ? rateOf(it) : it.key === 'FIBRAS' ? num(J.dist_fibras_pct, 7) : it.key === 'ACCIONES' ? num(J.div_acciones_pct, 1.8) : 0;
+  // Tasa anual real de cada edificio: CETES con la subasta del Banco de México; FIBRAs y acciones con lo que pagaron
+  // en los últimos 12 meses ÷ su precio (Yahoo Finance, pestaña Rendimientos). Sin dato no se inventa: no se cuenta.
+  const rateY = it => it.key === 'RENTA_FIJA' ? (it.tasa != null && it.tasa !== '' && isFinite(+it.tasa) ? +it.tasa : null) : it.div_pct != null && it.div_pct !== '' ? +it.div_pct : null;
+  const udiTasa = it => { const E = window.MAREA && MAREA.estado ? MAREA.estado() : null; return E && E.udibono_tasa_real != null ? +E.udibono_tasa_real + num(J.inflacion_pct, 4) : num(it.tasa, 0); };
+  const tasaDe = it => /udi/i.test(it.activo) && it.key === 'RENTA_FIJA' ? udiTasa(it) : rateY(it);
+  const fuenteDe = it => {
+    if (it.key === 'RENTA_FIJA') { if (/cetes/i.test(it.activo)) return 'Banco de México (subasta de la semana)'; if (/udi/i.test(it.activo)) { const E = window.MAREA && MAREA.estado ? MAREA.estado() : null; return (E && E.udibono_auto ? 'tasa real del Banco de México' : 'tasa real escrita en tu hoja') + ' + inflación de tu hoja'; } return 'tasa escrita en tu hoja (a mano)'; }
+    return it.div_pct == null || it.div_pct === '' ? 'sin dato todavía' : +it.div_pct > 0 ? 'pagado en los últimos 12 meses' : 'no repartió en 12 meses';
+  };
   function renderProd() {
     if (!has()) return;
     const M = model, its = M.items.filter(i => i.valor > 0 && KIND[i.key]);
-    const yr = i => i.valor * rateY(i) / 100, totY = its.reduce((a, i) => a + yr(i), 0);
+    const yr = i => { const t = tasaDe(i); return t == null ? 0 : i.valor * t / 100; }, totY = its.reduce((a, i) => a + yr(i), 0);
     const byK = Object.keys(KIND).map(k => ({ k, v: its.filter(i => i.key === k).reduce((a, i) => a + yr(i), 0) }));
     const ks = prodFilter === 'resumen' || prodFilter === 'pagos' ? Object.keys(KIND) : [prodFilter];
     const ev = typeof EV !== 'undefined' && EV ? EV : { rentas: [], upcoming: [], avisos: [] };
@@ -4137,9 +4154,9 @@ window.MENU = (() => {
       <div class="hud mn-hud"><div class="stat"><div class="k">Al día</div><div class="v">${money2(totY / 365)}</div></div><div class="stat"><div class="k">Al mes</div><div class="v">${money2(totY / 12)}</div></div><div class="stat"><div class="k">Al año</div><div class="v">${money(totY)}</div></div>
       ${byK.map(x => `<div class="stat" style="border-left:3px solid ${CLS[x.k].color}"><div class="k">${KIND[x.k][0]} al año</div><div class="v">${money(x.v)}</div></div>`).join('')}</div>
       ${tabs([['resumen', 'Todo'], ['RENTA_FIJA', 'Intereses'], ['FIBRAS', 'Rentas'], ['ACCIONES', 'Dividendos'], ['pagos', 'Próximos pagos']], prodFilter, 'data-pr')}
-      ${prodFilter === 'pagos' ? '' : `<div class="tbl"><table><thead><tr><th>Edificio</th><th>Produce</th><th style="text-align:right">Valor</th><th style="text-align:right">Tasa anual</th><th style="text-align:right">Al mes</th><th style="text-align:right">Al año</th></tr></thead><tbody>${ks.map(k => its.filter(i => i.key === k).sort((a, b) => yr(b) - yr(a)).map(i => `<tr><td><span class="dot" style="--c:${CLS[k].color}"></span> <b>${esc(i.activo)}</b></td><td>${KIND[k][0]}</td><td class="n">${money(i.valor)}</td><td class="n">${rateY(i).toFixed(2)}%</td><td class="n">${money2(yr(i) / 12)}</td><td class="n"><b>${money2(yr(i))}</b></td></tr>`).join('')).join('') || '<tr><td colspan="6" class="muted">Todavía no hay edificios que produzcan aquí.</td></tr>'}</tbody></table></div>`}
+      ${prodFilter === 'pagos' ? '' : `<div class="tbl"><table><thead><tr><th>Edificio</th><th>Produce</th><th style="text-align:right">Valor</th><th style="text-align:right">Tasa anual</th><th>De dónde sale</th><th style="text-align:right">Al mes</th><th style="text-align:right">Al año</th></tr></thead><tbody>${ks.map(k => its.filter(i => i.key === k).sort((a, b) => yr(b) - yr(a)).map(i => `<tr><td><span class="dot" style="--c:${CLS[k].color}"></span> <b>${esc(i.activo)}</b></td><td>${KIND[k][0]}</td><td class="n">${money(i.valor)}</td><td class="n">${tasaDe(i) == null ? '<span class="muted">—</span>' : tasaDe(i).toFixed(2) + '%'}</td><td><small class="muted">${fuenteDe(i)}</small></td><td class="n">${money2(yr(i) / 12)}</td><td class="n"><b>${money2(yr(i))}</b></td></tr>`).join('')).join('') || '<tr><td colspan="7" class="muted">Todavía no hay edificios que produzcan aquí.</td></tr>'}</tbody></table></div>`}
       <div id="prodPagos"><h3 class="mn-h3">Próximos pagos y avisos</h3>${pagos.length ? `<ul class="gz mn-pagos">${pagos.join('')}</ul>` : '<p class="muted" style="margin:0">No hay días de rentas ni avisos programados en tu hoja.</p>'}</div>
-      <p class="foot">Tasas: renta fija con la tasa de cada instrumento; FIBRAs con ${num(J.dist_fibras_pct, 7)}% anual de distribución y fábricas con ${num(J.div_acciones_pct, 1.8)}% anual de dividendos (referencias de tu hoja). El oro virtual no produce.</p>`;
+      <p class="foot">Tasa anual: los CETES con la tasa de la subasta del Banco de México; las FIBRAs y las fábricas con lo que repartieron en rentas o dividendos en los últimos 12 meses entre su precio de hoy (Yahoo Finance). Un ETF que reinvierte sus dividendos (como VUAA) sale en 0% porque no reparte. Lo que dice "a mano" o "sin dato" no viene de internet. El oro virtual no produce.</p>`;
     prodView.querySelectorAll('[data-pr]').forEach(b => b.onclick = () => { prodFilter = b.dataset.pr; renderProd(); });
   }
   function chartSvg(rows) {
@@ -4365,7 +4382,7 @@ window.MAREA = (() => {
     if (raw && raw.marea !== undefined) { tomarDeDatos(); auto(); return; }
     ocupado = true;
     try { E = await mapi('marea_estado'); cargado = token || 'demo'; } catch (e) { E = E || null; console.warn(e); }
-    ocupado = false; pintar(); auto();
+    ocupado = false; pintar(); auto(); revisaGuia();
   }
   function tomarDeDatos() {
     if (!raw || raw === rawVisto || raw.marea === undefined) return;
@@ -4512,27 +4529,77 @@ window.MAREA = (() => {
     return (f - 1) * 100;
   }
   let per = '1M';
+  // Historial diario de precios (pestaña Rendimientos del servidor): precio en pesos al inicio de cada periodo
+  const MK = () => (typeof raw !== 'undefined' && raw && raw.mercado && raw.mercado.act && raw.mercado.eje && raw.mercado.eje.length) ? raw.mercado : null;
+  const P_NOM = { '1D': '1 día', '1S': '1 semana', '1M': '1 mes', '3M': '3 meses', '6M': '6 meses', 'YTD': 'En el año (desde el 1 de enero)', '1A': '1 año' };
+  function inicioPer(k) {
+    const d = new Date(); d.setHours(12, 0, 0, 0);
+    if (k === '1S') d.setDate(d.getDate() - 7); else if (k === '1M') d.setMonth(d.getMonth() - 1); else if (k === '3M') d.setMonth(d.getMonth() - 3);
+    else if (k === '6M') d.setMonth(d.getMonth() - 6); else if (k === '1A') d.setFullYear(d.getFullYear() - 1); else if (k === 'YTD') { d.setFullYear(d.getFullYear() - 1, 11, 31); }
+    return d;
+  }
+  const tasaRF = i => /udi/i.test(i.activo) ? (E && E.udibono_tasa_real != null ? +E.udibono_tasa_real : 4) + num(J.inflacion_pct, 4) : num(i.tasa, rateOf(i));
+  // rendimiento de un edificio en el periodo (fracción) o null si no hay historial
+  function rendItem(i, k) {
+    if (i.key === 'RENTA_FIJA') return tasaRF(i) / 100 * Math.max(0, (Date.now() - inicioPer(k).getTime()) / 864e5) / 360;
+    const m = MK() && MK().act[i.activo], b = m && m.b && m.b[k], p = +i.precio_mxn;
+    return b > 0 && p > 0 ? p / b - 1 : null;
+  }
+  function perfMk(k, cls) {
+    let g = 0, base = 0; const sin = [];
+    (cls ? model.classes[cls].items : model.items).filter(i => i.valor > 0).forEach(i => {
+      const r = rendItem(i, k); if (r == null) { sin.push(i.activo); return; }
+      const v0 = i.valor / (1 + r); g += i.valor - v0; base += v0;
+    });
+    return { r: base > 0 ? g / base * 100 : 0, g, sin, base };
+  }
+  function serieMk(k) {   // valor de lo que tienes hoy a lo largo del periodo, en % contra el inicio
+    const M = MK(), d0 = ymd(inicioPer(k)), idx = M.eje.map((d, j) => d >= d0 ? j : -1).filter(j => j >= 0);
+    if (idx.length < 1) return [];
+    const its = model.items.filter(i => i.valor > 0 && rendItem(i, k) != null);
+    const val = j => its.reduce((a, i) => {
+      if (i.key === 'RENTA_FIJA') { const t = (new Date(M.eje[j] + 'T12:00:00').getTime() - Date.now()) / 864e5; return a + i.valor * (1 + tasaRF(i) / 100 * t / 360); }
+      const s = (M.act[i.activo] || {}).s || [], p = +i.precio_mxn; let v = s[j]; if (v == null) v = s.find(x => x != null); return a + (v && p ? i.valor * v / p : i.valor);
+    }, 0);
+    const xs = idx.map(j => ({ mes: M.eje[j], v: val(j) })), hoy = its.reduce((a, i) => a + i.valor, 0);
+    xs.push({ mes: ymd(new Date()), v: hoy });
+    const v0 = xs[0].v || 1; return xs.map(x => ({ mes: x.mes, v: (x.v / v0 - 1) * 100 }));
+  }
   function rPerf() {
-    const pts = serieMeses(), n = pts.length, hoyP = model.total - model.hoy > 0 ? model.hoy / (model.total - model.hoy) * 100 : 0;
+    const pts = serieMeses(), n = pts.length, hoyP = model.total - model.hoy > 0 ? model.hoy / (model.total - model.hoy) * 100 : 0, mk = MK();
     const year = mesActual().slice(0, 4), iY = pts.findIndex(p => p.mes.slice(0, 4) === year), dic = iY > 0 ? iY - 1 : 0;
     const P = { '1D': ['1 día', null], '1S': ['1 semana', 'x'], '1M': ['1 mes', n - 2], '3M': ['3 meses', n - 4], '6M': ['6 meses', n - 7], 'YTD': ['En el año', dic], '1A': ['1 año', n - 13] };
-    const ok = k => k === '1D' || (k !== '1S' && P[k][1] != null && P[k][1] >= 0 && n >= 2);
+    const ok = k => k === '1D' || (mk ? model.items.some(i => i.valor > 0 && i.key !== 'RENTA_FIJA' && (mk.act[i.activo] || { b: {} }).b[k] > 0) : (k !== '1S' && P[k][1] != null && P[k][1] >= 0 && n >= 2));
     if (!ok(per)) per = '1D';
-    const val = (k, cls) => k === '1D' ? (cls ? model.classes[cls].chg : hoyP) : rendDesde(pts, P[k][1], cls);
-    const r = val(per), gan = per === '1D' ? model.hoy : model.total - model.total / (1 + r / 100), col = r >= 0 ? 'var(--ok)' : 'var(--bad)';
-    // gráfica: rendimiento acumulado mes a mes dentro del periodo
+    const val = (k, cls) => k === '1D' ? (cls ? model.classes[cls].chg : hoyP) : mk ? perfMk(k, cls).r : rendDesde(pts, P[k][1], cls);
+    const PM = per !== '1D' && mk ? perfMk(per) : null;
+    const r = val(per), gan = per === '1D' ? model.hoy : PM ? PM.g : model.total - model.total / (1 + r / 100), col = r >= 0 ? 'var(--ok)' : 'var(--bad)';
     let chart = '';
     if (per !== '1D') {
-      const s = P[per][1], xs = []; for (let j = s; j < n; j++) xs.push({ mes: pts[j].mes, v: j === s ? 0 : rendDesde(pts.slice(0, j + 1), s) });
-      const lo = Math.min(0, ...xs.map(x => x.v)), hi = Math.max(0, ...xs.map(x => x.v)), Y = v => 12 + (hi - v) / ((hi - lo) || 1) * 100, X = j => 10 + j / Math.max(1, xs.length - 1) * 580;
-      const L = xs.map((x, j) => `${X(j).toFixed(1)},${Y(x.v).toFixed(1)}`).join(' ');
-      chart = `<svg viewBox="0 0 600 136" class="mchart" role="img" aria-label="Rendimiento acumulado ${pc(r, 2)}"><line x1="10" x2="590" y1="${Y(0)}" y2="${Y(0)}" stroke="#3a4670" stroke-dasharray="3 4"/><polygon points="10,${Y(0)} ${L} 590,${Y(0)}" fill="${col}" fill-opacity=".12"/><polyline points="${L}" fill="none" stroke="${col}" stroke-width="2"/>${xs.map((x, j) => `<circle cx="${X(j)}" cy="${Y(x.v)}" r="3" fill="${col}"/>`).join('')}<text x="10" y="132" font-size="11" fill="#9ba6c6">${MESES[+xs[0].mes.slice(5) - 1].slice(0, 3)} ${xs[0].mes.slice(2, 4)}</text><text x="590" y="132" font-size="11" fill="#9ba6c6" text-anchor="end">hoy</text></svg>`;
+      let xs;
+      if (mk) xs = serieMk(per);
+      else { const s = P[per][1]; xs = []; for (let j = s; j < n; j++) xs.push({ mes: pts[j].mes, v: j === s ? 0 : rendDesde(pts.slice(0, j + 1), s) }); }
+      if (xs.length >= 2) {
+        const lo = Math.min(0, ...xs.map(x => x.v)), hi = Math.max(0, ...xs.map(x => x.v)), Y = v => 12 + (hi - v) / ((hi - lo) || 1) * 100, X = j => 10 + j / Math.max(1, xs.length - 1) * 580;
+        const L = xs.map((x, j) => `${X(j).toFixed(1)},${Y(x.v).toFixed(1)}`).join(' '), f0 = xs[0].mes, lbl = f0.length > 7 ? `${+f0.slice(8)} ${MESES[+f0.slice(5, 7) - 1].slice(0, 3)} ${f0.slice(2, 4)}` : `${MESES[+f0.slice(5) - 1].slice(0, 3)} ${f0.slice(2, 4)}`;
+        chart = `<svg viewBox="0 0 600 136" class="mchart" role="img" aria-label="Rendimiento acumulado ${pc(r, 2)}"><line x1="10" x2="590" y1="${Y(0)}" y2="${Y(0)}" stroke="#3a4670" stroke-dasharray="3 4"/><polygon points="10,${Y(0)} ${L} 590,${Y(0)}" fill="${col}" fill-opacity=".12"/><polyline points="${L}" fill="none" stroke="${col}" stroke-width="2"/>${xs.length <= 40 ? xs.map((x, j) => `<circle cx="${X(j)}" cy="${Y(x.v)}" r="2.5" fill="${col}"/>`).join('') : ''}<text x="10" y="132" font-size="11" fill="#9ba6c6">${lbl}</text><text x="590" y="132" font-size="11" fill="#9ba6c6" text-anchor="end">hoy</text></svg>`;
+      }
     }
+    // tabla: cada periodo para la ciudad y para cada barrio
+    const ks = Object.keys(P), barrios = ORDER.filter(k => model.classes[k].valor > 0);
+    const celda = (k, cls) => { if (!ok(k)) return '<td class="n muted">—</td>'; const v = val(k, cls); return `<td class="n"><span class="${v >= 0 ? 'pos' : 'neg'}">${pc(v, 1)}</span></td>`; };
+    const tabla = mk ? `<div class="mtbl"><table><thead><tr><th></th>${ks.map(k => `<th class="n">${k === 'YTD' ? 'Año' : k}</th>`).join('')}</tr></thead><tbody>
+      <tr><td><b>Toda la ciudad</b></td>${ks.map(k => celda(k)).join('')}</tr>
+      <tr><td class="muted">En pesos</td>${ks.map(k => { if (!ok(k)) return '<td class="n muted">—</td>'; const g = k === '1D' ? model.hoy : perfMk(k).g; return `<td class="n"><small class="${g >= 0 ? 'pos' : 'neg'}">${g >= 0 ? '+' : '−'}${money(Math.abs(g))}</small></td>`; }).join('')}</tr>
+      ${barrios.map(c => `<tr><td><span style="color:${CLS[c].color}">●</span> ${CLS[c].scene}</td>${ks.map(k => celda(k, c)).join('')}</tr>`).join('')}</tbody></table></div>` : '';
+    const sin = PM && PM.sin.length ? `<p class="foot">Sin historial de precios todavía: ${PM.sin.map(esc).join(', ')} (no cuentan en este periodo).</p>` : '';
+    const pie = mk ? `Con lo que tienes hoy: cuánto cambió su valor en cada periodo, con los precios de cierre de Yahoo Finance convertidos a pesos (actualizado ${esc(String(mk.fecha || '').slice(0, 16))}); el día de hoy usa el precio en vivo de tu hoja. La renta fija avanza con su tasa. No cuenta el dinero que aportaste.`
+      : 'Los periodos de un mes o más usan las fotos mensuales de tu Historial. Cuando instales el historial de precios en tu hoja, se activan todos los periodos.';
     B.perf.innerHTML = `<article class="mcard" style="--c:#5b8cff"><div class="mrow-top"><div><h3>Cómo le ha ido a tu ciudad</h3><p class="foot">${term('Rendimiento')} sin contar el dinero nuevo que aportaste.</p></div>
-      <div class="mseg" role="group" aria-label="Periodo">${Object.keys(P).map(k => `<button type="button" data-per="${k}" aria-pressed="${per === k}" ${ok(k) ? '' : 'disabled'} title="${P[k][0]}${ok(k) ? '' : ' · se necesita más historial'}">${k === 'YTD' ? 'Año' : k}</button>`).join('')}</div></div>
-      <div class="mperf"><div class="mperf-big"><small class="muted">${P[per][0]}</small><b style="color:${col}">${pc(r, 2)}</b><span class="${gan >= 0 ? 'pos' : 'neg'}">${gan >= 0 ? '+' : '−'}${money(Math.abs(gan))}</span>
-        ${ORDER.filter(k => model.classes[k].valor > 0).map(k => { const v = val(per, k); return `<div class="mrow"><span><span style="color:${CLS[k].color}">●</span> ${CLS[k].scene}</span><b class="${v >= 0 ? 'pos' : 'neg'}">${pc(v, 1)}</b></div>`; }).join('')}</div>${chart || '<p class="foot">El día de hoy: el cambio de precio de cada edificio desde el cierre de ayer.</p>'}</div>
-      <p class="foot">Los periodos de un mes o más usan las fotos mensuales de tu Historial. "1 semana" se activa cuando la ciudad guarde un historial diario de precios.</p></article>`;
+      <div class="mseg" role="group" aria-label="Periodo">${ks.map(k => `<button type="button" data-per="${k}" aria-pressed="${per === k}" ${ok(k) ? '' : 'disabled'} title="${P_NOM[k]}${ok(k) ? '' : ' · se necesita más historial'}">${k === 'YTD' ? 'Año' : k}</button>`).join('')}</div></div>
+      <div class="mperf"><div class="mperf-big"><small class="muted">${P_NOM[per]}</small><b style="color:${col}">${pc(r, 2)}</b><span class="${gan >= 0 ? 'pos' : 'neg'}">${gan >= 0 ? '+' : '−'}${money(Math.abs(gan))}</span>
+        ${barrios.map(k => { const v = val(per, k); return `<div class="mrow"><span><span style="color:${CLS[k].color}">●</span> ${CLS[k].scene}</span><b class="${v >= 0 ? 'pos' : 'neg'}">${pc(v, 1)}</b></div>`; }).join('')}</div>${chart || '<p class="foot">El día de hoy: el cambio de precio de cada edificio desde el cierre de ayer.</p>'}</div>
+      ${tabla}${sin}<p class="foot">${pie}</p></article>`;
   }
   function regimen(k) {
     if (k === 'BOLSA') return 'HUB'; if (!(model.classes[k].valor > 0)) return 'VAC'; if (k === 'RENTA_FIJA') return 'INT';
@@ -4594,6 +4661,63 @@ window.MAREA = (() => {
       <div class="mform"><div><b>CETES y Bondia</b><span>saldo × (1 + tasa × días ÷ 360)</span></div><div><b>Udibono</b><span>saldo × (UDI hoy ÷ UDI al capturar) × (1 + tasa real × días ÷ 360)</span></div></div>
       <p class="foot">${E && E.banxico_actualizado ? 'Tasas de CETES y UDI del Banco de México, actualizadas el ' + esc(String(E.banxico_actualizado)) + '.' : 'Cuando conectes el token del Banco de México, las tasas de CETES y la UDI se actualizarán solas cada semana.'} Al actualizar la Tesorería, el saldo capturado vuelve a empezar.</p></article>`;
   }
+
+  // ---------- Qué cambió desde tu registro anterior ----------
+  function cambios() {
+    const R = (typeof raw !== 'undefined' && raw && raw.registros) || [];
+    if (R.length < 2) return null;
+    const [A, Bq] = R, d0 = new Date(A.fecha), d1 = new Date(Bq.fecha), dias = Math.max(0, (d1 - d0) / 864e5);
+    const cat = {}; ((raw && raw.catalogo) || []).forEach(c => cat[c.activo] = c);
+    const hoyP = a => { const it = model.items.find(i => i.activo === a); return it && +it.precio_mxn > 0 ? +it.precio_mxn : null; };
+    const filas = [], rf = [];
+    let compras = 0, ventas = 0, realizada = 0;
+    new Set([...Object.keys(A.det), ...Object.keys(Bq.det)]).forEach(a => {
+      const x = A.det[a] || [0, 0, 0, null, null], y = Bq.det[a] || [0, x[1], 0, x[3], x[4]], c = cat[a] || {};
+      const renta = /^RENTA/i.test(c.clase || '') || ((x[2] || y[2]) && !(x[0] || y[0]));
+      if (renta) {
+        const s0 = +x[2] || 0, s1 = +y[2] || 0, dif = s1 - s0; if (!s0 && !s1) return;
+        const tasa = y[4] != null ? +y[4] : x[4] != null ? +x[4] : null, esp = tasa != null && s0 ? s0 * tasa / 100 * dias / 360 : null;
+        rf.push({ a, s0, s1, dif, tasa, esp, extra: esp == null ? null : dif - esp, anual: s0 && dias >= 1 ? dif / s0 * 360 / dias * 100 : null });
+        return;
+      }
+      const t0 = +x[0] || 0, t1 = +y[0] || 0, p0 = +x[1] || 0, p1 = +y[1] || 0, dt = t1 - t0;
+      if (!dt && Math.abs(p1 - p0) < 1e-9) return;
+      const f = { a, t0, t1, p0, p1, dt, hoy: hoyP(a) };
+      if (dt > 0) {
+        const q = (t1 * p1 - t0 * p0) / dt;
+        f.tipo = 'compra'; f.precio = q > 0 && !(t0 && Math.abs(p1 - p0) < 1e-9) ? q : null;
+        if (f.precio) { compras += f.precio * dt; f.vsProm = t0 && p0 ? (f.precio / p0 - 1) * 100 : null; f.gan = f.hoy ? (f.hoy - f.precio) * dt : null; }
+      } else if (dt < 0) {
+        f.tipo = 'venta'; f.precio = +y[3] || +x[3] || null;
+        if (f.precio && p0) { f.vsProm = (f.precio / p0 - 1) * 100; f.gan = (f.precio - p0) * -dt; realizada += f.gan; ventas += f.precio * -dt; }
+      } else f.tipo = 'promedio';
+      filas.push(f);
+    });
+    return { d0, d1, dias, filas, rf, compras, ventas, realizada };
+  }
+  function cambiosCard() {
+    const C = cambios(); if (!C) return '';
+    const fecha = d => `${d.getDate()} de ${MESES[d.getMonth()]}`, nd = Math.round(C.dias), m2 = v => mxn2.format(v), sg = v => `<span class="${v >= 0 ? 'pos' : 'neg'}">${v >= 0 ? '+' : '−'}${m2(Math.abs(v))}</span>`;
+    const tit = v => (+v).toLocaleString('es-MX', { maximumFractionDigits: 8 });
+    const lin = f => {
+      if (f.tipo === 'promedio') return `<tr><td><b>${esc(f.a)}</b></td><td>Cambiaste el precio promedio</td><td class="n">${tit(f.t1)}</td><td class="n">${m2(f.p0)} → ${m2(f.p1)}</td><td class="n muted">—</td><td class="n muted">—</td></tr>`;
+      const que = f.tipo === 'compra' ? `Compraste ${tit(f.dt)}` : `Vendiste ${tit(-f.dt)}`;
+      const pos = f.vsProm == null ? (f.tipo === 'compra' && !f.t0 ? '<span class="muted">edificio nuevo</span>' : '<span class="muted">—</span>')
+        : `<span class="${(f.tipo === 'compra' ? -f.vsProm : f.vsProm) >= 0 ? 'pos' : 'neg'}">${Math.abs(f.vsProm).toFixed(1)}% ${f.vsProm < 0 ? 'abajo' : 'arriba'}</span>`;
+      const pr = f.precio ? m2(f.precio) + (f.tipo === 'venta' ? '<br><small class="muted">aprox.</small>' : '') : '<small class="muted">no cambiaste tu promedio</small>';
+      return `<tr><td><b>${esc(f.a)}</b></td><td>${que}<br><small class="muted">${tit(f.t0)} → ${tit(f.t1)} títulos</small></td><td class="n">${pr}</td><td class="n">${m2(f.p0)}${Math.abs(f.p1 - f.p0) > 1e-9 ? ` → ${m2(f.p1)}` : ''}</td><td class="n">${pos}</td><td class="n">${f.gan == null ? '<span class="muted">—</span>' : sg(f.gan) + `<br><small class="muted">${f.tipo === 'venta' ? 'ganancia de la venta' : 'desde que compraste'}</small>`}</td></tr>`;
+    };
+    const rfT = C.rf.reduce((a, x) => a + x.dif, 0), rfE = C.rf.reduce((a, x) => a + (x.esp || 0), 0);
+    return `<article class="mcard" style="--c:#8ab4ff"><h3><span class="mbadge">${ico('bitacora')}</span>Qué cambió desde tu registro anterior</h3>
+      <p class="foot">Del ${fecha(C.d0)} al ${fecha(C.d1)} (${nd === 0 ? 'el mismo día' : nd === 1 ? '1 día' : nd + ' días'}). Se compara lo que guardaste en la Tesorería esas dos veces.</p>
+      ${C.filas.length ? `<div class="mtbl"><table><thead><tr><th>Edificio</th><th>Qué hiciste</th><th class="n">Precio</th><th class="n">Tu promedio</th><th class="n">Contra tu promedio</th><th class="n">Ganaste o perdiste</th></tr></thead><tbody>${C.filas.map(lin).join('')}</tbody></table></div>
+      <div class="mrow"><span>Compras</span><b>${m2(C.compras)}</b></div><div class="mrow"><span>Ventas</span><b>${m2(C.ventas)}</b></div>${C.ventas ? `<div class="mrow"><span>Ganancia o pérdida de lo vendido</span><b>${sg(C.realizada)}</b></div>` : ''}` : '<p class="foot">No compraste ni vendiste títulos entre estos registros.</p>'}
+      ${C.rf.length ? `<h3 style="margin-top:12px">Renta fija</h3><div class="mtbl"><table><thead><tr><th>Instrumento</th><th class="n">Antes</th><th class="n">Ahora</th><th class="n">Diferencia</th><th class="n">Al día</th><th class="n">Intereses esperados</th></tr></thead><tbody>
+        ${C.rf.map(x => `<tr><td><b>${esc(x.a)}</b>${x.anual != null && x.esp != null && Math.abs(x.dif - x.esp) <= Math.max(50, Math.abs(x.esp) * 0.5) ? `<br><small class="muted">equivale a ${x.anual.toFixed(2)}% anual</small>` : ''}</td><td class="n">${m2(x.s0)}</td><td class="n">${m2(x.s1)}</td><td class="n">${sg(x.dif)}</td><td class="n">${C.dias >= 1 ? sg(x.dif / C.dias) : '—'}</td><td class="n">${x.esp == null ? '—' : m2(x.esp) + `<br><small class="muted">con ${x.tasa.toFixed(2)}% anual</small>`}</td></tr>`).join('')}
+        <tr class="sub"><td>Total</td><td></td><td></td><td class="n"><b>${sg(rfT)}</b></td><td class="n"><b>${C.dias >= 1 ? sg(rfT / C.dias) : '—'}</b></td><td class="n">${m2(rfE)}</td></tr></tbody></table></div>
+        ${C.dias >= 1 && Math.abs(rfT - rfE) > Math.max(50, Math.abs(rfE) * 0.5) ? `<p class="foot">La diferencia es ${rfT > rfE ? 'mayor' : 'menor'} que los intereses esperados por ${m2(Math.abs(rfT - rfE))}: casi seguro ${rfT > rfE ? 'agregaste' : 'sacaste'} dinero, así que el promedio al día incluye ese movimiento.</p>` : ''}` : ''}
+      <p class="foot">El precio de compra sale de tu nuevo precio promedio: (títulos nuevos × promedio nuevo − títulos anteriores × promedio anterior) ÷ títulos comprados. El precio de venta es aproximado: es el precio que tenía tu hoja el día que guardaste el registro. Para que sea exacto, registra el mismo día que operas y actualiza tu precio promedio como te lo da tu casa de bolsa.</p></article>`;
+  }
   function rTes() {
     const mes = mesActual(), tes = claimed('tesoreria:' + mes), mis = claimed('mision:' + mes);
     let mision = '';
@@ -4604,7 +4728,7 @@ window.MAREA = (() => {
     B.tes.innerHTML = `<div class="mgrid">${mision}<article class="mcard" style="--c:#ff8a6a"><h3><span class="mbadge">${ico('flame')}</span>${term('Racha')} y Tesorería</h3>
       <div class="mrow"><span>Racha actual</span><b>${ST ? ST.s : 0} ${ST && ST.s === 1 ? 'mes' : 'meses'}</b></div><div class="mrow"><span>Récord</span><b>${ST ? ST.best : 0}</b></div>
       <div class="mrow"><span>Tesorería de ${MESES[new Date().getMonth()]}</span><b class="${ST && ST.savedThisMonth ? 'pos' : 'muted'}">${ST && ST.savedThisMonth ? 'Al día' + (tes ? ' · +20 cobrados' : '') : 'Pendiente (+20)'}</b></div>
-      <button type="button" class="mbtn pri" data-reg="">Registrar títulos y saldos</button></article></div>${rfCard()}`;
+      <button type="button" class="mbtn pri" data-reg="">Registrar títulos y saldos</button></article></div>${cambiosCard()}${rfCard()}`;
   }
 
   // ---------- Ingresos ----------
@@ -4614,7 +4738,7 @@ window.MAREA = (() => {
     B.ing.innerHTML = `<div class="mlead mlead-row"><div><h2>Ingresos de la ciudad</h2><p>Un estimado automático de lo que producen tus inversiones: ${term('CETE', 'CETES')} con las tasas de la semana, ${term('Rentas', 'rentas')} de FIBRAs y ${term('Dividendo', 'dividendos')}.</p></div>
       <button type="button" class="mbtn pri" data-ing="1" ${hecho ? 'disabled' : ''}>${hecho ? 'Ingresos del mes revisados' : 'Revisar los ingresos del mes'} <small>${hecho ? '' : '+10'}</small></button></div>
       <div class="mgrid"><article class="mcard" style="--c:#4fc3b0"><h3>Tasas de esta semana</h3>${cetes.map(i => `<div class="mrow"><span>${esc(i.activo)}</span><b>${(+i.tasa).toFixed(2)}%</b></div>`).join('') || '<p class="foot">Sin tasas de CETES en tu catálogo.</p>'}
-        <div class="mrow"><span>Udibono 3 años (${term('TasaReal', 'tasa real')})</span><b>${E && E.udibono_tasa_real != null ? (+E.udibono_tasa_real).toFixed(2) + '%' : '—'}</b></div>
+        <div class="mrow"><span>Udibono 3 años (${term('TasaReal', 'tasa real')})${E && E.udibono_auto ? '' : ' <small class="muted">escrita a mano</small>'}</span><b>${E && E.udibono_tasa_real != null ? (+E.udibono_tasa_real).toFixed(2) + '%' : '—'}</b></div>
         <p class="foot">${E && E.banxico_actualizado ? 'Del Banco de México, ' + esc(String(E.banxico_actualizado)) + '.' : 'Se actualizan solas cada semana cuando conectes el Banco de México.'}</p></article></div>${rfCard()}`;
   }
 
@@ -4718,7 +4842,6 @@ window.MAREA = (() => {
   function render() {
     onOff();
     if (!has()) return;
-    if (!guiado) { guiado = true; let v = null; try { v = localStorage.getItem('cm_guia'); } catch (_) {} if (!v) setTimeout(() => guia(0), 700); }
     if (!elegido) { elegido = true; if (fundInfo().etapa < 3 && cur === 'mercado') { go('fundacion'); return; } }
     if (cargado !== (token || 'demo')) { cargado = token || 'demo'; cargar(); }
     else { tomarDeDatos(); if (E) auto(); }
@@ -4727,6 +4850,12 @@ window.MAREA = (() => {
       PANT[cur]();
       if (VISTA[cur] && window.MENU) MENU.render(VISTA[cur]);
     } catch (e) { console.error(e); }
+    revisaGuia();
+  }
+  // la guía espera a saber quién eres (créditos y progreso del usuario) antes de decidir si sale
+  function revisaGuia() {
+    if (guiado || !has() || (!E && !(raw && raw.marea === null))) return;
+    guiado = true; if (guiaNueva()) setTimeout(() => guia(0, true), 700);
   }
   function go(id, sub) {
     if (!S[id]) id = 'mercado';
@@ -4766,12 +4895,27 @@ window.MAREA = (() => {
     ['El clima es el mercado', 'Si un barrio sube se encienden sus luces; si baja, llueve; si cae fuerte, hay tormenta. Nada se destruye: las caídas son parte de invertir.'],
     ['Ganas por constancia', 'Revisa tu ciudad, aporta cada mes y sigue tu plan. Eso te da Créditos de Marea, que se guardan en tu usuario, para construir infraestructura con herramientas nuevas. Ganar o perder dinero no cambia tus créditos.']
   ];
-  function guia(i = 0) {
+  // Solo sale sola a usuarios nuevos (sin títulos registrados) hasta que tocan "No volver a aparecer".
+  // Esa decisión se guarda en el usuario (no en el dispositivo). El botón "¿Cómo se juega?" la abre cuando quieras.
+  function guiaNueva() {
+    let no = false; try { no = localStorage.getItem('cm_guia_no') === '1'; } catch (_) {}
+    if (no || (E && E.fund && E.fund.guia_no)) return false;
+    return !((raw && raw.posiciones) || []).length;
+  }
+  function noGuia() {
+    try { localStorage.setItem('cm_guia_no', '1'); } catch (_) {}
+    cerrar();
+    if (!E) return;
+    const fund = Object.assign({}, E.fund || {}, { guia_no: 1 }); E.fund = fund;
+    mapi('marea_guardar', { fund }).then(r => { const f = E.fund; fusionar(r); E.fund = f; copiaE(); }).catch(() => {});
+  }
+  function guia(i = 0, auto) {
     modal(`<div class="mmhead"><div><small>Cómo se juega · ${i + 1} de ${GUIA.length}</small><h2>${GUIA[i][0]}</h2></div><button type="button" class="mbtn" data-close>Cerrar</button></div><p class="mguia">${GUIA[i][1]}</p>
-      <div class="mbtns" style="justify-content:space-between">${i ? '<button type="button" class="mbtn" id="mGp">Atrás</button>' : '<span></span>'}<button type="button" class="mbtn pri" id="mGn">${i < GUIA.length - 1 ? 'Siguiente' : 'Empezar'}</button></div>`);
-    try { localStorage.setItem('cm_guia', '1'); } catch (_) {}
-    if (i) $('mGp').onclick = () => guia(i - 1);
-    $('mGn').onclick = () => i < GUIA.length - 1 ? guia(i + 1) : cerrar();
+      <div class="mbtns" style="justify-content:space-between">${i ? '<button type="button" class="mbtn" id="mGp">Atrás</button>' : '<span></span>'}<button type="button" class="mbtn pri" id="mGn">${i < GUIA.length - 1 ? 'Siguiente' : 'Empezar'}</button></div>
+      ${auto ? '<div class="mbtns" style="justify-content:center;margin-top:10px"><button type="button" class="mbtn" id="mGno">No volver a aparecer</button></div>' : ''}`);
+    if (i) $('mGp').onclick = () => guia(i - 1, auto);
+    $('mGn').onclick = () => i < GUIA.length - 1 ? guia(i + 1, auto) : cerrar();
+    if (auto) $('mGno').onclick = noGuia;
   }
   $('mGuia').onclick = () => guia(0);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrar(); const g = $('mGloss'); if (g) g.hidden = true; } });
@@ -4782,11 +4926,11 @@ window.MAREA = (() => {
     const h = (location.hash || '').slice(1), F = has() ? fundInfo() : { etapa: 3 };
     go(S[h] ? h : OLD[h] || (F.etapa < 3 ? 'fundacion' : 'mercado'));
   }
-  function reset() { enCurso.clear(); E = null; cargado = null; rawVisto = null; elegido = false; cur = 'mercado'; }
+  function reset() { enCurso.clear(); E = null; cargado = null; rawVisto = null; elegido = false; guiado = false; cur = 'mercado'; }
   function onOff() { document.body.classList.toggle('m-on', !$('app').hidden); }
   new MutationObserver(onOff).observe($('app'), { attributes: true, attributeFilter: ['hidden'] });
   inicio();
-  return { render, go, fromOld, reset, inicio };
+  return { render, go, fromOld, reset, inicio, estado: () => E };
 })();
 
 </script>
