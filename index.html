@@ -186,7 +186,7 @@ td.n{font-family:var(--f-data);text-align:right;font-variant-numeric:tabular-num
   .m3card{left:8px;right:8px;width:auto;top:auto;bottom:8px;max-height:52%;padding:10px 14px 12px}
 }
 
-/* ---------- Gaceta del pueblo: banda de noticiero ---------- */
+/* ---------- Noticias de la ciudad: banda de noticiero ---------- */
 .gz-band{display:block;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#0b1124;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .gz-band[hidden]{display:none}
 .gz-top{display:flex;align-items:center;gap:12px;padding:9px 14px;background:linear-gradient(90deg,#16204a,#101836);flex-wrap:wrap}
@@ -440,10 +440,6 @@ body.marea header.top .who{order:1}
 .mscr[hidden]{display:none}
 .mbox{display:flex;flex-direction:column;gap:14px;min-width:0}
 .mbox:empty{display:none}
-.mhelp{background:rgba(138,180,255,.07);border:1px solid rgba(138,180,255,.25);border-radius:14px;padding:4px 14px}
-.mhelp summary{cursor:pointer;color:#a9c6ff;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;padding:8px 0;list-style:none}
-.mhelp summary::-webkit-details-marker{display:none}
-.mhelp p{margin:0 0 10px;color:var(--fg);font-size:14.5px;max-width:75ch}
 .mlead h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:22px;letter-spacing:.02em}
 .mlead p{margin:4px 0 0;color:var(--muted);max-width:70ch}
 .mlead-row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
@@ -526,22 +522,6 @@ body.marea header.top .who{order:1}
 .mbar .now{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--c);border:2px solid #fff}
 .mscale{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:var(--f-data)}
 
-/* tablas y fórmulas */
-.mtbl{overflow-x:auto;border-radius:12px;border:1px solid var(--line)}
-.mtbl table{width:100%;border-collapse:collapse;font-size:13.5px}
-.mtbl th,.mtbl td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
-.mtbl th{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:#121a30}
-.mtbl td.n,.mtbl th.n{text-align:right;font-family:var(--f-data)}
-.mtbl tr:last-child td{border-bottom:0}
-.mform{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
-.mform>div{background:rgba(0,0,0,.2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
-.mform span{font-family:var(--f-data);font-size:12.5px;color:var(--muted)}
-
-/* infraestructura */
-.mlot{display:flex;gap:12px;align-items:center}
-.mlot canvas{width:44px;height:64px;image-rendering:pixelated;background:linear-gradient(180deg,#0b1020,#151d35);border-radius:10px;flex:none}
-.mst{font-size:12.5px;font-weight:700}
-
 /* bitácora */
 .mlog{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .mlog li{display:grid;grid-template-columns:62px 1fr auto;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.07);font-size:14px}
@@ -559,8 +539,6 @@ body.marea header.top .who{order:1}
 .mmhead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
 .mmhead small{color:var(--muted)}
 .mguia{font-size:16px;line-height:1.6}
-.mquiz{display:flex;flex-direction:column;gap:8px}
-.mquiz .mbtn{justify-content:flex-start;text-align:left}
 .mpend{justify-content:flex-start;width:100%}
 .mmbox input[type=range]{width:100%;accent-color:#f8a43c}
 #mGloss{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:210;width:min(460px,calc(100vw - 32px));background:#1c2646;border:1px solid #8ab4ff;border-radius:16px;padding:14px 16px;display:flex;gap:12px;align-items:flex-end;box-shadow:0 18px 40px rgba(0,0,0,.5)}
@@ -589,6 +567,32 @@ body.marea header.top .who{order:1}
   .mlink{font-size:12.5px}
   .mgrid{grid-template-columns:1fr}
 }
+
+/* gráfica de "Cómo le ha ido": botones para encender cada línea */
+.mserie{display:flex;flex-direction:column;gap:10px;min-width:0}
+.mseries{display:flex;flex-wrap:wrap;gap:6px}
+.mseries button{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#10172c;color:var(--muted);font:inherit;font-size:13px;font-weight:700;padding:6px 12px 6px 10px;border-radius:999px;cursor:pointer}
+.mseries button i{width:9px;height:9px;border-radius:50%;background:var(--c);opacity:.45}
+.mseries button[aria-pressed=true]{color:var(--fg);border-color:color-mix(in srgb,var(--c) 70%,transparent);background:color-mix(in srgb,var(--c) 14%,#10172c)}
+.mseries button[aria-pressed=true] i{opacity:1;box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 25%,transparent)}
+.mseries button:focus-visible{outline:2px solid #ffc46b;outline-offset:2px}
+
+/* tarjetas resumidas: tres cifras y una línea por instrumento */
+.msum-h{display:flex;align-items:center;gap:10px}
+.msum-h h3{margin:0}
+.msum-h small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.mkpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 6px}
+.mkpis>div{background:#10172c;border:1px solid var(--line);border-radius:12px;padding:9px 11px;min-width:0}
+.mkpis small{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.mkpis b{display:block;font-family:var(--f-data);font-size:18px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mlist{list-style:none;margin:0;padding:0}
+.mlist li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px dashed rgba(255,255,255,.07)}
+.mlist li:last-child{border-bottom:0}
+.mlist li>span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mlist li small{color:var(--muted);font-size:12px;line-height:1.35}
+.mlist li .n{text-align:right;font-family:var(--f-data);flex:none;font-size:14.5px}
+.mlist li .n small{font-family:var(--f-data);font-size:11.5px}
+@media (max-width:560px){.mkpis b{font-size:15px}.mkpis>div{padding:8px}}
 </style>
 </head>
 <body>
@@ -656,7 +660,7 @@ body.marea header.top .who{order:1}
         <div class="badge hint" id="hint">Toca un barrio para recorrerlo</div>
       </div>
     </div>
-    <section class="gz-band" id="gaceta" hidden aria-label="Gaceta del pueblo"></section>
+    <section class="gz-band" id="gaceta" hidden aria-label="Noticias de la ciudad"></section>
     <div class="under">
       <div class="chips" id="chips"></div>
       
@@ -716,7 +720,7 @@ body.marea header.top .who{order:1}
       <details id="calcBox"><summary style="cursor:pointer;font-weight:700">Así se calcula el tesoro del pueblo</summary><div id="calc" style="margin-top:10px"></div></details>
       <form id="pfForm" style="display:flex;flex-direction:column;gap:14px"></form>
     </section>
-    <p class="foot">Ciudad Marea es una herramienta educativa y de visualización: convierte tu portafolio en un pueblo y calcula con las metas y reglas que tú defines. No es una recomendación de inversión ni una oferta de compra o venta. Las noticias de la gaceta son narrativa inspirada en cómo se movió cada barrio, no noticias reales; las animaciones son representaciones y nada de esto es una promesa de resultados.</p>
+    <p class="foot">Ciudad Marea es una herramienta educativa y de visualización: convierte tu portafolio en un pueblo y calcula con las metas y reglas que tú defines. No es una recomendación de inversión ni una oferta de compra o venta. Las noticias de la ciudad son narrativa inspirada en cómo se movió cada barrio, no noticias reales; las animaciones son representaciones y nada de esto es una promesa de resultados.</p>
   </div>
 </div>
 <div class="celebrate" id="celebrate" hidden></div>
@@ -3034,7 +3038,7 @@ const GOV = (() => {
     const hd = headline(), list = sectorNews(), now = new Date();
     const item = n => `<span class="gz-it ${n.tone}" style="--c:${CLS[n.x.key].color}"><b class="gz-sec">${esc(n.x.title)}</b><i class="gz-chg">${secChg(n.x)}</i><span>${esc(n.text)}</span>${n.decree ? '<em>tu decreto</em>' : ''}</span>`;
     const run = list.map(item).join('');
-    box.innerHTML = `<div class="gz-top"><span class="gz-live"><span class="gz-rec" aria-hidden="true"></span>Gaceta del pueblo</span><b class="gz-hd ${hd.tone}">${esc(hd.text)}</b><span class="gz-date">${fechaLarga(now)} · ${pad2(now.getHours())}:${pad2(now.getMinutes())}</span></div>
+    box.innerHTML = `<div class="gz-top"><span class="gz-live"><span class="gz-rec" aria-hidden="true"></span>Noticias de la ciudad</span><b class="gz-hd ${hd.tone}">${esc(hd.text)}</b><span class="gz-date">${fechaLarga(now)} · ${pad2(now.getHours())}:${pad2(now.getMinutes())}</span></div>
       <div class="gz-tick" tabindex="0" aria-label="Noticias del día por barrio"><div class="gz-track"><div class="gz-run">${run}</div><div class="gz-run" aria-hidden="true">${run}</div></div></div>
       <details class="gz-more"><summary>Ver todas las noticias</summary>
         <ul class="gz">${list.map(n => `<li class="${n.tone}" style="--c:${CLS[n.x.key].color}"><span class="dot"></span><div><b>${esc(n.text)}</b><span>${esc(n.x.title)} · <i class="${n.x.hoy >= 0 ? 'pos' : 'neg'}">${secChg(n.x)}</i>${n.decree ? ' · <em>tu decreto</em>' : ''}</span></div></li>`).join('')}</ul>
@@ -4292,37 +4296,17 @@ window.MAREA = (() => {
   const META1 = 10000, META2 = 20000;
   const NIVELES = [[10000, 'Nivel 1'], [20000, 'Nivel 2'], [50000, 'Nivel 3'], [100000, 'Nivel 4'], [250000, 'Nivel 5'], [500000, 'Nivel 6'], [1000000, 'Nivel 7']];
   const RANGOS = [[0, 'Aprendiz'], [3, 'Administrador'], [6, 'Tesorero'], [12, 'Gobernador'], [24, 'Gobernador de la Marea'], [36, 'Leyenda de la Marea']];
-  const INFRA = [
-    { id: 'BOLSA', n: 'Bolsa de valores', c: 0, label: 'BOLSA', type: 'tiered', theme: 'gold', h: 74, abre: 'Tablero del día: cómo se movió cada edificio.' },
-    { id: 'DATOS', n: 'Centro de datos', c: 100, label: 'DATOS', type: 'modules', theme: 'cyan', h: 60, abre: 'Historial y reportes de tu ciudad mes a mes.' },
-    { id: 'INST', n: 'Instituto de investigación', c: 150, label: 'INSTITUTO', type: 'stepped', theme: 'blue', h: 82, abre: 'Ficha de cada instrumento y una lección al día (+2 créditos).' },
-    { id: 'TESORO', n: 'Banco del tesoro', c: 250, label: 'TESORO', type: 'lowrise', theme: 'mint', h: 40, abre: 'Escalera de plazos: tasa, intereses y cuánto vale hoy tu renta fija.' },
-    { id: 'OBS', n: 'Observatorio económico', c: 350, label: 'OBSERVA', type: 'needle', theme: 'blue', h: 104, abre: 'Tasa real (tasa menos inflación) y qué parte de tu ciudad está en dólares.' },
-    { id: 'RIESGO', n: 'Centro de análisis de riesgos', c: 500, req: { cer: 1 }, label: 'RIESGOS', type: 'tower', theme: 'red', h: 88, abre: 'Concentración, distancia a tus bandas y prueba de tormenta, solo de lectura.' },
-    { id: 'ARCHIVO', n: 'Archivo histórico', c: 700, req: { racha: 6 }, label: 'ARCHIVO', type: 'chamfer', theme: 'pink', h: 96, abre: 'Archivo de mercados: escenarios y carteras hipotéticas (próximamente).' },
-    { id: 'GLOBAL', n: 'Centro de operaciones globales', c: 1000, req: { cer: 2 }, label: 'GLOBAL', type: 'capsule', theme: 'cyan', h: 116, abre: 'Tu exposición por región y por moneda.' }
-  ];
-  const LECCIONES = [
-    ['¿Qué hace un fondo de acumulación, como VUAA, con los dividendos?', ['Los reinvierte dentro del fondo', 'Te los deposita cada mes', 'Los dona'], 0],
-    ['¿Cómo te paga un CETE?', ['Lo compras con descuento y al vencer recibes su valor completo', 'Te paga rentas cada trimestre', 'Sube y baja como una acción'], 0],
-    ['¿De dónde salen las distribuciones de una FIBRA?', ['De las rentas de sus inmuebles', 'De vender sus edificios cada año', 'De los intereses de CETES'], 0],
-    ['¿Contra qué te protege un Udibono?', ['Contra la inflación', 'Contra las caídas de la bolsa', 'Contra el tipo de cambio'], 0],
-    ['¿Qué es la banda de una meta?', ['El margen que aceptas antes de reordenar', 'La ganancia mínima del mes', 'El costo del fondo'], 0],
-    ['Si un CETE paga 7.2% y la inflación es 4%, ¿cuánto es la tasa real aproximada?', ['3.2%', '11.2%', '7.2%'], 0],
-    ['¿Para qué sirve reordenar dos veces al año?', ['Para volver al nivel de riesgo que elegiste', 'Para ganar más que el mercado', 'Para pagar menos comisiones'], 0]
-  ];
   const AYUDA = {
     fundacion: 'Así se funda tu ciudad: primero lo más seguro y al final lo más arriesgado. Cada paso te explica por qué se invierte ahí y qué puede pasar. Tú decides: puedes saltar lo que no esté en tu plan y ganas los mismos créditos.',
     mercado: 'Aquí ves cómo se movieron tus inversiones. Cada barrio es un tipo de inversión: si sube se encienden sus luces y si baja llueve. Es normal que el mercado suba y baje; lo importante es seguir tu plan.',
     plano: 'Tu plan dice qué parte de tu dinero va en cada tipo de inversión. La franja es el margen que aceptas. Si un barrio se sale de su franja, lo acomodas en la siguiente ceremonia.',
     tesoreria: 'Cada mes registras lo que tienes y aportas algo nuevo. La misión te dice dónde conviene poner la aportación para acercarte a tu plan. Cualquier monto cuenta para tu racha.',
     ingresos: 'Tus inversiones también te pagan: los CETES dan intereses, las FIBRAs reparten rentas y algunos ETFs dan dividendos. Aquí ves un estimado de cuánto produce tu ciudad.',
-    infra: 'Con los Créditos de Marea construyes edificios que te dan herramientas para entender mejor tus inversiones. Los créditos se ganan con constancia, nunca con ganancias.',
     ayto: 'Tus metas, el cierre del mes y, en marzo y septiembre, la ceremonia de reordenamiento.',
     bitacora: 'Tus créditos y los reportes de tu ciudad mes a mes.'
   };
   const SCR = [['fundacion', 'Fundación', 'Fundar'], ['mercado', 'Mercado', 'Mercado'], ['plano', 'Plano', 'Plano'], ['tesoreria', 'Tesorería', 'Tesorería'], ['ingresos', 'Ingresos', 'Ingresos'],
-    ['infra', 'Infraestructura', 'Obras'], ['ayto', 'Ayuntamiento', 'Cabildo'], ['bitacora', 'Bitácora', 'Bitácora']];
+    ['ayto', 'Ayuntamiento', 'Cabildo'], ['bitacora', 'Bitácora', 'Bitácora']];
   const VISTA = { mercado: 'pf', tesoreria: 'ed', ingresos: 'prod', bitacora: 'rep', ayto: 'cierre' };   // vista de consulta de cada pantalla
   const OLD = { ciudad: 'mercado', portafolio: 'mercado', edificios: 'tesoreria', produccion: 'ingresos', misiones: 'tesoreria', reportes: 'bitacora', ayuntamiento: 'ayto' };
 
@@ -4334,22 +4318,22 @@ window.MAREA = (() => {
   const top = mk('div', 'mtop', `<div class="mstat mcred"><span class="msi">${ico('coin')}</span><div><small>Créditos de Marea</small><b id="mCred">—</b></div></div>
     <div class="mstat mracha"><span class="msi">${ico('flame')}</span><div><small>Racha</small><b id="mRacha">—</b></div></div>
     <button type="button" class="mbell" id="mBell" aria-label="Pendientes">${ico('bell')}<span id="mBellN" hidden></span></button>
+    <button type="button" class="mlink" id="mQue">¿Qué es esto?</button>
     <button type="button" class="mlink" id="mGuia">¿Cómo se juega?</button>`);
   header.appendChild(top);
   const S = {};
   SCR.forEach(([id]) => { S[id] = mk('div', 'mscr'); S[id].dataset.scr = id; S[id].hidden = true; });
   const foot = wrap.querySelector(':scope > p.foot');
   SCR.forEach(([id]) => wrap.insertBefore(S[id], foot));
-  const help = id => { const d = mk('details', 'mhelp', `<summary>${ico('ayuda')} ¿Qué es esto?</summary><p>${AYUDA[id]}</p>`); let cerr = false; try { cerr = localStorage.getItem('mh_' + id) === '1'; } catch (_) {} d.open = !cerr; d.addEventListener('toggle', () => { try { localStorage.setItem('mh_' + id, d.open ? '0' : '1'); } catch (_) {} }); return d; };
+  const help = () => null;   // la ayuda de cada pantalla ahora sale con el botón "¿Qué es esto?" del encabezado
   const put = (id, ...els) => els.filter(Boolean).forEach(e => S[id].appendChild(e));
   const box = id => { const e = mk('div', 'mbox'); e.id = id; return e; };
-  const B = { fund: box('mFund'), perf: box('mPerf'), ronda: box('mRonda'), plano: box('mPlano'), tes: box('mTes'), ing: box('mIng'), infra: box('mInfra'), ayto: box('mAyto'), log: box('mLog') };
+  const B = { fund: box('mFund'), perf: box('mPerf'), ronda: box('mRonda'), plano: box('mPlano'), tes: box('mTes'), ing: box('mIng'), ayto: box('mAyto'), log: box('mLog') };
   put('fundacion', help('fundacion'), B.fund);
-  put('mercado', help('mercado'), $('stage'), $('zoominfo'), $('events'), wrap.querySelector('.live'), B.perf, B.ronda, $('gaceta'), wrap.querySelector('.hud'), wrap.querySelector('.under'), $('pfView'), $('districts'));
+  put('mercado', wrap.querySelector('.under'), $('stage'), $('gaceta'), $('zoominfo'), $('events'), wrap.querySelector('.live'), B.perf, B.ronda, wrap.querySelector('.hud'), $('pfView'), $('districts'));
   put('plano', help('plano'), B.plano, $('bands'));
   put('tesoreria', help('tesoreria'), B.tes, wrap.querySelector('.two'), $('edSearch'), $('portafolio'));
   put('ingresos', help('ingresos'), B.ing, $('prodView'));
-  put('infra', help('infra'), B.infra);
   put('ayto', help('ayto'), B.ayto, $('ceremony'), $('metas'), $('cierrePanel'), $('simPanel'), $('sellPanel'));
   put('bitacora', help('bitacora'), B.log, $('repView'));
   let cur = 'mercado';
@@ -4369,7 +4353,6 @@ window.MAREA = (() => {
     await new Promise(r => setTimeout(r, 120));
     const D = DEMO_E;
     if (accion === 'marea_dar') { const g = []; (data.claves || [data.clave]).forEach(k => { const v = VAL(k); if (!v || D.claves.includes(k)) return; D.claves.push(k); D.creditos += v[0]; D.movimientos.unshift({ fecha: new Date().toISOString(), creditos: v[0], motivo: v[1] }); g.push({ creditos: v[0], motivo: v[1] }); }); return { ok: true, ...JSON.parse(JSON.stringify(D)), nuevo: g.reduce((a, x) => a + x.creditos, 0), ganados: g }; }
-    if (accion === 'marea_construir') { const b = INFRA.find(x => x.id === data.id); if (D.creditos < b.c) throw new Error('Te faltan ' + (b.c - D.creditos) + ' créditos.'); D.creditos -= b.c; D.construidos.push(b.id); D.movimientos.unshift({ fecha: new Date().toISOString(), creditos: -b.c, motivo: 'Construiste ' + b.n }); }
     if (accion === 'marea_guardar') D.fund = data.fund;
     return { ok: true, ...JSON.parse(JSON.stringify(D)) };
   }
@@ -4553,10 +4536,11 @@ window.MAREA = (() => {
     });
     return { r: base > 0 ? g / base * 100 : 0, g, sin, base };
   }
-  function serieMk(k) {   // valor de lo que tienes hoy a lo largo del periodo, en % contra el inicio
+  function serieMk(k, cls) {   // valor de lo que tienes hoy (todo o un barrio) a lo largo del periodo, en % contra el inicio
     const M = MK(), d0 = ymd(inicioPer(k)), idx = M.eje.map((d, j) => d >= d0 ? j : -1).filter(j => j >= 0);
     if (idx.length < 1) return [];
-    const its = model.items.filter(i => i.valor > 0 && rendItem(i, k) != null);
+    const its = model.items.filter(i => i.valor > 0 && (!cls || i.key === cls) && rendItem(i, k) != null);
+    if (!its.length) return [];
     const val = j => its.reduce((a, i) => {
       if (i.key === 'RENTA_FIJA') { const t = (new Date(M.eje[j] + 'T12:00:00').getTime() - Date.now()) / 864e5; return a + i.valor * (1 + tasaRF(i) / 100 * t / 360); }
       const s = (M.act[i.activo] || {}).s || [], p = +i.precio_mxn; let v = s[j]; if (v == null) v = s.find(x => x != null); return a + (v && p ? i.valor * v / p : i.valor);
@@ -4565,6 +4549,7 @@ window.MAREA = (() => {
     xs.push({ mes: ymd(new Date()), v: hoy });
     const v0 = xs[0].v || 1; return xs.map(x => ({ mes: x.mes, v: (x.v / v0 - 1) * 100 }));
   }
+  const serSel = new Set(['T']);   // líneas encendidas en la gráfica: T = toda la ciudad, o la clave de cada barrio
   function rPerf() {
     const pts = serieMeses(), n = pts.length, hoyP = model.total - model.hoy > 0 ? model.hoy / (model.total - model.hoy) * 100 : 0, mk = MK();
     const year = mesActual().slice(0, 4), iY = pts.findIndex(p => p.mes.slice(0, 4) === year), dic = iY > 0 ? iY - 1 : 0;
@@ -4574,32 +4559,36 @@ window.MAREA = (() => {
     const val = (k, cls) => k === '1D' ? (cls ? model.classes[cls].chg : hoyP) : mk ? perfMk(k, cls).r : rendDesde(pts, P[k][1], cls);
     const PM = per !== '1D' && mk ? perfMk(per) : null;
     const r = val(per), gan = per === '1D' ? model.hoy : PM ? PM.g : model.total - model.total / (1 + r / 100), col = r >= 0 ? 'var(--ok)' : 'var(--bad)';
+    const barrios = ORDER.filter(k => model.classes[k].valor > 0), ks = Object.keys(P);
+    [...serSel].forEach(k => { if (k !== 'T' && !barrios.includes(k)) serSel.delete(k); }); if (!serSel.size) serSel.add('T');
+    const SER = [['T', 'Total', '#e8ecff'], ...barrios.map(k => [k, CLS[k].scene, CLS[k].color])];
     let chart = '';
     if (per !== '1D') {
-      let xs;
-      if (mk) xs = serieMk(per);
-      else { const s = P[per][1]; xs = []; for (let j = s; j < n; j++) xs.push({ mes: pts[j].mes, v: j === s ? 0 : rendDesde(pts.slice(0, j + 1), s) }); }
-      if (xs.length >= 2) {
-        const lo = Math.min(0, ...xs.map(x => x.v)), hi = Math.max(0, ...xs.map(x => x.v)), Y = v => 12 + (hi - v) / ((hi - lo) || 1) * 100, X = j => 10 + j / Math.max(1, xs.length - 1) * 580;
-        const L = xs.map((x, j) => `${X(j).toFixed(1)},${Y(x.v).toFixed(1)}`).join(' '), f0 = xs[0].mes, lbl = f0.length > 7 ? `${+f0.slice(8)} ${MESES[+f0.slice(5, 7) - 1].slice(0, 3)} ${f0.slice(2, 4)}` : `${MESES[+f0.slice(5) - 1].slice(0, 3)} ${f0.slice(2, 4)}`;
-        chart = `<svg viewBox="0 0 600 136" class="mchart" role="img" aria-label="Rendimiento acumulado ${pc(r, 2)}"><line x1="10" x2="590" y1="${Y(0)}" y2="${Y(0)}" stroke="#3a4670" stroke-dasharray="3 4"/><polygon points="10,${Y(0)} ${L} 590,${Y(0)}" fill="${col}" fill-opacity=".12"/><polyline points="${L}" fill="none" stroke="${col}" stroke-width="2"/>${xs.length <= 40 ? xs.map((x, j) => `<circle cx="${X(j)}" cy="${Y(x.v)}" r="2.5" fill="${col}"/>`).join('') : ''}<text x="10" y="132" font-size="11" fill="#9ba6c6">${lbl}</text><text x="590" y="132" font-size="11" fill="#9ba6c6" text-anchor="end">hoy</text></svg>`;
+      const serie = cls => {
+        if (mk) return serieMk(per, cls);
+        const st = P[per][1], xs = []; for (let j = st; j < n; j++) xs.push({ mes: pts[j].mes, v: j === st ? 0 : rendDesde(pts.slice(0, j + 1), st, cls) }); return xs;
+      };
+      const L = SER.filter(x => serSel.has(x[0])).map(([k, nm, c]) => ({ k, nm, c: serSel.size === 1 && k === 'T' ? col : c, xs: serie(k === 'T' ? null : k) })).filter(x => x.xs.length >= 2);
+      if (L.length) {
+        const all = L.flatMap(x => x.xs.map(p => p.v)), lo = Math.min(0, ...all), hi = Math.max(0, ...all), Y = v => 14 + (hi - v) / ((hi - lo) || 1) * 120;
+        const X = (j, m) => 10 + j / Math.max(1, m - 1) * 560, f0 = L[0].xs[0].mes;
+        const lbl = f0.length > 7 ? `${+f0.slice(8)} ${MESES[+f0.slice(5, 7) - 1].slice(0, 3)} ${f0.slice(2, 4)}` : `${MESES[+f0.slice(5) - 1].slice(0, 3)} ${f0.slice(2, 4)}`;
+        const uno = L.length === 1;
+        const lineas = L.map(x => { const m = x.xs.length, pt = x.xs.map((p, j) => `${X(j, m).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' '), last = x.xs[m - 1].v;
+          return `${uno ? `<polygon points="10,${Y(0)} ${pt} 570,${Y(0)}" fill="${x.c}" fill-opacity=".12"/>` : ''}<polyline points="${pt}" fill="none" stroke="${x.c}" stroke-width="${x.k === 'T' ? 2.6 : 2}" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="570" cy="${Y(last)}" r="3.2" fill="${x.c}"/>${uno ? '' : `<text x="576" y="${Y(last) + 4}" font-size="11" fill="${x.c}" font-weight="700">${pc(last, 1)}</text>`}`; }).join('');
+        chart = `<svg viewBox="0 0 ${uno ? 580 : 620} 162" class="mchart" role="img" aria-label="Rendimiento acumulado en el periodo"><line x1="10" x2="570" y1="${Y(0)}" y2="${Y(0)}" stroke="#3a4670" stroke-dasharray="3 4"/>${lineas}<text x="10" y="158" font-size="11" fill="#9ba6c6">${lbl}</text><text x="570" y="158" font-size="11" fill="#9ba6c6" text-anchor="end">hoy</text></svg>`;
       }
+      chart = `<div class="mserie"><div class="mseries" role="group" aria-label="Qué ver en la gráfica">${SER.map(([k, nm, c]) => `<button type="button" data-ser="${k}" aria-pressed="${serSel.has(k)}" style="--c:${c}"><i></i>${nm}</button>`).join('')}</div>${chart || '<p class="foot">Todavía no hay historial para dibujar este periodo.</p>'}</div>`;
     }
-    // tabla: cada periodo para la ciudad y para cada barrio
-    const ks = Object.keys(P), barrios = ORDER.filter(k => model.classes[k].valor > 0);
-    const celda = (k, cls) => { if (!ok(k)) return '<td class="n muted">—</td>'; const v = val(k, cls); return `<td class="n"><span class="${v >= 0 ? 'pos' : 'neg'}">${pc(v, 1)}</span></td>`; };
-    const tabla = mk ? `<div class="mtbl"><table><thead><tr><th></th>${ks.map(k => `<th class="n">${k === 'YTD' ? 'Año' : k}</th>`).join('')}</tr></thead><tbody>
-      <tr><td><b>Toda la ciudad</b></td>${ks.map(k => celda(k)).join('')}</tr>
-      <tr><td class="muted">En pesos</td>${ks.map(k => { if (!ok(k)) return '<td class="n muted">—</td>'; const g = k === '1D' ? model.hoy : perfMk(k).g; return `<td class="n"><small class="${g >= 0 ? 'pos' : 'neg'}">${g >= 0 ? '+' : '−'}${money(Math.abs(g))}</small></td>`; }).join('')}</tr>
-      ${barrios.map(c => `<tr><td><span style="color:${CLS[c].color}">●</span> ${CLS[c].scene}</td>${ks.map(k => celda(k, c)).join('')}</tr>`).join('')}</tbody></table></div>` : '';
     const sin = PM && PM.sin.length ? `<p class="foot">Sin historial de precios todavía: ${PM.sin.map(esc).join(', ')} (no cuentan en este periodo).</p>` : '';
-    const pie = mk ? `Con lo que tienes hoy: cuánto cambió su valor en cada periodo, con los precios de cierre de Yahoo Finance convertidos a pesos (actualizado ${esc(String(mk.fecha || '').slice(0, 16))}); el día de hoy usa el precio en vivo de tu hoja. La renta fija avanza con su tasa. No cuenta el dinero que aportaste.`
+    const pie = mk ? `Con lo que tienes hoy, con precios de cierre de Yahoo Finance en pesos (actualizado ${esc(String(mk.fecha || '').slice(0, 16))}). El día de hoy usa el precio en vivo de tu hoja y la renta fija avanza con su tasa.`
       : 'Los periodos de un mes o más usan las fotos mensuales de tu Historial. Cuando instales el historial de precios en tu hoja, se activan todos los periodos.';
     B.perf.innerHTML = `<article class="mcard" style="--c:#5b8cff"><div class="mrow-top"><div><h3>Cómo le ha ido a tu ciudad</h3><p class="foot">${term('Rendimiento')} sin contar el dinero nuevo que aportaste.</p></div>
       <div class="mseg" role="group" aria-label="Periodo">${ks.map(k => `<button type="button" data-per="${k}" aria-pressed="${per === k}" ${ok(k) ? '' : 'disabled'} title="${P_NOM[k]}${ok(k) ? '' : ' · se necesita más historial'}">${k === 'YTD' ? 'Año' : k}</button>`).join('')}</div></div>
       <div class="mperf"><div class="mperf-big"><small class="muted">${P_NOM[per]}</small><b style="color:${col}">${pc(r, 2)}</b><span class="${gan >= 0 ? 'pos' : 'neg'}">${gan >= 0 ? '+' : '−'}${money(Math.abs(gan))}</span>
         ${barrios.map(k => { const v = val(per, k); return `<div class="mrow"><span><span style="color:${CLS[k].color}">●</span> ${CLS[k].scene}</span><b class="${v >= 0 ? 'pos' : 'neg'}">${pc(v, 1)}</b></div>`; }).join('')}</div>${chart || '<p class="foot">El día de hoy: el cambio de precio de cada edificio desde el cierre de ayer.</p>'}</div>
-      ${tabla}${sin}<p class="foot">${pie}</p></article>`;
+      ${sin}<p class="foot">${pie}</p></article>`;
   }
   function regimen(k) {
     if (k === 'BOLSA') return 'HUB'; if (!(model.classes[k].valor > 0)) return 'VAC'; if (k === 'RENTA_FIJA') return 'INT';
@@ -4652,14 +4641,17 @@ window.MAREA = (() => {
       return { i, fecha, d, saldo, udi, tasa: udi ? real : tasa, inf, est };
     });
   }
+  // tarjeta resumida: tres cifras arriba y una línea por instrumento
+  const m2 = v => mxn2.format(v), sgn = (v, d) => `<span class="${v >= 0 ? 'pos' : 'neg'}">${v >= 0 ? '+' : '−'}${(d ? m2 : money)(Math.abs(v))}</span>`;
+  const resumen = (col, icon, titulo, sub, kpis, filas, pie) => `<article class="mcard msum" style="--c:${col}"><div class="msum-h"><span class="mbadge">${ico(icon)}</span><div><h3>${titulo}</h3><small>${sub}</small></div></div>
+    <div class="mkpis">${kpis.map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`).join('')}</div>
+    <ul class="mlist">${filas.map(([a, b, c, d]) => `<li><span><b>${a}</b><small>${b}</small></span><span class="n">${c}<small>${d || ''}</small></span></li>`).join('')}</ul>${pie ? `<p class="foot">${pie}</p>` : ''}</article>`;
   function rfCard() {
     const F = rfFilas(); if (!F.length) return '';
-    return `<article class="mcard" style="--c:#4fc3b0"><h3><span class="mbadge">${ico('RENTA_FIJA')}</span>Renta fija: cuánto vale hoy (aprox.)</h3>
-      <p class="foot">Con lo que capturaste en la Tesorería, los días que han pasado y la tasa de la semana. El Udibono además sube con la inflación a través de la ${term('UDI')}.</p>
-      <div class="mtbl"><table><thead><tr><th>Instrumento</th><th>Capturado</th><th class="n">Saldo</th><th class="n">Tasa</th><th class="n">Días</th><th class="n">Por inflación</th><th class="n">Vale hoy</th></tr></thead><tbody>
-      ${F.map(f => `<tr><td>${esc(f.i.activo)}</td><td>${f.fecha ? f.fecha.split('-').reverse().slice(0, 2).join('/') : '—'}</td><td class="n">${money(f.saldo)}</td><td class="n">${f.tasa.toFixed(2)}%${f.udi ? ' real' : ''}</td><td class="n">${f.d}</td><td class="n">${f.inf == null ? '—' : pc(f.inf, 2)}</td><td class="n"><b>${money(f.est)}</b> <span class="pos">+${money(f.est - f.saldo)}</span></td></tr>`).join('')}</tbody></table></div>
-      <div class="mform"><div><b>CETES y Bondia</b><span>saldo × (1 + tasa × días ÷ 360)</span></div><div><b>Udibono</b><span>saldo × (UDI hoy ÷ UDI al capturar) × (1 + tasa real × días ÷ 360)</span></div></div>
-      <p class="foot">${E && E.banxico_actualizado ? 'Tasas de CETES y UDI del Banco de México, actualizadas el ' + esc(String(E.banxico_actualizado)) + '.' : 'Cuando conectes el token del Banco de México, las tasas de CETES y la UDI se actualizarán solas cada semana.'} Al actualizar la Tesorería, el saldo capturado vuelve a empezar.</p></article>`;
+    const hoy = F.reduce((a, f) => a + f.est, 0), gan = F.reduce((a, f) => a + f.est - f.saldo, 0), dia = F.reduce((a, f) => a + (f.d ? (f.est - f.saldo) / f.d : 0), 0);
+    return resumen('#4fc3b0', 'RENTA_FIJA', 'Renta fija hoy', 'Aproximado, desde que la capturaste', [['Vale hoy', money(hoy)], ['Has ganado', sgn(gan)], ['Al día', sgn(dia, 1)]],
+      F.map(f => [esc(f.i.activo), `${money(f.saldo)} → ${money(f.est)} · ${f.d} ${f.d === 1 ? 'día' : 'días'} · ${f.tasa.toFixed(2)}%${f.udi ? ' real' : ''}`, sgn(f.est - f.saldo), f.d ? `${sgn((f.est - f.saldo) / f.d, 1)} al día` : '']),
+      E && E.banxico_actualizado ? `Tasas del Banco de México del ${esc(String(E.banxico_actualizado).slice(0, 10))}.` : '');
   }
 
   // ---------- Qué cambió desde tu registro anterior ----------
@@ -4697,26 +4689,33 @@ window.MAREA = (() => {
   }
   function cambiosCard() {
     const C = cambios(); if (!C) return '';
-    const fecha = d => `${d.getDate()} de ${MESES[d.getMonth()]}`, nd = Math.round(C.dias), m2 = v => mxn2.format(v), sg = v => `<span class="${v >= 0 ? 'pos' : 'neg'}">${v >= 0 ? '+' : '−'}${m2(Math.abs(v))}</span>`;
-    const tit = v => (+v).toLocaleString('es-MX', { maximumFractionDigits: 8 });
-    const lin = f => {
-      if (f.tipo === 'promedio') return `<tr><td><b>${esc(f.a)}</b></td><td>Cambiaste el precio promedio</td><td class="n">${tit(f.t1)}</td><td class="n">${m2(f.p0)} → ${m2(f.p1)}</td><td class="n muted">—</td><td class="n muted">—</td></tr>`;
-      const que = f.tipo === 'compra' ? `Compraste ${tit(f.dt)}` : `Vendiste ${tit(-f.dt)}`;
-      const pos = f.vsProm == null ? (f.tipo === 'compra' && !f.t0 ? '<span class="muted">edificio nuevo</span>' : '<span class="muted">—</span>')
-        : `<span class="${(f.tipo === 'compra' ? -f.vsProm : f.vsProm) >= 0 ? 'pos' : 'neg'}">${Math.abs(f.vsProm).toFixed(1)}% ${f.vsProm < 0 ? 'abajo' : 'arriba'}</span>`;
-      const pr = f.precio ? m2(f.precio) + (f.tipo === 'venta' ? '<br><small class="muted">aprox.</small>' : '') : '<small class="muted">no cambiaste tu promedio</small>';
-      return `<tr><td><b>${esc(f.a)}</b></td><td>${que}<br><small class="muted">${tit(f.t0)} → ${tit(f.t1)} títulos</small></td><td class="n">${pr}</td><td class="n">${m2(f.p0)}${Math.abs(f.p1 - f.p0) > 1e-9 ? ` → ${m2(f.p1)}` : ''}</td><td class="n">${pos}</td><td class="n">${f.gan == null ? '<span class="muted">—</span>' : sg(f.gan) + `<br><small class="muted">${f.tipo === 'venta' ? 'ganancia de la venta' : 'desde que compraste'}</small>`}</td></tr>`;
-    };
-    const rfT = C.rf.reduce((a, x) => a + x.dif, 0), rfE = C.rf.reduce((a, x) => a + (x.esp || 0), 0);
-    return `<article class="mcard" style="--c:#8ab4ff"><h3><span class="mbadge">${ico('bitacora')}</span>Qué cambió desde tu registro anterior</h3>
-      <p class="foot">Del ${fecha(C.d0)} al ${fecha(C.d1)} (${nd === 0 ? 'el mismo día' : nd === 1 ? '1 día' : nd + ' días'}). Se compara lo que guardaste en la Tesorería esas dos veces.</p>
-      ${C.filas.length ? `<div class="mtbl"><table><thead><tr><th>Edificio</th><th>Qué hiciste</th><th class="n">Precio</th><th class="n">Tu promedio</th><th class="n">Contra tu promedio</th><th class="n">Ganaste o perdiste</th></tr></thead><tbody>${C.filas.map(lin).join('')}</tbody></table></div>
-      <div class="mrow"><span>Compras</span><b>${m2(C.compras)}</b></div><div class="mrow"><span>Ventas</span><b>${m2(C.ventas)}</b></div>${C.ventas ? `<div class="mrow"><span>Ganancia o pérdida de lo vendido</span><b>${sg(C.realizada)}</b></div>` : ''}` : '<p class="foot">No compraste ni vendiste títulos entre estos registros.</p>'}
-      ${C.rf.length ? `<h3 style="margin-top:12px">Renta fija</h3><div class="mtbl"><table><thead><tr><th>Instrumento</th><th class="n">Antes</th><th class="n">Ahora</th><th class="n">Diferencia</th><th class="n">Al día</th><th class="n">Intereses esperados</th></tr></thead><tbody>
-        ${C.rf.map(x => `<tr><td><b>${esc(x.a)}</b>${x.anual != null && x.esp != null && Math.abs(x.dif - x.esp) <= Math.max(50, Math.abs(x.esp) * 0.5) ? `<br><small class="muted">equivale a ${x.anual.toFixed(2)}% anual</small>` : ''}</td><td class="n">${m2(x.s0)}</td><td class="n">${m2(x.s1)}</td><td class="n">${sg(x.dif)}</td><td class="n">${C.dias >= 1 ? sg(x.dif / C.dias) : '—'}</td><td class="n">${x.esp == null ? '—' : m2(x.esp) + `<br><small class="muted">con ${x.tasa.toFixed(2)}% anual</small>`}</td></tr>`).join('')}
-        <tr class="sub"><td>Total</td><td></td><td></td><td class="n"><b>${sg(rfT)}</b></td><td class="n"><b>${C.dias >= 1 ? sg(rfT / C.dias) : '—'}</b></td><td class="n">${m2(rfE)}</td></tr></tbody></table></div>
-        ${C.dias >= 1 && Math.abs(rfT - rfE) > Math.max(50, Math.abs(rfE) * 0.5) ? `<p class="foot">La diferencia es ${rfT > rfE ? 'mayor' : 'menor'} que los intereses esperados por ${m2(Math.abs(rfT - rfE))}: casi seguro ${rfT > rfE ? 'agregaste' : 'sacaste'} dinero, así que el promedio al día incluye ese movimiento.</p>` : ''}` : ''}
-      <p class="foot">El precio de compra sale de tu nuevo precio promedio: (títulos nuevos × promedio nuevo − títulos anteriores × promedio anterior) ÷ títulos comprados. El precio de venta es aproximado: es el precio que tenía tu hoja el día que guardaste el registro. Para que sea exacto, registra el mismo día que operas y actualiza tu precio promedio como te lo da tu casa de bolsa.</p></article>`;
+    const fecha = d => `${d.getDate()} ${MESES[d.getMonth()].slice(0, 3)}`, nd = Math.max(1, C.dias), tit = v => (+v).toLocaleString('es-MX', { maximumFractionDigits: 8 });
+    const R = (typeof raw !== 'undefined' && raw && raw.registros) || [], [A, Bq] = R;
+    const filas = [];
+    let tot = 0;
+    C.filas.forEach(f => {
+      const x = A.det[f.a] || [], y = Bq.det[f.a] || [], p0 = +x[3] || null, p1 = +y[3] || p0;
+      let g = null;
+      if (p0 && p1) { g = f.t0 * (p1 - p0); if (f.tipo === 'compra' && f.precio) g += (p1 - f.precio) * f.dt; }
+      if (g != null) tot += g;
+      const que = f.tipo === 'compra' ? `compraste ${tit(f.dt)}` : f.tipo === 'venta' ? `vendiste ${tit(-f.dt)}` : 'cambiaste tu promedio';
+      const vs = f.vsProm != null ? ` · ${Math.abs(f.vsProm).toFixed(1)}% ${f.vsProm < 0 ? 'abajo' : 'arriba'} de tu promedio` : '';
+      filas.push([esc(f.a), (p0 && p1 ? `${m2(p0)} → ${m2(p1)} (${pc((p1 / p0 - 1) * 100, 1)}) · ` : '') + que + vs, g == null ? '<span class="muted">—</span>' : sgn(g), g == null ? '' : `${sgn(g / nd, 1)} al día`]);
+    });
+    // títulos que no cambiaron: también ganan o pierden con el precio
+    Object.keys(Bq.det).forEach(a => {
+      if (C.filas.some(f => f.a === a)) return; const x = A.det[a], y = Bq.det[a]; if (!x || !+x[0] || +x[0] !== +y[0] || !+x[3] || !+y[3] || +x[3] === +y[3]) return;
+      const g = x[0] * (y[3] - x[3]); tot += g;
+      filas.push([esc(a), `${m2(+x[3])} → ${m2(+y[3])} (${pc((y[3] / x[3] - 1) * 100, 1)}) · ${tit(x[0])} títulos`, sgn(g), `${sgn(g / nd, 1)} al día`]);
+    });
+    C.rf.forEach(x => {
+      const normal = x.esp == null || Math.abs(x.dif - x.esp) <= Math.max(50, Math.abs(x.esp) * 0.5), g = normal ? x.dif : x.esp; tot += g;
+      filas.push([esc(x.a), `${money(x.s0)} → ${money(x.s1)}${normal ? '' : ` · ${x.dif - x.esp > 0 ? 'agregaste' : 'sacaste'} unos ${money(Math.abs(x.dif - x.esp))}`}`, sgn(g), `${sgn(g / nd, 1)} al día`]);
+    });
+    if (!filas.length) return '';
+    return resumen('#8ab4ff', 'bitacora', 'Desde tu registro anterior', `${fecha(C.d0)} → ${fecha(C.d1)} · ${Math.round(C.dias) === 0 ? 'el mismo día' : Math.round(C.dias) + ' días'}`,
+      [['Ganaste', sgn(tot)], ['Al día', sgn(tot / nd, 1)], ['Días', String(Math.round(C.dias))]], filas,
+      'Aproximado con los precios de tu hoja el día de cada registro; en renta fija, los intereses sin el dinero que agregaste o sacaste.');
   }
   function rTes() {
     const mes = mesActual(), tes = claimed('tesoreria:' + mes), mis = claimed('mision:' + mes);
@@ -4734,76 +4733,16 @@ window.MAREA = (() => {
   // ---------- Ingresos ----------
   function rIng() {
     const mes = mesActual(), hecho = claimed('ingresos:' + mes);
-    const cetes = model.classes.RENTA_FIJA.items.filter(i => /cetes/i.test(i.activo) && i.tasa != null && i.tasa !== '').sort((a, b) => (parseInt(a.activo.match(/\d+/)) || 0) - (parseInt(b.activo.match(/\d+/)) || 0));
-    B.ing.innerHTML = `<div class="mlead mlead-row"><div><h2>Ingresos de la ciudad</h2><p>Un estimado automático de lo que producen tus inversiones: ${term('CETE', 'CETES')} con las tasas de la semana, ${term('Rentas', 'rentas')} de FIBRAs y ${term('Dividendo', 'dividendos')}.</p></div>
-      <button type="button" class="mbtn pri" data-ing="1" ${hecho ? 'disabled' : ''}>${hecho ? 'Ingresos del mes revisados' : 'Revisar los ingresos del mes'} <small>${hecho ? '' : '+10'}</small></button></div>
-      <div class="mgrid"><article class="mcard" style="--c:#4fc3b0"><h3>Tasas de esta semana</h3>${cetes.map(i => `<div class="mrow"><span>${esc(i.activo)}</span><b>${(+i.tasa).toFixed(2)}%</b></div>`).join('') || '<p class="foot">Sin tasas de CETES en tu catálogo.</p>'}
-        <div class="mrow"><span>Udibono 3 años (${term('TasaReal', 'tasa real')})${E && E.udibono_auto ? '' : ' <small class="muted">escrita a mano</small>'}</span><b>${E && E.udibono_tasa_real != null ? (+E.udibono_tasa_real).toFixed(2) + '%' : '—'}</b></div>
-        <p class="foot">${E && E.banxico_actualizado ? 'Del Banco de México, ' + esc(String(E.banxico_actualizado)) + '.' : 'Se actualizan solas cada semana cuando conectes el Banco de México.'}</p></article></div>${rfCard()}`;
+    B.ing.innerHTML = `<div class="mlead mlead-row"><div><h2>Ingresos de la ciudad</h2><p>Un estimado de lo que producen tus inversiones: intereses de ${term('CETE', 'CETES')}, ${term('Rentas', 'rentas')} de FIBRAs y ${term('Dividendo', 'dividendos')}.</p></div>
+      <button type="button" class="mbtn pri" data-ing="1" ${hecho ? 'disabled' : ''}>${hecho ? 'Ingresos del mes revisados' : 'Revisar los ingresos del mes'} <small>${hecho ? '' : '+10'}</small></button></div>`;
   }
 
-  // ---------- Infraestructura ----------
-  function estadoInfra(b) {
-    const hecho = E && E.construidos.includes(b.id); if (hecho) return ['hecho', 'Construido'];
-    const i = INFRA.indexOf(b); if (i > 0 && !(E && E.construidos.includes(INFRA[i - 1].id))) return ['lock', 'Primero: ' + INFRA[i - 1].n];
-    if (b.req && b.req.cer && (!E || E.ceremonias < b.req.cer)) return ['lock', `Requiere ${b.req.cer} ${b.req.cer === 1 ? 'ceremonia completada' : 'ceremonias completadas'}`];
-    if (b.req && b.req.racha && (!ST || ST.best < b.req.racha)) return ['lock', `Requiere racha de ${b.req.racha} meses`];
-    return ['disp', E && E.creditos >= b.c ? 'Disponible' : `Faltan ${b.c - (E ? E.creditos : 0)} créditos`];
-  }
-  function rInfra() {
-    B.infra.innerHTML = `<div class="mlead mlead-row"><div><h2>Infraestructura financiera</h2><p>Se construye en orden con Créditos de Marea. Cada edificio abre una herramienta; ninguno depende de tus rendimientos.</p></div><span class="mpill" style="--c:#f8a43c">${E ? E.creditos.toLocaleString('es-MX') : '—'} créditos</span></div>
-      <div class="mgrid">${INFRA.map(b => { const [k, t] = estadoInfra(b), can = k === 'disp' && E && E.creditos >= b.c;
-        return `<article class="mcard ${can ? 'hl' : ''}" style="--c:#f8a43c"><div class="mlot"><canvas data-lot="${b.id}" width="44" height="64"></canvas><div><h3>${b.n}</h3><small class="mst" style="color:${k === 'hecho' ? 'var(--ok)' : k === 'lock' ? 'var(--muted)' : '#f8a43c'}">${t}</small></div></div>
-          <p class="foot">${b.abre}</p>${k === 'hecho' ? `<button type="button" class="mbtn" data-tool="${b.id}">Abrir</button>` : `<button type="button" class="mbtn ${can ? 'pri' : ''}" data-build="${b.id}" ${can ? '' : 'disabled'}>Construir · ${b.c}</button>`}</article>`; }).join('')}</div>`;
-    B.infra.querySelectorAll('canvas[data-lot]').forEach(cv => {
-      const g = cv.getContext('2d'), b = INFRA.find(x => x.id === cv.dataset.lot); g.imageSmoothingEnabled = false; g.clearRect(0, 0, 44, 64);
-      if (E && E.construidos.includes(b.id) && window.EdificiosNeon) { try { const bd = EdificiosNeon.building('infra-' + b.id, { type: b.type, label: b.label, hMul: 1, themes: [b.theme], signTheme: b.theme, signFit: true }), c = EdificiosNeon.toCanvas(bd), s = Math.min(1, 60 / bd.h, 40 / bd.w); g.drawImage(c, (44 - bd.w * s) / 2, 64 - bd.h * s, bd.w * s, bd.h * s); } catch (e) {} }
-      else { g.fillStyle = '#5a4a2a'; for (let x = 8; x <= 36; x += 7) g.fillRect(x, 30, 1, 34); g.fillStyle = '#6a5630'; for (let y = 30; y < 64; y += 6) g.fillRect(8, y, 29, 1); g.fillStyle = '#8a6a2a'; g.fillRect(14, 22, 16, 6); }
-    });
-  }
-  async function construir(id) {
-    const b = INFRA.find(x => x.id === id), k = 'obra:' + id;
-    if (!E || E.construidos.includes(id) || enCurso.has(k)) return;
-    anotar(k, -b.c, 'Construiste ' + b.n);
-    mtoast(`Construyendo <b>${esc(b.n)}</b>…`);
-    repintar();
-    try { const r = await mapi('marea_construir', { id, racha: ST ? ST.best : 0 }); enCurso.delete(k); fusionar(r); copiaE(); if (typeof celebrate === 'function') celebrate('¡Se inauguró ' + b.n + '!'); }
-    catch (e) { deshacer(k); mtoast(esc(e.message)); }
-    repintar();
-  }
   function modal(html) {
     let m = $('mModal'); if (!m) { m = mk('div', ''); m.id = 'mModal'; m.addEventListener('click', e => { if (e.target === m) cerrar(); }); document.body.appendChild(m); }
     m.innerHTML = `<div class="mmbox" role="dialog" aria-modal="true">${html}</div>`; m.hidden = false;
     m.querySelectorAll('[data-close]').forEach(b => b.onclick = cerrar); const f = m.querySelector('button'); if (f) f.focus();
   }
   function cerrar() { const m = $('mModal'); if (m) { m.hidden = true; m.innerHTML = ''; } }
-  function herramienta(id) {
-    const b = INFRA.find(x => x.id === id), head = sub => `<div class="mmhead"><div><h2>${b.n}</h2><small>${sub}</small></div><button type="button" class="mbtn" data-close>Cerrar</button></div>`, T = model.total;
-    if (id === 'DATOS') { cerrar(); go('bitacora'); return; }
-    if (id === 'BOLSA') { const L = model.items.filter(i => i.valor > 0 && i.key !== 'RENTA_FIJA').sort((a, c) => c.cambio_dia - a.cambio_dia);
-      return modal(head('Tablero del día') + `<div class="mtbl"><table><thead><tr><th>Edificio</th><th>Barrio</th><th class="n">Hoy</th><th class="n">Valor</th></tr></thead><tbody>${L.map(i => `<tr><td>${esc(i.activo)}</td><td>${CLS[i.key].scene}</td><td class="n ${i.cambio_dia >= 0 ? 'pos' : 'neg'}">${pc(i.cambio_dia, 2)}</td><td class="n">${money(i.valor)}</td></tr>`).join('')}</tbody></table></div>`); }
-    if (id === 'INST') {
-      const d0 = ymd(new Date()), L = LECCIONES[Math.floor(Date.now() / 864e5) % LECCIONES.length], done = claimed('leccion:' + d0);
-      modal(head('Fichas y lección del día') + `<div class="mcard hl" style="--c:#8ab4ff"><h3>Lección del día</h3><p>${esc(L[0])}</p><div class="mquiz">${L[1].map((a, k) => `<button type="button" class="mbtn" data-q="${k}" ${done ? 'disabled' : ''}>${esc(a)}</button>`).join('')}</div><p class="foot" id="mQres">${done ? 'Ya hiciste la lección de hoy.' : 'Responde bien para ganar 2 créditos.'}</p></div>
-        <div class="mtbl"><table><thead><tr><th>Edificio</th><th>Qué es</th><th>Moneda</th><th class="n">Costo anual</th></tr></thead><tbody>${model.items.filter(i => i.valor > 0).map(i => `<tr><td>${esc(i.activo)}</td><td>${esc(i.descripcion || '')}${i.indice ? ` <span class="muted">Índice: ${esc(i.indice)}</span>` : ''}</td><td>${esc(i.moneda || '')}</td><td class="n">${i.costo_pct != null && i.costo_pct !== '' ? (i.costo_url ? `<a href="${esc(i.costo_url)}" target="_blank" rel="noopener">${(+i.costo_pct).toFixed(2)}%</a>` : (+i.costo_pct).toFixed(2) + '%') : '—'}</td></tr>`).join('')}</tbody></table></div>`);
-      $('mModal').querySelectorAll('[data-q]').forEach(btn => btn.onclick = () => { const k = +btn.dataset.q; $('mModal').querySelectorAll('[data-q]').forEach(x => x.disabled = true);
-        if (k === L[2]) { btn.classList.add('ok'); $('mQres').textContent = 'Correcto.'; dar('leccion:' + d0); } else { btn.classList.add('no'); $('mModal').querySelector(`[data-q="${L[2]}"]`).classList.add('ok'); $('mQres').textContent = 'Casi. Mañana hay otra lección.'; } });
-      return;
-    }
-    if (id === 'TESORO') { const F = rfFilas(); return modal(head('Escalera de plazos') + `<div class="mtbl"><table><thead><tr><th>Instrumento</th><th class="n">Tasa</th><th class="n">Saldo</th><th class="n">Intereses al día</th><th class="n">Al mes</th><th class="n">Vale hoy</th></tr></thead><tbody>${F.map(f => `<tr><td>${esc(f.i.activo)}</td><td class="n">${f.tasa.toFixed(2)}%${f.udi ? ' real' : ''}</td><td class="n">${money(f.saldo)}</td><td class="n">${money(f.saldo * num(f.i.tasa, rateOf(f.i)) / 100 / 365)}</td><td class="n">${money(f.saldo * num(f.i.tasa, rateOf(f.i)) / 100 / 12)}</td><td class="n">${money(f.est)}</td></tr>`).join('')}</tbody></table></div>`); }
-    if (id === 'OBS') { const inf = num(J.inflacion_pct, 4), usd = T ? model.items.filter(i => i.moneda === 'USD').reduce((a, i) => a + i.valor, 0) / T * 100 : 0;
-      return modal(head(`Inflación de tu hoja: ${inf}% al año`) + `<p>${term('TasaReal', 'La tasa real')} es lo que de verdad ganas después de la inflación.</p><div class="mtbl"><table><thead><tr><th>Instrumento</th><th class="n">Tasa</th><th class="n">Tasa real</th></tr></thead><tbody>${model.classes.RENTA_FIJA.items.filter(i => i.valor > 0).map(i => { const t = num(i.tasa, rateOf(i)); return `<tr><td>${esc(i.activo)}</td><td class="n">${t.toFixed(2)}%</td><td class="n ${t - inf >= 0 ? 'pos' : 'neg'}">${pc(t - inf, 2)}</td></tr>`; }).join('')}</tbody></table></div>
-        <div class="mrow"><span>Parte de tu ciudad en dólares</span><b>${pct1(usd)}</b></div><p class="foot">Si el dólar sube contra el peso, esta parte vale más en pesos, y al revés.</p>`); }
-    if (id === 'RIESGO') { const L = model.items.filter(i => i.valor > 0).sort((a, c) => c.valor - a.valor), top3 = L.slice(0, 3).reduce((a, i) => a + i.valor, 0) / (T || 1) * 100;
-      modal(head('Solo lectura: nada aquí cambia tu ciudad') + `<div class="mrow"><span>Edificio más grande</span><b>${L[0] ? esc(L[0].activo) + ' · ' + pct1(L[0].pct) : '—'}</b></div><div class="mrow"><span>Los 3 más grandes</span><b>${pct1(top3)}</b></div>
-        <h3>Prueba de tormenta</h3><label class="mrow" for="mShock">Caída de acciones <b id="mShv">−20%</b></label><input id="mShock" type="range" min="0" max="50" value="20"><div id="mShr"></div>`);
-      const upd = () => { const v = +$('mShock').value, c = model.classes, loss = c.ACCIONES.valor * v / 100 + c.FIBRAS.valor * v / 200 + c.BITCOIN.valor * Math.min(100, v * 2) / 100; $('mShv').textContent = '−' + v + '%'; $('mShr').innerHTML = `<p class="foot">FIBRAs caen la mitad y cripto el doble.</p><div class="mrow"><span>Tu ciudad perdería</span><b class="neg">${money(loss)} · ${pct1(loss / (T || 1) * 100)}</b></div><div class="mrow"><span>La renta fija sigue en</span><b>${money(c.RENTA_FIJA.valor)}</b></div>`; };
-      $('mShock').oninput = upd; upd(); return; }
-    if (id === 'ARCHIVO') return modal(head('Archivo de mercados · próximamente') + `<p>Escenarios que se documentarán con fuentes antes de mostrarse:</p><div class="mrow"><span>Crisis financiera de 2008</span></div><div class="mrow"><span>Caída de los mercados de marzo de 2020</span></div><div class="mrow"><span>Crisis inflacionaria de 2022</span></div><div class="mrow"><span>Periodos de recuperación y expansión</span></div>`);
-    if (id === 'GLOBAL') { const R = {}; model.items.filter(i => i.valor > 0).forEach(i => { const r = i.key === 'ACCIONES' ? (i.cuenta_como || i.subclase || 'Acciones') : i.key === 'BITCOIN' ? 'Cripto (sin país)' : 'México'; R[r] = (R[r] || 0) + i.valor; });
-      return modal(head('Tu exposición por región') + Object.entries(R).sort((a, c) => c[1] - a[1]).map(([k, v]) => `<div class="mrow"><span>${esc(k)}</span><b>${pct1(v / (T || 1) * 100)}</b></div><div class="mlv" style="--c:#8ab4ff"><i style="width:${v / (T || 1) * 100}%"></i></div>`).join('')); }
-  }
-
   // ---------- Ayuntamiento y Bitácora ----------
   function rAyto() {
     const mes = mesActual(), meses = ST && ST.contribMonths ? ST.contribMonths.size : 0, rg = RANGOS.filter(r => meses >= r[0]).pop()[1];
@@ -4824,7 +4763,7 @@ window.MAREA = (() => {
     return {
       fundacion: F.etapa < 3, mercado: ['BOLSA', ...ORDER].some(k => !claimed(`ronda:${k}:${hoy}`)), plano: hasMetas() && !claimed('plano:' + lunes()),
       tesoreria: !(ST && ST.savedThisMonth) || (MI && MI.type === 'obra' && !MI.done), ingresos: !claimed('ingresos:' + mes),
-      infra: INFRA.some(b => estadoInfra(b)[0] === 'disp' && E && E.creditos >= b.c), ayto: !!(CE && CE.active && !CE.done) || !hasMetas()
+      ayto: !!(CE && CE.active && !CE.done) || !hasMetas()
     };
   }
   function pintar() {
@@ -4837,7 +4776,7 @@ window.MAREA = (() => {
     $('mRacha').textContent = ST ? `${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}` : '—';
     const n = Object.values(P).filter(Boolean).length; $('mBellN').textContent = n; $('mBellN').hidden = !n;
   }
-  const PANT = { fundacion: () => rFund(), mercado: () => { rPerf(); rRonda(); }, plano: () => rPlano(), tesoreria: () => rTes(), ingresos: () => rIng(), infra: () => rInfra(), ayto: () => rAyto(), bitacora: () => rLog() };
+  const PANT = { fundacion: () => rFund(), mercado: () => { rPerf(); rRonda(); }, plano: () => rPlano(), tesoreria: () => rTes(), ingresos: () => rIng(), ayto: () => rAyto(), bitacora: () => rLog() };
   let elegido = !!(location.hash || '').slice(1), guiado = false;
   function render() {
     onOff();
@@ -4877,9 +4816,8 @@ window.MAREA = (() => {
     else if (d.ing) { t.disabled = true; dar('ingresos:' + mesActual()); }
     else if (d.cer) { t.disabled = true; dar('cer-rev:' + mesActual()); }
     else if (d.salta) saltar(d.salta);
-    else if (d.build) construir(d.build);
-    else if (d.tool) herramienta(d.tool);
     else if (d.per && !t.disabled) { per = d.per; rPerf(); }
+    else if (d.ser) { if (serSel.has(d.ser) && serSel.size > 1) serSel.delete(d.ser); else serSel.add(d.ser); rPerf(); }
     else if (d.go) { const [s, sub] = d.go.split(':'); go(s, sub); }
     else if (d.reg !== undefined && t.classList.contains('mbtn')) { go('tesoreria', 'portafolio'); if (typeof GOV !== 'undefined' && GOV.openTesoreria) GOV.openTesoreria(); }
   });
@@ -4893,7 +4831,7 @@ window.MAREA = (() => {
     ['Tu ciudad es tu dinero', 'Cada edificio es una inversión que tienes: mientras más dinero tiene, más alto es. Si empiezas de cero, construyes de lo más seguro a lo más arriesgado en la Fundación.'],
     ['Cuatro barrios y la Bolsa', `<b style="color:${CLS.ACCIONES.color}">Fábricas:</b> acciones y ${term('ETF', 'ETFs')}. <b style="color:${CLS.FIBRAS.color}">Inmuebles:</b> ${term('FIBRA', 'FIBRAs')}. <b style="color:${CLS.RENTA_FIJA.color}">Obras públicas:</b> ${term('CETE', 'CETES')} y bonos. <b style="color:${CLS.BITCOIN.color}">Oro virtual:</b> bitcoin. La Bolsa resume el día de toda tu ciudad.`],
     ['El clima es el mercado', 'Si un barrio sube se encienden sus luces; si baja, llueve; si cae fuerte, hay tormenta. Nada se destruye: las caídas son parte de invertir.'],
-    ['Ganas por constancia', 'Revisa tu ciudad, aporta cada mes y sigue tu plan. Eso te da Créditos de Marea, que se guardan en tu usuario, para construir infraestructura con herramientas nuevas. Ganar o perder dinero no cambia tus créditos.']
+    ['Ganas por constancia', 'Revisa tu ciudad, aporta cada mes y sigue tu plan. Eso te da Créditos de Marea, que se guardan en tu usuario y muestran tu constancia. Ganar o perder dinero no cambia tus créditos.']
   ];
   // Solo sale sola a usuarios nuevos (sin títulos registrados) hasta que tocan "No volver a aparecer".
   // Esa decisión se guarda en el usuario (no en el dispositivo). El botón "¿Cómo se juega?" la abre cuando quieras.
@@ -4918,6 +4856,7 @@ window.MAREA = (() => {
     if (auto) $('mGno').onclick = noGuia;
   }
   $('mGuia').onclick = () => guia(0);
+  $('mQue').onclick = () => { const t = (SCR.find(x => x[0] === cur) || [, ''])[1]; modal(`<div class="mmhead"><div><small>¿Qué es esto?</small><h2>${t}</h2></div><button type="button" class="mbtn" data-close>Cerrar</button></div><p class="mguia">${AYUDA[cur] || ''}</p>`); };
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrar(); const g = $('mGloss'); if (g) g.hidden = true; } });
   // los saltos que hacía el menú anterior ahora llevan a las pantallas nuevas
   window.goSec = (sec, elId) => go(OLD[sec] || sec, elId);
