@@ -298,6 +298,9 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
 #signupForm label.chk,.chk{display:flex;flex-direction:row;gap:9px;align-items:flex-start;font-size:13px;line-height:1.4;cursor:pointer}
 .chk input{width:18px;height:18px;margin:1px 0 0;flex:none;accent-color:var(--acc)}
 .chk a{color:var(--acc);font-weight:700;text-decoration:underline}
+.aviso-corto{margin:0;font-size:12.5px;line-height:1.45;color:var(--muted);background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+.aviso-corto a{color:var(--acc);font-weight:700;text-decoration:underline}
+.aviso-corto mark{background:rgba(242,181,68,.3);color:inherit;padding:0 3px;border-radius:4px}
 @media (max-width:600px){#btnPw{padding:5px 9px}}
 
 /* ---------- tus metas ---------- */
@@ -624,7 +627,8 @@ body.marea header.top .who{order:1}
     <label for="suPin2">Repite la contraseña<input id="suPin2" type="password" autocomplete="new-password" minlength="8" maxlength="64" required></label>
     <label for="suCode">Código de invitación<input id="suCode" autocomplete="off" maxlength="40"></label>
     <p class="pw-hint">Al menos 8 caracteres. Puedes mezclar palabras, números o símbolos.</p>
-    <label class="chk" for="suAcepta"><input type="checkbox" id="suAcepta" aria-required="true"><span>Leí y acepto el <a id="suAviso" href="aviso-privacidad.html" target="_blank" rel="noopener">aviso de privacidad</a>.</span></label>
+    <p class="aviso-corto" id="suAvisoCorto">Usamos tu nombre, usuario y lo que captures de tu portafolio (datos patrimoniales) para mostrarte tu ciudad y calcular con tus metas. El administrador puede verlos; no los vendemos. Para limitar su uso o borrar tu cuenta, escribe a <a href="mailto:fondomareainternacional@gmail.com">fondomareainternacional@gmail.com</a>. Responsable: Eduardo Hernández Martínez, <mark>[DOMICILIO]</mark>. <a id="suAviso" href="aviso-privacidad.html" target="_blank" rel="noopener">Aviso completo</a>.</p>
+    <label class="chk" for="suAcepta"><input type="checkbox" id="suAcepta" aria-required="true"><span>Leí el aviso de privacidad y doy mi consentimiento expreso para tratar mis datos patrimoniales para estas finalidades.</span></label>
     <div class="err" id="suErr"></div>
     <button type="submit" id="suBtn">Crear mi cuenta y entrar</button>
     <button type="button" class="ghost" id="btnHaveAcc">Ya tengo cuenta</button>
