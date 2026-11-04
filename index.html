@@ -589,13 +589,15 @@ body.marea header.top .who{order:1}
 .mkpis small{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .mkpis b{display:block;font-family:var(--f-data);font-size:18px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mlist{list-style:none;margin:0;padding:0}
-.mlist li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px dashed rgba(255,255,255,.07)}
-.mlist li:last-child{border-bottom:0}
-.mlist li>span{display:flex;flex-direction:column;gap:2px;min-width:0}
-.mlist li small{color:var(--muted);font-size:12px;line-height:1.35}
-.mlist li .n{text-align:right;font-family:var(--f-data);flex:none;font-size:14.5px}
-.mlist li .n small{font-family:var(--f-data);font-size:11.5px}
+.mlist li,.mlist .mli{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px dashed rgba(255,255,255,.07)}
+.mlist li:last-child,.mlist .mli:last-child{border-bottom:0}
+.mlist li>span,.mlist .mli>span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mlist li small,.mlist .mli small{color:var(--muted);font-size:12px;line-height:1.35}
+.mlist li .n,.mlist .mli .n{text-align:right;font-family:var(--f-data);flex:none;font-size:14.5px}
+.mlist li .n small,.mlist .mli .n small{font-family:var(--f-data);font-size:11.5px}
 @media (max-width:560px){.mkpis b{font-size:15px}.mkpis>div{padding:8px}}
+
+.mcompra{background:#10172c;border:1px solid var(--line);border-radius:12px;padding:2px 12px;margin:8px 0}
 </style>
 </head>
 <body>
@@ -4297,7 +4299,7 @@ window.MAREA = (() => {
       por: 'Algunas personas tienen una parte muy pequeña porque no depende de ningún gobierno ni empresa. Es opcional.', pasa: 'Riesgo muy alto. Varias veces ha perdido más de la mitad de su valor; pon solo lo que estarías dispuesto a perder.', donde: 'En una plataforma de criptomonedas regulada.' }
   ];
   const POR_QUE = k => (PASOS.find(p => p.g === k) || PASOS[0]).por;
-  const META1 = 10000, META2 = 20000;
+  const META2 = 20000;   // la Fundación planea una ciudad de $20,000: alcanza para títulos completos en cada barrio
   const NIVELES = [[10000, 'Nivel 1'], [20000, 'Nivel 2'], [50000, 'Nivel 3'], [100000, 'Nivel 4'], [250000, 'Nivel 5'], [500000, 'Nivel 6'], [1000000, 'Nivel 7']];
   const RANGOS = [[0, 'Aprendiz'], [3, 'Administrador'], [6, 'Tesorero'], [12, 'Gobernador'], [24, 'Gobernador de la Marea'], [36, 'Leyenda de la Marea']];
   const AYUDA = {
@@ -4436,18 +4438,39 @@ window.MAREA = (() => {
     const metaPct = k => M.classes[k].objetivo || 0;
     const niveles = ORDER.filter(k => metaPct(k) > 0).map(k => { const obj = META2 * metaPct(k) / 100; return { k, obj, valor: M.classes[k].valor, nv2: M.classes[k].valor >= obj * .95 }; });
     const todos = PASOS.every(p => hechos[p.k]);
-    const etapa = !hasMetas() || !todos || M.total < META1 - 1 ? 1 : M.total < META2 - 1 || !niveles.every(n => n.nv2) ? 2 : 3;
+    const etapa = !hasMetas() || !todos ? 1 : M.total < META2 - 1 || !niveles.every(n => n.nv2) ? 2 : 3;
     return { hechos, niveles, etapa, metaPct, actual: hasMetas() ? PASOS.find(p => !hechos[p.k]) : null };
   }
-  const monto = (p, F) => Math.round(META1 * F.metaPct(p.g) / 100 * p.share / 100) * 100;
+  // Plan de la Fundación = el mismo cálculo de la Aportación del mes, con lo que falta para llegar a $20,000.
+  // Así cada paso dice qué instrumento comprar, cuántos títulos y cuánto, igual que la calculadora.
+  const pasoDe = i => i.key === 'RENTA_FIJA' ? (/udi/i.test(i.activo) ? 'UDI' : 'CETES') : i.key === 'ACCIONES' ? 'ETF' : i.key === 'FIBRAS' ? 'FIBRA' : 'BTC';
+  function planFund() {
+    const falta = Math.max(0, Math.round(META2 - model.total));
+    if (!falta || typeof repartir !== 'function') return { falta, por: {}, avisos: [] };
+    let R; try { R = repartir(falta); } catch (e) { return { falta, por: {}, avisos: [] }; }
+    const por = {};
+    R.plan.filter(x => x.i && x.amt >= 1).forEach(x => { const k = pasoDe(x.i); (por[k] = por[k] || []).push(x); });
+    Object.values(por).forEach(l => l.sort((a, b) => b.amt - a.amt));
+    return { falta, por, avisos: R.avisos || [] };
+  }
+  const montoPaso = (P, k) => (P.por[k] || []).reduce((a, x) => a + x.amt, 0);
+  const listaPaso = (P, k) => `<div class="mlist mcompra">${(P.por[k] || []).map(x => {
+    const unit = x.units > 0 && +x.i.precio_mxn > 0, cri = x.i.key === 'BITCOIN';
+    const det = unit ? `${x.units} ${x.units === 1 ? 'título' : 'títulos'} a unos ${mxn2.format(+x.i.precio_mxn)} cada uno` : cri && +x.i.precio_mxn > 0 ? `${(x.amt / x.i.precio_mxn).toFixed(5)} · se compra por monto` : 'se compra por monto, cualquier cantidad';
+    return `<div class="mli"><span><b>${esc(x.i.activo)}</b><small>${det}</small></span><span class="n"><b>${money(x.amt)}</b></span></div>`; }).join('')}</div>`;
+  // abre la calculadora de la Aportación del mes con lo que falta para $20,000
+  function aCalculadora(m) {
+    go('ayto', 'simPanel');
+    const inp = $('simAmt'); if (inp) { inp.value = Math.round(m); if (typeof renderSim === 'function') renderSim(); }
+  }
   const riesgo = n => `<span class="mriesgo" aria-label="Riesgo ${n} de 5" title="Riesgo ${n} de 5">${[1, 2, 3, 4, 5].map(k => `<i class="${k <= n ? 'on' : ''}"></i>`).join('')}</span>`;
   function rFund() {
-    const F = fundInfo(), M = model, T = M.total, meta = F.etapa === 1 ? META1 : META2;
+    const F = fundInfo(), M = model, T = M.total, meta = META2, P = F.etapa < 3 && hasMetas() ? planFund() : { falta: 0, por: {}, avisos: [] };
     const nv = NIVELES.filter(([m]) => T >= m - 1).length;
     const prog = `<article class="mcard" style="--c:#f8a43c"><div class="mrow-top"><div><small class="muted">${F.etapa === 1 ? 'Etapa 1 · Funda tu ciudad' : F.etapa === 2 ? 'Etapa 2 · Haz crecer tus barrios' : 'Ciudad fundada · ' + (NIVELES[nv - 1] || ['', 'Nivel 1'])[1]}</small>
       <b class="mbig">${money(T)} <small>/ ${money(F.etapa === 3 ? (NIVELES[nv] || NIVELES[NIVELES.length - 1])[0] : meta)}</small></b></div></div>
-      <div class="mfbar"><i style="width:${Math.min(100, T / META2 * 100)}%"></i><u style="left:50%"></u></div>
-      <div class="mfsteps"><span class="${F.etapa > 1 ? 'ok' : 'on'}">Etapa 1 · ${money(META1)}</span><span class="${F.etapa > 2 ? 'ok' : F.etapa === 2 ? 'on' : ''}">Etapa 2 · ${money(META2)}</span><span class="${F.etapa === 3 ? 'on' : ''}">Ciudad fundada</span></div></article>`;
+      <div class="mfbar"><i style="width:${Math.min(100, T / META2 * 100)}%"></i></div>
+      <div class="mfsteps"><span class="${F.etapa > 1 ? 'ok' : 'on'}">Etapa 1 · un edificio por barrio</span><span class="${F.etapa > 2 ? 'ok' : F.etapa === 2 ? 'on' : ''}">Etapa 2 · ${money(META2)}</span><span class="${F.etapa === 3 ? 'on' : ''}">Ciudad fundada</span></div></article>`;
     if (!hasMetas()) {
       B.fund.innerHTML = prog + `<article class="mcard hl" style="--c:#f8a43c"><h3>Paso 0 · Elige tu plan</h3><p>Tu plan dice qué parte de tu dinero va en cada barrio. Con él sabrás cuánto poner en cada edificio. Puedes empezar con una plantilla (por ejemplo Mixta o Mayoría renta fija) y cambiarla cuando quieras.</p>
         <button type="button" class="mbtn pri" data-go="ayto:metas">Elegir mi plan <small>+10</small></button></article>`;
@@ -4455,22 +4478,23 @@ window.MAREA = (() => {
     }
     if (F.etapa === 1) {
       const lad = PASOS.map((p, n) => {
-        const st = F.hechos[p.k], cur = F.actual === p, m = monto(p, F), col = CLS[p.g].color;
+        const st = F.hechos[p.k], cur = F.actual === p, m = montoPaso(P, p.k), col = CLS[p.g].color;
         const estado = st === 'comprado' ? `<span class="mpill" style="--c:var(--ok)">Construido · ${money(M.classes[p.g].items.filter(i => i.valor > 0 && (p.k !== 'CETES' || /cetes|bondia/i.test(i.activo)) && (p.k !== 'UDI' || /udi/i.test(i.activo))).reduce((a, i) => a + i.valor, 0))}</span>`
           : st === 'saltado' ? '<span class="mpill" style="--c:var(--muted)">No va en tu plan</span>' : cur ? '<span class="mpill" style="--c:#f8a43c">Sigue</span>' : '<span class="mpill" style="--c:var(--muted)">Bloqueado</span>';
-        const head = `<div class="mlh"><span class="mln" style="--c:${col}">${n + 1}</span><div class="mlt"><b>${p.n}${p.opcional ? ' <small class="muted">(opcional)</small>' : ''}</b><small>${p.ed}</small></div>${riesgo(p.riesgo)}${estado}</div>`;
+        const head = `<div class="mlh"><span class="mln" style="--c:${col}">${n + 1}</span><div class="mlt"><b>${p.n}${p.opcional ? ' <small class="muted">(opcional)</small>' : ''}</b><small>${p.ed}${!st && m >= 1 ? ' · ' + money(m) + ' en tu plan' : ''}</small></div>${riesgo(p.riesgo)}${estado}</div>`;
         if (!cur) return `<li class="${st ? 'done' : 'lock'}" style="--c:${col}">${head}</li>`;
         return `<li class="cur" style="--c:${col}">${head}
           <div class="mwhy"><div><b>¿Por qué se invierte aquí?</b><p>${p.por}</p></div><div><b>¿Qué puede pasar?</b><p>${p.pasa}</p></div><div><b>¿Dónde se compra?</b><p>${p.donde}</p></div></div>
-          ${m > 0 ? `<p>Según tu plan, para empezar: <b>${money(m)}</b>. Cuando compres, registra tus títulos o tu saldo en la Tesorería y este edificio aparecerá en tu ciudad.</p>
-            <div class="mbtns"><button type="button" class="mbtn pri" data-reg="${p.g}">Registrar mi compra en la Tesorería <small>+15</small></button><button type="button" class="mlink" data-salta="${p.k}">No va en mi plan por ahora (también da +15)</button></div>`
+          ${m >= 1 ? `<p>Para que tu ciudad llegue a <b>${money(META2)}</b> con tu plan, en este paso compra <b>${money(m)}</b>:</p>${listaPaso(P, p.k)}
+            <p class="foot">Es el mismo cálculo de la Aportación del mes con ${money(P.falta)}. Los precios cambian cada día, así que el número de títulos puede variar un poco. Cuando compres, registra tus títulos o tu saldo en la Tesorería y este edificio aparecerá en tu ciudad.</p>
+            <div class="mbtns"><button type="button" class="mbtn pri" data-reg="${p.g}">Registrar mi compra en la Tesorería <small>+15</small></button><button type="button" class="mbtn" data-calc="${Math.round(P.falta)}">Ver el reparto completo en la calculadora</button><button type="button" class="mlink" data-salta="${p.k}">No va en mi plan por ahora (también da +15)</button></div>`
           : `<p>Tu plan no incluye ${p.n.toLowerCase()}. Puedes seguir sin invertir aquí.</p><div class="mbtns"><button type="button" class="mbtn" data-salta="${p.k}">Entendido, sigo <small>+15</small></button></div>`}</li>`;
       }).join('');
-      const falta = !F.actual && T < META1 - 1 ? `<article class="mcard hl" style="--c:#f8a43c"><h3>Te faltan ${money(META1 - T)} para terminar la Etapa 1</h3><p>Ya tienes un edificio en cada barrio de tu plan. Tu misión del mes te dice dónde conviene aportar.</p><button type="button" class="mbtn pri" data-go="tesoreria">Ver mi misión</button></article>` : '';
-      B.fund.innerHTML = `<div class="mlead"><h2>Funda tu ciudad</h2><p>Se construye de lo más seguro a lo más arriesgado. En cada paso te explicamos por qué se invierte ahí y tú decides. Cada decisión da los mismos créditos, compres o no.</p></div>${prog}${falta}<ol class="mladder">${lad}</ol>`;
+      const falta = P.avisos.length ? `<p class="foot">${P.avisos.join(' ')}</p>` : '';
+      B.fund.innerHTML = `<div class="mlead"><h2>Funda tu ciudad</h2><p>Tu plan para una ciudad de ${money(META2)}, de lo más seguro a lo más arriesgado. En cada paso te decimos qué comprar, cuántos títulos y por qué; tú decides. Cada decisión da los mismos créditos, compres o no.</p></div>${prog}${falta}<ol class="mladder">${lad}</ol>`;
     } else if (F.etapa === 2) {
       const top = F.niveles.slice().sort((a, b) => a.valor / a.obj - b.valor / b.obj)[0];
-      B.fund.innerHTML = `<div class="mlead"><h2>Haz crecer tus barrios</h2><p>Cada barrio sube a nivel 2 cuando llega a la parte que le toca en tu plan con una ciudad de ${money(META2)}. Sube primero el que va más atrás.</p></div>${prog}
+      B.fund.innerHTML = `<div class="mlead"><h2>Haz crecer tus barrios</h2><p>Cada barrio sube a nivel 2 cuando llega a la parte que le toca en tu plan con una ciudad de ${money(META2)}. Sube primero el que va más atrás.</p>${P.falta >= 1 ? `<div class="mbtns"><button type="button" class="mbtn pri" data-calc="${P.falta}">Calcular cómo repartir los ${money(P.falta)} que faltan</button></div>` : ''}</div>${prog}
         <div class="mgrid">${F.niveles.map(n => { const r = Math.min(1, n.valor / n.obj), sug = top === n && !n.nv2, p = PASOS.find(q => q.g === n.k);
           return `<article class="mcard ${sug ? 'hl' : ''}" style="--c:${CLS[n.k].color}"><div class="mrow-top"><span class="mbadge">${ico(n.k)}</span>${riesgo(n.k === 'RENTA_FIJA' ? 1 : p.riesgo)}</div>
             <h3>${CLS[n.k].scene} <span class="mpill" style="--c:${n.nv2 ? 'var(--ok)' : CLS[n.k].color}">Nivel ${n.nv2 ? 2 : 1}</span></h3>
@@ -4819,6 +4843,7 @@ window.MAREA = (() => {
     else if (d.plano) { t.disabled = true; dar('plano:' + lunes()); }
     else if (d.ing) { t.disabled = true; dar('ingresos:' + mesActual()); }
     else if (d.cer) { t.disabled = true; dar('cer-rev:' + mesActual()); }
+    else if (d.calc) aCalculadora(+d.calc);
     else if (d.salta) saltar(d.salta);
     else if (d.per && !t.disabled) { per = d.per; rPerf(); }
     else if (d.ser) { if (serSel.has(d.ser) && serSel.size > 1) serSel.delete(d.ser); else serSel.add(d.ser); rPerf(); }
