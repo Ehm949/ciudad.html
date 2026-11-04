@@ -2476,6 +2476,24 @@ function neonFor(it, k, slot, hT, dim) {
   return (NBC[key] = best);
 }
 let blink = [], healT = 1.2, lastHeal = null;
+// ---------- flamas de petrolera en las chimeneas de las fábricas ----------
+const FLAMA = true;
+const flamaH = e => e.up ? 14 : 6;
+const FLCOL = ['#fff6d8', '#ffe27a', '#ffb43c', '#ff7a1f', '#e8401c', '#a8241a'];
+function drawFlama(g, e, i) {
+  const H0 = flamaH(e), fl = Math.sin(T * 17 + i * 2.1) * .5 + Math.sin(T * 29 + i) * .5;
+  const h = Math.max(3, Math.round(H0 + fl * (e.up ? 3 : 1.4))), mw = e.up ? 7 : 4;
+  for (let r = 0; r < h; r++) {
+    const f = r / h, sway = Math.sin(T * 11 + i * 1.3 + r * .7) * f * 1.6 + WIND * .08 * f * h;
+    const w = Math.max(1, Math.round(mw * Math.pow(1 - f, .75) + (r === 0 ? 0 : .3))), x = Math.round(e.x - w / 2 + sway), y = Math.round(e.y - 2 - r);
+    px(g, x, y, w, 1, FLCOL[Math.min(5, 2 + Math.floor(f * 4))]);                         // borde naranja-rojo
+    if (w >= 3 && f < .7) px(g, x + 1, y, w - 2, 1, FLCOL[f < .35 ? 1 : 2]);                // centro amarillo
+    if (w >= 4 && f < .3) px(g, x + Math.floor(w / 2) - (w > 4 ? 1 : 0), y, w > 4 ? 2 : 1, 1, FLCOL[0]);   // núcleo casi blanco
+  }
+  if (!reduce) {
+    let nE = e.up ? .8 : .22; while (nE > 0) { if (Math.random() < nE) spawn({ x: e.x + (Math.random() - .5) * mw, y: e.y - 2 - h * (.4 + Math.random() * .6), vx: WIND * (.4 + Math.random() * .8) + (Math.random() - .5) * 6, vy: -(12 + Math.random() * 16), life: 0, max: .9 + Math.random() * 1.3, type: 'ember', sz: Math.random() < .3 ? 2 : Math.random() < .5 ? 1.4 : 1, sd: Math.random() * 6 }); nE -= 1; }
+  }
+}
 function crane(x, top) {
   px(wb, x, top, 2, SHORE - top, '#e2b340'); for (let yy = top + 4; yy < SHORE; yy += 6) px(wb, x - 1, yy, 4, 1, '#a07a24');
   px(wb, x - 22, top, 32, 2, '#e2b340'); px(wb, x + 6, top + 2, 4, 3, '#6a5a3a');
@@ -2579,7 +2597,8 @@ cv.addEventListener('click', e => {
 });
 
 // ---------- animación ----------
-function spawn(p) { if (parts.length < 160) parts.push(p); }
+let nEmb = 0;
+function spawn(p) { if (p.type === 'ember') { if (nEmb >= 200) return; nEmb++; } if (parts.length < 320) parts.push(p); }
 function spawnFirework() {
   // si hay un barrio de fiesta (día de dividendos), la mayoría de los cohetes salen sobre él
   const z = window.fwZona && zones[window.fwZona], x = z && Math.random() < .7 ? z.x + z.w * (.1 + Math.random() * .8) : LW * (.12 + Math.random() * .76), y = 30 + Math.random() * 60;
@@ -2604,7 +2623,8 @@ function update(dt, prewarm) {
     e.acc += dt * e.rate;
     while (e.acc >= 1 && smoke.length < 320) {
       e.acc -= 1;
-      smoke.push({ x: e.x + (Math.random() - .5) * 1.5, y: e.y - 1, vx: WIND * (.3 + Math.random() * .4), vy: -(9 + Math.random() * 6) * (e.up ? 1.15 : .8),
+      if (FLAMA && Math.random() < .45) continue;
+      smoke.push({ x: e.x + (Math.random() - .5) * 1.5, y: e.y - 1 - (FLAMA ? flamaH(e) : 0), vx: WIND * (.3 + Math.random() * .4), vy: -(9 + Math.random() * 6) * (e.up ? 1.15 : .8),
         r: 1.4 + Math.random() * .8, g: (e.up ? 4.2 : 3.2) + Math.random() * 1.5, age: 0, max: (e.up ? 3.6 : 2.4) + Math.random() * 1.4, a: e.up ? .62 : .34, sd: Math.random() * 6 });
     }
   });
@@ -2671,7 +2691,7 @@ function update(dt, prewarm) {
       }
     }
   }
-  parts.forEach(p => { p.life += dt; p.y += p.vy * dt; }); parts = parts.filter(p => p.life < p.max);
+  parts.forEach(p => { p.life += dt; p.y += p.vy * dt; if (p.vx) p.x += p.vx * dt; if (p.type === 'ember') { p.vy *= 1 - .3 * dt; p.vx += WIND * .6 * dt; } }); parts = parts.filter(p => p.life < p.max); nEmb = parts.reduce((a, p) => a + (p.type === "ember"), 0);
   if (celebrateT > 0) { celebrateT -= dt; if (Math.random() < dt * (window.fwZona ? 5 : 3)) spawnFirework(); }
   else if (CE && CE.active && Math.random() < dt * (CE.done ? .6 : .12)) spawnFirework();
   fws.forEach(f => { f.life += dt; f.x += f.vx * dt; f.y += f.vy * dt; f.vy += 20 * dt; f.vx *= .985; }); fws = fws.filter(f => f.life < f.max);
@@ -2705,7 +2725,8 @@ function composeWorld() {
     g.globalAlpha = .35; px(g, L.x - 1, L.y, 3, 1, c); px(g, L.x, L.y - 1, 1, 3, c);
     g.globalAlpha = 1; px(g, L.x, L.y, 1, 1, '#ffe0e8');
   });
-  emitters.forEach((e, i) => { px(g, e.x - 1, e.y - 2, 2, 1, Math.sin(T * 3 + i * 1.7) > 0 ? '#ff2d55' : '#5a1020'); if (e.up) px(g, e.x - 1.5, e.y, 3, 1, `rgba(255,150,70,${.5 + .5 * Math.sin(T * 11 + i)})`); });
+  if (FLAMA) emitters.forEach((e, i) => drawFlama(g, e, i));
+  else emitters.forEach((e, i) => { px(g, e.x - 1, e.y - 2, 2, 1, Math.sin(T * 3 + i * 1.7) > 0 ? '#ff2d55' : '#5a1020'); if (e.up) px(g, e.x - 1.5, e.y, 3, 1, `rgba(255,150,70,${.5 + .5 * Math.sin(T * 11 + i)})`); });
   // los barrios con lluvia se oscurecen
   rainZ.forEach(r => { const gr = g.createLinearGradient(0, 0, 0, 60); gr.addColorStop(0, 'rgba(2,4,16,0)'); gr.addColorStop(1, r.heavy ? 'rgba(2,4,16,.38)' : 'rgba(2,4,16,.24)'); g.fillStyle = gr; g.fillRect(Math.round(r.z.x), 0, Math.round(r.z.w), SHORE); });
   // coches del malecón
@@ -2844,7 +2865,7 @@ function drawSmoke() {
     puff(PUFF_L, p.x, p.y, p.r, a * (1 - q * .8));
     puff(PUFF_D, p.x, p.y, p.r * 1.08, a * q * .9);
   });
-  emitters.forEach((e, i) => { if (e.up) puff(PUFF_W, e.x, e.y + .5, 2.6, .35 + .2 * Math.sin(T * 9 + i)); });
+  emitters.forEach((e, i) => { if (FLAMA) puff(PUFF_W, e.x, e.y - 2 - flamaH(e) * .45, e.up ? 9 : 5, (e.up ? .5 : .3) + .12 * Math.sin(T * 13 + i)); else if (e.up) puff(PUFF_W, e.x, e.y + .5, 2.6, .35 + .2 * Math.sin(T * 9 + i)); });
   ctx.globalAlpha = 1;
 }
 function drawParts() {
@@ -2855,9 +2876,17 @@ function drawParts() {
     if (p.type === 'coin') { ctx.fillStyle = '#f2b544'; ctx.beginPath(); ctx.arc(x, y, cs, 0, 7); ctx.fill(); ctx.fillStyle = '#ffe08a'; ctx.beginPath(); ctx.arc(x - cs * .25, y - cs * .25, cs * .45, 0, 7); ctx.fill(); }
     else if (p.type === 'down') { ctx.strokeStyle = '#ff7a7a'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(x - 3.5, y - 2); ctx.lineTo(x, y + 1.5); ctx.lineTo(x + 3.5, y - 2); ctx.stroke(); }
     else if (p.type === 'conf') { ctx.fillStyle = p.col; ctx.save(); ctx.translate(x, y); ctx.rotate(p.life * 6 + p.r); ctx.fillRect(-2, -1.1, 4, 2.2); ctx.restore(); }
+    else if (p.type === 'ember') {
+      const q = p.life / p.max, z = Math.round(Math.max(2, cam.s * 1.1) * p.sz), fx = x + Math.sin(p.life * 8 + p.sd) * 1.5 * cam.s;
+      const blinkA = .7 + .3 * Math.sin(p.life * 30 + p.sd * 5);
+      ctx.globalAlpha = Math.max(0, (1 - q) * blinkA);
+      ctx.fillStyle = q < .25 ? '#fff1b8' : q < .55 ? '#ffc04a' : q < .8 ? '#ff7a26' : '#c7341c';
+      ctx.fillRect(Math.round(fx), Math.round(y), z, z);
+      if (q < .6) { ctx.globalAlpha *= .22; ctx.fillStyle = '#ff9a3c'; ctx.fillRect(Math.round(fx) - z, Math.round(y) - z, z * 3, z * 3); }
+    }
     else if (p.type === 'heal') {
       const pop = p.life < .18 ? 1.45 - p.life / .18 * .45 : 1, fz = (W < 600 ? 12 : 15) * pop;
-      const yy = Math.max(58, y - 24) - p.life * 22;
+      const yy = Math.max(62, y - 24 - p.life * 22);
       ctx.globalAlpha = p.life < .12 ? p.life / .12 : Math.max(0, Math.min(1, (p.max - p.life) / .8));
       ctx.font = `900 ${fz}px Figtree, system-ui, sans-serif`; ctx.textAlign = 'center';
       ctx.shadowColor = 'rgba(93,211,158,.9)'; ctx.shadowBlur = 8;
