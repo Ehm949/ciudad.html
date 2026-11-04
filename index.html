@@ -601,6 +601,7 @@ body.marea header.top .who{order:1}
 
 .mfiesta h3{font-size:19px}
 .mfiesta{margin-bottom:12px}
+.chips .pxi{display:inline-block;vertical-align:-2px;margin-right:6px;image-rendering:pixelated}
 </style>
 </head>
 <body>
@@ -1601,7 +1602,7 @@ function demoApi(accion, data) {
     ok: true, nombre: 'Inversor de ejemplo', catalogo: DEMO_CATALOGO, posiciones: demoPos.map(demoCompute), juego: {},
     metas: demoMetas, plantillas: DEMO_PLANT, metas_inicial: DEMO_CONF, precios_hora: new Date().toISOString(),
     historial: demoHist,
-    dividendos: (() => { const p = demoPos.find(x => x.activo === 'FIBRAPL14'), t = p ? +p.titulos || 0 : 0, b = Math.round(t * 0.7766 * 100) / 100, r = Math.round(b * 30) / 100; return t ? [{ activo: 'FIBRAPL14', fecha: ymd(hoy), por_titulo: 0.7766, retencion_pct: 30, nota: 'Ejemplo', titulos: t, bruto: b, retencion: r, neto: Math.round((b - r) * 100) / 100, aprox: false, proximo: false }] : []; })(),
+    dividendos: (() => { const p = demoPos.find(x => x.activo === 'FIBRAPL14'), t = p ? +p.titulos || 0 : 0, b = Math.round(t * 0.7766 * 100) / 100, r = Math.round(b * 30) / 100; const c = Math.round(t * 0.12 * 100) / 100; return t ? [{ activo: 'FIBRAPL14', fecha: ymd(hoy), resultado_fiscal: 0.7766, reembolso_capital: 0.12, por_titulo: 0.8966, retencion_pct: 30, nota: 'Ejemplo', titulos: t, bruto_rf: b, bruto_rc: c, bruto: Math.round((b + c) * 100) / 100, retencion: r, neto: Math.round((b + c - r) * 100) / 100, aprox: false, proximo: false }] : []; })(),
     eventos: [
       { inicio: ymd(hoy), fin: ymd(fin), tipo: 'RENTAS', objetivo: 'FUNO11', mensaje: 'FUNO11 está repartiendo las rentas del trimestre a sus dueños.' },
       { inicio: ymd(prox), fin: ymd(prox), tipo: 'RENTAS', objetivo: 'FIBRAPL14', mensaje: '' }
@@ -1941,7 +1942,7 @@ function renderAll() {
   $('hStreak').innerHTML = `<span style="color:var(--acc)">${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}</span>`;
 
   renderEvents();
-  $('chips').innerHTML = ORDER.map(k => `<button type="button" data-k="${k}" aria-pressed="${focus === k}" style="--c:${CLS[k].color}"><span class="dot"></span>${CLS[k].scene}</button>`).join('');
+  $('chips').innerHTML = ORDER.map(k => `<button type="button" data-k="${k}" aria-pressed="${focus === k}" style="--c:${CLS[k].color}">${pixIconSVG(k, CLS[k].color)}${CLS[k].scene}</button>`).join('');
   $('chips').querySelectorAll('button').forEach(b => b.onclick = () => setFocus(focus === b.dataset.k ? null : b.dataset.k));
 
   $('districts').innerHTML = ORDER.map(k => {
@@ -2339,9 +2340,9 @@ let stormAll = false, cityFlash = 0, dirty = true, hm = new Int16Array(LW).fill(
 const SPI = {}; let spLeft = 0;
 function spLoad(k, src) { spLeft++; const i = new Image(); i.onload = i.onerror = () => { if (--spLeft === 0) layout(); }; i.src = src; SPI[k] = i; }
 if (window.SP) { ['cielo', 'lejos', 'luces', 'agua'].forEach(k => spLoad(k, SP[k])); spLoad('torres', SP.torres.src); spLoad('medios', SP.medios.src); }
-const WB = document.createElement('canvas'), FB = document.createElement('canvas');
-WB.width = FB.width = LW; WB.height = FB.height = LH;
-const wb = WB.getContext('2d'), fb = FB.getContext('2d');
+const WB = document.createElement('canvas'), FB = document.createElement('canvas'), BG = document.createElement('canvas'), LJ = document.createElement('canvas');
+WB.width = FB.width = BG.width = LJ.width = LW; WB.height = FB.height = BG.height = LJ.height = LH;
+const wb = WB.getContext('2d'), fb = FB.getContext('2d'), bgc = BG.getContext('2d'), ljc = LJ.getContext('2d');
 
 function rng(seed) { let a = (seed * 9301 + 49297) >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 function puffSprite(rgb, soft) {
@@ -2474,7 +2475,7 @@ function neonFor(it, k, slot, hT, dim) {
   best.cv = EdificiosNeon.toCanvas(EdificiosNeon.unlit(best));
   return (NBC[key] = best);
 }
-let blink = [];
+let blink = [], healT = 1.2, lastHeal = null;
 function crane(x, top) {
   px(wb, x, top, 2, SHORE - top, '#e2b340'); for (let yy = top + 4; yy < SHORE; yy += 6) px(wb, x - 1, yy, 4, 1, '#a07a24');
   px(wb, x - 22, top, 32, 2, '#e2b340'); px(wb, x + 6, top + 2, 4, 3, '#6a5a3a');
@@ -2485,9 +2486,9 @@ function layout() {
   if (!view || spLeft || !SPI.cielo || !SPI.cielo.naturalWidth) return;
   const V = view, R = rng(7);
   hm = new Int16Array(LW).fill(SHORE); emitters = []; rainZ = []; clouds = []; blink = [];
-  wb.imageSmoothingEnabled = false; wb.clearRect(0, 0, LW, LH);
-  wb.drawImage(SPI.cielo, 27, 16, LW, SHORE, 0, 0, LW, SHORE);
-  wb.globalAlpha = .75; wb.drawImage(SPI.lejos, 27, 16, LW, SHORE, 0, 0, LW, SHORE); wb.globalAlpha = 1;
+  wb.imageSmoothingEnabled = bgc.imageSmoothingEnabled = ljc.imageSmoothingEnabled = false; wb.clearRect(0, 0, LW, LH);
+  bgc.clearRect(0, 0, LW, LH); bgc.drawImage(SPI.cielo, 27, 16, LW, SHORE, 0, 0, LW, SHORE);
+  ljc.clearRect(0, 0, LW, LH); ljc.drawImage(SPI.lejos, 27, 16, LW, SHORE, 0, 0, LW, SHORE);
   const MINP = 13, tot = ORDER.reduce((a, k) => a + Math.max(V.classes[k].pct, MINP), 0) || 1;
   const gmax = Math.max(1, ...V.items.map(i => i.valor));
   const used = { torres: new Set(), medios: new Set() };
@@ -2522,7 +2523,6 @@ function layout() {
         const bd = neonFor(it, k, slot, hT, k !== 'RENTA_FIJA' && it.cambio_dia < 0);
         b.bd = bd; b.dx = Math.round(Math.max(x + 1 - bd.foot.x0, Math.min(x + zw - 2 - bd.foot.x1, bx + slot / 2 - (bd.foot.x0 + bd.foot.x1) / 2))); b.dy = SHORE - bd.h;   // sin salirse de su barrio
         b.top = b.dy + Math.min(bd.top - 10, ...bd.stacks.map(p => p.y));
-        if (k === 'BITCOIN' && j === 0) { b.coin = { x: b.dx + (bd.foot.x0 + bd.foot.x1) / 2, y: b.dy + bd.top - 26, r: 9 }; b.top = b.coin.y - 12; }
         if (k === 'RENTA_FIJA' && j === 0) b.craneAt = true;
         z.top = Math.min(z.top, b.top); z.items.push(b); bx += slot;
       });
@@ -2539,6 +2539,7 @@ function layout() {
       const nc = Math.ceil(zw / 16) + 2;
       for (let i = 0; i < nc; i++) clouds.push({ x: x - 6 + (zw + 12) * i / (nc - 1), y: 50 + R() * 14 - (i % 2) * 6, r: 14 + R() * 14, p: R() * 6, z, dark: z.storm });
     }
+    if (k === 'BITCOIN') { const r = sunRad(zw); z.top = Math.min(z.top, sunY(r) - r - 10); }   // la cámara también enfoca el sol
     zones[k] = z; x += zw;
   });
   // malecón con faroles
@@ -2656,6 +2657,20 @@ function update(dt, prewarm) {
       }
     });
   });
+  healT -= dt;
+  if (healT <= 0) {
+    healT = W < 600 ? 3.6 + Math.random() * 1.6 : 2.3 + Math.random() * 1.4;   // de vez en cuando, sin saturar
+    if (parts.filter(p => p.type === 'heal').length < 2) {
+      const cand = [];
+      ORDER.forEach(k => { const z = zones[k]; if (!z || (focus && focus !== k)) return; z.items.forEach(b => { if (b.owned && b.it.hoy > 0 && b.it.activo !== lastHeal) cand.push(b); }); });
+      const vis = cand.filter(b => { const [sx] = toS(b.x + b.w / 2, 0); return sx > 20 && sx < W - 20; });
+      if (vis.length) {
+        const b = vis[Math.floor(Math.random() * vis.length)]; lastHeal = vis.length > 1 ? b.it.activo : null;
+        const v = b.it.hoy, t = '+' + (v >= 100 ? mxn.format(v) : mxn2.format(v));
+        spawn({ x: b.x + b.w / 2, y: b.top, vy: 0, life: 0, max: 2.3, type: 'heal', t });
+      }
+    }
+  }
   parts.forEach(p => { p.life += dt; p.y += p.vy * dt; }); parts = parts.filter(p => p.life < p.max);
   if (celebrateT > 0) { celebrateT -= dt; if (Math.random() < dt * (window.fwZona ? 5 : 3)) spawnFirework(); }
   else if (CE && CE.active && Math.random() < dt * (CE.done ? .6 : .12)) spawnFirework();
@@ -2667,7 +2682,11 @@ function rr(x, y, w, h, r) { r = Math.max(0, Math.min(r, w / 2, h / 2)); ctx.beg
 function text(t, x, y, size, col, align, weight) { ctx.font = `${weight || 700} ${size}px Figtree, system-ui, sans-serif`; ctx.fillStyle = col; ctx.textAlign = align || 'center'; ctx.fillText(t, x, y); }
 function composeWorld() {
   const g = fb; g.imageSmoothingEnabled = false;
-  g.globalAlpha = 1; g.drawImage(WB, 0, 0);
+  g.globalAlpha = 1; g.drawImage(BG, 0, 0);
+  drawSun(g);
+  g.globalAlpha = .75; g.drawImage(LJ, 0, 0); g.globalAlpha = 1;
+  drawAuras(g);
+  g.drawImage(WB, 0, 0);
   g.globalAlpha = .55 + .45 * Math.sin(T * 1.3); g.drawImage(SPI.luces, 27, 16, LW, SHORE, 0, 0, LW, SHORE); g.globalAlpha = 1;
   ORDER.forEach(k => {
     const z = zones[k]; if (!z) return;
@@ -2676,12 +2695,6 @@ function composeWorld() {
       const up = b.it.cambio_dia > 0;
       if (b.door) { const f = up ? .65 + .35 * Math.sin(T * 9 + b.x) * Math.sin(T * 3.7) : .25; px(g, b.door.x + 1, SHORE - 4, b.door.w - 2, 4, `rgba(255,${Math.round(120 + 60 * f)},60,${.35 + .6 * f})`); }
       if (b.crane) { const hy = b.crane.top + 8 + Math.round((Math.sin(T * .7) + 1) * 9); px(g, b.crane.x - 18, b.crane.top + 2, 1, hy - b.crane.top - 2, '#8a6a2a'); px(g, b.crane.x - 20, hy, 4, 3, '#c98d2a'); px(g, b.crane.x + 1, b.crane.top - 3, 1, 3, Math.sin(T * 4) > 0 ? '#ff2d55' : '#5a1020'); }
-      if (b.coin) {
-        const c = b.coin, sx = Math.abs(Math.cos(T * 1.6 + b.x)) * (c.r - 1) + 1;
-        g.fillStyle = 'rgba(247,147,26,.22)'; g.beginPath(); g.arc(c.x, c.y, c.r * 1.45, 0, 7); g.fill();
-        g.fillStyle = '#f7931a'; g.beginPath(); g.ellipse(c.x, c.y, sx, c.r, 0, 0, 7); g.fill();
-        g.fillStyle = '#ffc56b'; g.beginPath(); g.ellipse(c.x - 1, c.y - 1, Math.max(.6, sx - 3), c.r * .7, 0, 0, 7); g.fill();
-      }
       if (false) { const cx = Math.round(b.x + b.w / 2); for (let i = 0; i < 2; i++) { const yy = Math.round(b.top - 5 - i * 4 - (T * 6 % 4)); px(g, cx - 2, yy, 5, 1, '#5dd39e'); px(g, cx - 1, yy - 1, 3, 1, '#5dd39e'); px(g, cx, yy - 2, 1, 1, '#5dd39e'); } }
     });
   });
@@ -2704,6 +2717,83 @@ function composeWorld() {
     g.globalAlpha = .38 * (1 - y / (LH - SHORE)); g.drawImage(FB, 0, Math.floor(src), LW, 2, dx, SHORE + 4 + y, LW, 1);
   }
   g.globalAlpha = 1;
+}
+
+// ---------- el sol del oro virtual: una esfera de pixel art que gira, con franjas que bajan ----------
+const SUNC = document.createElement('canvas'), sunc = SUNC.getContext('2d');
+let sunImg = null, sunR = 0;
+const sunRad = w => Math.round(Math.max(20, Math.min(34, w * .38))), sunY = r => Math.round(SHORE - 72 - r * .5);
+const SUNPAL = [[120, 30, 8], [190, 60, 12], [230, 95, 18], [247, 140, 30], [255, 182, 60], [255, 214, 110], [255, 238, 176]];
+const hash2 = (a, b) => { let h = Math.imul(a * 374761393 + b * 668265263, 1274126177); h ^= h >>> 13; h = Math.imul(h, 1103515245); return ((h ^ h >>> 16) >>> 0) / 4294967296; };
+function sunPlace() {
+  const z = zones.BITCOIN; if (!z) return null;
+  const r = sunRad(z.w);
+  return { x: Math.round(z.x + z.w / 2), y: sunY(r), r };
+}
+function drawSun(g) {
+  const P = sunPlace(); if (!P) return;
+  const R = P.r, D = R * 2 + 1;
+  if (sunR !== R) { sunR = R; SUNC.width = SUNC.height = D; sunImg = sunc.createImageData(D, D); }
+  // resplandor que respira
+  const pulse = .85 + .15 * Math.sin(T * 1.4);
+  const gl = g.createRadialGradient(P.x, P.y, R * .6, P.x, P.y, R * 2.6);
+  gl.addColorStop(0, `rgba(255,150,50,${.38 * pulse})`); gl.addColorStop(.45, `rgba(255,90,40,${.13 * pulse})`); gl.addColorStop(1, 'rgba(255,60,40,0)');
+  g.fillStyle = gl; g.fillRect(P.x - R * 3, P.y - R * 3, R * 6, R * 6);
+  const d = sunImg.data, rot = T * .32, scroll = T * 3.2;
+  for (let j = 0; j < D; j++) for (let i = 0; i < D; i++) {
+    const o = (j * D + i) * 4, nx = (i - R) / (R + .5), ny = (j - R) / (R + .5), rr2 = nx * nx + ny * ny;
+    if (rr2 > 1) { d[o + 3] = 0; continue; }
+    // franjas horizontales que bajan en la mitad de abajo (sol retro)
+    if (ny > .12) { const band = (j + scroll) % 7; if (band < .6 + ny * 2.6) { d[o + 3] = 0; continue; } }
+    const lat = Math.asin(ny), cl = Math.cos(lat), lon = Math.asin(Math.max(-1, Math.min(1, nx / (cl || 1)))) + rot;
+    const u = Math.floor(lon / (Math.PI * 2) * 30 + 300), v = Math.floor((lat / Math.PI + .5) * 16);
+    const h = hash2(u, v), mu = Math.sqrt(1 - rr2);
+    let lvl = 5.4 - (ny + 1) * 1.9 + mu * 1.2;     // amarillo arriba, naranja abajo, borde más oscuro
+    const fu = (lon / (Math.PI * 2) * 30 + 300) % 1;
+    if (h > .58 && fu > .15 && fu < .85 && (j % 2 === 0)) lvl += 1.6;   // circuitos claros
+    else if (h < .16) lvl -= 1.3;                                     // manchas oscuras
+    const c = SUNPAL[Math.max(0, Math.min(6, Math.round(lvl)))];
+    d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255;
+  }
+  sunc.putImageData(sunImg, 0, 0);
+  g.drawImage(SUNC, P.x - R, P.y - R);
+}
+// ---------- auras: cintas de luz que suben ondulando detrás de los barrios que ganaron hoy ----------
+const AURA = [[95, 242, 255], [155, 123, 255], [79, 195, 176], [255, 79, 184], [95, 242, 255], [143, 162, 255]];
+function drawAuras(g) {
+  ORDER.forEach((k, zi) => { const z = zones[k], c = view.classes[k]; if (z && c && c.valor > 0 && c.hoy > 0) auraZona(g, z, zi); });   // solo en barrios que ganaron hoy
+}
+function auraZona(g, z, zi) {
+  const n = Math.max(3, Math.min(6, Math.round(z.w / 16))), base = SHORE - 8;
+  for (let i = 0; i < n; i++) {
+    const c = AURA[(i + zi * 2) % AURA.length], x0 = z.x + z.w * (i + .5) / n, top = 26 + (i % 3) * 14, len = base - top;
+    for (let y = base; y > top; y--) {
+      const t = base - y, f = t / len;
+      const x = x0 + Math.sin(y * .045 + T * 1.25 + i * 1.7 + zi * 2.3) * (3 + t * .07) + Math.sin(y * .12 - T * 2 + i) * 1.6;
+      const flow = ((t - T * 34 - i * 37) % 95 + 95) % 95, hot = flow < 14 ? 1 - flow / 14 : 0;   // pulso de energía que sube
+      const a = Math.pow(1 - f, .7) * (.75 + .25 * Math.sin(T * 2.2 + y * .05 + i)) + hot * .6 * (1 - f);
+      if (a < .02) continue;
+      g.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${(a * .3).toFixed(3)})`; g.fillRect(Math.round(x) - 3, y, 7, 1);
+      g.fillStyle = `rgba(${Math.min(255, c[0] + hot * 120)},${Math.min(255, c[1] + hot * 120)},${Math.min(255, c[2] + hot * 120)},${Math.min(1, a).toFixed(3)})`;
+      g.fillRect(Math.round(x), y, i % 2 ? 1 : 2, 1);
+    }
+  }
+}
+// ---------- iconos de pixel art de cada barrio (etiquetas de la ciudad y botones) ----------
+const PIXICO = {
+  ACCIONES: ['.o..........', '.##.........', '.##.........', '.##.........', '.##...#...#.', '.##..##..##.', '.##.###.###.', '############', '#oo#oo#oo#o#', '#oo#oo#oo#o#', '############', '############'],
+  FIBRAS: ['....##......', '...####.....', '..######....', '..#o#o##....', '..######.###', '..#o#o##.#o#', '..######.###', '..#o#o##.#o#', '..######.###', '..#o#o##.#o#', '..######.###', '############'],
+  RENTA_FIJA: ['.....##.....', '....#oo#....', '..##oooo##..', '.##########.', '############', '.o..o..o..o.', '.#..#..#..#.', '.#..#..#..#.', '.#..#..#..#.', '.#..#..#..#.', '############', '############'],
+  BITCOIN: ['.....#......', '.....#......', '....#o#.....', '..##ooo##...', '....#o#.....', '.....#....#.', '.....#....#.', '.........#o#', '..#.......#.', '.#o#......#.', '..#.........', '............']
+};
+function pixIcon(c2, k, x, y, p, col) {
+  const rows = PIXICO[k]; if (!rows) return;
+  rows.forEach((r, j) => { for (let i = 0; i < r.length; i++) { const ch = r[i]; if (ch === '.') continue; c2.fillStyle = ch === 'o' ? '#fff3c4' : col; c2.fillRect(x + i * p, y + j * p, p, p); } });
+}
+function pixIconSVG(k, col) {
+  const rows = PIXICO[k]; if (!rows) return '';
+  let r = ''; rows.forEach((row, j) => { for (let i = 0; i < row.length; i++) if (row[i] !== '.') r += `<rect x="${i}" y="${j}" width="1.02" height="1.02" fill="${row[i] === 'o' ? '#fff3c4' : col}"/>`; });
+  return `<svg class="pxi" viewBox="0 0 12 12" width="14" height="14" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
 }
 function puff(img, wx, wy, r, a) { if (a <= .003) return; const [x, y] = toS(wx, wy), d = r * 2 * cam.s; ctx.globalAlpha = Math.min(1, a); ctx.drawImage(img, x - d / 2, y - d / 2, d, d); }
 function drawWeather() {
@@ -2765,6 +2855,15 @@ function drawParts() {
     if (p.type === 'coin') { ctx.fillStyle = '#f2b544'; ctx.beginPath(); ctx.arc(x, y, cs, 0, 7); ctx.fill(); ctx.fillStyle = '#ffe08a'; ctx.beginPath(); ctx.arc(x - cs * .25, y - cs * .25, cs * .45, 0, 7); ctx.fill(); }
     else if (p.type === 'down') { ctx.strokeStyle = '#ff7a7a'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(x - 3.5, y - 2); ctx.lineTo(x, y + 1.5); ctx.lineTo(x + 3.5, y - 2); ctx.stroke(); }
     else if (p.type === 'conf') { ctx.fillStyle = p.col; ctx.save(); ctx.translate(x, y); ctx.rotate(p.life * 6 + p.r); ctx.fillRect(-2, -1.1, 4, 2.2); ctx.restore(); }
+    else if (p.type === 'heal') {
+      const pop = p.life < .18 ? 1.45 - p.life / .18 * .45 : 1, fz = (W < 600 ? 12 : 15) * pop;
+      const yy = Math.max(58, y - 24) - p.life * 22;
+      ctx.globalAlpha = p.life < .12 ? p.life / .12 : Math.max(0, Math.min(1, (p.max - p.life) / .8));
+      ctx.font = `900 ${fz}px Figtree, system-ui, sans-serif`; ctx.textAlign = 'center';
+      ctx.shadowColor = 'rgba(93,211,158,.9)'; ctx.shadowBlur = 8;
+      ctx.lineWidth = 3.5; ctx.strokeStyle = 'rgba(4,22,14,.9)'; ctx.strokeText(p.t, x, yy);
+      ctx.fillStyle = '#7dffb6'; ctx.fillText(p.t, x, yy); ctx.shadowBlur = 0;
+    }
     else if (p.type === 'text') { ctx.font = '800 11px Figtree, system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(8,12,30,.85)'; ctx.strokeText(p.t, x, y); ctx.fillStyle = p.col; ctx.fillText(p.t, x, y); }
   });
   ctx.globalAlpha = 1;
@@ -2815,7 +2914,7 @@ function drawLabels() {
     ctx.font = `800 ${fz}px Figtree, system-ui, sans-serif`;
     let label = `${CLS[k].scene} ${Math.round(c.pct)}%`;
     if (!focus && ctx.measureText(label).width + 30 > zw && narrow) label = `${CLS[k].scene.split(' ')[0]} ${Math.round(c.pct)}%`;
-    const tw = ctx.measureText(label).width + 22;
+    const ip = narrow ? 1 : 1.25, tw = ctx.measureText(label).width + 22 + 12 * ip - 4;
     let lx = focus ? Math.max(10, Math.min(W - tw - 10, zx + 6)) : Math.max(4, Math.min(W - tw - 4, zx + 4));
     const sub = focus && c.valor ? (k === 'RENTA_FIJA' ? 'intereses ' : 'hoy ') + signed2(c.hoy) : '';   // la vista completa solo dice barrio y %
     let ly = 10; while (!free(lx, ly, tw, 20) && ly < 120) ly += 28;
@@ -2823,8 +2922,8 @@ function drawLabels() {
     const zAlert = c.items.some(i => ALERT.has(i.activo));
     ctx.fillStyle = 'rgba(10,14,32,.85)'; rr(lx, ly, tw, 22, 11); ctx.fill();
     if (zAlert) { ctx.strokeStyle = `rgba(255,122,122,${.55 + .45 * Math.sin(T * 6)})`; ctx.lineWidth = 2; rr(lx, ly, tw, 22, 11); ctx.stroke(); }
-    ctx.fillStyle = zAlert ? '#ff7a7a' : CLS[k].color; ctx.beginPath(); ctx.arc(lx + 11, ly + 11, 3.5, 0, 7); ctx.fill();
-    text(label, lx + 18, ly + 15, fz, '#eef1f8', 'left', 800);
+    pixIcon(ctx, k, Math.round(lx + 8), Math.round(ly + 11 - 6 * ip), ip, zAlert ? '#ff7a7a' : CLS[k].color);
+    text(label, lx + 14 + 12 * ip, ly + 15, fz, '#eef1f8', 'left', 800);
     if (sub) {
       ctx.font = '700 11px Figtree, system-ui, sans-serif';
       const hw = ctx.measureText(sub).width + 14;
@@ -2839,7 +2938,7 @@ function drawLabels() {
     const z = zones[k]; if (!z || (focus && focus !== k)) return;
     z.items.forEach(b => {
       const bw = b.w * s, sel = selected === b.it.activo;
-      if (!sel && (bw < 34 || !focus)) return;
+      if (!sel && (bw < (focus ? 34 : 18) || (!focus && (W < 900 || !b.owned)))) return;   // en compu, la vista completa también muestra el % del día
       const [bx, by] = toS(b.x + b.w / 2, b.top);
       if (bx < -20 || bx > W + 20) return;
       const up = b.it.cambio_dia >= 0, colC = up ? '#5dd39e' : '#ff7a7a';
@@ -4774,10 +4873,15 @@ window.MAREA = (() => {
   const m4 = v => '$' + (+v).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 4 });   // pago por título con 4 decimales
   const divRecientes = () => { const hoy = ymd(new Date()), lim = ymd(new Date(Date.now() - 6 * 864e5)); return DIVS().filter(d => !d.proximo && d.fecha <= hoy && d.fecha >= lim); };
   const divVisto = d => 'cm_div_' + String(raw && raw.nombre || '') + '_' + d.activo + '_' + d.fecha;
+  // resultado fiscal: paga ISR (retención); reembolso de capital: te devuelven parte de tu inversión, sin impuestos
+  const rfDe = d => d.resultado_fiscal != null ? +d.resultado_fiscal : +d.por_titulo || 0, rcDe = d => +d.reembolso_capital || 0;
   function explicaDiv(d) {
-    const neto1 = d.titulos ? d.neto / d.titulos : 0;
-    return `${titTxt(d.titulos)} títulos × ${m4(d.por_titulo)} por título = <b>${m2(d.bruto)}</b> brutos.${d.retencion_pct ? ` Tu casa de bolsa retuvo ${d.retencion_pct}% de impuestos (${m2(d.retencion)}), así que te llegaron <b>${m2(d.neto)}</b>, es decir ${m4(neto1)} por título.` : ` Te llegaron <b>${m2(d.neto)}</b>.`}`;
+    const rf = rfDe(d), rc = rcDe(d), t = titTxt(d.titulos), neto1 = d.titulos ? d.neto / d.titulos : 0, partes = [];
+    if (rf > 0) partes.push(`<b>Resultado fiscal:</b> ${t} títulos × ${m4(rf)} = ${m2(d.bruto_rf != null ? d.bruto_rf : d.bruto)}${d.retencion_pct ? `, menos ${d.retencion_pct}% de ISR que retuvo tu casa de bolsa (${m2(d.retencion)})` : ''}.`);
+    if (rc > 0) partes.push(`<b>Reembolso de capital:</b> ${t} títulos × ${m4(rc)} = ${m2(d.bruto_rc)}, sin impuestos: te devuelven parte de lo que invertiste.`);
+    return `${partes.join('<br>')}<br>Te ${d.proximo ? 'llegarían' : 'llegaron'} <b>${m2(d.neto)}</b>, es decir ${m4(neto1)} por título.`;
   }
+  const tipoDiv = d => { const rf = rfDe(d), rc = rcDe(d); return rf > 0 && rc > 0 ? `${m4(rf)} resultado fiscal + ${m4(rc)} reembolso` : rc > 0 ? `${m4(rc)} reembolso de capital` : `${m4(rf)} resultado fiscal${d.retencion_pct ? ` − ${d.retencion_pct}% ISR` : ''}`; };
   function divCard() {
     const D = DIVS(), pag = D.filter(d => !d.proximo), prox = D.filter(d => d.proximo).reverse(), rec = divRecientes();
     const año = ymd(new Date(Date.now() - 365 * 864e5)), U = pag.filter(d => d.fecha >= año);
@@ -4785,11 +4889,11 @@ window.MAREA = (() => {
       <p>${explicaDiv(d)}</p>${d.aprox ? '<p class="foot">Calculado con los títulos que tienes hoy: no hay un registro de tu Tesorería de antes del pago.</p>' : ''}
       <div class="mbtns"><button type="button" class="mbtn pri" data-fiesta="${D.indexOf(d)}">Celebrar en la ciudad</button></div></article>`).join('');
     if (!pag.length && !prox.length) return `<article class="mcard" style="--c:#ef7b6c"><h3>Dividendos y rentas que cobraste</h3><p class="foot">Cuando una FIBRA o un ETF que tienes pague, aquí verás cuánto te tocó por título, cuánto te retuvieron de impuestos y cuánto te llegó.</p></article>`;
-    const filas = [...prox.map(d => [`${esc(d.activo)} <small class="mpill" style="--c:#8ab4ff">Próximo</small>`, `${fechaL(d.fecha)} · ${titTxt(d.titulos)} títulos × ${m4(d.por_titulo)}${d.retencion_pct ? ` − ${d.retencion_pct}% de retención` : ''}`, `<span class="muted">${m2(d.neto)}</span>`, 'estimado']),
-      ...pag.map(d => [esc(d.activo), `${fechaL(d.fecha)} · ${titTxt(d.titulos)} títulos × ${m4(d.por_titulo)}${d.retencion_pct ? ` − ${d.retencion_pct}% de retención` : ''}${d.nota ? ' · ' + esc(d.nota) : ''}`, `<span class="pos">+${m2(d.neto)}</span>`, `bruto ${m2(d.bruto)}`])];
+    const filas = [...prox.map(d => [`${esc(d.activo)} <small class="mpill" style="--c:#8ab4ff">Próximo</small>`, `${fechaL(d.fecha)} · ${titTxt(d.titulos)} títulos · ${tipoDiv(d)}`, `<span class="muted">${m2(d.neto)}</span>`, 'estimado']),
+      ...pag.map(d => [esc(d.activo), `${fechaL(d.fecha)} · ${titTxt(d.titulos)} títulos · ${tipoDiv(d)}${d.nota ? ' · ' + esc(d.nota) : ''}`, `<span class="pos">+${m2(d.neto)}</span>`, `bruto ${m2(d.bruto)}`])];
     return hoyCard + resumen('#ef7b6c', 'FIBRAS', 'Dividendos y rentas que cobraste', 'Lo que te llegó en los últimos 12 meses',
       [['Te llegó', `<span class="pos">${m2(U.reduce((a, d) => a + d.neto, 0))}</span>`], ['Retenciones', m2(U.reduce((a, d) => a + d.retencion, 0))], ['Pagos', String(U.length)]], filas,
-      'Bruto = tus títulos el día del pago × lo que pagó cada título. La retención es el impuesto que tu casa de bolsa descuenta antes de depositarte; lo que te llega es el neto.');
+      'Una FIBRA puede pagar resultado fiscal (sale de sus utilidades y paga ISR: tu casa de bolsa retiene normalmente 30%), reembolso de capital (te devuelve parte de tu inversión y no paga impuestos) o las dos cosas. Lo que te llega es el neto.');
   }
   function fiesta(d) {
     const it = model.items.find(i => i.activo === d.activo);
