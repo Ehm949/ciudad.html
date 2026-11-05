@@ -2475,6 +2475,107 @@ function neonFor(it, k, slot, hT, dim) {
   best.cv = EdificiosNeon.toCanvas(EdificiosNeon.unlit(best));
   return (NBC[key] = best);
 }
+// ---------- edificios de renta fija: bóveda, torres de datos, pantallas con gráficas y ticker ----------
+const F3 = { A: '010101111101101', B: '110101110101110', C: '011100100100011', D: '110101101101110', E: '111100110100111', F: '111100110100100', G: '011100101101011', H: '101101111101101', I: '111010010010111', J: '001001001101010', K: '101101110101101', L: '100100100100111', M: '101111111101101', N: '110101101101101', O: '010101101101010', P: '110101110100100', Q: '010101101110011', R: '110101110101101', S: '011100010001110', T: '111010010010010', U: '101101101101111', V: '101101101101010', W: '101101111111101', X: '101101010101101', Y: '101101010010010', Z: '111001010100111', 0: '111101101101111', 1: '010110010010111', 2: '110001010100111', 3: '110001010001110', 4: '101101111001001', 5: '111100110001110', 6: '011100111101111', 7: '111001010010010', 8: '111101111101111', 9: '111101111001110', '.': '000000000000010', '-': '000000111000000', '+': '000010111010000', ':': '000010000010000', ' ': '000000000000000' };
+function txt3(g, s, x, y, c) { for (let k = 0; k < s.length; k++) { const gl = F3[s[k]] || F3[' ']; for (let j = 0; j < 5; j++) for (let i = 0; i < 3; i++) if (gl[j * 3 + i] === '1') px(g, x + k * 4 + i, y + j, 1, 1, c); } }
+function txt3v(g, s, x, y, c) { for (let k = 0; k < s.length; k++) txt3(g, s[k], x, y + k * 6, c); }
+const BN = { body: '#122230', body2: '#0e1b26', edge: '#34586a', hi: '#4a7a8c', shade: '#08121a', panel: '#061018', led: '#8dffbf', ledD: '#2f7a5a', ledH: 'rgba(125,255,191,.28)', cyan: '#9fe8ff' };
+const TAGN = { 'Cetes 28 días': 'CETES 28D', 'Cetes 91 días': 'CETES 91D', 'Cetes 182 días': 'CETES 182D', 'Cetes 364 días': 'CETES 364D', Udibonos: 'UDIBONOS', Bondia: 'BONDIA' };
+const BNC = {};
+function bonoFor(it, slot, hT) {
+  const key = [it.activo, Math.round(slot / 3), Math.round(hT / 8)].join('|');
+  if (BNC[key]) return BNC[key];
+  const a = it.activo.toLowerCase(), R = rng([...it.activo].reduce((s, ch) => s * 31 + ch.charCodeAt(0) | 0, 7));
+  const kind = a.includes('udi') ? 'graficas' : a.includes('bondia') ? 'ticker' : 'datos';
+  const label = (SHORTN[it.activo] || cleanUp(it.activo)).slice(0, 7);
+  const w = Math.max(16, Math.min(kind === 'boveda' ? 40 : 36, Math.round(slot - 3)));
+  const bodyH = Math.round(kind === 'boveda' ? Math.max(24, Math.min(46, hT * .6)) : Math.max(34, hT));
+  const roof = kind === 'boveda' ? 2 : 12, H = bodyH + roof, top = roof;
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = H; const g = cv.getContext('2d');
+  const lights = [], anims = [];
+  if (kind === 'boveda') {
+    // bóveda de acero: placas, remaches y una puerta redonda
+    px(g, 0, top, w, bodyH, '#56626a'); px(g, 0, top, w, 1, '#8c99a1'); px(g, 0, top, 1, bodyH, '#7a868e'); px(g, w - 2, top, 2, bodyH, '#3b454c');
+    for (let y = top + 6; y < H - 2; y += 7) px(g, 1, y, w - 3, 1, '#4a555c');
+    for (let y = top + 3; y < H - 2; y += 7) for (let x = 3; x < w - 3; x += 6) px(g, x, y, 1, 1, '#9aa7af');
+    const cx = Math.round(w / 2), cy = Math.round(top + bodyH * .52), r = Math.max(6, Math.min(Math.floor(w / 2) - 3, Math.floor(bodyH / 2) - 4));
+    for (let y = -r - 1; y <= r + 1; y++) for (let x = -r - 1; x <= r + 1; x++) { const d = Math.sqrt(x * x + y * y); if (d <= r + 1) px(g, cx + x, cy + y, 1, 1, d > r ? '#2c353b' : d > r - 2 ? '#b8c4cb' : d > r - 3 ? '#6b777e' : '#7f8b92'); }
+    for (let k = 0; k < 6; k++) { const an = k * Math.PI / 3 + .3; for (let q = 2; q < r - 3; q++) px(g, Math.round(cx + Math.cos(an) * q), Math.round(cy + Math.sin(an) * q), 1, 1, '#c9d3d9'); }
+    px(g, cx - 1, cy - 1, 3, 3, '#e3eaee'); px(g, cx + r - 1, cy - 2, 3, 4, '#9aa7af');
+    if (w >= 20) { px(g, cx - 8, top + 2, 17, 7, BN.panel); txt3(g, label.slice(0, 4), cx - Math.floor((Math.min(4, label.length) * 4 - 1) / 2), top + 3, BN.led); }
+  } else {
+    // torre de vidrio oscuro con marco
+    px(g, 0, top, w, bodyH, BN.body); px(g, 0, top, 1, bodyH, BN.hi); px(g, w - 2, top, 2, bodyH, BN.shade); px(g, 0, top, w, 1, BN.hi); px(g, 1, top + 1, w - 3, 1, BN.edge);
+    // azotea
+    const rw = Math.max(6, Math.round(w * .4)); px(g, 3, top - 3, rw, 3, BN.body2); px(g, 3, top - 3, rw, 1, BN.edge);
+    const ax = w - 5; px(g, ax, top - 11, 1, 11, '#3a4a5a'); lights.push({ x: ax, y: top - 11, c: [255, 45, 85], period: 34, phase: Math.floor(R() * 30), duty: .45 });
+    if (kind !== 'datos' && w >= 22) { // panel solar
+      const sx = 4 + rw - 1; px(g, sx + 1, top - 2, 1, 2, '#3a4a5a'); for (let i = 0; i < 7; i++) px(g, sx - 2 + i, top - 4 - (i > 3 ? 1 : 0), 1, 1, i % 2 ? '#3b6fd8' : '#5b8ef0'); px(g, sx - 2, top - 3, 7, 1, '#9fb8ff');
+    }
+    if (kind === 'ticker' && w >= 22) { // antena parabólica
+      px(g, 5, top - 6, 4, 1, '#cdd6dc'); px(g, 4, top - 5, 6, 1, '#aab5bc'); px(g, 6, top - 4, 1, 1, '#8b969d');
+    }
+    // letrero LED con el nombre
+    const lw = label.length * 4 - 1;
+    let y0 = top + 4;
+    if (lw + 6 <= w) { px(g, 2, y0, w - 5, 9, BN.panel); px(g, 2, y0, w - 5, 1, BN.edge); const tx = Math.round((w - 1 - lw) / 2); txt3(g, label, tx, y0 + 2, BN.led); y0 += 12; }
+    let vert = false;
+    if (!(lw + 6 <= w)) { vert = true; px(g, 2, y0, 7, label.length * 6 + 3, BN.panel); txt3v(g, label, 4, y0 + 2, BN.led); }
+    const x0 = vert ? 11 : 3, x1 = w - 3;
+    if (kind === 'graficas' && bodyH > 34) {
+      // dos pantallas: línea que sube y área verde
+      const ph = Math.max(10, Math.floor((H - y0 - 10) / 2) - 2);
+      [[y0 + 2, BN.cyan, false], [y0 + ph + 5, BN.led, true]].forEach(([py, col, area], n) => {
+        if (py + ph > H - 6) return;
+        px(g, x0, py, x1 - x0, ph, BN.panel); px(g, x0, py, x1 - x0, 1, BN.edge);
+        for (let gx = x0 + 3; gx < x1; gx += 4) px(g, gx, py + 1, 1, ph - 1, 'rgba(95,180,200,.12)');
+        let v = ph * .75; const pts = [];
+        for (let x = x0 + 1; x < x1 - 1; x++) { v += (R() - .62) * 2.2; v = Math.max(2, Math.min(ph - 2, v)); pts.push([x, Math.round(py + v)]); }
+        pts.forEach(([x, y], i) => { if (area) px(g, x, y + 1, 1, py + ph - y - 1, 'rgba(93,211,158,.25)'); px(g, x, y, 1, 1, col); if (i && Math.abs(pts[i - 1][1] - y) > 1) px(g, x, Math.min(y, pts[i - 1][1]), 1, Math.abs(pts[i - 1][1] - y), col); });
+        const e = pts[pts.length - 1]; lights.push({ x: e[0], y: e[1], c: area ? [141, 255, 191] : [159, 232, 255], period: 22, phase: n * 9, duty: .6 });
+      });
+    } else {
+      // renglones de datos y columnas de código
+      const cols = kind === 'datos' ? Math.max(1, Math.floor((w - 6) / 8)) : 0;
+      for (let y = y0 + 1; y < H - (kind === 'ticker' ? 14 : 5); y += 3) {
+        let x = x0 + Math.floor(R() * 3);
+        while (x < x1 - 1) { const l = 1 + Math.floor(R() * 4), r = R(); if (r < .5 && x + l < x1) px(g, x, y, l, 1, r < .12 ? BN.led : r < .3 ? '#4fbf8e' : '#2a5e50'); x += l + 1 + Math.floor(R() * 4); }
+      }
+      if (cols) for (let c = 0; c < cols; c++) { const cx = x0 + 2 + c * 8; px(g, cx - 1, y0, 5, H - y0 - 4, BN.panel); anims.push({ t: 'code', x: cx, y: y0 + 1, h: H - y0 - 6, seed: R() * 100 }); }
+      if (kind === 'datos' && w >= 14) px(g, w - 4, y0, 1, H - y0 - 6, R() < .5 ? '#e2c04a' : BN.led);
+    }
+    if (kind === 'ticker') anims.push({ t: 'ticker', x: 1, y: H - 12, w: w - 3, seed: R() * 1000 });
+    // puerta
+    px(g, Math.round(w / 2) - 3, H - 5, 6, 5, BN.panel); px(g, Math.round(w / 2) - 3, H - 5, 6, 1, BN.edge); px(g, Math.round(w / 2), H - 4, 1, 4, '#1d3a48');
+  }
+  const bd = { cv, w, h: H, top, bodyH, foot: { x0: 0, x1: w - 1 }, stacks: [], lights, anims, sign: null, tag: TAGN[it.activo] || label };
+  return (BNC[key] = bd);
+}
+const cleanUp = s => String(s || '').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Z0-9 .\-]/g, '').trim();
+function drawBonoAnims(g) {
+  ORDER.forEach(k => { const z = zones[k]; if (!z || k !== 'RENTA_FIJA') return; z.items.forEach(b => { if (!b.bd || !b.bd.anims) return; b.bd.anims.forEach(A => {
+    const X = b.dx + A.x, Y = b.dy + A.y;
+    if (A.t === 'code') {   // lluvia de dígitos: cada gota baja, deja una estela que se apaga y entra otra desde arriba
+      const n = Math.floor(A.h / 6), trail = 5, cyc = n + trail + 3, sp = 2.4 + (A.seed % 1.3);
+      for (let d = 0; d < 2; d++) {
+        const hp = (T * sp + A.seed * 3 + d * cyc / 2) % cyc;
+        for (let i = 0; i < n; i++) {
+          const dist = hp - i; if (dist < 0 || dist > trail) continue;
+          const ch = String(Math.floor(hash2(Math.floor(T * 3 + i * 7 + d * 13), Math.floor(A.seed * 10 + i)) * 10));
+          const col = dist < 1 ? '#e6fff0' : dist < 2 ? '#8dffbf' : dist < 3.5 ? '#3fbf8a' : '#1f6b4e';
+          txt3(g, ch, X, Y + i * 6, col);
+        }
+      }
+    } else if (A.t === 'ticker') {   // cinta de cotizaciones que corre
+      px(g, X, Y, A.w, 11, '#040b10'); px(g, X, Y, A.w, 1, '#1d3a48');
+      g.save(); g.beginPath(); g.rect(X, Y, A.w, 11); g.clip();
+      const items = ['8.76+', '25.13-', '11.02+', '99.81+', '4.27-', '17.19+'], step = 30, sh = (T * 9 + A.seed) % (items.length * step);
+      items.concat(items).forEach((s, i) => { const xx = Math.round(X + i * step - sh), up = s.endsWith('+'), col = up ? '#7dffb0' : '#ff6b6b';
+        txt3(g, s.slice(0, -1), xx, Y + 3, col); const ax = xx + (s.length - 1) * 4 + 1; if (up) { px(g, ax + 1, Y + 4, 1, 1, col); px(g, ax, Y + 5, 3, 1, col); px(g, ax - 1, Y + 6, 5, 1, col); } else { px(g, ax - 1, Y + 4, 5, 1, col); px(g, ax, Y + 5, 3, 1, col); px(g, ax + 1, Y + 6, 1, 1, col); } });
+      g.restore();
+    }
+  }); }); });
+}
 let blink = [], healT = 1.2, lastHeal = null;
 // ---------- flamas de petrolera en las chimeneas de las fábricas ----------
 const FLAMA = true;
@@ -2538,7 +2639,7 @@ function layout() {
         const b = { it, x: bx, w: slot, owned: it.valor > 0, kind: kindOf(k, it), top: SHORE - 20 };
         if (!b.owned) { b.top = lot(bx + 1, slot - 2).top; z.top = Math.min(z.top, b.top); z.items.push(b); bx += slot; return; }
         const hT = k === 'ACCIONES' ? 46 + 104 * hN : k === 'FIBRAS' ? 46 + 130 * hN : k === 'RENTA_FIJA' ? 30 + 70 * hN : 20 + 18 * Math.min(1, hN * 2);
-        const bd = neonFor(it, k, slot, hT, k !== 'RENTA_FIJA' && it.cambio_dia < 0);
+        const bd = k === 'RENTA_FIJA' ? bonoFor(it, slot, hT) : neonFor(it, k, slot, hT, k !== 'RENTA_FIJA' && it.cambio_dia < 0);
         b.bd = bd; b.dx = Math.round(Math.max(x + 1 - bd.foot.x0, Math.min(x + zw - 2 - bd.foot.x1, bx + slot / 2 - (bd.foot.x0 + bd.foot.x1) / 2))); b.dy = SHORE - bd.h;   // sin salirse de su barrio
         b.top = b.dy + Math.min(bd.top - 10, ...bd.stacks.map(p => p.y));
         if (k === 'RENTA_FIJA' && j === 0) b.craneAt = true;
@@ -2725,6 +2826,7 @@ function composeWorld() {
     g.globalAlpha = .35; px(g, L.x - 1, L.y, 3, 1, c); px(g, L.x, L.y - 1, 1, 3, c);
     g.globalAlpha = 1; px(g, L.x, L.y, 1, 1, '#ffe0e8');
   });
+  drawBonoAnims(g);
   if (FLAMA) emitters.forEach((e, i) => drawFlama(g, e, i));
   else emitters.forEach((e, i) => { px(g, e.x - 1, e.y - 2, 2, 1, Math.sin(T * 3 + i * 1.7) > 0 ? '#ff2d55' : '#5a1020'); if (e.up) px(g, e.x - 1.5, e.y, 3, 1, `rgba(255,150,70,${.5 + .5 * Math.sin(T * 11 + i)})`); });
   // los barrios con lluvia se oscurecen
@@ -2982,7 +3084,22 @@ function drawLabels() {
         text(l3, x - cw / 2 + 12, y + 53, 12, '#9ba6c6', 'left', 600);
         placed.push([x - cw / 2, y, cw, 62]); return;
       }
-      if (k === 'RENTA_FIJA' && b.owned) return;   // en obras públicas no hay cambio del día que mostrar
+      if (k === 'RENTA_FIJA' && b.owned) {   // en obras públicas no hay cambio del día: va su etiqueta con el nombre
+        const t = b.bd && b.bd.tag || b.it.activo, fz = focus ? 12 : 10.5;
+        ctx.font = `800 ${fz}px "JetBrains Mono", ui-monospace, Menlo, monospace`;
+        const tw = ctx.measureText(t).width + 14, th = fz + 9, x = Math.max(tw / 2 + 4, Math.min(W - tw / 2 - 4, bx));
+        let y = Math.max(64, by - 10 - th);
+        for (let n = 0; n < 4 && !free(x - tw / 2, y, tw, th + 6); n++) y -= th + 6;
+        if (!free(x - tw / 2, y, tw, th + 6)) return;
+        placed.push([x - tw / 2, y, tw, th + 6]);
+        ctx.strokeStyle = 'rgba(79,195,176,.55)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.round(bx) + .5, y + th + 5); ctx.lineTo(Math.round(bx) + .5, by - 2); ctx.stroke();
+        ctx.fillStyle = 'rgba(6,18,24,.92)'; rr(x - tw / 2, y, tw, th, 4); ctx.fill();
+        ctx.strokeStyle = '#4fc3b0'; ctx.lineWidth = 1.5; rr(x - tw / 2, y, tw, th, 4); ctx.stroke();
+        ctx.fillStyle = '#4fc3b0'; ctx.beginPath(); ctx.moveTo(bx - 4, y + th); ctx.lineTo(bx + 4, y + th); ctx.lineTo(bx, y + th + 5); ctx.fill();
+        ctx.shadowColor = 'rgba(125,255,191,.6)'; ctx.shadowBlur = 6;
+        ctx.fillStyle = '#c8ffe0'; ctx.textAlign = 'center'; ctx.fillText(t, x, y + th - 5.5); ctx.shadowBlur = 0;
+        return;
+      }
       const t1 = b.owned ? (up ? '▲' : '▼') + Math.abs(b.it.cambio_dia).toFixed(1) + '%' : b.it.activo + (b.it.objetivo > 0 ? ' · por construir' : ' · lote vacío');
       ctx.font = '700 10.5px Figtree, system-ui, sans-serif';
       const w1 = ctx.measureText(t1).width + 10, x = Math.max(w1 / 2 + 4, Math.min(W - w1 / 2 - 4, bx)), y = Math.max(64, by - 4);
