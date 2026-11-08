@@ -874,11 +874,12 @@ window.SP={"torres": {"src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAi4A
     modules: 'Módulos', billboard: 'Pantalla', lowrise: 'Bajo dorado', tiered: 'Pagoda', needle: 'Aguja', factory: 'Fábrica',
   };
   // Cada forma devuelve { w, h, secs:[{x,y,w,h}] (y desde arriba), cuts:[], extras }
+  const mw = (o, min) => (o && o.maxW) ? Math.max(min, Math.floor(o.maxW)) : 9999;   // ancho máximo pedido, sin bajar del mínimo de cada forma
   const SHAPES = {
-    tower(r, hm) { const w = r.int(22, 38), h = Math.round(r.int(80, 140) * hm); return { w, h, secs: [{ x: 0, y: 0, w, h }] }; },
-    needle(r, hm) { const w = r.int(14, 20), h = Math.round(r.int(95, 150) * hm); return { w, h, secs: [{ x: 0, y: 0, w, h }], mast: r.int(14, 26) }; },
-    stepped(r, hm) {
-      const n = r.int(2, 3), baseW = r.int(38, 54), align = r.pick(['c', 'c', 'l', 'r']);
+    tower(r, hm, o) { const w = Math.min(r.int(22, 38), mw(o, 14)), h = Math.round(r.int(80, 140) * hm); return { w, h, secs: [{ x: 0, y: 0, w, h }] }; },
+    needle(r, hm, o) { const w = Math.min(r.int(14, 20), mw(o, 12)), h = Math.round(r.int(95, 150) * hm); return { w, h, secs: [{ x: 0, y: 0, w, h }], mast: r.int(14, 26) }; },
+    stepped(r, hm, o) {
+      const n = r.int(2, 3), baseW = Math.min(r.int(38, 54), mw(o, 22)), align = r.pick(['c', 'c', 'l', 'r']);
       const H = Math.round(r.int(85, 150) * hm);
       const secs = []; let w = baseW, y = H;
       const shares = n === 2 ? [0.45, 0.55] : [0.35, 0.33, 0.32];
@@ -886,7 +887,7 @@ window.SP={"torres": {"src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAi4A
         const sh = i === n - 1 ? y : Math.round(H * shares[i]);
         const x = align === 'c' ? Math.round((baseW - w) / 2) : align === 'l' ? 0 : baseW - w;
         secs.push({ x, y: y - sh, w, h: sh }); y -= sh;
-        w -= r.int(3, 6) * 2;
+        w = Math.max(8, w - r.int(3, 6) * 2);
       }
       return { w: baseW, h: H, secs };
     },
@@ -895,37 +896,37 @@ window.SP={"torres": {"src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAi4A
       const h1 = Math.round(r.int(100, 150) * hm), h2 = h1 + r.int(-8, 8), H = Math.max(h1, h2);
       return { w: W, h: H, secs: [{ x: 0, y: H - ph, w: W, h: ph }, { x: 0, y: H - h1, w: tw, h: h1 - ph }, { x: tw + gap, y: H - h2, w: tw, h: h2 - ph }], twin: { tw, gap, h1, h2 }, cuts: [{ sec: 1, l: r.int(5, 9) }, { sec: 2, r: r.int(5, 9) }] };
     },
-    chamfer(r, hm) {
-      const w = r.int(26, 38), h = Math.round(r.int(95, 155) * hm), side = r.pick(['l', 'r', 'b', 'b']), d = r.int(6, 11);
+    chamfer(r, hm, o) {
+      const w = Math.min(r.int(26, 38), mw(o, 16)), h = Math.round(r.int(95, 155) * hm), side = r.pick(['l', 'r', 'b', 'b']), d = r.int(6, 11);
       const secs = [];
-      const skirt = r.chance(0.5);
+      const skirt = r.chance(0.5) && w + 10 <= mw(o, 999);
       if (skirt) { const sw = w + r.int(3, 5) * 2, shh = r.int(18, 34); secs.push({ x: 0, y: h - shh, w: sw, h: shh }); secs.push({ x: (sw - w) / 2, y: 0, w, h: h - shh }); return { w: sw, h, secs, cuts: [{ sec: 1, l: side !== 'r' ? d : 0, r: side !== 'l' ? d : 0 }, { sec: 0, l: 3, r: 3 }] }; }
       secs.push({ x: 0, y: 0, w, h });
       return { w, h, secs, cuts: [{ sec: 0, l: side !== 'r' ? d : 0, r: side !== 'l' ? d : 0 }] };
     },
-    capsule(r, hm) {
-      const w = r.int(22, 32), seg = r.int(16, 24), n = Math.max(3, Math.round(r.int(90, 140) * hm / (seg + 2)));
+    capsule(r, hm, o) {
+      const w = Math.min(r.int(22, 32), mw(o, 14)), seg = r.int(16, 24), n = Math.max(3, Math.round(r.int(90, 140) * hm / (seg + 2)));
       const H = n * (seg + 2); const secs = [];
       for (let i = 0; i < n; i++) secs.push({ x: 0, y: i * (seg + 2), w, h: seg + 2, capsule: true });
       return { w, h: H, secs, capsule: { seg, n } };
     },
-    modules(r, hm) { const w = r.int(26, 38), h = Math.round(r.int(85, 135) * hm); return { w, h, secs: [{ x: 0, y: 0, w, h }], notch: r.int(9, 14) }; },
+    modules(r, hm, o) { const w = Math.min(r.int(26, 38), mw(o, 16)), h = Math.round(r.int(85, 135) * hm); return { w, h, secs: [{ x: 0, y: 0, w, h }], notch: r.int(9, 14) }; },
     billboard(r, hm) {
       const w = r.int(32, 44), h = Math.round(r.int(95, 140) * hm), sh = Math.round(w * r.int(80, 105) / 100);
       return { w, h, secs: [{ x: 0, y: 0, w, h }], screen: { x: 1, y: 3, w: w - 2, h: sh } };
     },
-    lowrise(r, hm) { const w = r.int(18, 32), h = Math.round(r.int(26, 46) * Math.sqrt(hm)); return { w, h, secs: [{ x: 0, y: 0, w, h }], crown: true }; },
+    lowrise(r, hm, o) { const w = Math.min(r.int(18, 32), mw(o, 12)), h = Math.round(r.int(26, 46) * Math.sqrt(hm)); return { w, h, secs: [{ x: 0, y: 0, w, h }], crown: true }; },
     // fábrica: nave ancha con techo de dientes y chimeneas + torre de oficinas donde va el letrero del ticker
-    factory(r, hm) {
-      const hallW = r.int(30, 46), hallH = Math.max(20, Math.round(r.int(24, 34) * Math.sqrt(hm)));
-      const offW = r.int(13, 19), offH = Math.max(hallH + 16, Math.round(hallH + r.int(28, 60) * hm * 0.8));
+    factory(r, hm, o) {
+      const M = mw(o, 26), offW = Math.min(r.int(13, 19), Math.max(11, Math.round(M * .38))), hallW = Math.max(16, Math.min(r.int(30, 46), M - offW + 3)), hallH = Math.max(20, Math.round(r.int(24, 34) * Math.sqrt(hm)));
+      const offW_ = offW, offH = Math.max(hallH + 16, Math.round(hallH + r.int(28, 60) * hm * 0.8));
       const left = r.chance(0.5), W = hallW + offW - 3, H = offH;
       const hall = { x: left ? offW - 3 : 0, y: H - hallH, w: hallW, h: hallH };
       const office = { x: left ? 0 : hallW - 3, y: H - offH, w: offW, h: offH };
       return { w: W, h: H, secs: [office, hall], factory: { hall: 1, stacks: Math.max(1, Math.min(3, Math.round(hallW / 16))) } };
     },
-    tiered(r, hm) {
-      const n = r.int(4, 6), baseW = r.int(34, 46), th = r.int(7, 10); const H = n * th + r.int(4, 10);
+    tiered(r, hm, o) {
+      const n = r.int(4, 6), baseW = Math.min(r.int(34, 46), mw(o, 22)), th = r.int(7, 10); const H = n * th + r.int(4, 10);
       const secs = []; let w = baseW, y = H;
       for (let i = 0; i < n; i++) { const hh = i === 0 ? th + (H - n * th) : th; secs.push({ x: Math.round((baseW - w) / 2), y: y - hh, w, h: hh, tier: true }); y -= hh; w = Math.max(10, w - r.int(2, 4) * 2); }
       return { w: baseW, h: H, secs, tiered: true };
@@ -2461,15 +2462,15 @@ const SHORTN = { 'Cetes 28 días': 'C28', 'Cetes 91 días': 'C91', 'Cetes 182 d�
 const BASEH = { factory: 72, lowrise: 36, tiered: 52, needle: 122, tower: 110, stepped: 117, twin: 125, chamfer: 125, capsule: 115, modules: 110, billboard: 117 };
 const NBC = {};
 function neonFor(it, k, slot, hT, dim) {
-  const key = [it.activo, Math.round(slot / 3), Math.round(hT / 8), dim ? 1 : 0].join('|');
+  const key = [k, it.activo, Math.floor(slot), Math.round(hT / 8), dim ? 1 : 0].join('|');
   if (NBC[key]) return NBC[key];
   const cfg = NEON[k], label = SHORTN[it.activo] || it.activo;
   let best = null, bs = 1e9;
   for (let i = 0; i < 10; i++) {
     const type = cfg.types[i % cfg.types.length];
-    const bd = EdificiosNeon.building(it.activo + '#' + i, { type, label, hMul: Math.max(.3, hT / BASEH[type]), themes: cfg.themes, signTheme: cfg.sign, dim: dim ? .55 : 0, signFit: true });
+    const bd = EdificiosNeon.building(it.activo + '#' + i, { type, label, hMul: Math.max(.3, hT / BASEH[type]), themes: cfg.themes, signTheme: cfg.sign, dim: dim ? .55 : 0, signFit: true, maxW: slot - 2 });
     const fw = bd.foot.x1 - bd.foot.x0 + 1, sg = bd.sign || { mode: 'face', w: 0 };
-    const sc = (sg.mode === 'top' && sg.w > Math.min(fw, slot) ? 40 : 0) + Math.max(0, fw - slot * 1.1) * 4 + Math.max(0, slot * .6 - fw) + Math.abs(bd.bodyH - hT) * .4 + Math.max(0, bd.w - slot * 1.7);
+    const sc = (sg.mode === 'top' && sg.w > Math.min(fw, slot) ? 40 : 0) + Math.max(0, fw - (slot - 1)) * 60 + Math.max(0, slot * .6 - fw) + Math.abs(bd.bodyH - hT) * .4 + Math.max(0, bd.w - slot * 1.7);
     if (sc < bs) { bs = sc; best = bd; }
   }
   best.cv = EdificiosNeon.toCanvas(EdificiosNeon.unlit(best));
@@ -2483,7 +2484,7 @@ const BN = { body: '#122230', body2: '#0e1b26', edge: '#34586a', hi: '#4a7a8c', 
 const TAGN = { 'Cetes 28 días': 'CETES 28D', 'Cetes 91 días': 'CETES 91D', 'Cetes 182 días': 'CETES 182D', 'Cetes 364 días': 'CETES 364D', Udibonos: 'UDIBONOS', Bondia: 'BONDIA' };
 const BNC = {};
 function bonoFor(it, slot, hT) {
-  const key = [it.activo, Math.round(slot / 3), Math.round(hT / 8)].join('|');
+  const key = [it.activo, Math.floor(slot), Math.round(hT / 8)].join('|');
   if (BNC[key]) return BNC[key];
   const a = it.activo.toLowerCase(), R = rng([...it.activo].reduce((s, ch) => s * 31 + ch.charCodeAt(0) | 0, 7));
   const kind = a.includes('udi') ? 'graficas' : a.includes('bondia') ? 'ticker' : 'datos';
@@ -2532,7 +2533,7 @@ function bonoFor(it, slot, hT) {
         let v = ph * .75; const pts = [];
         for (let x = x0 + 1; x < x1 - 1; x++) { v += (R() - .62) * 2.2; v = Math.max(2, Math.min(ph - 2, v)); pts.push([x, Math.round(py + v)]); }
         pts.forEach(([x, y], i) => { if (area) px(g, x, y + 1, 1, py + ph - y - 1, 'rgba(93,211,158,.25)'); px(g, x, y, 1, 1, col); if (i && Math.abs(pts[i - 1][1] - y) > 1) px(g, x, Math.min(y, pts[i - 1][1]), 1, Math.abs(pts[i - 1][1] - y), col); });
-        const e = pts[pts.length - 1]; lights.push({ x: e[0], y: e[1], c: area ? [141, 255, 191] : [159, 232, 255], period: 22, phase: n * 9, duty: .6 });
+        const e = pts[pts.length - 1]; if (e) lights.push({ x: e[0], y: e[1], c: area ? [141, 255, 191] : [159, 232, 255], period: 22, phase: n * 9, duty: .6 });
       });
     } else {
       // renglones de datos y columnas de código
@@ -2787,8 +2788,18 @@ function layout() {
   const dayPct = V.total - V.hoy > 0 ? V.hoy / (V.total - V.hoy) * 100 : 0;
   stormAll = dayPct <= -num(J.umbral_tormenta_pct, 2);
   zones = {}; let x = 0;
+  const MINB = { ACCIONES: 29, FIBRAS: 17, RENTA_FIJA: 19, BITCOIN: 14 };
+  const nB = k => { const c = V.classes[k]; const o = c.items.filter(i => i.valor > 0).length + c.items.filter(i => !(i.valor > 0) && i.objetivo > 0 && !i.retirado).length; return o || Math.min(4, c.items.filter(i => !i.retirado).length); };
+  const ZW = {}; ORDER.forEach(k => ZW[k] = LW * Math.max(V.classes[k].pct, MINP) / tot);
+  for (let p = 0; p < 4; p++) {   // si a un barrio no le caben sus edificios, se le da más ancho y se les quita a los demás
+    const need = {}; ORDER.forEach(k => need[k] = nB(k) * MINB[k] + 8);
+    const fixed = ORDER.filter(k => ZW[k] < need[k]); if (!fixed.length) break;
+    const fw = fixed.reduce((a, k) => a + need[k], 0), free = ORDER.filter(k => !fixed.includes(k)), fs = free.reduce((a, k) => a + ZW[k], 0) || 1;
+    fixed.forEach(k => ZW[k] = need[k]); free.forEach(k => ZW[k] = Math.max(need[k], (LW - fw) * ZW[k] / fs));
+    const sum = ORDER.reduce((a, k) => a + ZW[k], 0); if (sum > LW) ORDER.forEach(k => ZW[k] *= LW / sum);
+  }
   ORDER.forEach(k => {
-    const c = V.classes[k], zw = LW * Math.max(c.pct, MINP) / tot;
+    const c = V.classes[k], zw = ZW[k];
     const z = { k, x, w: zw, items: [], top: SHORE, flash: 0, bolt: 2 + R() * 4,
       down: k !== 'RENTA_FIJA' && c.hoy < 0, storm: stormAll || !!(EV && EV.storms && EV.storms.find(s => s.k === k)) };
     const tg = wb.createLinearGradient(0, 30, 0, SHORE); tg.addColorStop(0, CLS[k].color + '00'); tg.addColorStop(1, CLS[k].color + '1c');
@@ -2806,17 +2817,40 @@ function layout() {
         const small = sl.map(v => v < minW), fixed = small.filter(Boolean).length * minW, rest = wt.reduce((a, v, i) => a + (small[i] ? 0 : v), 0) || 1;
         sl = wt.map((v, i) => small[i] ? minW : (inner - fixed) * v / rest);
       }
-      let bx = x + 3;
+      let bx = x + 3; const row = [];
       list.forEach((it, j) => {
-        const slot = sl[j], hN = Math.sqrt(Math.max(0, it.valor) / gmax), up = it.cambio_dia > 0;
-        const b = { it, x: bx, w: slot, owned: it.valor > 0, kind: kindOf(k, it), top: SHORE - 20 };
-        if (!b.owned) { b.top = lot(bx + 1, slot - 2).top; z.top = Math.min(z.top, b.top); z.items.push(b); bx += slot; return; }
-        const hT = k === 'ACCIONES' ? 46 + 104 * hN : k === 'FIBRAS' ? 46 + 130 * hN : k === 'RENTA_FIJA' ? 30 + 70 * hN : 20 + 18 * Math.min(1, hN * 2);
-        const bd = k === 'RENTA_FIJA' ? bonoFor(it, slot, hT) : neonFor(it, k, slot, hT, k !== 'RENTA_FIJA' && it.cambio_dia < 0);
-        b.bd = bd; b.dx = Math.round(Math.max(x + 1 - bd.foot.x0, Math.min(x + zw - 2 - bd.foot.x1, bx + slot / 2 - (bd.foot.x0 + bd.foot.x1) / 2))); b.dy = SHORE - bd.h;   // sin salirse de su barrio
+        const slot = sl[j], hN = Math.sqrt(Math.max(0, it.valor) / gmax);
+        const b = { it, x: bx, w: slot, owned: it.valor > 0, kind: kindOf(k, it), top: SHORE - 20, cx: bx + slot / 2 };
+        if (!b.owned) b.fw = Math.max(5, Math.round(slot - 2));
+        else {
+          const hT = k === 'ACCIONES' ? 46 + 104 * hN : k === 'FIBRAS' ? 46 + 130 * hN : k === 'RENTA_FIJA' ? 30 + 70 * hN : 20 + 18 * Math.min(1, hN * 2);
+          b.hT = hT; b.mk = sl2 => k === 'RENTA_FIJA' ? bonoFor(it, sl2, hT) : neonFor(it, k, sl2, hT, k !== 'RENTA_FIJA' && it.cambio_dia < 0);
+          b.bd = b.mk(slot); b.fw = b.bd.foot.x1 - b.bd.foot.x0 + 1;
+        }
+        row.push(b); bx += slot;
+      });
+      // acomodo sin encimar: cada edificio junto a su lugar, empujando a los vecinos si hace falta
+      const L0 = Math.ceil(x + 1), R0 = Math.floor(x + zw - 2), G = 1;
+      for (let p = 0; p < 5; p++) {   // si no caben, los más anchos se hacen más angostos hasta que quepan
+        const space = R0 - L0 + 1, total = row.reduce((a, b) => a + b.fw, 0) + G * (row.length - 1);
+        if (total <= space) break;
+        const flex = row.filter(b => b.owned && b.fw > MINB[k] - 3), fixed = total - flex.reduce((a, b) => a + b.fw, 0);
+        if (!flex.length) break;
+        const f = Math.max(.5, (space - fixed) / flex.reduce((a, b) => a + b.fw, 0));
+        flex.forEach(b => { b.bd = b.mk(Math.max(MINB[k] - 5, Math.floor(b.fw * f) - 1) + 2); b.fw = b.bd.foot.x1 - b.bd.foot.x0 + 1; });
+      }
+      const pack = () => {
+        let end = L0; row.forEach(b => { b.l = Math.max(Math.round(b.cx - b.fw / 2), end); end = b.l + b.fw + G; });
+        let lim = R0 + 1; for (let i = row.length - 1; i >= 0; i--) { const b = row[i]; if (b.l + b.fw > lim) b.l = lim - b.fw; lim = b.l - G; }
+        return row.length ? row[0].l >= L0 : true;
+      };
+      if (!pack()) { row.forEach(b => { if (!b.owned) b.fw = 4; }); pack(); }
+      row.forEach((b, j) => {
+        if (!b.owned) { b.x = b.l; b.w = b.fw; b.top = lot(b.l, b.fw).top; z.top = Math.min(z.top, b.top); z.items.push(b); return; }
+        const bd = b.bd; b.dx = b.l - bd.foot.x0; b.dy = SHORE - bd.h; b.x = b.l; b.w = b.fw;
         b.top = b.dy + Math.min(bd.top - 10, ...bd.stacks.map(p => p.y));
         if (k === 'RENTA_FIJA' && j === 0) b.craneAt = true;
-        z.top = Math.min(z.top, b.top); z.items.push(b); bx += slot;
+        z.top = Math.min(z.top, b.top); z.items.push(b);
       });
     }
     z.items.filter(b => b.bd).sort((p, q) => q.bd.bodyH - p.bd.bodyH).forEach(b => {
