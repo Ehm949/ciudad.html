@@ -2476,7 +2476,7 @@ function neonFor(it, k, slot, hT, dim) {
   return (NBC[key] = best);
 }
 // ---------- edificios de renta fija: bóveda, torres de datos, pantallas con gráficas y ticker ----------
-const F3 = { A: '010101111101101', B: '110101110101110', C: '011100100100011', D: '110101101101110', E: '111100110100111', F: '111100110100100', G: '011100101101011', H: '101101111101101', I: '111010010010111', J: '001001001101010', K: '101101110101101', L: '100100100100111', M: '101111111101101', N: '110101101101101', O: '010101101101010', P: '110101110100100', Q: '010101101110011', R: '110101110101101', S: '011100010001110', T: '111010010010010', U: '101101101101111', V: '101101101101010', W: '101101111111101', X: '101101010101101', Y: '101101010010010', Z: '111001010100111', 0: '111101101101111', 1: '010110010010111', 2: '110001010100111', 3: '110001010001110', 4: '101101111001001', 5: '111100110001110', 6: '011100111101111', 7: '111001010010010', 8: '111101111101111', 9: '111101111001110', '.': '000000000000010', '-': '000000111000000', '+': '000010111010000', ':': '000010000010000', ' ': '000000000000000' };
+const F3 = { A: '010101111101101', B: '110101110101110', C: '011100100100011', D: '110101101101110', E: '111100110100111', F: '111100110100100', G: '011100101101011', H: '101101111101101', I: '111010010010111', J: '001001001101010', K: '101101110101101', L: '100100100100111', M: '101111111101101', N: '110101101101101', O: '010101101101010', P: '110101110100100', Q: '010101101110011', R: '110101110101101', S: '011100010001110', T: '111010010010010', U: '101101101101111', V: '101101101101010', W: '101101101111101', X: '101101010101101', Y: '101101010010010', Z: '111001010100111', 0: '111101101101111', 1: '010110010010111', 2: '110001010100111', 3: '110001010001110', 4: '101101111001001', 5: '111100110001110', 6: '011100111101111', 7: '111001010010010', 8: '111101111101111', 9: '111101111001110', '.': '000000000000010', '-': '000000111000000', '+': '000010111010000', ':': '000010000010000', ' ': '000000000000000' };
 function txt3(g, s, x, y, c) { for (let k = 0; k < s.length; k++) { const gl = F3[s[k]] || F3[' ']; for (let j = 0; j < 5; j++) for (let i = 0; i < 3; i++) if (gl[j * 3 + i] === '1') px(g, x + k * 4 + i, y + j, 1, 1, c); } }
 function txt3v(g, s, x, y, c) { for (let k = 0; k < s.length; k++) txt3(g, s[k], x, y + k * 6, c); }
 const BN = { body: '#122230', body2: '#0e1b26', edge: '#34586a', hi: '#4a7a8c', shade: '#08121a', panel: '#061018', led: '#8dffbf', ledD: '#2f7a5a', ledH: 'rgba(125,255,191,.28)', cyan: '#9fe8ff' };
@@ -2576,6 +2576,179 @@ function drawBonoAnims(g) {
     }
   }); }); });
 }
+// ---------- fábricas: divisa sobre cada flama y pantallita con las banderas de dónde invierte ----------
+const DIV = {
+  '$': ['..#..', '.####', '#.#..', '.###.', '..#.#', '####.', '..#..'],
+  '€': ['..###', '.#...', '####.', '.#...', '####.', '.#...', '..###'],
+  '£': ['..##.', '.#..#', '.#...', '###..', '.#...', '.#...', '#####'],
+  '¥': ['#...#', '.#.#.', '..#..', '#####', '..#..', '#####', '..#..'],
+  '₹': ['#####', '...#.', '#####', '..#..', '##...', '..#..', '...##'],
+  '₩': ['#...#', '#...#', '#####', '#.#.#', '#####', '.#.#.', '.#.#.']
+};
+const GEO = {
+  US: { f: ['US'], c: ['$'], tk: [['APPLE', 'tel'], ['MICROSOFT', 'lap'], ['NVIDIA', 'chip'], ['AMAZON', 'caja'], ['GOOGLE', 'lupa'], ['META', 'chat'], ['TESLA', 'auto'], ['NETFLIX', 'tv'], ['COCA-COLA', 'lata'], ['MCDONALDS', 'burger'], ['DISNEY', 'cine'], ['NIKE', 'tenis'], ['VISA', 'tarjeta'], ['WALMART', 'carrito'], ['STARBUCKS', 'cafe']] },
+  DEV: { f: ['JP', 'GB', 'CA', 'FR', 'CH', 'DE', 'AU', 'KR', 'NL', 'SE', 'DK', 'IT', 'ES'], c: ['¥', '£', '€', '$', '₩'] },
+  EM: { f: ['CN', 'IN', 'TW', 'BR', 'SA', 'ZA', 'MX', 'TH', 'ID', 'MY', 'AE', 'TR', 'CL'], c: ['¥', '₹', '$'] },
+  XUS: { f: ['JP', 'GB', 'CN', 'CA', 'FR', 'IN', 'DE', 'TW', 'CH', 'AU', 'KR', 'BR'], c: ['¥', '£', '€', '₹'] },
+  WORLD: { f: ['US', 'JP', 'GB', 'CN', 'CA', 'FR', 'DE', 'IN', 'CH', 'AU'], c: ['$', '¥', '£', '€'] },
+  EU: { f: ['GB', 'FR', 'DE', 'CH', 'NL', 'SE', 'DK', 'IT', 'ES'], c: ['€', '£'] },
+  MX: { f: ['MX'], c: ['$'] }, JP: { f: ['JP'], c: ['¥'] }, CN: { f: ['CN'], c: ['¥'] }, IN: { f: ['IN'], c: ['₹'] },
+  BR: { f: ['BR'], c: ['$'] }, KR: { f: ['KR'], c: ['₩'] }, DE: { f: ['DE'], c: ['€'] }, GB: { f: ['GB'], c: ['£'] }
+};
+function geoDe(it) {
+  const t = String(it.activo || '').toUpperCase().replace(/[^A-Z0-9]/g, ''), d = String(it.descripcion || '').toLowerCase();
+  if (/^(VEA|IEFA|EFA|SCHF|SPDW)/.test(t)) return GEO.DEV;
+  if (/^(VWO|IEMG|EEM|SCHE|SPEM|EIMI)/.test(t)) return GEO.EM;
+  if (/^(VEU|VXUS|IXUS|ACWX)/.test(t)) return GEO.XUS;
+  if (/^(VT$|VTWAX|ACWI|VWRA|VWCE|IWDA|URTH)/.test(t)) return GEO.WORLD;
+  if (/^(VGK|IEUR|EZU|IEV|FEZ)/.test(t)) return GEO.EU;
+  if (/^(EWJ|DXJ)/.test(t)) return GEO.JP; if (/^(MCHI|FXI|KWEB)/.test(t)) return GEO.CN; if (/^(INDA|EPI)/.test(t)) return GEO.IN;
+  if (/^EWZ/.test(t)) return GEO.BR; if (/^EWY/.test(t)) return GEO.KR; if (/^EWG/.test(t)) return GEO.DE; if (/^EWU/.test(t)) return GEO.GB;
+  if (/^(EWW|NAFTRAC|MEXTRAC)/.test(t)) return GEO.MX;
+  if (/^(VOO|VTI|VIG|VUAA|IVV|SPY|QQQ|CSPX|SPLG|SCHD|VYM|VUG|VTV|VB$|VO$|VXF|IWM|DIA|RSP|SCHB|ITOT)/.test(t)) return GEO.US;
+  if (/emergent|china|india|brasil/.test(d)) return GEO.EM;
+  if (/mundo|global|todo el mundo/.test(d)) return GEO.WORLD;
+  if (/europa|jap[oó]n|desarrollad/.test(d)) return GEO.DEV;
+  if (/estados unidos|s&p|eua|ee\.? ?uu/.test(d)) return GEO.US;
+  if (/m[eé]xico|bmv|ipc/.test(d)) return GEO.MX;
+  return String(it.moneda || '').toUpperCase() === 'USD' ? GEO.US : GEO.MX;
+}
+
+// iconos genéricos de 9×8 de lo que hace cada empresa (no son logotipos)
+const ICP = { w: '#f4f6fb', g: '#9aa7b4', d: '#3a4656', y: '#ffd23a', o: '#f2a95a', r: '#e23b3b', b: '#3b7bff', c: '#5fe1ff', n: '#3fbf6e', k: '#141a22', m: '#8a5a2b', s: '#e8c9a0' };
+const ICO = {
+  tel: ['..ddddd..', '..dcccd..', '..dcbcd..', '..dcccd..', '..dcbcd..', '..dcccd..', '..ddwdd..', '..ddddd..'],
+  lap: ['.ddddddd.', '.dbbbbbd.', '.dbcbbbd.', '.dbbbcbd.', '.ddddddd.', 'ggggggggg', '.ggggggg.', '.........'],
+  chip: ['.g.g.g.g.', 'gdddddddg', '.dnnnnnd.', 'gdnwwwndg', '.dnnnnnd.', 'gdddddddg', '.g.g.g.g.', '.........'],
+  caja: ['.........', '.mmmmmmm.', 'msssmsssm', 'mmmmmmmmm', 'msssssssm', 'msssssssm', 'mmmmmmmmm', '.........'],
+  lupa: ['..www....', '.wcccw...', 'wcccccw..', 'wcccccw..', '.wcccw...', '..wwwww..', '......ww.', '.......ww'],
+  chat: ['.bbbbbbb.', 'bbbbbbbbb', 'bbwbwbwbb', 'bbbbbbbbb', '.bbbbbbb.', '..bb.....', '.b.......', '.........'],
+  auto: ['.........', '...rrrr..', '..rcccrr.', '.rrrrrrrr', 'rrrrrrrrr', '.kk...kk.', '.kk...kk.', '.........'],
+  tv: ['ddddddddd', 'dkkkkkkkd', 'dkkrkkkkd', 'dkkrrkkkd', 'dkkrkkkkd', 'dkkkkkkkd', 'ddddddddd', '...ddd...'],
+  lata: ['..ggggg..', '..rrrrr..', '..rwwrr..', '..rrwwr..', '..rrrrr..', '..rrrrr..', '..ggggg..', '.........'],
+  burger: ['..ooooo..', '.oowoooo.', 'ooooooooo', 'nnnnnnnnn', 'mmmmmmmmm', 'yyyyyyyyy', '.ooooooo.', '.........'],
+  cine: ['kwkwkwkwk', 'kkkkkkkkk', 'ddddddddd', 'dgggggggd', 'dgwgggggd', 'dgggggggd', 'ddddddddd', '.........'],
+  tenis: ['.........', '..www....', '..wwww...', '..wwwwww.', '.wwwwwwww', 'ggggggggg', '.........', '.........'],
+  tarjeta: ['.........', 'bbbbbbbbb', 'bbbbbbbbb', 'kkkkkkkkk', 'bbbbbbbbb', 'byybbwwwb', 'bbbbbbbbb', '.........'],
+  carrito: ['c........', '.ccccccc.', '.c.c.c.c.', '.ccccccc.', '..c.c.c..', '..ccccc..', '..k...k..', '.........'],
+  cafe: ['..wwwww..', '..ggggg..', '.wwwwwww.', '.wmmmmmw.', '.wmmmmmw.', '.wwwwwww.', '..wwwww..', '.........']
+};
+function icono(g, k, x, y) { const r = ICO[k]; if (!r) return; r.forEach((row, j) => { for (let i = 0; i < row.length; i++) if (row[i] !== '.') px(g, x + i, y + j, 1, 1, ICP[row[i]]); }); }
+// banderas de 11×7 pixeles
+function bandera(g, k, x, y) {
+  const P = (i, j, w, h, c) => px(g, x + i, y + j, w, h, c), W = '#f4f6fb';
+  switch (k) {
+    case 'US': for (let j = 0; j < 7; j++) P(0, j, 11, 1, j % 2 ? W : '#d8263b'); P(0, 0, 5, 4, '#2b3f8f'); [[1, 1], [3, 1], [2, 2], [1, 3], [3, 3]].forEach(([i, j]) => P(i, j, 1, 1, W)); break;
+    case 'MX': P(0, 0, 4, 7, '#0a8a4a'); P(4, 0, 3, 7, W); P(7, 0, 4, 7, '#d1263b'); P(5, 3, 1, 1, '#8a5a2b'); P(4, 4, 3, 1, '#3d9a5a'); break;
+    case 'JP': P(0, 0, 11, 7, W); P(4, 2, 3, 3, '#d1263b'); P(5, 1, 1, 5, '#d1263b'); P(3, 3, 5, 1, '#d1263b'); break;
+    case 'GB': P(0, 0, 11, 7, '#1f3a8a'); for (let i = 0; i < 11; i++) { const j = Math.round(i * 6 / 10); P(i, j, 1, 1, W); P(i, 6 - j, 1, 1, W); } P(0, 2, 11, 3, W); P(4, 0, 3, 7, W); P(0, 3, 11, 1, '#d1263b'); P(5, 0, 1, 7, '#d1263b'); break;
+    case 'CA': P(0, 0, 3, 7, '#d1263b'); P(8, 0, 3, 7, '#d1263b'); P(3, 0, 5, 7, W); P(5, 1, 1, 5, '#d1263b'); P(4, 2, 3, 2, '#d1263b'); P(3, 3, 5, 1, '#d1263b'); break;
+    case 'FR': P(0, 0, 4, 7, '#1f3a8a'); P(4, 0, 3, 7, W); P(7, 0, 4, 7, '#d1263b'); break;
+    case 'DE': P(0, 0, 11, 2, '#141414'); P(0, 2, 11, 3, '#d1263b'); P(0, 5, 11, 2, '#f2c12e'); break;
+    case 'CH': P(0, 0, 11, 7, '#d1263b'); P(5, 1, 1, 5, W); P(3, 3, 5, 1, W); P(4, 2, 3, 3, W); P(4, 2, 1, 1, '#d1263b'); P(6, 2, 1, 1, '#d1263b'); P(4, 4, 1, 1, '#d1263b'); P(6, 4, 1, 1, '#d1263b'); break;
+    case 'AU': P(0, 0, 11, 7, '#1f3a8a'); P(0, 1, 5, 1, W); P(2, 0, 1, 3, W); P(0, 1, 5, 1, '#d1263b'); P(2, 0, 1, 3, '#d1263b'); [[8, 1], [9, 3], [7, 4], [8, 5], [2, 5]].forEach(([i, j]) => P(i, j, 1, 1, W)); break;
+    case 'CN': P(0, 0, 11, 7, '#d8261f'); P(2, 1, 1, 3, '#ffd23a'); P(1, 2, 3, 1, '#ffd23a'); [[5, 1], [6, 2], [6, 3], [5, 4]].forEach(([i, j]) => P(i, j, 1, 1, '#ffd23a')); break;
+    case 'IN': P(0, 0, 11, 2, '#ff9933'); P(0, 2, 11, 3, W); P(0, 5, 11, 2, '#138808'); P(5, 3, 1, 1, '#1f3a8a'); P(4, 3, 3, 1, 'rgba(31,58,138,.55)'); break;
+    case 'TW': P(0, 0, 11, 7, '#d1263b'); P(0, 0, 5, 4, '#1f3a8a'); P(2, 1, 1, 2, W); P(1, 2, 3, 1, W); break;
+    case 'BR': P(0, 0, 11, 7, '#11924a'); P(5, 0, 1, 7, '#ffd23a'); P(3, 1, 5, 5, '#ffd23a'); P(1, 3, 9, 1, '#ffd23a'); P(2, 2, 7, 3, '#ffd23a'); P(4, 2, 3, 3, '#24448f'); P(4, 3, 3, 1, W); break;
+    case 'KR': P(0, 0, 11, 7, W); P(4, 2, 3, 1, '#d1263b'); P(4, 3, 1, 1, '#d1263b'); P(5, 3, 2, 1, '#2246a8'); P(4, 4, 3, 1, '#2246a8'); P(1, 1, 2, 1, '#141414'); P(8, 1, 2, 1, '#141414'); P(1, 5, 2, 1, '#141414'); P(8, 5, 2, 1, '#141414'); break;
+    case 'NL': P(0, 0, 11, 2, '#c8102e'); P(0, 2, 11, 3, W); P(0, 5, 11, 2, '#21468b'); break;
+    case 'SE': P(0, 0, 11, 7, '#1f5fae'); P(3, 0, 2, 7, '#ffcd00'); P(0, 3, 11, 1, '#ffcd00'); break;
+    case 'DK': P(0, 0, 11, 7, '#c8102e'); P(3, 0, 2, 7, W); P(0, 3, 11, 1, W); break;
+    case 'IT': P(0, 0, 4, 7, '#11924a'); P(4, 0, 3, 7, W); P(7, 0, 4, 7, '#ce2b37'); break;
+    case 'ES': P(0, 0, 11, 2, '#c60b1e'); P(0, 2, 11, 3, '#ffc400'); P(0, 5, 11, 2, '#c60b1e'); P(2, 3, 2, 1, '#a0522d'); break;
+    case 'SA': P(0, 0, 11, 7, '#0b6b3a'); [[2, 2], [3, 2], [5, 2], [6, 2], [8, 2], [3, 3], [4, 3], [7, 3]].forEach(([i, j]) => P(i, j, 1, 1, W)); P(2, 5, 7, 1, W); P(8, 4, 1, 1, W); break;
+    case 'ZA': P(0, 0, 11, 3, '#d1263b'); P(0, 4, 11, 3, '#1f3a8a'); P(0, 2, 11, 3, W); P(0, 3, 11, 1, '#11924a'); P(0, 1, 2, 5, '#ffb612'); P(0, 2, 1, 3, '#141414'); P(1, 3, 1, 1, '#141414'); P(2, 2, 1, 1, '#11924a'); P(2, 4, 1, 1, '#11924a'); break;
+    case 'TH': P(0, 0, 11, 7, '#d1263b'); P(0, 1, 11, 5, W); P(0, 2, 11, 3, '#24315e'); break;
+    case 'ID': P(0, 0, 11, 4, '#d1263b'); P(0, 4, 11, 3, W); break;
+    case 'MY': for (let j = 0; j < 7; j++) P(0, j, 11, 1, j % 2 ? W : '#cc0001'); P(0, 0, 5, 4, '#1f3a8a'); P(1, 1, 1, 2, '#ffcc00'); P(2, 1, 1, 1, '#ffcc00'); P(2, 2, 1, 1, '#ffcc00'); P(3, 2, 1, 1, '#ffcc00'); break;
+    case 'AE': P(0, 0, 11, 2, '#00843d'); P(0, 2, 11, 3, W); P(0, 5, 11, 2, '#141414'); P(0, 0, 3, 7, '#d1263b'); break;
+    case 'TR': P(0, 0, 11, 7, '#e30a17'); P(3, 2, 1, 3, W); P(4, 1, 1, 1, W); P(4, 5, 1, 1, W); P(5, 1, 1, 1, W); P(5, 5, 1, 1, W); P(7, 3, 1, 1, W); P(6, 3, 1, 1, W); P(7, 2, 1, 1, W); P(7, 4, 1, 1, W); break;
+    case 'CL': P(0, 0, 11, 4, W); P(0, 4, 11, 3, '#d52b1e'); P(0, 0, 4, 4, '#0039a6'); P(1, 1, 2, 2, W); break;
+  }
+}
+// dónde va la pantalla: en el frente de la nave, entre las chimeneas
+function pantallaDe(b) {
+  const bd = b.bd; if (!bd || !bd.data || !bd.stacks || !bd.stacks.length) return null;
+  const A = (x, y) => (x < 0 || y < 0 || x >= bd.w || y >= bd.h) ? 0 : bd.data[(y * bd.w + x) * 4 + 3];
+  const xs = bd.stacks.map(p => p.x).sort((a, b) => a - b), cx = Math.round(xs.length > 1 ? (xs[0] + xs[xs.length - 1]) / 2 : xs[0]);
+  let sx = xs.length > 1 ? Math.round((xs[0] + xs[1]) / 2) : xs[0] + 4, roof = -1;
+  for (let y = Math.max(0, Math.round(bd.stacks[0].y) + 4); y < bd.h; y++) if (A(sx, y) && A(sx - 2, y) && A(sx + 2, y)) { roof = y; break; }
+  if (roof < 0 || bd.h - roof < 16) return null;
+  const y0 = roof + Math.max(3, Math.round((bd.h - roof - 9) * .38));
+  const yt = roof + Math.max(2, Math.round((bd.h - roof - 17) * .35)), xt = cx - 10;
+  const tall = (bd.h - roof >= 22 && A(xt - 1, yt) && A(xt + 21, yt) && A(xt - 1, yt + 16) && A(xt + 21, yt + 16)) ? { x: xt, y: yt } : null;
+  const xw = cx - 10; if (A(xw - 1, y0 + 4) && A(xw + 21, y0 + 4) && A(xw - 1, y0) && A(xw + 21, y0 + 8)) return { x: xw, y: y0, wide: true, tall };
+  const x0 = cx - 6; if (!A(x0 - 1, y0 + 4) || !A(x0 + 13, y0 + 4)) return tall ? { x: tall.x, y: tall.y, tall } : null;
+  return { x: x0, y: y0, tall };
+}
+function pantallaAlta(g, b, bi, geo, X, Y) {
+  const IW = 19, IH = 15;
+  px(g, X - 1, Y - 1, IW + 4, IH + 4, '#05090f'); px(g, X, Y, IW + 2, IH + 2, '#0d1826'); px(g, X - 1, Y - 1, IW + 4, 1, '#3a5068');
+  // diapositivas: bandera y después las empresas, cada una con su icono y su nombre
+  const sl = [{ flag: geo.f[0], d: 2.2 }].concat((geo.tk || []).map(([n, i]) => { const w = n.length * 4 - 1; return { n, i, w, d: w <= IW ? 1.9 : .6 + (w - IW) / 12 + .8 }; }));
+  const tot = sl.reduce((a, x) => a + x.d, 0); let q = (T + bi * 3.1) % tot, k = 0; while (q >= sl[k].d) { q -= sl[k].d; k++; }
+  const draw = (S, tq) => {
+    px(g, X + 1, Y + 1, IW, IH, '#04101a');
+    if (S.flag) { bandera(g, S.flag, X + 5, Y + 2); txt3(g, 'EUA', X + 5, Y + 11, '#9fb8d0'); return; }
+    icono(g, S.i, X + 6, Y + 1);
+    g.save(); g.beginPath(); g.rect(X + 1, Y + 10, IW, 5); g.clip();
+    const tx = S.w <= IW ? X + 1 + Math.floor((IW - S.w) / 2) : Math.max(X + 1 + IW - S.w, X + 1 - Math.floor(Math.max(0, tq - .6) * 12));   // los nombres largos empiezan a la izquierda y se recorren
+    txt3(g, S.n, tx, Y + 10, '#ffe39a'); g.restore();
+  };
+  draw(sl[k], q);
+  if (q < .22) {   // cambio: barrido de arriba hacia abajo
+    const rows = Math.floor(q / .22 * IH), pv = sl[(k - 1 + sl.length) % sl.length]; draw(pv, pv.d);
+    g.save(); g.beginPath(); g.rect(X + 1, Y + 1, IW, rows); g.clip(); draw(sl[k], q); g.restore();
+    px(g, X + 1, Y + 1 + rows, IW, 1, 'rgba(200,255,240,.85)');
+  }
+  for (let j = 1; j < IH + 1; j += 2) px(g, X + 1, Y + j, IW, 1, 'rgba(0,0,0,.12)');
+  const gl = ((T * .6 + bi) % 3) / 3 * (IW + 10) - 4; if (gl > 0 && gl < IW + 1) px(g, X + 1 + Math.floor(gl), Y + 1, 1, IH, 'rgba(255,255,255,.18)');
+  px(g, X + IW + 1, Y + IH + 1, 1, 1, (Math.floor(T * 2 + bi) % 2) ? '#5dff9e' : '#1f6b4e');
+}
+function drawFabricas(g) {
+  const z = zones.ACCIONES; if (!z) return;
+  z.items.forEach((b, bi) => {
+    if (!b.owned || !b.bd) return;
+    const geo = b.geo || (b.geo = geoDe(b.it));
+    if (b.scr === undefined) b.scr = pantallaDe(b);
+    const S = b.scr; if (!S) return;
+    const X = b.dx + S.x, Y = b.dy + S.y, IW = S.wide ? 19 : 11;
+    if (S.tall && geo.tk) { pantallaAlta(g, b, bi, geo, b.dx + S.tall.x, b.dy + S.tall.y); return; }
+    // diapositivas: banderas (y en EE. UU., la bandera seguida de las empresas más grandes del índice)
+    const sl = geo.f.map(k => '@' + k);
+    const per = geo.tk ? 1.5 : 2.2, ph = T / per + bi * .37, idx = Math.floor(ph) % sl.length, f = ph % 1;
+    px(g, X - 1, Y - 1, IW + 4, 11, '#05090f'); px(g, X, Y, IW + 2, 9, '#0d1826'); px(g, X - 1, Y - 1, IW + 4, 1, '#3a5068');
+    const slide = (k) => {
+      px(g, X + 1, Y + 1, IW, 7, '#04101a');
+      if (k[0] === '@') { const c = k.slice(1); bandera(g, c, X + 1, Y + 1); if (S.wide) txt3(g, c, X + 13, Y + 2, '#9fb8d0'); }
+      else { const w = k.length * 4 - 1; txt3(g, k, X + 1 + Math.floor((IW - w) / 2), Y + 2, '#ffe39a'); }
+    };
+    if (geo.tk) {   // pantalla baja: las empresas pasan como cinta
+      const TK = geo.tk.map(x => x[0]), str = TK.join('  '), len = str.length * 4 + 11, dur = 2.5 + len / 16, q = (T + bi * 3.1) % dur;
+      if (q < 2.5) slide('@' + geo.f[0]);
+      else { px(g, X + 1, Y + 1, IW, 7, '#04101a'); const off = Math.floor((q - 2.5) * 16); g.save(); g.beginPath(); g.rect(X + 1, Y + 1, IW, 7); g.clip(); let cx = X + IW + 1 - off; TK.forEach((tk, n) => { txt3(g, tk, cx, Y + 2, n % 2 ? '#bfe9ff' : '#ffe39a'); cx += tk.length * 4 + 7; }); g.restore(); }
+    } else {
+      slide(sl[idx]);
+      if (sl.length > 1 && f < .14) {   // cambio: barrido de arriba hacia abajo
+        const rows = Math.floor(f / .14 * 8); slide(sl[(idx - 1 + sl.length) % sl.length]);
+        g.save(); g.beginPath(); g.rect(X + 1, Y + 1, IW, rows); g.clip(); slide(sl[idx]); g.restore();
+        px(g, X + 1, Y + 1 + rows, IW, 1, 'rgba(200,255,240,.85)');
+      }
+    }
+    for (let j = 1; j < 8; j += 2) px(g, X + 1, Y + j, IW, 1, 'rgba(0,0,0,.14)');   // líneas de pantalla
+    const gl = ((T * .6 + bi) % 3) / 3 * (IW + 10) - 4; if (gl > 0 && gl < IW + 1) px(g, X + 1 + Math.floor(gl), Y + 1, 1, 7, 'rgba(255,255,255,.22)');
+    px(g, X + IW + 1, Y + 8, 1, 1, (Math.floor(T * 2 + bi) % 2) ? '#5dff9e' : '#1f6b4e');
+  });
+}
+function drawDivisa(g, e, i) {
+  const geo = e.b && (e.b.geo || (e.b.geo = geoDe(e.b.it))); if (!geo) return;
+  const ci = e.ci || 0, sym = geo.c[ci % geo.c.length], G = DIV[sym]; if (!G) return;
+  const tip = e.y - 2 - flamaH(e) - 10 + Math.round(Math.sin(T * 2.2 + i * 1.1) * 1.2), x0 = Math.round(e.x - 2), y0 = Math.round(tip);
+  const on = (i, j) => G[j] && G[j][i] === '#';
+  for (let j = -1; j <= 7; j++) for (let k = -1; k <= 5; k++) if (!on(k, j) && (on(k - 1, j) || on(k + 1, j) || on(k, j - 1) || on(k, j + 1))) px(g, x0 + k, y0 + j, 1, 1, 'rgba(40,20,0,.85)');
+  for (let j = 0; j < 7; j++) for (let k = 0; k < 5; k++) if (on(k, j)) px(g, x0 + k, y0 + j, 1, 1, j < 2 ? '#fff1b8' : j < 5 ? '#ffd36b' : '#f2a93b');
+}
 let blink = [], healT = 1.2, lastHeal = null;
 // ---------- flamas de petrolera en las chimeneas de las fábricas ----------
 const FLAMA = true;
@@ -2650,7 +2823,7 @@ function layout() {
       const bd = b.bd; wb.drawImage(bd.cv, b.dx, b.dy);
       setHm(b.dx + bd.foot.x0, bd.foot.x1 - bd.foot.x0, b.dy + bd.top);
       bd.lights.forEach(L => blink.push({ ...L, x: b.dx + L.x, y: b.dy + L.y }));
-      if (k === 'ACCIONES') bd.stacks.forEach((p, ci) => emitters.push({ x: b.dx + p.x, y: b.dy + p.y, up: b.it.cambio_dia > 0, rate: b.it.cambio_dia > 0 ? 7 : 2.4, acc: ci * .37, b }));
+      if (k === 'ACCIONES') bd.stacks.forEach((p, ci) => emitters.push({ x: b.dx + p.x, y: b.dy + p.y, up: b.it.cambio_dia > 0, rate: b.it.cambio_dia > 0 ? 7 : 2.4, acc: ci * .37, b, ci }));
       if (b.craneAt) b.crane = crane(Math.round(b.dx + bd.foot.x1 - 4), b.dy + bd.top - 22);
     });
     if (z.down || z.storm) {
@@ -2826,8 +2999,8 @@ function composeWorld() {
     g.globalAlpha = .35; px(g, L.x - 1, L.y, 3, 1, c); px(g, L.x, L.y - 1, 1, 3, c);
     g.globalAlpha = 1; px(g, L.x, L.y, 1, 1, '#ffe0e8');
   });
-  drawBonoAnims(g);
-  if (FLAMA) emitters.forEach((e, i) => drawFlama(g, e, i));
+  drawBonoAnims(g); drawFabricas(g);
+  if (FLAMA) emitters.forEach((e, i) => { drawFlama(g, e, i); drawDivisa(g, e, i); });
   else emitters.forEach((e, i) => { px(g, e.x - 1, e.y - 2, 2, 1, Math.sin(T * 3 + i * 1.7) > 0 ? '#ff2d55' : '#5a1020'); if (e.up) px(g, e.x - 1.5, e.y, 3, 1, `rgba(255,150,70,${.5 + .5 * Math.sin(T * 11 + i)})`); });
   // los barrios con lluvia se oscurecen
   rainZ.forEach(r => { const gr = g.createLinearGradient(0, 0, 0, 60); gr.addColorStop(0, 'rgba(2,4,16,0)'); gr.addColorStop(1, r.heavy ? 'rgba(2,4,16,.38)' : 'rgba(2,4,16,.24)'); g.fillStyle = gr; g.fillRect(Math.round(r.z.x), 0, Math.round(r.z.w), SHORE); });
