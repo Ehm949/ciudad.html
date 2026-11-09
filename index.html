@@ -599,7 +599,11 @@ body.marea header.top .who{order:1}
 
 .mcompra{background:#10172c;border:1px solid var(--line);border-radius:12px;padding:2px 12px;margin:8px 0}
 
-.mfiesta h3{font-size:19px}
+.mfiesta h3{font-size:17px;margin:0}
+.mfiesta .mfhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+.mfiesta .mlist{margin:2px 0 6px}
+.mbtn.mini{min-height:30px;padding:5px 11px;font-size:12.5px;border-radius:999px;background:rgba(255,193,90,.12);border-color:rgba(255,193,90,.45);color:#ffd27a}
+.mbtn.mini:hover{background:rgba(255,193,90,.22)}
 .mfiesta{margin-bottom:12px}
 .chips .pxi{display:inline-block;vertical-align:-2px;margin-right:6px;image-rendering:pixelated}
 </style>
@@ -5238,9 +5242,16 @@ window.MAREA = (() => {
   function divCard() {
     const D = DIVS(), pag = D.filter(d => !d.proximo), prox = D.filter(d => d.proximo).reverse(), rec = divRecientes();
     const año = ymd(new Date(Date.now() - 365 * 864e5)), U = pag.filter(d => d.fecha >= año);
-    const hoyCard = rec.map((d, n) => `<article class="mcard hl mfiesta" style="--c:${CLS[(model.items.find(i => i.activo === d.activo) || { key: 'FIBRAS' }).key].color}"><h3>${d.fecha === ymd(new Date()) ? 'Hoy' : 'El ' + fechaL(d.fecha)} ${esc(d.activo)} te pagó ${m2(d.neto)}</h3>
-      <p>${explicaDiv(d)}</p>${d.aprox ? '<p class="foot">Calculado con los títulos que tienes hoy: no hay un registro de tu Tesorería de antes del pago.</p>' : ''}
-      <div class="mbtns"><button type="button" class="mbtn pri" data-fiesta="${D.indexOf(d)}">Celebrar en la ciudad</button></div></article>`).join('');
+    // pagos de los últimos días: una sola tarjeta resumida, con un renglón por pago y un solo botón pequeño
+    const hoyS = ymd(new Date()), cuando = d => d.fecha === hoyS ? 'Hoy' : fechaL(d.fecha);
+    const tot = rec.reduce((a, d) => a + d.neto, 0), isr = rec.reduce((a, d) => a + (d.retencion || 0), 0);
+    const hoyCard = !rec.length ? '' : `<article class="mcard hl mfiesta" style="--c:#ef7b6c">
+      <div class="mfhead"><h3>${rec.length === 1 ? `${cuando(rec[0])} ${esc(rec[0].activo)} te pagó` : `${rec.length} pagos en los últimos días`} <span class="pos">${m2(tot)}</span></h3>
+        <button type="button" class="mbtn mini" data-fiesta="todos" title="Ver la celebración en la ciudad">🎆 Celebrar</button></div>
+      <div class="mlist">${rec.map(d => { const rf = rfDe(d), rc = rcDe(d), t = titTxt(d.titulos);
+        const det = [rf > 0 ? `${t} × ${m4(rf)}${d.retencion ? ` − ISR ${m2(d.retencion)}` : ''}` : '', rc > 0 ? `${rf > 0 ? '+ ' : `${t} × `}${m4(rc)} reembolso sin ISR` : ''].filter(Boolean).join(' ');
+        return `<div class="mli"><span><b>${esc(d.activo)}</b><small>${cuando(d)} · ${det}${d.aprox ? ' · aprox.' : ''}</small></span><span class="n"><span class="pos">+${m2(d.neto)}</span><small>${m4(d.titulos ? d.neto / d.titulos : 0)} por título</small></span></div>`; }).join('')}</div>
+      <p class="foot">${isr > 0 ? `Tu casa de bolsa retuvo ${m2(isr)} de ISR del resultado fiscal (30% normalmente). ` : ''}El reembolso de capital no paga impuestos.${rec.some(d => d.aprox) ? ' «aprox.»: calculado con los títulos que tienes hoy porque no hay un registro de antes del pago.' : ''}</p></article>`;
     if (!pag.length && !prox.length) return `<article class="mcard" style="--c:#ef7b6c"><h3>Dividendos y rentas que cobraste</h3><p class="foot">Cuando una FIBRA o un ETF que tienes pague, aquí verás cuánto te tocó por título, cuánto te retuvieron de impuestos y cuánto te llegó.</p></article>`;
     const filas = [...prox.map(d => [`${esc(d.activo)} <small class="mpill" style="--c:#8ab4ff">Próximo</small>`, `${fechaL(d.fecha)} · ${titTxt(d.titulos)} títulos · ${tipoDiv(d)}`, `<span class="muted">${m2(d.neto)}</span>`, 'estimado']),
       ...pag.map(d => [esc(d.activo), `${fechaL(d.fecha)} · ${titTxt(d.titulos)} títulos · ${tipoDiv(d)}${d.nota ? ' · ' + esc(d.nota) : ''}`, `<span class="pos">+${m2(d.neto)}</span>`, `bruto ${m2(d.bruto)}`])];
@@ -5249,13 +5260,15 @@ window.MAREA = (() => {
       'Una FIBRA puede pagar resultado fiscal (sale de sus utilidades y paga ISR: tu casa de bolsa retiene normalmente 30%), reembolso de capital (te devuelve parte de tu inversión y no paga impuestos) o las dos cosas. Lo que te llega es el neto.');
   }
   function fiesta(d) {
-    const it = model.items.find(i => i.activo === d.activo);
-    try { localStorage.setItem(divVisto(d), '1'); } catch (_) {}
+    const L = Array.isArray(d) ? d : [d]; if (!L.length) return;
+    const it = model.items.find(i => i.activo === L[0].activo), tot = L.reduce((a, x) => a + x.neto, 0);
+    L.forEach(x => { try { localStorage.setItem(divVisto(x), '1'); } catch (_) {} });
+    const msg = L.length === 1 ? `¡${L[0].activo} te pagó ${m2(tot)}!` : `¡${L.length} pagos: te llegaron ${m2(tot)}!`;
     window.fwZona = it ? it.key : 'FIBRAS';
     if (cur !== 'mercado') go('mercado');
     setTimeout(() => {
       try { (S.mercado.querySelector('.stage') || S.mercado).scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) {}
-      if (typeof celebrate === 'function') { celebrate(`¡${d.activo} te pagó ${m2(d.neto)}!`); celebrateT = 10; clearTimeout(celebrate._t); celebrate._t = setTimeout(() => { $('celebrate').hidden = true; }, 7000); }
+      if (typeof celebrate === 'function') { celebrate(msg); celebrateT = 10; clearTimeout(celebrate._t); celebrate._t = setTimeout(() => { $('celebrate').hidden = true; }, 7000); }
       clearTimeout(fiesta._t); fiesta._t = setTimeout(() => { window.fwZona = null; }, 11000);
     }, 350);
   }
@@ -5263,10 +5276,10 @@ window.MAREA = (() => {
   let fiestaRevisada = false;
   function revisaFiesta() {
     if (fiestaRevisada || !has() || !raw || !raw.dividendos) return;
-    const d = divRecientes().find(x => { try { return !localStorage.getItem(divVisto(x)); } catch (_) { return false; } });
-    if (!d) { fiestaRevisada = true; return; }
-    if (cur !== 'mercado') { if (!revisaFiesta.aviso) { revisaFiesta.aviso = true; mtoast(`<b>${esc(d.activo)}</b> te pagó ${m2(d.neto)}. Abre Mercado para celebrarlo.`); } return; }
-    fiestaRevisada = true; setTimeout(() => fiesta(d), 900);
+    const nv = divRecientes().filter(x => { try { return !localStorage.getItem(divVisto(x)); } catch (_) { return false; } });
+    if (!nv.length) { fiestaRevisada = true; return; }
+    if (cur !== 'mercado') { if (!revisaFiesta.aviso) { revisaFiesta.aviso = true; mtoast(nv.length === 1 ? `<b>${esc(nv[0].activo)}</b> te pagó ${m2(nv[0].neto)}. Abre Mercado para celebrarlo.` : `Te llegaron <b>${nv.length} pagos</b> por ${m2(nv.reduce((a, x) => a + x.neto, 0))}. Abre Mercado para celebrarlo.`); } return; }
+    fiestaRevisada = true; setTimeout(() => fiesta(nv), 900);
   }
   function rIng() {
     const mes = mesActual(), hecho = claimed('ingresos:' + mes);
@@ -5353,7 +5366,7 @@ window.MAREA = (() => {
     else if (d.ing) { t.disabled = true; dar('ingresos:' + mesActual()); }
     else if (d.cer) { t.disabled = true; dar('cer-rev:' + mesActual()); }
     else if (d.calc) aCalculadora(+d.calc);
-    else if (d.fiesta !== undefined) { const x = DIVS()[+d.fiesta]; if (x) fiesta(x); }
+    else if (d.fiesta !== undefined) { if (d.fiesta === 'todos') fiesta(divRecientes()); else { const x = DIVS()[+d.fiesta]; if (x) fiesta(x); } }
     else if (d.salta) saltar(d.salta);
     else if (d.per && !t.disabled) { per = d.per; rPerf(); }
     else if (d.ser) { if (serSel.has(d.ser) && serSel.size > 1) serSel.delete(d.ser); else serSel.add(d.ser); rPerf(); }
