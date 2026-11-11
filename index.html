@@ -606,6 +606,9 @@ body.marea header.top .who{order:1}
 .mbtn.mini:hover{background:rgba(255,193,90,.22)}
 .mfiesta{margin-bottom:12px}
 .chips .pxi{display:inline-block;vertical-align:-2px;margin-right:6px;image-rendering:pixelated}
+.frow.propia{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,.9fr) minmax(0,.7fr) 34px}
+.frow.propia .rf_x{padding:0;min-height:36px;height:36px;font-size:18px;line-height:1}
+@media (max-width:560px){.frow.propia{grid-template-columns:1fr 1fr 1fr 30px;row-gap:6px}.frow.propia .rf_n{grid-column:1/4}.frow.propia .rf_x{grid-column:4;grid-row:1}.frow.propia .fhead{display:none}.rfprow{padding-bottom:8px;border-bottom:1px dashed rgba(255,255,255,.08)}}
 </style>
 </head>
 <body>
@@ -719,8 +722,8 @@ body.marea header.top .who{order:1}
       </section>
       <section class="panel" id="sellPanel">
         <h2>Cosecha del tesoro</h2>
-        <p class="muted" style="margin:0">El pueblo trabaja para ti. Sacar parte del tesoro para darte un gusto, un viaje o cumplir una meta es justo: es el fruto de tu esfuerzo. Escribe cuánto quieres sacar: la ciudad calcula de qué barrios saldría según las metas que tú definiste y prepara la carta con tu precio límite de venta.</p>
-        <div class="viewsw" role="group" aria-label="¿Para qué es la venta?" style="width:max-content;max-width:100%;margin-top:10px"><button type="button" id="smJoy" aria-pressed="true">Para disfrutarlo</button><button type="button" id="smRe" aria-pressed="false">Para reordenar</button></div>
+        <p class="muted" style="margin:0">El pueblo trabaja para ti. Sacar parte del tesoro para darte un gusto, un viaje o cumplir una meta es justo: es el fruto de tu esfuerzo. Con <b>Para disfrutarlo</b>, escribes cuánto quieres sacar y la ciudad calcula de qué barrios saldría según tus metas. Con <b>Rebalancear</b>, la ciudad usa el dinero que ya tienes: vende donde hay de más y compra donde falta, barrio por barrio y parte por parte, para dejar el pueblo como lo planeaste. En los dos casos te prepara la carta con tus precios límite.</p>
+        <div class="viewsw" role="group" aria-label="¿Para qué es la venta?" style="width:max-content;max-width:100%;margin-top:10px"><button type="button" id="smJoy" aria-pressed="true">Para disfrutarlo</button><button type="button" id="smRe" aria-pressed="false">Rebalancear</button></div>
         <div class="sim"><input id="sellAmt" type="number" min="0" step="any" inputmode="decimal" placeholder="¿Cuánto quieres sacar?" aria-label="Cuánto quieres sacar, en pesos"><button id="btnSell" type="button">Calcular</button></div>
         <label class="lim">Tu precio límite de venta<span><input id="sellLim" type="number" min="0" max="50" step="0.1" value="0" inputmode="decimal" aria-label="Tu precio límite de venta: porcentaje arriba del precio de hoy">% arriba del precio de hoy (0% = precio de hoy)</span></label>
         <div id="sellOut"></div>
@@ -1465,6 +1468,40 @@ const pct1 = v => (Math.round(v * 10) / 10).toFixed(1) + '%';
 const short = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(v >= 1e7 ? 0 : 1) + ' M' : v >= 1e4 ? '$' + Math.round(v / 1e3) + ' mil' : mxn.format(v);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const idOf = s => 'a_' + String(s).replace(/[^a-zA-Z0-9]/g, '_');
+// ---------- renta fija en otras plataformas (la captura el usuario: nombre, saldo, tasa anual) ----------
+function rfpRowHtml(p, n) {
+  const v = k => p && p[k] != null ? esc(String(p[k])) : '';
+  return `<div class="frow propia rfprow" data-n="${n}">
+    <input class="rf_n" type="text" maxlength="40" placeholder="Nombre (ej. Cetesdirecto 28 días)" value="${v('nombre')}" aria-label="Nombre de tu renta fija">
+    <input class="rf_pl" type="text" maxlength="40" placeholder="Plataforma (ej. Nu, Hey, GBM)" value="${v('plataforma')}" aria-label="Plataforma">
+    <input class="rf_s" type="number" min="0" step="any" inputmode="decimal" placeholder="Saldo" value="${v('saldo')}" aria-label="Saldo en pesos">
+    <input class="rf_r" type="number" min="0" max="100" step="any" inputmode="decimal" placeholder="% anual" value="${v('tasa')}" aria-label="Tasa anual en porcentaje">
+    <button type="button" class="ghost rf_x" title="Quitar este renglón" aria-label="Quitar">×</button></div>`;
+}
+function rfpFormHtml() {
+  const own = model.items.filter(i => i.propia).map(i => ({ nombre: i.activo.replace(/ \(propia\)$/, ''), plataforma: i.plataforma || '', saldo: i.pos ? i.pos.saldo : i.valor, tasa: i.tasa }));
+  return `<div class="fgroup" style="--c:var(--ren,#4fc3b0)" id="rfpBox"><h3><span class="dot"></span>Renta fija en otras plataformas</h3>
+    <p class="foot" style="margin:0">¿Tienes CETES, pagarés o cuentas que pagan interés fuera de tu casa de bolsa? Anótalos aquí con su saldo y su tasa anual. Cuentan como obras públicas del pueblo: entran a tus metas, al rebalanceo y a los intereses de cada día.</p>
+    <div class="frow propia"><span class="fhead">Nombre</span><span class="fhead">Plataforma</span><span class="fhead">Saldo (MXN)</span><span class="fhead">Tasa anual</span><span></span></div>
+    <div id="rfpRows">${own.map(rfpRowHtml).join('')}</div>
+    <div><button type="button" class="ghost" id="rfpAdd">+ Agregar renta fija</button></div></div>`;
+}
+function rfpLeer() {
+  const out = [];
+  document.querySelectorAll('#rfpRows .rfprow').forEach(r => {
+    const g = c => r.querySelector(c).value.trim();
+    const nombre = g('.rf_n'), plataforma = g('.rf_pl'), saldo = g('.rf_s'), tasa = g('.rf_r');
+    if (!nombre && !saldo && !tasa) return;
+    out.push({ nombre, plataforma, saldo: saldo === '' ? null : Number(saldo), tasa: tasa === '' ? null : Number(tasa) });
+  });
+  return out;
+}
+document.addEventListener('click', e => {
+  const add = e.target.closest('#rfpAdd'), x = e.target.closest('.rf_x');
+  if (add) { const box = $('rfpRows'); box.insertAdjacentHTML('beforeend', rfpRowHtml(null, box.children.length)); const last = box.lastElementChild.querySelector('.rf_n'); if (last) last.focus(); }
+  else if (x) { const row = x.closest('.rfprow'); if (row) row.remove(); }
+});
+
 const pad2 = n => String(n).padStart(2, '0');
 const ym = d => d.getFullYear() + '-' + pad2(d.getMonth() + 1);
 const ymd = d => ym(d) + '-' + pad2(d.getDate());
@@ -1534,6 +1571,9 @@ let demoPos = [
   { activo: 'Cetes 91 días', saldo: 40000 }, { activo: 'Udibonos', saldo: 30000 }, { activo: 'Bondia', saldo: 15000 },
   { activo: 'Bitcoin', titulos: 0.01, precio_promedio: 1300000 }
 ];
+let demoRfp = [{ nombre: 'Cetesdirecto 28 días', plataforma: 'Cetesdirecto', saldo: 20000, tasa: 7.3 }];
+const demoRfpCat = () => demoRfp.map(r => ({ activo: r.nombre, clase: 'RENTA_FIJA', subclase: 'Propia', privado: true, propia: true, plataforma: r.plataforma, tasa: r.tasa, descripcion: r.plataforma ? 'En ' + r.plataforma : 'Renta fija en otra plataforma', precio_mxn: null, cambio_dia: 0, moneda: 'MXN' }));
+const demoRfpPos = () => demoRfp.map(r => ({ activo: r.nombre, saldo: r.saldo, clase: 'RENTA_FIJA', valor: r.saldo, costo: r.saldo, ganancia: 0, cambio_hoy: r.saldo * r.tasa / 100 / 360 }));
 function demoCompute(p) {
   const c = DEMO_CATALOGO.find(x => x.activo === p.activo) || {};
   const renta = p.saldo != null;
@@ -1596,6 +1636,7 @@ function demoApi(accion, data) {
   if (accion === 'cambiar_clave') return { ok: true, token: 'demo' };
   if (accion === 'salir') return { ok: true };
   if (accion === 'guardar') {
+    if (Array.isArray(data.rfp)) demoRfp = data.rfp.filter(r => r.nombre && r.saldo > 0).map(r => ({ nombre: r.nombre, plataforma: r.plataforma || '', saldo: +r.saldo, tasa: +r.tasa || 0 }));
     const map = {}; demoPos.forEach(p => map[p.activo] = p);
     data.posiciones.forEach(p => { const empty = p.saldo != null ? !p.saldo : !p.titulos; if (empty) delete map[p.activo]; else map[p.activo] = p; });
     demoPos = Object.values(map);
@@ -1604,7 +1645,7 @@ function demoApi(accion, data) {
   }
   const hoy = new Date(), fin = new Date(Date.now() + 2 * 864e5), prox = new Date(Date.now() + 20 * 864e5);
   return {
-    ok: true, nombre: 'Inversor de ejemplo', catalogo: DEMO_CATALOGO, posiciones: demoPos.map(demoCompute), juego: {},
+    ok: true, nombre: 'Inversor de ejemplo', catalogo: DEMO_CATALOGO.concat(demoRfpCat()), posiciones: demoPos.map(demoCompute).concat(demoRfpPos()), juego: {},
     metas: demoMetas, plantillas: DEMO_PLANT, metas_inicial: DEMO_CONF, precios_hora: new Date().toISOString(),
     historial: demoHist,
     dividendos: (() => { const p = demoPos.find(x => x.activo === 'FIBRAPL14'), t = p ? +p.titulos || 0 : 0, b = Math.round(t * 0.7766 * 100) / 100, r = Math.round(b * 30) / 100; const c = Math.round(t * 0.12 * 100) / 100; return t ? [{ activo: 'FIBRAPL14', fecha: ymd(hoy), resultado_fiscal: 0.7766, reembolso_capital: 0.12, por_titulo: 0.8966, retencion_pct: 30, nota: 'Ejemplo', titulos: t, bruto_rf: b, bruto_rc: c, bruto: Math.round((b + c) * 100) / 100, retencion: r, neto: Math.round((b + c - r) * 100) / 100, aprox: false, proximo: false }] : []; })(),
@@ -2106,7 +2147,7 @@ function renderForm() {
   const f = $('pfForm');
   let html = '';
   ORDER.forEach(k => {
-    const its = model.classes[k].items;
+    const its = model.classes[k].items.filter(i => !i.propia);
     if (!its.length) return;
     const renta = k === 'RENTA_FIJA';
     html += `<div class="fgroup" style="--c:${CLS[k].color}"><h3><span class="dot"></span>${CLS[k].name}</h3>`;
@@ -2121,6 +2162,7 @@ function renderForm() {
     });
     html += '</div>';
   });
+  html += rfpFormHtml();
   html += `<div class="save"><button type="submit" id="btnSave">Registrar en la tesorería</button><span class="toast" id="toast"></span></div>`;
   f.innerHTML = html;
 }
@@ -2128,7 +2170,7 @@ $('pfForm').addEventListener('submit', async e => {
   e.preventDefault();
   const btn = $('btnSave'), toast = $('toast');
   const n = v => v === '' ? null : Number(v);
-  const posiciones = model.items.map(it => {
+  const posiciones = model.items.filter(it => !it.propia).map(it => {
     const id = idOf(it.activo);
     if (it.key === 'RENTA_FIJA') return { activo: it.activo, saldo: n($(id + '_s').value) };
     return { activo: it.activo, titulos: n($(id + '_t').value), precio_promedio: n($(id + '_p').value) };
@@ -2137,9 +2179,12 @@ $('pfForm').addEventListener('submit', async e => {
   if (bad) { toast.className = 'toast neg'; toast.textContent = 'Revisa los números de ' + bad.activo + ': deben ser positivos.'; return; }
   const noPrice = posiciones.find(p => p.titulos && !p.precio_promedio);
   if (noPrice) { toast.className = 'toast neg'; toast.textContent = 'Falta el precio promedio de ' + noPrice.activo + '.'; return; }
+  const rfp = rfpLeer();
+  const rb = rfp.find(r => !r.nombre || r.saldo == null || isNaN(r.saldo) || r.saldo < 0 || (r.saldo > 0 && (r.tasa == null || isNaN(r.tasa) || r.tasa < 0 || r.tasa > 100)));
+  if (rb) { toast.className = 'toast neg'; toast.textContent = !rb.nombre ? 'Ponle nombre a tu renta fija de otra plataforma.' : rb.saldo == null || isNaN(rb.saldo) || rb.saldo < 0 ? 'Revisa el saldo de ' + rb.nombre + '.' : 'Escribe la tasa anual de ' + rb.nombre + ' (entre 0 y 100%).'; return; }
   btn.disabled = true; toast.className = 'toast muted'; toast.textContent = 'Guardando…';
   try {
-    apply(await api('guardar', { posiciones }));
+    apply(await api('guardar', { posiciones, rfp }));
     $('toast').className = 'toast pos'; $('toast').textContent = 'Registrado. El pueblo ya se actualizó.';
     if (!window.goSec) $('stage').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
   } catch (err) { $('toast').className = 'toast neg'; $('toast').textContent = err.message; }
@@ -3818,6 +3863,137 @@ const GOV = (() => {
     const gain = items.reduce((a, x) => { const pp = x.i.pos && +x.i.pos.precio_promedio; return a + (x.units != null && pp > 0 ? x.units * (+x.i.precio_mxn - pp) : 0); }, 0);
     return { mode: joy ? 'disfrutar' : 'reordenar', req, A, maxA, total, rowsG, items, dest, buys, buyRest, gain, T, T2, fromOver, overG: groups.filter(g => isOverG(g) && excG(g, T) > 1) };
   }
+
+  // ---------- rebalanceo: con el dinero que ya tienes, dejar el pueblo como lo planeaste en Tus metas ----------
+  // Por barrio y por parte (en Fábricas: EE.UU., Desarrollados, Emergentes; en los demás: cada instrumento con peso).
+  // Lo que cuenta pero no está en tus metas se queda igual, salvo que el barrio rebase su meta y no alcance con lo demás.
+  const REBAL_MIN = T => Math.max(50, T * 0.002);
+  function rebalUnits() {
+    const M = model, T = M.total, units = [], avisos = [];
+    (M.groups || []).forEach(g => {
+      const Tg = T * g.tG / 100, inT = new Set(g.traders.flatMap(t => t.members || [t.i]));
+      const holds = g.members.filter(i => !inT.has(i) && i.valor > 0), H = holds.reduce((a, i) => a + i.valor, 0);
+      const Tv = g.traders.reduce((a, t) => a + (t.members || [t.i]).reduce((b, i) => b + i.valor, 0), 0);
+      let holdF = 1, trT = null;   // holdF: cuánto conservan los que no están en tus metas; trT: objetivo total de los elegidos
+      if (H <= Tg) trT = Tg - H;
+      else if (Tv <= Tg) { trT = null; holdF = H > 0 ? (Tg - Tv) / H : 0; }
+      else { trT = Tg; holdF = 0; }
+      g.traders.forEach(t => {
+        const mem = (t.members || [t.i]).filter(i => i.valor > 0 || i === t.i), cur = mem.reduce((a, i) => a + i.valor, 0);
+        const target = trT == null ? cur : Math.max(0, g.tres ? T * t.t / 100 : trT * t.sh);
+        units.push({ g, key: g.key, name: g.tres ? CLS[g.key].scene + ' · ' + t.slot : (g.traders.length > 1 ? CLS[g.key].scene + ' · ' + t.i.activo : CLS[g.key].scene), tG: g.tres ? t.t : (trT == null ? cur / T * 100 : g.tG * t.sh), members: mem, veh: t.i, cur, target, tres: g.tres, hold: false });
+      });
+      if (holds.length) units.push({ g, key: g.key, name: CLS[g.key].scene + ' · ' + holds.map(i => i.activo).join(', ') + (g.traders.length ? ' (no está en tus metas)' : ' (sin vehículo elegido)'), tG: H * holdF / T * 100, members: holds, veh: null, cur: H, target: H * holdF, tres: false, hold: true });
+      if (!g.traders.length && Tg - H >= REBAL_MIN(T)) avisos.push(`Elige en Tus metas cómo cubres ${esc(CLS[g.key].scene)}: le falta ${mxn.format(Tg - H)} y sin vehículo no se puede comprar.`);
+      else if (!g.traders.length && H - Tg >= REBAL_MIN(T)) avisos.push(`${esc(CLS[g.key].scene)} no tiene vehículo elegido en Tus metas, así que lo que sobra se vende parejo de todo lo que tienes ahí. Si prefieres vender de uno en particular, elígelo en Tus metas.`);
+    });
+    return { units, avisos };
+  }
+  function rebalPlan() {
+    const M = model, T = M.total, { units, avisos } = rebalUnits(), lim = REBAL_MIN(T);
+    const plan = [];
+    units.forEach(u => {
+      const ex = u.cur - u.target; if (ex < lim) return;
+      const cut = levelCut(u.members.map(i => ({ t: i.valor, v: i.valor })), ex);   // proporcional a lo que tienes en la parte
+      u.members.forEach((i, k) => { if (cut[k] >= 1) plan.push({ u, g: u.g, gi: u.key, i, ideal: cut[k], amt: 0, units: null }); });
+    });
+    plan.forEach(x => {
+      const p = +x.i.precio_mxn, held = x.i.pos ? +x.i.pos.titulos || 0 : 0;
+      if (x.i.key === 'RENTA_FIJA' || (x.i.key === 'BITCOIN' && p > 0)) { x.amt = Math.min(x.i.valor, x.ideal); if (p > 0) x.units = x.amt / p; return; }
+      if (!(p > 0)) { x.amt = 0; x.sinPrecio = true; return; }
+      x.units = Math.min(held, Math.round(x.ideal / p)); x.amt = x.units * p;
+    });
+    const sinPrecio = plan.filter(x => x.sinPrecio).map(x => x.i.activo);
+    // el redondeo no puede vender de más: se quita un título donde más se pasó de lo ideal
+    units.forEach(u => {
+      const its = plan.filter(x => x.u === u), ex = u.cur - u.target + 0.5;
+      for (let k = 0; k < 200 && its.reduce((a, x) => a + x.amt, 0) > ex; k++) {
+        const c = its.filter(x => x.units > 0 && isUnit(x.i)).sort((a, b) => (b.amt - b.ideal) - (a.amt - a.ideal))[0];
+        if (!c) break; c.units--; c.amt = c.units * +c.i.precio_mxn;
+      }
+    });
+    let items = plan.filter(x => x.amt >= 1), total = items.reduce((a, x) => a + x.amt, 0);
+    // con lo vendido se compra lo que quedó abajo de su meta, título por título (el tesoro no cambia)
+    let buys = [], buyRest = 0, buyAvisos = [];
+    if (total > 0 && typeof repartir === 'function') {
+      const R = repartir(total, new Map(items.map(x => [x.i, x.amt])));
+      buys = R.plan.filter(x => x.amt >= 1); buyRest = R.rest; buyAvisos = R.avisos || [];
+      buys = buys.filter(bx => {   // si algo se vende y también se compra, se compensa
+        const sx = items.find(x => x.i === bx.i); if (!sx) return true;
+        const p = +bx.i.precio_mxn;
+        if (bx.units != null && sx.units != null && isUnit(bx.i)) { const u = Math.min(sx.units, bx.units); sx.units -= u; sx.amt = sx.units * p; bx.units -= u; bx.amt = bx.units * p; }
+        else { const d = Math.min(sx.amt, bx.amt); sx.amt -= d; bx.amt -= d; if (sx.units != null && p > 0) sx.units = sx.amt / p; }
+        return bx.amt >= 1;
+      });
+      items = items.filter(x => x.amt >= 1); total = items.reduce((a, x) => a + x.amt, 0);
+    }
+    const soldOf = i => items.filter(x => x.i === i).reduce((a, x) => a + x.amt, 0), boughtOf = i => buys.filter(x => x.i === i).reduce((a, x) => a + x.amt, 0);
+    units.forEach(u => { u.sold = u.members.reduce((a, i) => a + soldOf(i), 0); u.bought = u.members.reduce((a, i) => a + boughtOf(i), 0) + (u.veh && !u.members.includes(u.veh) ? boughtOf(u.veh) : 0); u.after = u.cur - u.sold + u.bought; });
+    // por barrio (para la carta y la tabla)
+    const groups = (M.groups || []).map(g => { const us = units.filter(u => u.g === g), sold = us.reduce((a, u) => a + u.sold, 0), bought = us.reduce((a, u) => a + u.bought, 0);
+      return { g, gi: g.key, key: g.key, units: us, inv: sold, bought, items: items.filter(x => x.g === g), buys: buys.filter(x => x.g === g), now: g.valor / T * 100, after: (g.valor - sold + bought) / T * 100, tG: g.tG }; });
+    const rowsG = groups.filter(r => r.inv >= 1).sort((a, b) => b.inv - a.inv);
+    const gain = items.reduce((a, x) => { const pp = x.i.pos && +x.i.pos.precio_promedio; return a + (x.units != null && pp > 0 && isUnit(x.i) ? x.units * (+x.i.precio_mxn - pp) : 0); }, 0);
+    const mov = groups.filter(r => r.inv >= 1 || r.bought >= 1).length;
+    const avisosT = avisos.concat(buyAvisos, sinPrecio.length ? [`No hay precio de hoy para ${sinPrecio.map(esc).join(', ')}: no se incluyó en la venta.`] : []);
+    return { mode: 'reordenar', req: total, A: total, maxA: total, total, rowsG, items, dest: [], buys, buyRest, gain, T, T2: T, fromOver: total, overG: rowsG.map(r => r.g), units, groups, mov, avisos: avisosT, lim };
+  }
+  function renderRebal(out, P) {
+    const T = P.T, pc = v => (Math.round(v * 10) / 10).toFixed(1) + '%';
+    if (P.total < 1 && !P.buys.length) {
+      SELL = null;
+      out.innerHTML = `<p class="foot" style="margin-top:6px"><b>Tu pueblo ya está como lo planeaste.</b> Ningún barrio ni parte se aleja de su meta más de ${mxn.format(P.lim)}, así que no hay nada que mover.</p>${P.avisos.map(a => `<p class="foot">${a}</p>`).join('')}`;
+      return;
+    }
+    SELL = P;
+    const ut = x => x.i.key === 'RENTA_FIJA' ? 'monto' : x.units != null && isUnit(x.i) ? x.units + (x.units === 1 ? ' título' : ' títulos') : +x.i.precio_mxn ? (x.amt / x.i.precio_mxn).toFixed(5) + (unitSym(x.i) ? ' ' + unitSym(x.i) : '') : '—';
+    let rows = '';
+    P.groups.filter(r => r.inv >= 1 || r.bought >= 1).sort((a, b) => Math.abs(b.now - b.tG) - Math.abs(a.now - a.tG)).forEach(r => {
+      const col = CLS[r.key].color;
+      rows += `<tr style="background:var(--panel2)"><td><span class="dot" style="--c:${col};margin-right:6px"></span><b>${esc(CLS[r.key].scene)}</b></td><td class="n">${pc(r.now)}</td><td class="n muted">${pc(r.tG)}</td><td class="n">${pc(r.after)}</td><td class="n">${r.inv >= 1 ? '<span class="neg">−' + mxn.format(r.inv) + '</span>' : ''}</td><td class="n">${r.bought >= 1 ? '<span class="pos">+' + mxn.format(r.bought) + '</span>' : ''}</td><td></td></tr>`;
+      const multi = r.units.length > 1;
+      r.units.forEach(u => {
+        const moved = u.sold >= 1 || u.bought >= 1; if (!moved && !multi) return;
+        const sells = P.items.filter(x => x.u === u).sort((a, b) => b.amt - a.amt), buysU = P.buys.filter(x => x.g === r.g && (u.members.includes(x.i) || x.i === u.veh)).sort((a, b) => b.amt - a.amt);
+        const uno = !u.tres && u.members.length === 1 && sells.length + buysU.length <= 1;   // una parte con un solo instrumento: un renglón
+        const nm = esc(u.name.replace(CLS[r.key].scene + ' · ', ''));
+        if (uno) { const x = sells[0] || buysU[0]; rows += `<tr><td style="padding-left:14px">${nm}</td><td class="n muted">${pc(u.cur / T * 100)}</td><td class="n muted">${pc(u.tG)}</td><td class="n muted">${pc(u.after / T * 100)}</td><td class="n">${u.sold >= 1 ? '<span class="neg">−' + mxn.format(u.sold) + '</span>' : ''}</td><td class="n">${u.bought >= 1 ? '<span class="pos">+' + mxn.format(u.bought) + '</span>' : ''}</td><td class="n muted">${x ? ut(x) + (sells[0] ? sellObjTxt(x.i) : objTxt(x.i)) : ''}</td></tr>`; return; }
+        if (multi) rows += `<tr><td style="padding-left:14px"><span class="muted">${nm}</span></td><td class="n muted">${pc(u.cur / T * 100)}</td><td class="n muted">${pc(u.tG)}</td><td class="n muted">${pc(u.after / T * 100)}</td><td class="n">${u.sold >= 1 ? '<span class="neg">−' + mxn.format(u.sold) + '</span>' : ''}</td><td class="n">${u.bought >= 1 ? '<span class="pos">+' + mxn.format(u.bought) + '</span>' : ''}</td><td></td></tr>`;
+        sells.forEach(x => { rows += `<tr><td style="padding-left:${multi ? 28 : 14}px">${esc(x.i.activo)}</td><td class="n muted">${pc(x.i.valor / T * 100)}</td><td class="n muted">—</td><td class="n muted">${pc((x.i.valor - x.amt) / T * 100)}</td><td class="n neg">−${mxn.format(x.amt)}</td><td></td><td class="n muted">${ut(x)}${sellObjTxt(x.i)}</td></tr>`; });
+        buysU.forEach(x => { rows += `<tr><td style="padding-left:${multi ? 28 : 14}px">${esc(x.i.activo)}</td><td class="n muted">${pc(x.i.valor / T * 100)}</td><td class="n muted">—</td><td class="n muted">${pc((x.i.valor + x.amt) / T * 100)}</td><td></td><td class="n pos">+${mxn.format(x.amt)}</td><td class="n muted">${ut(x)}${objTxt(x.i)}</td></tr>`; });
+      });
+    });
+    const notes = [];
+    notes.push(`Se mueven <b>${mxn.format(P.total)}</b> dentro del pueblo: se vende donde hay de más y se compra donde falta. El tesoro sigue valiendo ${mxn.format(T)}.`);
+    if (P.buyRest >= 1) notes.push(`Quedan ${mxn.format(P.buyRest)} sin asignar porque no completan otro título; déjalos para la próxima aportación.`);
+    if (P.gain >= 1) notes.push(`Ganancia estimada sobre tu precio promedio: ${mxn.format(P.gain)}. Vender con ganancia puede causar impuestos; tu casa de bolsa te da la constancia.`);
+    else if (P.gain <= -1) notes.push(`Esta venta realiza una pérdida estimada de ${mxn.format(-P.gain)} sobre tu precio promedio.`);
+    const quietos = P.units.filter(u => u.hold && u.sold < 1 && u.cur > 0);
+    if (quietos.length) notes.push(`${quietos.flatMap(u => u.members.map(i => esc(i.activo))).join(', ')}: cuentan en su barrio pero no están en tus metas, así que se quedan igual. Si quieres que el rebalanceo los use, agrégalos en Tus metas.`);
+    P.avisos.forEach(a => notes.push(a));
+    // en celular, la misma información en lista: un renglón por barrio y uno por cada compra o venta
+    let lista = '';
+    if (window.innerWidth < 600) {
+      P.groups.filter(r => r.inv >= 1 || r.bought >= 1).sort((a, b) => Math.abs(b.now - b.tG) - Math.abs(a.now - a.tG)).forEach(r => {
+        lista += `<div class="mli" style="background:var(--panel2);border-radius:10px;padding:8px 10px;margin-top:8px"><span><b><span class="dot" style="--c:${CLS[r.key].color};margin-right:6px"></span>${esc(CLS[r.key].scene)}</b><small>Hoy ${pc(r.now)} · meta ${pc(r.tG)} · queda en ${pc(r.after)}</small></span><span class="n">${r.inv >= 1 ? '<span class="neg">−' + mxn.format(r.inv) + '</span>' : ''}${r.inv >= 1 && r.bought >= 1 ? '<br>' : ''}${r.bought >= 1 ? '<span class="pos">+' + mxn.format(r.bought) + '</span>' : ''}</span></div>`;
+        r.units.forEach(u => {
+          const sells = P.items.filter(x => x.u === u), buysU = P.buys.filter(x => x.g === r.g && (u.members.includes(x.i) || x.i === u.veh));
+          if (!sells.length && !buysU.length) return;
+          const nm = u.name.replace(CLS[r.key].scene + ' · ', '');
+          if (u.tres || (u.members.length > 1 && !u.hold)) lista += `<div class="mli"><span><small>${esc(nm)}: ${pc(u.cur / T * 100)} → ${pc(u.after / T * 100)} (meta ${pc(u.tG)})</small></span></div>`;
+          sells.forEach(x => { lista += `<div class="mli"><span>${esc(x.i.activo)}<small>Vender ${ut(x)}${sellPrice(x.i) ? ' · límite ' + mxn2.format(sellPrice(x.i)) : ''}</small></span><span class="n neg">−${mxn.format(x.amt)}</span></div>`; });
+          buysU.forEach(x => { lista += `<div class="mli"><span>${esc(x.i.activo)}<small>Comprar ${ut(x)}${targetPrice(x.i) ? ' · límite ' + mxn2.format(targetPrice(x.i)) : ''}</small></span><span class="n pos">+${mxn.format(x.amt)}</span></div>`; });
+        });
+      });
+    }
+    out.innerHTML = (lista ? `<div class="mlist">${lista}</div>` : `<div class="tbl"><table><thead><tr><th>Barrio / parte</th><th style="text-align:right">Hoy</th><th style="text-align:right">Tu meta</th><th style="text-align:right">Después</th><th style="text-align:right">Vende</th><th style="text-align:right">Compra</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${rows}</tbody></table></div>`) + `
+      ${notes.map(n => `<p class="foot" style="margin-top:6px">${n}</p>`).join('')}
+      <p class="foot" style="margin-top:6px">Las diferencias menores a ${mxn.format(P.lim)}, o que no completan un título, no se mueven: así no se vende y recompra por centavos. Precio límite de venta: ${LIMV()}% arriba del precio de hoy; de compra: ${DESC()}% abajo (los de la Aportación del mes). Primero se vende y, con el dinero que entra, se compra. Después actualiza la Tesorería del pueblo.</p>
+      <p class="foot" style="margin-top:6px">${pie()}</p>
+      <div class="simact"><button type="button" id="btnSellPdf">Descargar carta (PDF)</button><button type="button" class="ghost" id="btnSellPrint">Imprimir carta</button></div>`;
+    $('btnSellPdf').onclick = () => { const L = sellLetterData(); if (L) savePdf(L, $('btnSellPdf')); };
+    $('btnSellPrint').onclick = () => { const L = sellLetterData(); if (L) printLetter(L); };
+  }
   const unitTxt = x => {
     if (x.i.key === 'RENTA_FIJA' || x.units == null) return 'monto';
     if (!isUnit(x.i)) return x.units.toFixed(5) + (unitSym(x.i) ? ' ' + unitSym(x.i) : '');
@@ -3840,16 +4016,18 @@ const GOV = (() => {
     if (a) a.setAttribute('aria-pressed', String(sellMode === 'disfrutar'));
     if (b) b.setAttribute('aria-pressed', String(sellMode === 'reordenar'));
     const inp = $('sellAmt');
+    if (inp) { const row = inp.closest('.sim'); if (row) row.hidden = sellMode === 'reordenar'; }
     if (inp) {
       inp.setAttribute('aria-label', sellMode === 'disfrutar' ? 'Cuánto quieres sacar, en pesos' : 'Monto a vender para reordenar, en pesos');
       // no se sugiere ningún monto: la calculadora espera a que escribas el tuyo
-      inp.placeholder = sellMode === 'disfrutar' ? '¿Cuánto quieres sacar?' : '¿Cuánto quieres vender?';
+      inp.placeholder = '¿Cuánto quieres sacar?';
     }
     renderSell();
   }
   // calcula con lo que esté escrito en este momento (la carta siempre usa el monto actual)
   function computeSell() {
     const inp = $('sellAmt'); if (!inp || !model || !model.total) return null;
+    if (sellMode === 'reordenar') { const P = rebalPlan(); return P.total >= 1 ? P : null; }
     const amt = Math.max(0, Number(inp.value) || 0);
     if (!amt) return null;
     const P = sellPlan(amt, sellMode);
@@ -3857,6 +4035,7 @@ const GOV = (() => {
   }
   function renderSell() {
     const out = $('sellOut'); if (!out || !model || !model.total) return;
+    if (sellMode === 'reordenar') { if (!hasMetas()) { SELL = null; out.innerHTML = '<p class="foot" style="margin-top:6px">Para rebalancear, primero define <b>Tus metas</b> (cuánto quieres en cada barrio y con qué instrumentos).</p>'; return; } renderRebal(out, rebalPlan()); return; }
     const amt = Math.max(0, Number($('sellAmt').value) || 0);
     if (!amt) { SELL = null; out.innerHTML = sellHintHtml(); return; }
     const P = sellPlan(amt, sellMode);
@@ -3910,6 +4089,14 @@ const GOV = (() => {
       s.push(`El tesoro queda en ${mxn.format(P.T - P.total)} y sigue trabajando para ti.`);
       return s.join(' ');
     }
+    if (P.units) {
+      const ven = P.groups.filter(r => r.inv >= 1).map(r => place(r.g)), com = P.groups.filter(r => r.bought >= 1).map(r => place(r.g));
+      s.push(`${hi}: para que el pueblo quede como lo planeaste en tus metas, se mueven ${mxn.format(P.total)} con el mismo tesoro que ya tienes.`);
+      if (ven.length) s.push(`Se vende donde hay de más: ${ven.join(', ')}.`);
+      if (com.length) s.push(`Con ese dinero se compra donde falta: ${com.join(', ')}.`);
+      s.push('Ningún edificio se destruye: las obras solo cambian de barrio.');
+      return s.join(' ');
+    }
     const top = P.rowsG[0];
     s.push(`${hi}: ${place(top.g)} tiene ${pct1(top.now)} del pueblo y tu meta es ${pct1(top.g.tG)}.`);
     const others = P.rowsG.slice(1).map(r => place(r.g));
@@ -3952,17 +4139,17 @@ const GOV = (() => {
     notes.push(`Tu precio límite de venta: ${LIMV()}% arriba del precio de hoy (lo definiste tú; 0% es el precio de hoy). Si el precio no llega a ese nivel, la orden no se ejecuta. Las obras públicas se retiran por monto.`);
     notes.push(pie());
     return { now, groups, spentT, total: M.total, lvl: lv.name, next: lv.next, name: (raw && raw.nombre) || '', story: sellStory(P), hora, notes,
-      sub: joy ? 'Decreto de cosecha' : 'Decreto de reordenamiento', dir: 'arriba', totalLbl: joy ? 'Total de la cosecha' : 'Se vende y se reinvierte',
+      sub: joy ? 'Decreto de cosecha' : 'Decreto de rebalanceo', dir: 'arriba', totalLbl: joy ? 'Total de la cosecha' : 'Se vende y se reinvierte',
       cols: ['OBRA / ACTIVO', joy ? 'TÍTULOS\nA VENDER' : 'TÍTULOS', 'PRECIO HOY', 'TU PRECIO\nLÍMITE', 'MONTO SEGÚN\nTUS METAS'],
       boxes: joy
         ? [['TU COSECHA', mxn.format(P.total), 'el fruto de tu esfuerzo, para disfrutarlo'],
           ['DE LO QUE SOBRABA', P.fromOver >= 1 ? mxn.format(P.fromOver) : '—', P.fromOver >= 1 ? 'sale de barrios arriba de tu meta' : 'se toma parejo de todos los barrios'],
           ['TESORO DEL PUEBLO', mxn.format(P.T - P.total), 'queda trabajando para ti']]
-        : [['LO QUE VENDES', mxn.format(P.total), 'para reordenar el pueblo'],
-          ['LO QUE REBASA TU LÍMITE', sg.amt ? mxn.format(sg.amt) : '—', sg.amt ? 'según el margen que definiste' : 'ningún barrio rebasa tu límite'],
+        : [['LO QUE SE MUEVE', mxn.format(P.total), 'se vende donde sobra y se compra donde falta'],
+          ['BARRIOS QUE SE AJUSTAN', String(P.mov || P.rowsG.length), 'para quedar como en tus metas'],
           ['TESORO DEL PUEBLO', mxn.format(M.total), 'no cambia: el dinero se reinvierte en el pueblo']],
       gline: g => g.compra ? `Compra con el dinero de la venta  ·  tu meta ${pct1(g.ideal)}` : `Hoy ocupa ${pct1(g.now)} del pueblo  ·  después ${pct1(g.after)}  ·  tu meta ${pct1(g.ideal)}`,
-      file: (joy ? 'Carta-de-cosecha-' : 'Carta-de-reordenamiento-') + ymd(now) + '.pdf' };
+      file: (joy ? 'Carta-de-cosecha-' : 'Carta-de-rebalanceo-') + ymd(now) + '.pdf' };
   }
   // se llama en cada actualización del pueblo
   function sellHint() {
@@ -4142,7 +4329,7 @@ const GOV = (() => {
     if (b) b.onclick = () => { if (SIM && SIM.amt) printLetter(letterData()); };
   }
 
-  return { story, sectorBest, headline, feed, renderGaceta, objTxt, simButtons, wire, targetPrice, paper, letterData, drawLetter, loadJsPDF, sellHint, sellPlan, sellLetterData, renderSell, openTesoreria, levelCut, pie, limInput, limSync };
+  return { story, sectorBest, headline, feed, renderGaceta, objTxt, simButtons, wire, targetPrice, paper, letterData, drawLetter, loadJsPDF, sellHint, sellPlan, sellLetterData, renderSell, openTesoreria, levelCut, pie, limInput, limSync, rebalPlan, rebalUnits };
 })();
 // ================= Entrada: ciudad nocturna junto al agua (capas de pixel art) =================
 // Las capas vienen en CYBER (imágenes incrustadas). Se dibujan pixeladas, ancladas abajo;
@@ -4537,7 +4724,7 @@ window.MENU = (() => {
   // Aportación del mes, Cosecha del tesoro y Portafolio se pueden desplegar o retraer (se recuerda en este dispositivo)
   const sellPanel = $('sellPanel');
   [[simPanel, 'aportacion', 'Escribe un monto y la ciudad calcula cómo repartirlo según tus metas. Toca <b>Mostrar</b> para abrir la calculadora.'],
-   [sellPanel, 'cosecha', 'Calcula de qué barrios sacar dinero según tus metas. Toca <b>Mostrar</b> para abrir la calculadora.'],
+   [sellPanel, 'cosecha', 'Calcula de qué barrios sacar dinero según tus metas, o rebalancea todo el pueblo con lo que ya tienes. Toca <b>Mostrar</b> para abrir la calculadora.'],
    [pfView, 'portafolio_vista', 'Tus instrumentos, su valor y su ganancia. Toca <b>Mostrar</b> para ver la tabla.']].forEach(([el, k, t]) => {
     if (!el) return;
     if (!el.querySelector(':scope > .phead')) { const h = el.querySelector(':scope > h2'); if (h) { const d = mk('div', 'phead'); h.before(d); d.appendChild(h); } }
