@@ -2678,17 +2678,30 @@ function cristalFor(it, slot, hT, dim) {
   const bd = { cv, w, h: H, top: 0, bodyH, foot: { x0: 0, x1: w - 1 }, stacks: [], lights, anims, sign: null };
   return (CRC[key] = bd);
 }
+// versión compacta (7 de ancho) para torres angostas
+const CSYM7 = { BTC: ['..#.#..', '.####..', '.#...#.', '.#...#.', '.####..', '.#...#.', '.#...#.', '.####..', '..#.#..'],
+  ETH: ['...#...', '..###..', '.#####.', '#######', '.#####.', '..###..', '...#...', '.......', '.......'],
+  SOL: ['.######', '######.', '.......', '######.', '.######', '.......', '.######', '######.', '.......'],
+  GEN: ['.#####.', '#.....#', '#.###.#', '#.#.#.#', '#.###.#', '#.....#', '.#####.', '.......', '.......'] };
 function drawCriptoAnims(g) {
   const z = zones.BITCOIN; if (!z) return;
   z.items.forEach(b => { if (!b.bd || !b.bd.anims) return; b.bd.anims.forEach(A => { if (A.t !== 'cripto') return;
-    const C = CCOL[A.kind], X = b.dx + A.x, Y = b.dy + A.y + Math.round(Math.sin(T * 1.6 + A.seed) * 2.5), cx = X + 4, cy = Y + 5;
-    const p = A.dim ? .35 : .6 + .25 * Math.sin(T * 2.2 + A.seed);
-    g.save(); g.beginPath(); g.rect(b.dx, b.dy + A.top, A.w, A.h); g.clip();
-    const gl = g.createRadialGradient(cx, cy, 1, cx, cy, Math.max(7, A.w * .55)); gl.addColorStop(0, C.c + Math.round(p * 170).toString(16).padStart(2, '0')); gl.addColorStop(1, C.c + '00');
-    g.fillStyle = gl; g.fillRect(b.dx, b.dy + A.top, A.w, A.h); g.restore();
-    const S = CSYM[A.kind];
-    for (let j = 0; j < 11; j++) for (let i = 0; i < 9; i++) if (S[j][i] === '#') { px(g, X + i + 1, Y + j + 1, 1, 1, '#000a16'); }   // sombra para que se recorte
-    for (let j = 0; j < 11; j++) for (let i = 0; i < 9; i++) if (S[j][i] === '#') px(g, X + i, Y + j, 1, 1, A.dim ? C.c : ((i + j) % 3 === 0 ? C.c : C.l));
+    const C = CCOL[A.kind], big = A.w >= 15, S = (big ? CSYM : CSYM7)[A.kind], sw = big ? 9 : 7, sh = S.length;
+    const X = b.dx + Math.floor((A.w - sw) / 2), Y = b.dy + A.y + Math.round(Math.sin(T * 1.6 + A.seed) * 2), cx = X + sw / 2, cy = Y + sh / 2;
+    const p = A.dim ? .62 + .1 * Math.sin(T * 2.2 + A.seed) : .85 + .15 * Math.sin(T * 2.2 + A.seed);
+    g.save(); g.beginPath(); g.rect(b.dx + 1, b.dy + A.top + 1, A.w - 2, A.h - 1); g.clip();   // nada se sale del edificio
+    // aura: resplandor amplio + núcleo brillante sumado con luz
+    const R = Math.max(8, A.w * .7), hx = v => Math.round(Math.min(1, v) * 255).toString(16).padStart(2, '0');
+    let gl = g.createRadialGradient(cx, cy, 1, cx, cy, R); gl.addColorStop(0, C.c + hx(p * .85)); gl.addColorStop(.6, C.c + hx(p * .3)); gl.addColorStop(1, C.c + '00');
+    g.fillStyle = gl; g.fillRect(b.dx, b.dy + A.top, A.w, A.h);
+    g.globalCompositeOperation = 'lighter';
+    gl = g.createRadialGradient(cx, cy, 0, cx, cy, sw * .8); gl.addColorStop(0, C.l + hx(p * .35)); gl.addColorStop(1, C.l + '00');
+    g.fillStyle = gl; g.fillRect(cx - sw, cy - sw, sw * 2, sw * 2);
+    g.globalCompositeOperation = 'source-over';
+    const on = (i, j) => j >= 0 && j < sh && i >= 0 && i < sw && S[j][i] === '#';
+    for (let j = -1; j <= sh; j++) for (let i = -1; i <= sw; i++) if (!on(i, j) && (on(i - 1, j) || on(i + 1, j) || on(i, j - 1) || on(i, j + 1))) px(g, X + i, Y + j, 1, 1, 'rgba(0,6,16,.85)');   // contorno oscuro para que se recorte del aura
+    for (let j = 0; j < sh; j++) for (let i = 0; i < sw; i++) if (on(i, j)) px(g, X + i, Y + j, 1, 1, A.dim ? C.c : C.l);
+    g.restore();
   }); });
 }
 function drawBonoAnims(g) {
