@@ -762,26 +762,22 @@ body.marea header.top .who{order:1}
 .jvcode b{font-family:var(--f-data);font-size:24px;letter-spacing:.18em;color:#83f2f7}
 body.m-visita .mscr[data-scr="mercado"] > :not(#stage){display:none!important}
 @media (max-width:600px){.jbanner{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 74px)}}
-/* vecinos */
-.jvecs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.jvec{--c:#ffc46b;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:6px 4px 5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font:inherit;color:var(--muted);font-size:11.5px;font-weight:700;position:relative;min-width:0;transition:transform .15s,border-color .15s}
-.jvec canvas{width:64px;height:76px;image-rendering:pixelated}
-.jvec span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
-.jvec.on,.jvec:hover{border-color:var(--c);color:var(--fg);transform:translateY(-2px)}
-.jvec:focus-visible{outline:2px solid #ffc46b;outline-offset:2px}
-.jvec .jvdot{position:absolute;top:6px;right:8px;width:9px;height:9px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px var(--panel)}
-.jvec[data-e="llorando"] .jvdot{background:#83c8ff}.jvec[data-e="preocupado"] .jvdot{background:#ff7a7a}
-.jvecbub{--c:#ffc46b;position:relative;margin:0 0 10px;background:#f4f1ff;color:#1a1430;border-radius:14px;padding:10px 36px 10px 12px;border-left:4px solid var(--c)}
-.jvecbub[hidden]{display:none}
-.jvecbub::after{content:"";position:absolute;left:28px;bottom:-8px;border:8px solid transparent;border-bottom:0;border-top-color:#f4f1ff}
-.jvecbub b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#5a4a8a;margin-bottom:2px}
-.jvecbub p{margin:0;font-size:14.5px;font-weight:600;line-height:1.35}
-.jvecbub.pop{animation:jvpop .35s cubic-bezier(.2,.9,.3,1.3)}
-@keyframes jvpop{from{transform:translateY(8px) scale(.96);opacity:0}}
-.jvecx{position:absolute;top:6px;right:8px;border:0;background:none;font:inherit;font-size:20px;line-height:1;color:#5a4a8a;cursor:pointer;padding:2px 6px}
-@media (max-width:420px){.jvec canvas{width:48px;height:57px}.jvec{font-size:10.5px}}
-@media (prefers-reduced-motion:reduce){.jvecbub.pop{animation:none}}
-body.m-visita #lvlTag,body.m-visita #mVec{display:none!important}
+/* vecinos: globos sobre su barrio */
+.jglobo{--c:#ffc46b;position:absolute;z-index:6;display:flex;align-items:flex-end;gap:6px;width:min(260px,70%);pointer-events:auto;cursor:pointer;filter:drop-shadow(0 8px 16px rgba(0,0,0,.45))}
+.jglobo[hidden]{display:none}
+.jglobo canvas{width:56px;height:66px;image-rendering:pixelated;flex:none}
+.jglobo .jgb{position:relative;background:#f4f1ff;color:#1a1430;border-radius:14px;padding:8px 10px;border-left:4px solid var(--c);min-width:0;flex:1}
+.jglobo .jgb::after{content:"";position:absolute;left:-10px;bottom:12px;border:7px solid transparent;border-left:0;border-right-color:#f4f1ff}
+.jglobo.left{flex-direction:row-reverse}
+.jglobo.left .jgb::after{left:auto;right:-10px;border-right:0;border-left:7px solid #f4f1ff}
+.jglobo.left .jgb{border-left:0;border-right:4px solid var(--c)}
+.jglobo b{display:block;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#5a4a8a;margin-bottom:2px}
+.jglobo p{margin:0;font-size:13px;font-weight:600;line-height:1.3}
+.jglobo.pop{animation:jvpop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes jvpop{from{transform:translateY(10px) scale(.9);opacity:0}}
+@media (max-width:600px){.jglobo{width:min(230px,78%)}.jglobo canvas{width:44px;height:52px}.jglobo p{font-size:12px}}
+@media (prefers-reduced-motion:reduce){.jglobo.pop{animation:none}}
+body.m-visita #lvlTag{display:none!important}
 </style>
 </head>
 <body>
@@ -2180,7 +2176,7 @@ function renderAll() {
     </article>`;
   }).join('');
 
-  renderLive(); GOV.renderGaceta(); renderMetas(); GOV.sellHint(); renderBands(); renderMission(); renderStreak(); renderCeremony();
+  renderLive(); renderMetas(); GOV.sellHint(); renderBands(); renderMission(); renderStreak(); renderCeremony();
   renderForm(); renderSim(); renderZoom(); renderTm(); renderCalc();
   if (window.MAREA) MAREA.render();
 }
@@ -2602,7 +2598,8 @@ const clampX = (x, s) => Math.max(0, Math.min(Math.max(0, LW - W / s), x));
 const camY = s => LH - H / s;   // la ciudad siempre queda anclada abajo
 const toS = (wx, wy) => [(wx - cam.x) * cam.s, (wy - camY(cam.s)) * cam.s];
 function aimCamera(k, snap) { camT = camFor(k); if (snap || reduce) cam = { ...camT }; dirty = true; }
-function setFocus(k, fromMap) { focus = k; selected = null; aimCamera(k, false); renderZoom(); if (!fromMap) VL.onFocus(k); if (k && window.VECINOS_UI && !window.JVIS) VECINOS_UI.hablar(k, true); }
+function setFocus(k, fromMap) { focus = k; selected = null; aimCamera(k, false); renderZoom(); if (!fromMap) VL.onFocus(k); if (window.VECINOS_UI) { if (k && !window.JVIS) setTimeout(() => VECINOS_UI.hablar(k, true), 350); else VECINOS_UI.ocultar(); } }
+window.cityZoneScreen = k => { const z = zones && zones[k]; if (!z) return null; const [x, y] = toS(z.x + z.w / 2, Math.min(SHORE - 20, z.top)); return { x, y, w: z.w * cam.s }; };
 $('btnBack').addEventListener('click', () => setFocus(null));
 
 // ---------- edificios (se dibujan una vez por cambio de datos) ----------
@@ -4660,7 +4657,7 @@ const GOV = (() => {
     if (b) b.onclick = () => { if (SIM && SIM.amt) printLetter(letterData()); };
   }
 
-  return { story, sectorBest, headline, feed, renderGaceta, objTxt, simButtons, wire, targetPrice, paper, letterData, drawLetter, loadJsPDF, sellHint, sellPlan, sellLetterData, renderSell, openTesoreria, levelCut, pie, limInput, limSync, rebalPlan, rebalUnits };
+  return { story, sectorBest, sectorNews, headline, feed, renderGaceta, objTxt, simButtons, wire, targetPrice, paper, letterData, drawLetter, loadJsPDF, sellHint, sellPlan, sellLetterData, renderSell, openTesoreria, levelCut, pie, limInput, limSync, rebalPlan, rebalUnits };
 })();
 // ================= Entrada: ciudad nocturna junto al agua (capas de pixel art) =================
 // Las capas vienen en CYBER (imágenes incrustadas). Se dibujan pixeladas, ancladas abajo;
@@ -5366,64 +5363,109 @@ window.VECINOS = (() => {
   return { PERS, ESTADOS, NOMBRE_EST, FR, cara, frase };
 })();
 
-// ---------- la tira de vecinos debajo de la ciudad ----------
+// ---------- globos sobre los barrios: los vecinos dan las noticias del día ----------
 window.VECINOS_UI = (() => {
   const V = window.VECINOS, JORD = ['ACCIONES', 'FIBRAS', 'RENTA_FIJA', 'BITCOIN'];
   const listo = () => typeof model !== 'undefined' && model && model.classes && model.total > 0;
   const pctS = n => (n >= 0 ? '+' : '−') + Math.abs(n).toFixed(1) + '%';
   const mes = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
-  // qué le pasó hoy a cada barrio → estado y datos para la frase
+  const hoyS = () => new Date().toISOString().slice(0, 10);
+  const hs = str => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+  // la novela de cada vecino: un capítulo distinto cada día, según cómo le fue a su barrio
+  const SAGA = {
+    ACCIONES: { up: ['La Chimuela, mi máquina más vieja, hoy amaneció de buenas: sacó doble turno sin un solo rechinido.', 'El Beto, mi aprendiz, por fin armó una pieza sin que se le cayera. Lo voy a ascender a "casi ingeniero".', 'Hoy pasó el inspector y hasta sonrió. Ni la Chimuela se lo creía.', 'Puse música en la fábrica y las máquinas producen más. Les gusta la cumbia, qué les digo.', 'Le cambié el aceite a la Chimuela y me lo agradeció con una tarde entera sin pararse.', 'El Beto trajo pan dulce para todos. Es la primera vez que la producción sube por azúcar.'],
+      down: ['La Chimuela se paró a media tarde y me miró feo. Mañana le llevo flores… y una refacción.', 'El Beto conectó la banda al revés. Produjimos tres horas en reversa, literalmente.', 'Se fue la luz y nos quedamos contando tuercas a mano. Son 4,212, por si preguntan.', 'Hoy hasta el café de la fábrica salió frío. Día de esos.', 'La Chimuela está en huelga de hambre: no quiere aceite ni cariños. Mañana negociamos.', 'Llegó el proveedor tarde y mojado. Nos contó un chiste malo y aun así nos reímos, para sobrevivir.'],
+      flat: ['Día de inventario. Conté los mismos tornillos tres veces y dieron tres números distintos.', 'La Chimuela y yo nos quedamos viendo la lluvia. Ninguna dijo nada. Fue bonito.', 'El Beto preguntó qué hacemos cuando no pasa nada. Le dije: "Esto, mijo. Esto."', 'Hoy nada se movió. Aproveché para pintar la puerta de amarillo, como mi casco.', 'Día tranquilo. Las máquinas ronronean y yo ya me sé la letra.'] },
+    FIBRAS: { up: ['La señora Chuy pagó la renta puntual y hasta me regaló un tupper de mole. Buen día para ser casero.', 'Se rentó el local de la esquina. Van a poner una tortillería; yo ya aparté lugar en la fila.', 'Hoy el elevador funcionó a la primera. Lo anoté en mi libreta de milagros.', 'Un inquilino nuevo preguntó si aceptamos gatos. Le dije que sí, si pagan depósito.', 'Pinté el pasillo del tercero y ahora todos quieren vivir en el tercero.', 'Cobré todas las rentas antes de las diez. Me senté con un cafecito a presumirlo solo.'],
+      down: ['La señora Chuy dice que me paga "la semana que entra". Lleva tres semanas que entran.', 'Gotera en el 302. Puse una cubeta, luego otra, luego acepté que era una fuente.', 'Se fue el inquilino del 5. Dejó un sillón y una deuda. Me quedo con el sillón.', 'Hoy nadie vino a ver el local. Hasta las palomas se fueron a otro edificio.', 'El elevador se quedó entre el 2 y el 3 conmigo adentro. Tuve tiempo de pensar en mis decisiones.', 'Un vecino de enfrente abrió edificio nuevo con alberca. Yo tengo una cubeta, pero con cariño.'],
+      flat: ['Día tranquilo. Conté mis llaves: siguen siendo 47 y sigo sin saber de qué son 12.', 'Me senté en la entrada a ver pasar gente. Nadie rentó, nadie se fue. Equilibrio.', 'La señora Chuy me saludó. No pagó, pero me saludó. Algo es algo.', 'Hoy no hubo goteras ni cobros. Un casero también merece un domingo entre semana.', 'Le di de comer al gato del 4 que no es mío. Ya casi es mío.'] },
+    RENTA_FIJA: { up: ['Los intereses cayeron a las 9:00 en punto. Les tomé foto para el álbum.', 'Hoy tapamos el bache de la calle 5. Mañana aparecerá otro, pero hoy ganamos nosotros.', 'Llegaron los planos del puente nuevo. Tienen regla, escuadra y cero sorpresas. Perfecto.', 'La tasa siguió igual. Me gusta cuando las cosas siguen igual.', 'Mi termo mantuvo el café caliente ocho horas. Infraestructura de calidad.', 'Inauguramos una banqueta. Vinieron tres personas y un perro. Fue emotivo.'],
+      down: ['La tasa bajó un poquito. Lo anoté con lápiz, por si se arrepiente.', 'Volvió el bache de la calle 5. Ya le pusimos nombre: Don Bache.', 'Se me enfrió el café. No pasa nada, pero quería contarlo.', 'Hoy el presupuesto vino más flaco. Igual seguimos construyendo, nomás más despacio.', 'Un cono naranja desapareció. Abrí investigación. Sospecho del perro de la banqueta.'],
+      flat: ['Hoy cobramos intereses. Mañana también. Pasado mañana… adivinaron.', 'Revisé la tasa tres veces. No cambió. Eso, para mí, es un deporte extremo.', 'Me senté en mi banqueta nueva a ver el bache. Nos respetamos.', 'Día ordenado. Hasta los conos naranjas estaban alineados.', 'Pasó el camión de la basura puntual. Aplaudí solo y no me arrepiento.'] },
+    BITCOIN: { up: ['Satoshi, mi gato, se subió a la azotea cuando subió el precio. Dice que es su obra. Lo dejo creerlo.', 'Mi primo, el que "sabe de cripto", hoy sí le atinó. No le voy a decir que fue suerte.', 'Hoy el visor se me empañó de la emoción. O del vapor del café. Emoción, mejor.', 'Subimos y bailé en la azotea. Los vecinos de Obras públicas me miraron con lástima. No me importa.', 'Le puse un collar nuevo a Satoshi con las ganancias imaginarias. Él no sabe que son imaginarias.', 'Hoy soñé que llegábamos a la luna. Desperté en la azotea. Es casi lo mismo.'],
+      down: ['Satoshi se escondió abajo de la cama en cuanto vio el precio. Yo me metí con él.', 'Mi primo dice que "era obvio". Ayer dijo lo contrario. Mi primo es un oráculo bidireccional.', 'Bajó. Lloré. Hice un té. Volvió a bajar. Hice otro té. Tengo mucho té.', 'Hoy no miré el precio… bueno, 40 veces. Pero no más de 40.', 'Se me cayó el visor de la cara al ver la gráfica. Lo recogí. Seguimos.', 'Satoshi tiró el router. Por un momento el precio dejó de bajar. Gato sabio.'],
+      flat: ['Hoy bitcoin no se movió. Raro. Le tomé la temperatura y está normal. Sospechoso.', 'Satoshi durmió todo el día. El mercado también. Los dos roncan.', 'Día tranquilo en el oro virtual. Mi primo no me escribió. Doble milagro.', 'Me quedé viendo la gráfica plana como quien ve el mar. Bonito y aburrido.', 'Limpié mi visor. No había nada que ver, pero quedó brillante.'] } };
+  // cómo remata cada vecino una noticia
+  const REMATE = {
+    ACCIONES: { up: ['Yo no hice nada, pero me anoto el crédito.', 'La Chimuela y yo lo celebramos con pan dulce.', 'El Beto dice que fue por su playlist.'], down: ['No me vean a mí, yo nomás reporto.', 'La Chimuela también está de malas, así que estamos parejas.', 'Mañana le echamos más aceite y más ganas.'], flat: ['Lo cual, para una fábrica, es descanso.', 'Yo aproveché para dormirme en el turno.'] },
+    FIBRAS: { up: ['Hasta la señora Chuy sonrió, y eso cuesta.', 'Los ladrillos lo saben: aquí se vive bien.', 'Me lo tomo personal, con cafecito.'], down: ['Las rentas siguen llegando, aunque el precio ande llorón.', 'El ladrillo no se moja por dentro, se los juro.', 'Un casero de verdad no vende la casa porque llovió.'], flat: ['Ni modo, no todos los días hay chisme.', 'Aproveché para contar llaves.'] },
+    RENTA_FIJA: { up: ['Puntual, como me gusta.', 'Lo anoté con pluma, no con lápiz.', 'Esto es infraestructura de la buena.'], down: ['Igual seguimos construyendo, nomás más despacio.', 'Puse conos naranjas alrededor, por si acaso.', 'Ni el bache de la calle 5 es tan hondo.'], flat: ['Para nosotros, un día perfecto.', 'Ordenado, aburrido, hermoso.'] },
+    BITCOIN: { up: ['¡A LA AZOTEA!', 'Satoshi dice que lo vio venir. No lo vio venir.', 'Mi primo ya está presumiendo. Ni le contesten.'], down: ['Es oro virtual: sube como cohete, baja como piñata.', 'Estoy bien. Estoy… bien. ¿Alguien tiene un abrazo?', 'Satoshi y yo nos escondemos juntos, no se preocupen.'], flat: ['Sospechoso. Muy sospechoso.', 'Le tomé la temperatura al mercado y está normal.'] } };
   function estado(k) {
     const M = window.JVIEW || model, c = M.classes[k], items = c.items.filter(i => i.valor > 0);
     const chg = c.chg || 0, top = items.slice().sort((a, b) => Math.abs(b.hoy || 0) - Math.abs(a.hoy || 0))[0];
     const a = top ? (SHORTN && SHORTN[top.activo]) || top.activo : '';
-    const hoyS = new Date().toISOString().slice(0, 10), lim = new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10);
-    const divRec = (raw && raw.dividendos || []).filter(d => !d.proximo && d.fecha <= hoyS && d.fecha >= lim).find(d => items.some(i => i.activo === d.activo));
+    const lim = new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10);
+    const divRec = (raw && raw.dividendos || []).filter(d => !d.proximo && d.fecha <= hoyS() && d.fecha >= lim).find(d => items.some(i => i.activo === d.activo));
     const fuera = typeof BD !== 'undefined' && BD.some(b => (b.state === 'over' || b.state === 'under') && b.items.some(i => i.key === k));
     const aporto = typeof ST !== 'undefined' && ST && ST.contribMonths && ST.contribMonths.has(mes());
     const tormenta = typeof zones !== 'undefined' && zones[k] && zones[k].storm;
-    if (!items.length) return { e: 'broma', p: '', a };
-    if (divRec) return { e: 'fiesta', p: pctS(chg), a: (SHORTN && SHORTN[divRec.activo]) || divRec.activo };
-    if (k !== 'RENTA_FIJA') {
-      if (tormenta || chg <= -2) return { e: 'llorando', p: pctS(chg), a };
-      if (chg <= -0.3) return { e: 'triste', p: pctS(chg), a };
-    }
-    if (fuera) return { e: 'preocupado', p: pctS(chg), a };
-    if (k !== 'RENTA_FIJA' && chg >= 2) return { e: 'euforia', p: pctS(chg), a };
-    if (aporto && Math.random() < .35) return { e: 'orgulloso', p: pctS(chg), a };
-    if (k === 'RENTA_FIJA') return { e: Math.random() < .5 ? 'feliz' : 'broma', p: pctS(Math.max(0, chg)), a };
-    if (chg >= 0.3) return { e: 'feliz', p: pctS(chg), a };
-    return { e: 'broma', p: pctS(chg), a };
+    const mood = k === 'RENTA_FIJA' ? (chg >= 0 ? 'up' : 'down') : Math.abs(chg) < .3 ? 'flat' : chg > 0 ? 'up' : 'down';
+    let e = 'broma';
+    if (!items.length) e = 'broma';
+    else if (divRec) e = 'fiesta';
+    else if (k !== 'RENTA_FIJA' && (tormenta || chg <= -2)) e = 'llorando';
+    else if (k !== 'RENTA_FIJA' && chg <= -0.3) e = 'triste';
+    else if (fuera) e = 'preocupado';
+    else if (k !== 'RENTA_FIJA' && chg >= 2) e = 'euforia';
+    else if (aporto && hs(hoyS() + k) % 3 === 0) e = 'orgulloso';
+    else if (k === 'RENTA_FIJA') e = hs(hoyS() + k + 'r') % 2 ? 'feliz' : 'broma';
+    else if (chg >= 0.3) e = 'feliz';
+    return { e, mood, p: pctS(k === 'RENTA_FIJA' ? Math.max(0, chg) : chg), a: divRec ? ((SHORTN && SHORTN[divRec.activo]) || divRec.activo) : a, tiene: !!items.length };
   }
-  let box = null, cur = null, timer = null, hablaT = null, est = {};
-  function pintar(b) {
-    box = b; if (!b) return;
-    if (!listo() || window.JVIS) { b.innerHTML = ''; b.hidden = true; return; }
-    b.hidden = false;
+  // las tres cosas que puede decir un vecino: la noticia del día de su barrio, un capítulo de su novela o cómo se siente
+  function noticia(k, s) {
+    try {
+      const l = GOV.sectorNews ? GOV.sectorNews() : [], n = l.filter(x => x.x.key === k).sort((a, b) => Math.abs(b.x.hoy) - Math.abs(a.x.hoy))[0];
+      if (!n) return null; const R = REMATE[k][s.mood], r = R[hs(hoyS() + k + 'n') % R.length];
+      return n.text.replace(/\bde el\b/g, 'del').replace(/\ba el\b/g, 'al').replace(/\.?$/, '.') + ' ' + r;
+    } catch (e) { return null; }
+  }
+  const capitulo = (k, s) => { const L = SAGA[k][s.mood]; return L[hs(hoyS() + k + 's') % L.length]; };
+  function dicho(k, s, tipo) {
+    if (tipo === 'noticia') { const t = noticia(k, s); if (t) return t; }
+    if (tipo === 'saga') return capitulo(k, s);
+    return V.frase(k, s.e, { p: s.p, a: s.a });
+  }
+  let host = null, cur = null, timer = null, hideT = null, est = {}, turno = 0, ultimo = null, raf = false;
+  function globo() { let g = host.querySelector('#jGlobo'); if (!g) { g = document.createElement('div'); g.id = 'jGlobo'; g.className = 'jglobo'; g.hidden = true; g.innerHTML = '<canvas width="32" height="38"></canvas><div class="jgb"><b></b><p></p></div>'; host.appendChild(g); g.addEventListener('click', ocultar); } return g; }
+  function colocar() {
+    const g = host && host.querySelector('#jGlobo'); if (!g || g.hidden || !cur || typeof cityZoneScreen !== 'function') return;
+    const P = cityZoneScreen(cur), cw = host.clientWidth; if (!P) { g.hidden = true; return; }
+    const gw = g.offsetWidth, gh = g.offsetHeight, left = Math.max(6, Math.min(cw - gw - 6, P.x - 28)), top = Math.max(42, Math.min(P.y - gh - 10, (host.clientHeight || 300) - gh - 50));
+    g.style.left = left + 'px'; g.style.top = top + 'px';
+    g.classList.toggle('left', P.x - left > gw * .55);
+  }
+  function seguir() { if (raf) return; raf = true; (function fr() { raf = false; if (!host || !document.body.contains(host)) return; const g = host.querySelector('#jGlobo'); if (g && !g.hidden) { colocar(); raf = true; requestAnimationFrame(fr); } })(); }
+  function ocultar() { const g = host && host.querySelector('#jGlobo'); if (g) { g.classList.remove('pop'); g.hidden = true; } cur = null; }
+  function hablar(k, tap, tipo) {
+    if (!host || !listo() || window.JVIS || window.JQUIET) return;
+    est[k] = estado(k); const s = est[k]; if (!s.tiene) return;
+    const P = V.PERS[k], g = globo();
+    tipo = tipo || (tap ? 'noticia' : ['noticia', 'saga', 'estado'][turno++ % 3]);
+    g.querySelector('b').textContent = P.n; g.querySelector('p').textContent = dicho(k, s, tipo);
+    g.style.setProperty('--c', P.bar); g.dataset.k = k; cur = k; ultimo = k;
+    const c = g.querySelector('canvas').getContext('2d'); c.clearRect(0, 0, 32, 38); V.cara(k, s.e, 1.1, c);
+    g.hidden = false; g.classList.remove('pop'); void g.offsetWidth; g.classList.add('pop'); colocar(); seguir();
+    clearTimeout(hideT); hideT = setTimeout(() => { if (cur === k) ocultar(); }, tap ? 14000 : 10000);
+  }
+  function animar() { const still = matchMedia('(prefers-reduced-motion: reduce)').matches; if (still) return; const t0 = performance.now(); (function fr(now) { if (!host || !document.body.contains(host)) return; const g = host.querySelector('#jGlobo'); if (g && !g.hidden && cur) { const c = g.querySelector('canvas').getContext('2d'); c.clearRect(0, 0, 32, 38); V.cara(cur, (est[cur] || {}).e || 'feliz', (now - t0) / 1000, c); } requestAnimationFrame(fr); })(t0); }
+  function pintar() {
+    const cl = document.getElementById('classic'); if (!cl) return;
+    if (host !== cl) { host = cl; globo(); animar(); }
+    if (!listo() || window.JVIS) { ocultar(); return; }
     JORD.forEach(k => { est[k] = estado(k); });
-    if (!b.querySelector('.jvecs')) {
-      b.innerHTML = `<div class="jvecbub" id="jVecBub" hidden><button type="button" class="jvecx" aria-label="Cerrar">×</button><b></b><p></p></div>
-        <div class="jvecs" role="group" aria-label="Vecinos de la ciudad">${JORD.map(k => `<button type="button" class="jvec" data-k="${k}" style="--c:${V.PERS[k].bar}" aria-label="${V.PERS[k].n}, ${V.PERS[k].rol}"><canvas width="32" height="38"></canvas><span>${V.PERS[k].n}</span><i class="jvdot" hidden></i></button>`).join('')}</div>`;
-      b.querySelectorAll('.jvec').forEach(x => x.onclick = () => { hablar(x.dataset.k, true); if (typeof setFocus === 'function' && !window.JVIS) setFocus(x.dataset.k); });
-      b.querySelector('.jvecx').onclick = () => { b.querySelector('#jVecBub').hidden = true; cur = null; };
-      if (!timer) timer = setInterval(() => { if (!document.body.contains(b) || b.hidden || document.hidden) return; const vis = b.querySelector('.jvecs').getBoundingClientRect(); if (vis.bottom < 0 || vis.top > innerHeight) return; const k = JORD[Math.floor(Math.random() * 4)]; if (!cur || Math.random() < .5) hablar(k, false); }, 16000);
-      const still = matchMedia('(prefers-reduced-motion: reduce)').matches, t0 = performance.now();
-      (function fr(now) { if (!document.body.contains(b)) return; if (!b.hidden && !document.hidden) { const t = still ? 1.3 : (now - t0) / 1000; b.querySelectorAll('.jvec').forEach((x, i) => { const g = x.querySelector('canvas').getContext('2d'); g.clearRect(0, 0, 32, 38); V.cara(x.dataset.k, (est[x.dataset.k] || {}).e || 'feliz', t + i * .4, g); }); } if (!still) requestAnimationFrame(fr); })(t0);
-    }
-    b.querySelectorAll('.jvec').forEach(x => { const e = est[x.dataset.k].e; x.querySelector('.jvdot').hidden = !['fiesta', 'llorando', 'preocupado', 'euforia'].includes(e); x.dataset.e = e; });
-    if (cur) hablar(cur, false, true);
+    if (!timer) timer = setInterval(() => {
+      if (!host || host.hidden || document.hidden || window.JVIS || window.JQUIET || !listo()) return;
+      const r = host.getBoundingClientRect(); if (r.bottom < 40 || r.top > innerHeight - 40) return;
+      if (cur) return;
+      const cand = JORD.filter(k => est[k] && est[k].tiene && k !== ultimo), peso = k => ['fiesta', 'llorando', 'euforia', 'preocupado'].includes(est[k].e) ? 3 : 1;
+      const tot = cand.reduce((a, k) => a + peso(k), 0); let x = Math.random() * tot, k = cand[0]; for (const c of cand) { x -= peso(c); if (x <= 0) { k = c; break; } }
+      if (k) hablar(k, false);
+    }, 9000);
+    if (!cur) setTimeout(() => { if (!cur && host && !host.hidden) { const k = JORD.filter(k => est[k] && est[k].tiene).sort((a, b) => Math.abs((model.classes[b].chg || 0)) - Math.abs((model.classes[a].chg || 0)))[0]; if (k) hablar(k, false, 'noticia'); } }, 2500);
   }
-  function hablar(k, tap, quieto) {
-    if (!box) return; const bub = box.querySelector('#jVecBub'); if (!bub) return;
-    const P = V.PERS[k], s = est[k] || estado(k);
-    cur = k; bub.hidden = false; bub.style.setProperty('--c', P.bar);
-    bub.querySelector('b').textContent = P.n + ' · ' + P.rol.toLowerCase();
-    bub.querySelector('p').textContent = V.frase(k, s.e, { p: s.p, a: s.a });
-    box.querySelectorAll('.jvec').forEach(x => x.classList.toggle('on', x.dataset.k === k));
-    if (!quieto) { bub.classList.remove('pop'); void bub.offsetWidth; bub.classList.add('pop'); }
-    clearTimeout(hablaT); if (!tap) hablaT = setTimeout(() => { if (cur === k) { bub.hidden = true; cur = null; box.querySelectorAll('.jvec').forEach(x => x.classList.remove('on')); } }, 12000);
-  }
-  return { pintar, hablar, estado };
+  return { pintar, hablar, estado, ocultar };
 })();
 
 // ================= Juego: resumen al abrir, sobres de cartas y simulador de crisis =================
@@ -5837,7 +5879,7 @@ chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....
   const enMercado = () => !!document.querySelector('.mscr[data-scr="mercado"]:not([hidden])');
   let simPend = false;
   const tocaSim = () => !simOn && !VIS && listo() && (raw.posiciones || []).length && !st.get(K('simulacro'), 0) && enMercado() && !($j('jVeil') && !$j('jVeil').hidden) && !($j('mModal') && !$j('mModal').hidden);
-  function quizaSimulacro() { if (simPend || !tocaSim()) return; simPend = true; setTimeout(() => { simPend = false; if (tocaSim()) simulacro(); }, 1800); }
+  function quizaSimulacro() { /* el simulacro ya no arranca solo: se abre desde el Simulador */ }
 
   // ================= visitas entre ciudades =================
   // Solo se ven formas y porcentajes. Tu código lo activas tú y lo puedes apagar cuando quieras.
@@ -5977,9 +6019,9 @@ window.MAREA = (() => {
   };
   const SCR = [['fundacion', 'Fundación', 'Fundar'], ['mercado', 'Mercado', 'Mercado'], ['plano', 'Plano', 'Plano'], ['tesoreria', 'Tesorería', 'Tesorería'], ['ingresos', 'Ingresos', 'Ingresos'],
     ['cartas', 'Cartas', 'Cartas'], ['simula', 'Simulador', 'Simular'],
-    ['ayto', 'Ayuntamiento', 'Cabildo'], ['bitacora', 'Bitácora', 'Bitácora']];
-  const VISTA = { mercado: 'pf', tesoreria: 'ed', ingresos: 'prod', bitacora: 'rep', ayto: 'cierre' };   // vista de consulta de cada pantalla
-  const OLD = { ciudad: 'mercado', portafolio: 'mercado', edificios: 'tesoreria', produccion: 'ingresos', misiones: 'tesoreria', reportes: 'bitacora', ayuntamiento: 'ayto' };
+    ['ayto', 'Ayuntamiento', 'Cabildo']];
+  const VISTA = { mercado: 'pf', tesoreria: 'ed', ingresos: 'prod', ayto: 'cierre' };   // vista de consulta de cada pantalla
+  const OLD = { ciudad: 'mercado', portafolio: 'mercado', edificios: 'tesoreria', produccion: 'ingresos', misiones: 'tesoreria', reportes: 'mercado', bitacora: 'mercado', ayuntamiento: 'ayto' };
 
   // ---------- estructura: menú lateral, encabezado y pantallas ----------
   document.body.classList.add('marea');
@@ -6000,14 +6042,13 @@ window.MAREA = (() => {
   const help = () => null;   // la ayuda de cada pantalla ahora sale con el botón "¿Qué es esto?" del encabezado
   const put = (id, ...els) => els.filter(Boolean).forEach(e => S[id].appendChild(e));
   const box = id => { const e = mk('div', 'mbox'); e.id = id; return e; };
-  const B = { fund: box('mFund'), perf: box('mPerf'), ronda: box('mRonda'), plano: box('mPlano'), tes: box('mTes'), ing: box('mIng'), ayto: box('mAyto'), log: box('mLog'), cartas: box('mCartas'), simula: box('mSimula'), vec: box('mVec') };
+  const B = { fund: box('mFund'), perf: box('mPerf'), ronda: box('mRonda'), plano: box('mPlano'), tes: box('mTes'), ing: box('mIng'), ayto: box('mAyto'), log: box('mLog'), cartas: box('mCartas'), simula: box('mSimula') };
   put('fundacion', help('fundacion'), B.fund);
-  put('mercado', wrap.querySelector('.under'), $('stage'), B.vec, $('gaceta'), $('zoominfo'), $('events'), wrap.querySelector('.live'), B.perf, B.ronda, wrap.querySelector('.hud'), $('pfView'), $('districts'));
+  put('mercado', wrap.querySelector('.under'), $('stage'), $('zoominfo'), $('events'), wrap.querySelector('.live'), B.perf, B.ronda, wrap.querySelector('.hud'), $('pfView'), $('districts'));
   put('plano', help('plano'), B.plano, $('bands'));
   put('tesoreria', help('tesoreria'), B.tes, wrap.querySelector('.two'), $('edSearch'), $('portafolio'));
   put('ingresos', help('ingresos'), B.ing, $('prodView'));
   put('ayto', help('ayto'), B.ayto, $('ceremony'), $('metas'), $('cierrePanel'), $('simPanel'), $('sellPanel'));
-  put('bitacora', help('bitacora'), B.log, $('repView'));
   put('cartas', B.cartas);
   put('simula', B.simula);
   let cur = 'mercado';
@@ -6530,7 +6571,7 @@ window.MAREA = (() => {
     $('mRacha').textContent = ST ? `${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}` : '—';
     const n = Object.values(P).filter(Boolean).length; $('mBellN').textContent = n; $('mBellN').hidden = !n;
   }
-  const PANT = { fundacion: () => rFund(), mercado: () => { rPerf(); rRonda(); VECINOS_UI.pintar(B.vec); }, plano: () => rPlano(), tesoreria: () => rTes(), ingresos: () => rIng(), ayto: () => rAyto(), bitacora: () => rLog(), cartas: () => JUEGO.cartas(B.cartas), simula: () => JUEGO.simula(B.simula) };
+  const PANT = { fundacion: () => rFund(), mercado: () => { rPerf(); rRonda(); VECINOS_UI.pintar(); }, plano: () => rPlano(), tesoreria: () => rTes(), ingresos: () => rIng(), ayto: () => rAyto(), cartas: () => JUEGO.cartas(B.cartas), simula: () => JUEGO.simula(B.simula) };
   let elegido = !!(location.hash || '').slice(1), guiado = false;
   function render() {
     onOff();
