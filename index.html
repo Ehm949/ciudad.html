@@ -609,6 +609,179 @@ body.marea header.top .who{order:1}
 .frow.propia{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,.9fr) minmax(0,.7fr) 34px}
 .frow.propia .rf_x{padding:0;min-height:36px;height:36px;font-size:18px;line-height:1}
 @media (max-width:560px){.frow.propia{grid-template-columns:1fr 1fr 1fr 30px;row-gap:6px}.frow.propia .rf_n{grid-column:1/4}.frow.propia .rf_x{grid-column:4;grid-row:1}.frow.propia .fhead{display:none}.rfprow{padding-bottom:8px;border-bottom:1px dashed rgba(255,255,255,.08)}}
+
+/* ---------- Juego: resumen al abrir, sobres de cartas y simulador ---------- */
+.jpx{image-rendering:pixelated;flex:none}
+.jveil{position:fixed;inset:0;z-index:80;background:rgba(6,9,20,.6);display:grid;place-items:center;padding:16px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));opacity:0;transition:opacity .25s}
+.jveil.on{opacity:1}
+.jveil[hidden]{display:none}
+.jpop{width:min(340px,100%);background:linear-gradient(180deg,#18213d,#121a31);border:1px solid #3a4778;border-radius:18px;padding:14px 14px 12px;box-shadow:0 18px 50px rgba(0,0,0,.5);transform:translateY(14px) scale(.96);transition:transform .3s cubic-bezier(.2,.9,.3,1.3)}
+.jveil.on .jpop{transform:none}
+.jph{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.jph b{font-family:var(--f-display);font-weight:400;font-size:14px}
+.jph span{font-size:11.5px;color:var(--muted)}
+.jtot{display:flex;align-items:center;gap:8px;margin:10px 0 8px;font-family:var(--f-data);flex-wrap:wrap}
+.jtot .o{color:var(--muted);font-size:13px}.jtot .n{font-size:20px;font-weight:600}
+.jdel{font-family:var(--f-data);font-weight:600;font-size:13px;padding:2px 8px;border-radius:999px;display:inline-block}
+.jdel.up{background:rgba(125,255,176,.14);color:#7dffb0}.jdel.dn{background:rgba(255,122,122,.14);color:#ff7a7a}
+.jap{font-size:12px;color:var(--muted);margin:6px 0 0}
+.jrows{display:flex;flex-direction:column;gap:6px;margin:8px 0 12px}
+.jrow{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:10px;padding:6px 8px;border-radius:12px;background:rgba(255,255,255,.03)}
+.jrow .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;position:relative}
+.jrow .wx{position:absolute;right:-5px;top:-6px}
+.jrow .nm{font-weight:700;font-size:13.5px;line-height:1.15;min-width:0}
+.jrow .nm small{display:block;font-weight:500;color:var(--muted);font-size:11.5px;font-family:var(--f-data)}
+.jrow .dv{text-align:right;font-family:var(--f-data);font-size:13px;font-weight:600;line-height:1.15}
+.jrow .dv small{display:block;font-size:11px;font-weight:500}
+.jup{color:#7dffb0}.jdn{color:#ff7a7a}
+.jpop .mbtn{width:100%}
+
+/* sobres */
+.jpacks{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.jpack{position:relative;border:0;padding:0;background:none;cursor:pointer;font:inherit;color:inherit;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.jpack[disabled]{opacity:.45;cursor:default}
+.jfoil{width:100%;max-width:160px;aspect-ratio:5/7;border-radius:12px;position:relative;overflow:hidden;background:linear-gradient(160deg,var(--c) 0%,#1a1430 55%,var(--c) 120%);border:2px solid rgba(255,255,255,.18);box-shadow:0 10px 24px rgba(0,0,0,.4),inset 0 0 0 3px rgba(0,0,0,.25);transition:transform .2s}
+.jfoil::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.35) 45%,transparent 60%);transform:translateX(-120%);animation:jshine 3.2s ease-in-out infinite}
+.jfoil::after{content:"";position:absolute;left:0;right:0;top:9%;height:5px;background:repeating-linear-gradient(90deg,rgba(0,0,0,.35) 0 4px,transparent 4px 8px)}
+@keyframes jshine{60%,100%{transform:translateX(120%)}}
+.jfoil canvas{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:56%;image-rendering:pixelated}
+.jfoil .pn{position:absolute;left:6px;right:6px;bottom:10px;font-family:var(--f-display);font-size:12px;line-height:1.1;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+.jfoil .br{position:absolute;top:16%;left:0;right:0;font-family:var(--f-display);font-size:9px;letter-spacing:.12em;color:rgba(255,255,255,.75)}
+.jpack:not([disabled]):hover .jfoil{transform:translateY(-3px) rotate(-1deg)}
+.jpack .cnt{font-size:12.5px;color:var(--muted)}
+.jsob{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.jsob b{font-family:var(--f-data);font-size:22px;color:#ffc46b}
+.jstage{position:fixed;inset:0;z-index:85;background:radial-gradient(circle at 50% 40%,rgba(40,50,95,.94),rgba(6,9,20,.97));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px max(16px,env(safe-area-inset-right,0px)) 20px max(16px,env(safe-area-inset-left,0px))}
+.jstage[hidden]{display:none}
+.jstage .hint{color:var(--muted);font-size:13px;min-height:1.4em;text-align:center}
+.jstage .bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.jbig{width:min(200px,55vw)}
+.jbig .jfoil{max-width:none}
+.jbig.shake{animation:jshake .5s ease-in-out infinite}
+@keyframes jshake{25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+.jbig.tear .jfoil{animation:jtear .5s forwards}
+@keyframes jtear{to{transform:translateY(-40px) scale(1.1);opacity:0}}
+.jflip{width:min(270px,80vw);aspect-ratio:5/7;perspective:1000px;cursor:pointer;border:0;padding:0;background:none;display:block}
+.jflip .in{position:relative;width:100%;height:100%;transition:transform .6s cubic-bezier(.3,.8,.3,1);transform-style:preserve-3d}
+.jflip.open .in{transform:rotateY(180deg)}
+.jflip .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.jflip .face.front{transform:rotateY(180deg)}
+.jflip.enter{animation:jenter .45s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes jenter{from{transform:translateY(60px) scale(.8);opacity:0}}
+.jnew{position:absolute;top:-10px;right:-8px;z-index:3;font-family:var(--f-display);font-size:11px;background:#7dffb0;color:#062014;padding:3px 8px;border-radius:8px;transform:rotate(6deg);box-shadow:0 4px 10px rgba(0,0,0,.4)}
+.jsets{display:flex;gap:8px;flex-wrap:wrap}
+.jsets button{border:0;padding:0;background:none;cursor:pointer;font:inherit;color:inherit;display:flex;flex-direction:column;align-items:center;gap:6px;width:120px}
+.jsets button:focus-visible,.jpack:focus-visible,.jthumb:focus-visible,.jflip:focus-visible,.jchip:focus-visible{outline:2px solid #ffc46b;outline-offset:2px}
+
+/* carta: mismo marco y mismo reverso en todo el juego */
+.jcard{position:relative;width:100%;height:100%;border-radius:14px;padding:7px;font-weight:400;line-height:1.35;background:linear-gradient(145deg,#ffe6a3,#c9923c 40%,#ffe6a3 55%,#a8742b);box-shadow:0 14px 30px rgba(0,0,0,.45);font-size:12px;text-align:left;color:var(--fg)}
+.jcard::before,.jcard::after,.jback::before,.jback::after{content:"";position:absolute;width:6px;height:6px;background:#fff3c4;box-shadow:0 0 0 1px #7a5418;z-index:1}
+.jcard::before,.jback::before{left:3px;top:3px}.jcard::after,.jback::after{right:3px;bottom:3px}
+.jcard .ins{position:relative;height:100%;border-radius:9px;overflow:hidden;background:#101830;display:flex;flex-direction:column;border:1px solid #6b4a16}
+.jcard .band{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:5px 8px;background:var(--c);color:#140d04;font-weight:800;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase}
+.jcard .no{font-family:var(--f-data);font-weight:600;letter-spacing:0}
+.jcard .art{background:#000;border-bottom:2px solid var(--c)}
+.jcard .art canvas{display:block;width:100%;image-rendering:pixelated}
+.jcard .body{padding:8px 10px 6px;display:flex;flex-direction:column;gap:5px;flex:1;min-height:0}
+.jcard .ttl{font-family:var(--f-display);font-weight:400;font-size:15px;line-height:1.1;text-wrap:balance}
+.jcard .sub{font-family:var(--f-data);font-size:10.5px;color:var(--c)}
+.jcard .lbl{font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.jcard .txt{font-size:12px;line-height:1.35;margin:0}
+.jcard .dato{margin-top:auto;font-size:11px;line-height:1.3;color:#d9def0;background:rgba(255,255,255,.05);border-left:2px solid var(--c);padding:4px 6px;border-radius:0 6px 6px 0}
+.jcard .foot{display:flex;align-items:center;justify-content:space-between;padding:4px 10px 7px;font-size:10px;color:var(--muted)}
+.jcard .stars{display:flex;gap:3px}
+.jcard .stars i{width:7px;height:7px;transform:rotate(45deg);background:#3a4570;display:block}
+.jcard .stars i.on{background:#ffc46b;box-shadow:0 0 4px #ffc46b}
+.jcard.r3 .ins::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.18) 48%,transparent 60%);animation:jshine 4s ease-in-out infinite}
+.jcard.btc .ins{background:linear-gradient(180deg,#0a1222,#07101c)}
+.jcard.btc .ttl{color:#ffe3bf;text-shadow:0 0 8px rgba(247,147,26,.45)}
+.jcard.btc .sub{color:#83f2f7}
+.jback{position:relative;width:100%;height:100%;border-radius:14px;padding:7px;background:linear-gradient(145deg,#ffe6a3,#c9923c 40%,#ffe6a3 55%,#a8742b);box-shadow:0 14px 30px rgba(0,0,0,.45)}
+.jback .ins{height:100%;border-radius:9px;border:1px solid #6b4a16;background:radial-gradient(circle at 50% 42%,#2a3a78 0%,#141d3c 45%,#0b1128 100%);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.jback .ins::before{content:"";position:absolute;inset:0;background:repeating-radial-gradient(circle at 50% 120%,transparent 0 10px,rgba(131,242,247,.08) 10px 12px)}
+.jback .ins::after{content:"";position:absolute;inset:8px;border:1px dashed rgba(255,196,107,.35);border-radius:6px}
+.jback canvas{position:relative;width:42%;image-rendering:pixelated}
+.jback b{position:relative;font-family:var(--f-display);font-weight:400;font-size:15px;color:#ffc46b;letter-spacing:.06em;text-shadow:0 2px 0 #000}
+.jback small{position:relative;font-size:10px;letter-spacing:.2em;color:#9fb0e0;text-transform:uppercase}
+.jalb{display:flex;flex-direction:column;gap:10px}
+.jchips{display:flex;gap:6px;flex-wrap:wrap}
+.jchip{font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:var(--panel2);color:var(--fg);border-radius:999px;padding:6px 11px;cursor:pointer;display:flex;gap:6px;align-items:center}
+.jchip[aria-pressed=true]{border-color:var(--c);color:var(--c)}
+.jchip .mono{font-family:var(--f-data);font-size:11px;color:var(--muted)}
+.jprog{height:6px;border-radius:3px;background:var(--panel2);overflow:hidden}
+.jprog i{display:block;height:100%;background:var(--c);transition:width .4s}
+.jgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.jthumb{border:0;padding:0;background:none;cursor:pointer;aspect-ratio:5/7;font:inherit;color:inherit}
+.jthumb .jcard{font-size:9px;padding:4px;border-radius:9px}
+.jthumb .jcard .ins{border-radius:6px}
+.jthumb .jcard .band{font-size:7.5px;padding:3px 5px}
+.jthumb .jcard .body{padding:5px 6px}
+.jthumb .jcard .ttl{font-size:10px}
+.jthumb .jcard .sub{font-size:8px}
+.jthumb .jcard .lbl,.jthumb .jcard .txt,.jthumb .jcard .dato,.jthumb .jcard .foot{display:none}
+.jthumb .jback{padding:4px;border-radius:9px}
+.jthumb .jback .ins{border-radius:6px}
+.jthumb .jback b{font-size:22px}
+.jthumb .jback small,.jthumb .jback canvas{display:none}
+
+/* simulador */
+.jsim{display:flex;flex-direction:column;gap:12px}
+.jchart canvas{display:block;width:100%;height:210px}
+.jkpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.jkpi{background:var(--panel2);border-radius:14px;padding:10px 12px;min-width:0}
+.jkpi small{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.jkpi b{display:block;font-family:var(--f-data);font-size:18px;line-height:1.25}
+.jkpi span{font-size:12px;color:var(--muted)}
+.jcity{border-radius:14px;overflow:hidden;border:1px solid var(--line);max-width:560px}
+.jcity canvas{display:block;width:100%;image-rendering:pixelated}
+.jctrl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.jctrl input[type=range]{flex:1;min-width:140px;accent-color:#f8a43c}
+.jctrl .mes{font-family:var(--f-data);font-size:13px;min-width:86px}
+.jtog{display:flex;align-items:center;gap:8px;font-size:13.5px;flex-wrap:wrap}
+.jtog input[type=number]{width:96px;font:inherit;font-family:var(--f-data);background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:5px 8px}
+.jbrr{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px}
+.jbrr .jrow{grid-template-columns:30px minmax(0,1fr) auto}
+.jbrr .jrow .ic{width:30px;height:30px}
+.jlesson{border-left:3px solid #ffc46b;padding:8px 12px;background:rgba(255,196,107,.07);border-radius:0 12px 12px 0;font-size:13.5px}
+.jlbl{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.jfoil::before,.jcard.r3 .ins::after,.jbig.shake,.jbig.tear .jfoil,.jflip.enter{animation:none}.jflip .in,.jveil,.jpop{transition:none}}
+/* simulacro y visitas */
+.jbanner{position:fixed;z-index:70;left:50%;top:calc(env(safe-area-inset-top,0px) + 10px);transform:translateX(-50%);width:min(560px,calc(100% - 24px));background:rgba(14,20,38,.94);border:1px solid #3a4778;border-radius:16px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;box-shadow:0 12px 30px rgba(0,0,0,.45);backdrop-filter:blur(6px)}
+.jbanner[hidden]{display:none}
+.jbanner p{grid-column:1/-1;margin:0;font-size:14px;font-weight:600}
+.jbanner .mbtn{min-height:34px;padding:6px 12px;font-size:13px}
+.jtag{font-family:var(--f-display);font-weight:400;font-size:11px;letter-spacing:.08em;background:#ff7a7a;color:#1a0608;padding:3px 8px;border-radius:8px}
+.jbm{font-family:var(--f-data);font-size:13px;min-width:0}
+.jvchips{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.jvchip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;border:1px solid color-mix(in srgb,var(--c) 45%,var(--line));border-radius:999px;padding:3px 8px;background:color-mix(in srgb,var(--c) 10%,transparent)}
+.jvchip i{font-style:normal;font-family:var(--f-data);font-size:11px}
+.jvbox{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--line)}
+.jvform{display:flex;gap:8px}
+.jvform input{flex:1;min-width:0;font:inherit;font-family:var(--f-data);font-size:16px;letter-spacing:.12em;text-transform:uppercase;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.jvcode{display:flex;align-items:center;gap:10px}
+.jvcode b{font-family:var(--f-data);font-size:24px;letter-spacing:.18em;color:#83f2f7}
+body.m-visita .mscr[data-scr="mercado"] > :not(#stage){display:none!important}
+@media (max-width:600px){.jbanner{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 74px)}}
+/* vecinos */
+.jvecs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.jvec{--c:#ffc46b;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:6px 4px 5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font:inherit;color:var(--muted);font-size:11.5px;font-weight:700;position:relative;min-width:0;transition:transform .15s,border-color .15s}
+.jvec canvas{width:64px;height:76px;image-rendering:pixelated}
+.jvec span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.jvec.on,.jvec:hover{border-color:var(--c);color:var(--fg);transform:translateY(-2px)}
+.jvec:focus-visible{outline:2px solid #ffc46b;outline-offset:2px}
+.jvec .jvdot{position:absolute;top:6px;right:8px;width:9px;height:9px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px var(--panel)}
+.jvec[data-e="llorando"] .jvdot{background:#83c8ff}.jvec[data-e="preocupado"] .jvdot{background:#ff7a7a}
+.jvecbub{--c:#ffc46b;position:relative;margin:0 0 10px;background:#f4f1ff;color:#1a1430;border-radius:14px;padding:10px 36px 10px 12px;border-left:4px solid var(--c)}
+.jvecbub[hidden]{display:none}
+.jvecbub::after{content:"";position:absolute;left:28px;bottom:-8px;border:8px solid transparent;border-bottom:0;border-top-color:#f4f1ff}
+.jvecbub b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#5a4a8a;margin-bottom:2px}
+.jvecbub p{margin:0;font-size:14.5px;font-weight:600;line-height:1.35}
+.jvecbub.pop{animation:jvpop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes jvpop{from{transform:translateY(8px) scale(.96);opacity:0}}
+.jvecx{position:absolute;top:6px;right:8px;border:0;background:none;font:inherit;font-size:20px;line-height:1;color:#5a4a8a;cursor:pointer;padding:2px 6px}
+@media (max-width:420px){.jvec canvas{width:48px;height:57px}.jvec{font-size:10.5px}}
+@media (prefers-reduced-motion:reduce){.jvecbub.pop{animation:none}}
+body.m-visita #lvlTag,body.m-visita #mVec{display:none!important}
 </style>
 </head>
 <body>
@@ -673,7 +846,7 @@ body.marea header.top .who{order:1}
         <canvas id="city" role="img" aria-label="Ciudad animada con cuatro barrios: acciones, FIBRAs, renta fija y bitcoin"></canvas>
         <div class="badge" id="lvlTag"></div>
         <div class="badge" id="sampleTag" hidden>Datos de ejemplo</div>
-        <button class="ghost small back" id="btnBack" type="button" hidden>← Todo el pueblo</button>
+        <button class="ghost small back" id="btnBack" type="button" hidden>← Todo la ciudad</button>
         <div class="badge hint" id="hint">Toca un barrio para recorrerlo</div>
       </div>
     </div>
@@ -688,15 +861,15 @@ body.marea header.top .who{order:1}
     <div class="events" id="events"></div>
 
     <div class="hud">
-      <div class="stat"><div class="k">Tesoro del pueblo</div><div class="v" id="hTotal">—</div></div>
+      <div class="stat"><div class="k">Tesoro de la ciudad</div><div class="v" id="hTotal">—</div></div>
       <div class="stat"><div class="k">Prosperidad</div><div class="v" id="hGain">—</div></div>
-      <div class="stat"><div class="k">Hoy en el pueblo</div><div class="v" id="hToday">—</div></div>
+      <div class="stat"><div class="k">Hoy en la ciudad</div><div class="v" id="hToday">—</div></div>
       <div class="stat"><div class="k">Orden</div><div class="v" id="hBal">—</div></div>
       <div class="stat"><div class="k">Racha de obras</div><div class="v" id="hStreak">—</div></div>
     </div>
 
     <div class="live">
-      <div class="lhead"><span class="k" id="liveLabel">Hoy el pueblo prosperó</span><span class="big" id="liveToday">$0.00</span><span class="pill" id="livePct"></span></div>
+      <div class="lhead"><span class="k" id="liveLabel">Hoy la ciudad prosperó</span><span class="big" id="liveToday">$0.00</span><span class="pill" id="livePct"></span></div>
       <div class="lbreak" id="liveBreak"></div>
       <p class="sub" id="liveFoot"></p>
     </div>
@@ -722,7 +895,7 @@ body.marea header.top .who{order:1}
       </section>
       <section class="panel" id="sellPanel">
         <h2>Cosecha del tesoro</h2>
-        <p class="muted" style="margin:0">El pueblo trabaja para ti. Sacar parte del tesoro para darte un gusto, un viaje o cumplir una meta es justo: es el fruto de tu esfuerzo. Con <b>Para disfrutarlo</b>, escribes cuánto quieres sacar y la ciudad calcula de qué barrios saldría según tus metas. Con <b>Rebalancear</b>, la ciudad usa el dinero que ya tienes: vende donde hay de más y compra donde falta, barrio por barrio y parte por parte, para dejar el pueblo como lo planeaste. En los dos casos te prepara la carta con tus precios límite.</p>
+        <p class="muted" style="margin:0">La ciudad trabaja para ti. Sacar parte del tesoro para darte un gusto, un viaje o cumplir una meta es justo: es el fruto de tu esfuerzo. Con <b>Para disfrutarlo</b>, escribes cuánto quieres sacar y la ciudad calcula de qué barrios saldría según tus metas. Con <b>Rebalancear</b>, la ciudad usa el dinero que ya tienes: vende donde hay de más y compra donde falta, barrio por barrio y parte por parte, para dejar la ciudad como la planeaste. En los dos casos te prepara la carta con tus precios límite.</p>
         <div class="viewsw" role="group" aria-label="¿Para qué es la venta?" style="width:max-content;max-width:100%;margin-top:10px"><button type="button" id="smJoy" aria-pressed="true">Para disfrutarlo</button><button type="button" id="smRe" aria-pressed="false">Rebalancear</button></div>
         <div class="sim"><input id="sellAmt" type="number" min="0" step="any" inputmode="decimal" placeholder="¿Cuánto quieres sacar?" aria-label="Cuánto quieres sacar, en pesos"><button id="btnSell" type="button">Calcular</button></div>
         <label class="lim">Tu precio límite de venta<span><input id="sellLim" type="number" min="0" max="50" step="0.1" value="0" inputmode="decimal" aria-label="Tu precio límite de venta: porcentaje arriba del precio de hoy">% arriba del precio de hoy (0% = precio de hoy)</span></label>
@@ -732,12 +905,12 @@ body.marea header.top .who{order:1}
     <div class="grid" id="districts"></div>
 
     <section class="panel" id="portafolio">
-      <div class="phead"><h2>Tesorería del pueblo</h2></div>
+      <div class="phead"><h2>Tesorería de la ciudad</h2></div>
       <p class="muted" style="margin:0">Registra cuántos títulos tienes de cada edificio y a qué precio promedio los compraste. En las obras públicas (renta fija), solo el saldo. Deja vacío lo que no tengas. Actualízalo al menos una vez al mes para mantener tu racha de obras.</p>
-      <details id="calcBox"><summary style="cursor:pointer;font-weight:700">Así se calcula el tesoro del pueblo</summary><div id="calc" style="margin-top:10px"></div></details>
+      <details id="calcBox"><summary style="cursor:pointer;font-weight:700">Así se calcula el tesoro de la ciudad</summary><div id="calc" style="margin-top:10px"></div></details>
       <form id="pfForm" style="display:flex;flex-direction:column;gap:14px"></form>
     </section>
-    <p class="foot">Ciudad Marea es una herramienta educativa y de visualización: convierte tu portafolio en un pueblo y calcula con las metas y reglas que tú defines. No es una recomendación de inversión ni una oferta de compra o venta. Las noticias de la ciudad son narrativa inspirada en cómo se movió cada barrio, no noticias reales; las animaciones son representaciones y nada de esto es una promesa de resultados.</p>
+    <p class="foot">Ciudad Marea es una herramienta educativa y de visualización: convierte tu portafolio en una ciudad y calcula con las metas y reglas que tú defines. No es una recomendación de inversión ni una oferta de compra o venta. Las noticias de la ciudad son narrativa inspirada en cómo se movió cada barrio, no noticias reales; las animaciones son representaciones y nada de esto es una promesa de resultados.</p>
   </div>
 </div>
 <div class="celebrate" id="celebrate" hidden></div>
@@ -1445,13 +1618,13 @@ let J = { ...JUEGO_DEF };
 const ORDER = ['ACCIONES', 'FIBRAS', 'RENTA_FIJA', 'BITCOIN'];
 const CLS = {
   ACCIONES: { name: 'Acciones', color: '#f2b544', scene: 'Fábricas',
-    how: 'Aquí el pueblo es socio de miles de fábricas. Cuando venden más y ganan más, valen más, y muchas reparten parte de sus ganancias al tesoro (dividendos). Si la fábrica echa humo, está produciendo para el pueblo.' },
+    how: 'Aquí la ciudad es socio de miles de fábricas. Cuando venden más y ganan más, valen más, y muchas reparten parte de sus ganancias al tesoro (dividendos). Si la fábrica echa humo, está produciendo para la ciudad.' },
   FIBRAS: { name: 'FIBRAs', color: '#ef7b6c', scene: 'Inmuebles',
     how: 'Estos edificios se rentan: cada persona o camión que entra es un inquilino que paga. La mayor parte de las rentas llega al tesoro, normalmente cada trimestre. Si los inmuebles valen más, también sube su precio.' },
   RENTA_FIJA: { name: 'Renta fija', color: '#4fc3b0', scene: 'Obras públicas',
-    how: 'El pueblo le presta al gobierno central y cobra intereses todos los días. Con ese dinero se construyen escuelas, hospitales, bibliotecas, museos y estaciones de tren: cada obra que avanza es un pago de intereses para el tesoro.' },
+    how: 'La ciudad le presta al gobierno central y cobra intereses todos los días. Con ese dinero se construyen escuelas, hospitales, bibliotecas, museos y estaciones de tren: cada obra que avanza es un pago de intereses para el tesoro.' },
   BITCOIN: { name: 'Bitcoin', color: '#f7931a', scene: 'Oro virtual',
-    how: 'El oro virtual son monedas digitales: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico del pueblo.' }
+    how: 'El oro virtual son monedas digitales: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico de la ciudad.' }
 };
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 const LEVELS = [[0, 'Campamento'], [50000, 'Pueblo'], [250000, 'Villa'], [1000000, 'Ciudad'], [5000000, 'Metrópoli'], [20000000, 'Megalópolis']];
@@ -1481,7 +1654,7 @@ function rfpRowHtml(p, n) {
 function rfpFormHtml() {
   const own = model.items.filter(i => i.propia).map(i => ({ nombre: i.activo.replace(/ \(propia\)$/, ''), plataforma: i.plataforma || '', saldo: i.pos ? i.pos.saldo : i.valor, tasa: i.tasa }));
   return `<div class="fgroup" style="--c:var(--ren,#4fc3b0)" id="rfpBox"><h3><span class="dot"></span>Renta fija en otras plataformas</h3>
-    <p class="foot" style="margin:0">¿Tienes CETES, pagarés o cuentas que pagan interés fuera de tu casa de bolsa? Anótalos aquí con su saldo y su tasa anual. Cuentan como obras públicas del pueblo: entran a tus metas, al rebalanceo y a los intereses de cada día.</p>
+    <p class="foot" style="margin:0">¿Tienes CETES, pagarés o cuentas que pagan interés fuera de tu casa de bolsa? Anótalos aquí con su saldo y su tasa anual. Cuentan como obras públicas de la ciudad: entran a tus metas, al rebalanceo y a los intereses de cada día.</p>
     <div class="frow propia"><span class="fhead">Nombre</span><span class="fhead">Plataforma</span><span class="fhead">Saldo (MXN)</span><span class="fhead">Tasa anual</span><span></span></div>
     <div id="rfpRows">${own.map(rfpRowHtml).join('')}</div>
     <div><button type="button" class="ghost" id="rfpAdd">+ Agregar renta fija</button></div></div>`;
@@ -1949,8 +2122,8 @@ function apply(d) {
   const nCrypto = model.classes.BITCOIN.items.length;
   CLS.BITCOIN.name = nCrypto > 1 ? 'Cripto' : 'Bitcoin';
   CLS.BITCOIN.how = nCrypto > 1
-    ? 'El oro virtual son monedas digitales: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico del pueblo. Cada moneda que gira es una de tus criptos.'
-    : 'El oro virtual son monedas digitales: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico del pueblo.';
+    ? 'El oro virtual son monedas digitales: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico de la ciudad. Cada moneda que gira es una de tus criptos.'
+    : 'El oro virtual son monedas digitales: no cobran rentas ni intereses y valen lo que los mercaderes estén dispuestos a pagar. Pueden subir o bajar mucho en un día; por eso es el barrio más chico de la ciudad.';
   // altura de referencia por barrio: el edificio más grande de hoy
   const gmax = Math.max(1, ...model.items.map(i => i.valor));
   ORDER.forEach(k => { const m = Math.max(0, ...model.classes[k].items.map(i => i.valor)); refMax[k] = m || gmax; });
@@ -1960,8 +2133,8 @@ function apply(d) {
   ST = streakInfo(); MI = missionInfo(); CE = ceremonyInfo(ST); EV = eventsInfo();
   const nAlerts = BD.filter(b => b.state === 'over' || b.state === 'under').length;
   if (!firstApply && prevAlerts > 0 && nAlerts === 0) celebrateT = 3;
-  if (!firstApply && MI.done && prevMission === false) celebrate('¡Misión cumplida! Tu pueblo estrena ' + (MI.it ? obraName(MI.it).replace(/^(una|un) /, '') : 'barrio') + '.');
-  else if (!firstApply && CE.done && prevCer === false) celebrate('¡Ceremonia completada! Tu pueblo quedó en equilibrio.');
+  if (!firstApply && MI.done && prevMission === false) celebrate('¡Misión cumplida! Tu ciudad estrena ' + (MI.it ? obraName(MI.it).replace(/^(una|un) /, '') : 'barrio') + '.');
+  else if (!firstApply && CE.done && prevCer === false) celebrate('¡Ceremonia completada! Tu ciudad quedó en equilibrio.');
   firstApply = false;
   $('whoName').textContent = 'Gobierno de ' + (d.nombre || '');
   $('sampleTag').hidden = !DEMO;
@@ -2034,7 +2207,7 @@ function renderBands() {
   if (!BD.length) { box.hidden = true; return; }
   box.hidden = false;
   const lab = { ok: ['ok', 'En tu margen'], near: ['hi', 'Cerca de tu límite'], over: ['lo', 'Arriba de tu límite'], under: ['lo', 'Abajo de tu límite'], pend: ['info', 'Sin tolerancia guardada'] };
-  box.innerHTML = `<div class="phead"><h2>Semáforo del pueblo</h2><span class="pill ${balanced() ? 'ok' : 'lo'}">${balanced() ? 'Todo en tu margen' : 'Hay barrios fuera de tu margen'}</span></div>
+  box.innerHTML = `<div class="phead"><h2>Semáforo de la ciudad</h2><span class="pill ${balanced() ? 'ok' : 'lo'}">${balanced() ? 'Todo en tu margen' : 'Hay barrios fuera de tu margen'}</span></div>
     <div class="bands">${BD.map(b => {
       const tl = b.tol == null ? 0 : b.tol, ext = Math.max(tl * 2.2, 2), lo = Math.max(0, b.target - ext), hi = b.target + ext, span = hi - lo || 1;
       const pos = v => Math.max(0, Math.min(100, (v - lo) / span * 100));
@@ -2059,8 +2232,8 @@ function renderEvents() {
   BD.filter(b => b.state === 'over' || b.state === 'under').forEach(b => {
     const title = b.state === 'over' ? `${b.name}: arriba de tu límite` : `${b.name}: abajo de tu límite`;
     const msg = b.msg ? esc(b.msg) : b.state === 'over'
-      ? `Tiene ${pct1(b.actual)} del pueblo y el límite que definiste es ${pct1(b.target + b.tol)}.`
-      : `Tiene ${pct1(b.actual)} del pueblo y el mínimo que definiste es ${pct1(Math.max(0, b.target - b.tol))}: le faltan unos ${mxn.format(b.toLimit)} para volver a tu margen.`;
+      ? `Tiene ${pct1(b.actual)} de la ciudad y el límite que definiste es ${pct1(b.target + b.tol)}.`
+      : `Tiene ${pct1(b.actual)} de la ciudad y el mínimo que definiste es ${pct1(Math.max(0, b.target - b.tol))}: le faltan unos ${mxn.format(b.toLimit)} para volver a tu margen.`;
     out.push(`<div class="ev alert" style="--c:var(--bad)"><span class="dot"></span><div><b>${esc(title)}</b><span>${msg}</span></div></div>`);
   });
   const sinPrecio = model.items.filter(i => i.key !== 'RENTA_FIJA' && i.pos && (+i.pos.titulos > 0) && !(+i.precio_mxn > 0));
@@ -2085,7 +2258,7 @@ function renderMission() {
   if (MI.type === 'metas') {
     html += `<p class="mission-scene">Define tus metas.</p><p class="muted" style="margin:0">Escribe qué parte de tu tesoro quieres en cada barrio y con qué instrumento lo cubres. Con eso la ciudad calcula tu misión del mes.</p>`;
   } else if (MI.type === 'fundar') {
-    html += `<p class="mission-scene">Funda tu pueblo.</p><p class="muted" style="margin:0">Registra tu tesoro en la tesorería para que aparezcan tus primeros edificios. La próxima misión llega el mes que entra.</p>`;
+    html += `<p class="mission-scene">Funda tu ciudad.</p><p class="muted" style="margin:0">Registra tu tesoro en la tesorería para que aparezcan tus primeros edificios. La próxima misión llega el mes que entra.</p>`;
   } else {
     const it = MI.it, col = CLS[it.key].color;
     html += `<p class="mission-scene" style="--c:${col}"><span class="dot"></span> Tus metas piden ${obraName(it)}.</p>
@@ -2100,7 +2273,7 @@ function renderMission() {
   <div><button type="button" class="small" id="goForm">${MI.type === 'metas' ? 'Ir a tus metas' : 'Ir a la tesorería'}</button></div>`;
   box.innerHTML = html;
   $('goForm').onclick = () => MI.type === 'metas' ? goSec('ayuntamiento', 'metas') : GOV.openTesoreria();
-  collapsible(box, 'mission', MI.type === 'metas' ? 'Define tus metas para ver tu misión.' : MI.type === 'fundar' ? 'Funda tu pueblo: registra tu tesoro.' : `${MI.done ? '<b>¡Cumplida!</b> ' : ''}Según tus metas, a <b>${esc(MI.it.activo)}</b> le faltan unos <b>${mxn.format(MI.amt)}</b>.`, true);
+  collapsible(box, 'mission', MI.type === 'metas' ? 'Define tus metas para ver tu misión.' : MI.type === 'fundar' ? 'Funda tu ciudad: registra tu tesoro.' : `${MI.done ? '<b>¡Cumplida!</b> ' : ''}Según tus metas, a <b>${esc(MI.it.activo)}</b> le faltan unos <b>${mxn.format(MI.amt)}</b>.`, true);
 }
 
 function renderStreak() {
@@ -2126,7 +2299,7 @@ function renderStreak() {
     <div class="months" aria-label="Últimos 12 meses">${months.map(x => `<div><i class="${ST.contribMonths.has(x) ? 'on' : ''} ${x === cm && !ST.contribMonths.has(x) ? 'now' : ''}" title="${MESES[+x.slice(5) - 1]} ${x.slice(0, 4)}"></i>${MESES[+x.slice(5) - 1].slice(0, 1).toUpperCase()}</div>`).join('')}</div>
     <h2 style="font-size:15px;margin-top:4px">Logros</h2>
     <div class="ach">${ach.map(([t, on]) => `<div class="${on ? 'on' : ''}">${t}</div>`).join('')}</div>
-    <p class="foot">La racha cuenta los meses en que el pueblo recibió presupuesto nuevo. Actualiza la tesorería al menos una vez al mes.</p>`;
+    <p class="foot">La racha cuenta los meses en que la ciudad recibió presupuesto nuevo. Actualiza la tesorería al menos una vez al mes.</p>`;
   collapsible(box, 'streak', `<b>${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}</b> seguidos · récord ${ST.best} · ${ST.thisMonth ? 'este mes ya cuenta' : 'falta el presupuesto de este mes'}`, true);
 }
 
@@ -2185,7 +2358,7 @@ $('pfForm').addEventListener('submit', async e => {
   btn.disabled = true; toast.className = 'toast muted'; toast.textContent = 'Guardando…';
   try {
     apply(await api('guardar', { posiciones, rfp }));
-    $('toast').className = 'toast pos'; $('toast').textContent = 'Registrado. El pueblo ya se actualizó.';
+    $('toast').className = 'toast pos'; $('toast').textContent = 'Registrado. La ciudad ya se actualizó.';
     if (!window.goSec) $('stage').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
   } catch (err) { $('toast').className = 'toast neg'; $('toast').textContent = err.message; }
   if ($('btnSave')) $('btnSave').disabled = false;
@@ -2314,7 +2487,7 @@ $('simAmt').addEventListener('keydown', e => { if (e.key === 'Enter') renderSim(
 let simTimer = 0; $('simAmt').addEventListener('input', () => { clearTimeout(simTimer); simTimer = setTimeout(renderSim, 350); });
 
 // ---------- nivel de la ciudad (la máquina del tiempo se quitó) ----------
-function setTravel(years, silent) { travelYears = 0; view = model; layout(); if (!silent) renderTm(); }
+function setTravel(years, silent) { travelYears = 0; view = window.JVIEW || model; layout(); if (!silent) renderTm(); }
 function renderTm() { $('lvlTag').textContent = 'Nivel: ' + levelOf(model.total).name; }
 
 function renderZoom() {
@@ -2351,7 +2524,7 @@ let sessionStart = performance.now(), liveLast = 0, liveTarget = 0, liveShown = 
 function renderLive() {
   const M = model, hoy = M.hoy, ayer = M.total - hoy, pct = ayer > 0 ? hoy / ayer * 100 : 0;
   liveTarget = hoy;
-  $('liveLabel').textContent = hoy >= 0 ? 'Hoy el pueblo prosperó' : 'Hoy el pueblo tuvo pérdidas';
+  $('liveLabel').textContent = hoy >= 0 ? 'Hoy la ciudad prosperó' : 'Hoy la ciudad tuvo pérdidas';
   $('livePct').className = 'pill ' + (hoy >= 0 ? 'ok' : 'lo');
   $('livePct').textContent = (pct >= 0 ? '+' : '−') + Math.abs(pct).toFixed(2) + '% contra ayer';
   const groups = (M.groups && M.groups.length)
@@ -2361,10 +2534,10 @@ function renderLive() {
     .map(g => `<span class="lchip"><span class="dot" style="--c:${g.col}"></span>${esc(g.name)} <b class="${g.v >= 0 ? 'pos' : 'neg'}">${signed2(g.v)}</b></span>`).join('');
   const mov = M.items.filter(i => i.valor > 0 && i.key !== 'RENTA_FIJA').sort((a, b) => b.hoy - a.hoy);
   const top = mov[0], worst = mov[mov.length - 1];
-  $('liveFoot').innerHTML = `Ayer al cierre el tesoro del pueblo valía <b>${mxn.format(ayer)}</b>; ahora vale <b>${mxn.format(M.total)}</b>.`
+  $('liveFoot').innerHTML = `Ayer al cierre el tesoro de la ciudad valía <b>${mxn.format(ayer)}</b>; ahora vale <b>${mxn.format(M.total)}</b>.`
     + ((b => b ? ` Lo que más subió hoy: ${esc(b.text)} (<b>${esc(b.x.title)}</b> ${signed2(b.x.hoy)}).` : '')(GOV.sectorBest(true)))
     + ((b => b ? ` Lo que más bajó: ${esc(b.text)} (<b>${esc(b.x.title)}</b> ${signed2(b.x.hoy)}).` : '')(GOV.sectorBest(false)))
-    + `<br>Fábricas e inmuebles se comparan contra el cierre anterior, con tipo de cambio; el oro virtual contra las 7:00 de hoy; las obras públicas suman un día de intereses. Aparte, el pueblo cobra unos <b>${mxn2.format(incomePerDay(M))}</b> al día en intereses, rentas y dividendos.`;
+    + `<br>Fábricas e inmuebles se comparan contra el cierre anterior, con tipo de cambio; el oro virtual contra las 7:00 de hoy; las obras públicas suman un día de intereses. Aparte, la ciudad cobra unos <b>${mxn2.format(incomePerDay(M))}</b> al día en intereses, rentas y dividendos.`;
 }
 function tickLive(now) {
   if (!model || now - liveLast < 40) return;
@@ -2429,7 +2602,7 @@ const clampX = (x, s) => Math.max(0, Math.min(Math.max(0, LW - W / s), x));
 const camY = s => LH - H / s;   // la ciudad siempre queda anclada abajo
 const toS = (wx, wy) => [(wx - cam.x) * cam.s, (wy - camY(cam.s)) * cam.s];
 function aimCamera(k, snap) { camT = camFor(k); if (snap || reduce) cam = { ...camT }; dirty = true; }
-function setFocus(k, fromMap) { focus = k; selected = null; aimCamera(k, false); renderZoom(); if (!fromMap) VL.onFocus(k); }
+function setFocus(k, fromMap) { focus = k; selected = null; aimCamera(k, false); renderZoom(); if (!fromMap) VL.onFocus(k); if (k && window.VECINOS_UI && !window.JVIS) VECINOS_UI.hablar(k, true); }
 $('btnBack').addEventListener('click', () => setFocus(null));
 
 // ---------- edificios (se dibujan una vez por cambio de datos) ----------
@@ -3140,7 +3313,7 @@ function update(dt, prewarm) {
   healT -= dt;
   if (healT <= 0) {
     healT = W < 600 ? 3.6 + Math.random() * 1.6 : 2.3 + Math.random() * 1.4;   // de vez en cuando, sin saturar
-    if (parts.filter(p => p.type === 'heal').length < 2) {
+    if (parts.filter(p => p.type === 'heal').length < 2 && !window.JQUIET) {
       const cand = [];
       ORDER.forEach(k => { const z = zones[k]; if (!z || (focus && focus !== k)) return; z.items.forEach(b => { if (b.owned && b.it.hoy > 0 && b.it.activo !== lastHeal) cand.push(b); }); });
       const vis = cand.filter(b => { const [sx] = toS(b.x + b.w / 2, 0); return sx > 20 && sx < W - 20; });
@@ -3187,6 +3360,7 @@ function composeWorld() {
   });
   drawBonoAnims(g);
   drawCriptoAnims(g); drawFabricas(g);
+  drawTemporada(g);
   if (FLAMA) emitters.forEach((e, i) => { drawFlama(g, e, i); drawDivisa(g, e, i); });
   else emitters.forEach((e, i) => { px(g, e.x - 1, e.y - 2, 2, 1, Math.sin(T * 3 + i * 1.7) > 0 ? '#ff2d55' : '#5a1020'); if (e.up) px(g, e.x - 1.5, e.y, 3, 1, `rgba(255,150,70,${.5 + .5 * Math.sin(T * 11 + i)})`); });
   // los barrios con lluvia se oscurecen
@@ -3200,6 +3374,59 @@ function composeWorld() {
     g.globalAlpha = .38 * (1 - y / (LH - SHORE)); g.drawImage(FB, 0, Math.floor(src), LW, 2, dx, SHORE + 4 + y, LW, 1);
   }
   g.globalAlpha = 1;
+}
+
+// ---------- temporadas: adornos según la fecha real (solo ambiente; no cambian nada del dinero) ----------
+let TEMP = null, TEMPt = -99;
+function aniversarioCiudad() {
+  try { const h = ((raw && raw.historial) || []).filter(r => r.mes).map(r => String(r.mes)).sort(); if (!h.length) return false; const [y, m] = h[0].split('-').map(Number), d = new Date(); return d.getMonth() + 1 === m && d.getFullYear() > y; } catch (e) { return false; }
+}
+function temporada() {
+  if (window.CM_TEMP !== undefined) return window.CM_TEMP;
+  if (T - TEMPt < 20) return TEMP; TEMPt = T;
+  const d = new Date(), m = d.getMonth() + 1, dd = d.getDate();
+  TEMP = (m === 12 && dd === 31) || (m === 1 && dd === 1) ? 'anio' : (m === 12 && dd >= 12) || (m === 1 && dd <= 6) ? 'navidad' : (m === 10 && dd >= 28) || (m === 11 && dd <= 2) ? 'muertos'
+    : m === 9 && dd <= 16 ? (dd >= 15 ? 'grito' : 'patrias') : aniversarioCiudad() ? 'aniv' : null;
+  return TEMP;
+}
+function papelPicado(g, cols) {
+  const A = [0, LW / 3, LW * 2 / 3, LW], ys = x => { for (let i = 1; i < A.length; i++) if (x <= A[i]) return 12 + Math.round(9 * Math.sin(Math.PI * (x - A[i - 1]) / (A[i] - A[i - 1]))); return 12; };
+  for (let x = 0; x < LW; x += 2) px(g, x, ys(x), 2, 1, 'rgba(230,230,240,.55)');
+  for (let i = 0, x = 6; x < LW - 4; x += 13, i++) {
+    const y = ys(x) + 1, dx = Math.round(Math.sin(T * 1.6 + i * .9)), c = cols[i % cols.length];
+    px(g, x - 4 + dx, y, 9, 8, c);
+    for (let j = 0; j < 9; j += 2) px(g, x - 4 + dx + j, y + 8, 1, 1, c);
+    g.globalAlpha = .45; px(g, x - 2 + dx, y + 2, 1, 1, '#1a1020'); px(g, x + 2 + dx, y + 2, 1, 1, '#1a1020'); px(g, x + dx, y + 4, 1, 1, '#1a1020'); px(g, x - 2 + dx, y + 5, 2, 1, '#1a1020'); px(g, x + 1 + dx, y + 5, 2, 1, '#1a1020'); g.globalAlpha = 1;
+  }
+}
+function fuegos(g, n) {
+  const C = ['#ff4f9a', '#ffd36b', '#7af0b0', '#83c8ff', '#ff7a1a', '#c08aff'];
+  for (let k = 0; k < n; k++) {
+    const P = 2.6, tt = T + k * P / n, cyc = Math.floor(tt / P), p = (tt % P) / P, cx = 20 + hash2(cyc, k * 7) * (LW - 40), cy = 34 + hash2(k * 3, cyc) * 70, col = C[(cyc + k) % C.length];
+    if (p < .18) { const yy = SHORE - (SHORE - cy) * (p / .18); px(g, cx, yy, 1, 3, '#ffe9b0'); continue; }
+    const q = (p - .18) / .82, r = 4 + q * 26; g.globalAlpha = Math.max(0, 1 - q);
+    for (let a = 0; a < 18; a++) { const an = a / 18 * Math.PI * 2; px(g, cx + Math.cos(an) * r, cy + Math.sin(an) * r + q * q * 10, 1, 1, col); if (q < .5) px(g, cx + Math.cos(an) * r * .6, cy + Math.sin(an) * r * .6, 1, 1, '#fff6d8'); }
+    g.globalAlpha = 1;
+  }
+}
+function drawTemporada(g) {
+  const t = temporada(); if (!t) return;
+  if (t === 'muertos') {
+    papelPicado(g, ['#ff4f9a', '#ff9a1a', '#9b5cff', '#2fd6a0', '#ffd36b', '#4fa3ff']);
+    for (let i = 0; i < 28; i++) { const x = (i * 97 + T * 7 * (1 + i % 3)) % LW, y = (i * 53 + T * (9 + i % 5 * 3)) % SHORE; px(g, x + Math.sin(T * 2 + i) * 2, y, 2, 1, i % 3 ? '#ff9a1a' : '#ffc21a'); }
+    for (let x = 14; x < LW; x += 46) { px(g, x, SHORE - 3, 2, 3, '#f1ece2'); px(g, x, SHORE - 5 + (Math.sin(T * 9 + x) > 0 ? 0 : 1), 2, 2, Math.sin(T * 7 + x) > 0 ? '#ffd36b' : '#ff9a1a'); }
+  } else if (t === 'navidad' || t === 'anio') {
+    for (let i = 0; i < 120; i++) { const x = (i * 89 + Math.sin(T * .8 + i) * 6 + T * 3) % LW, y = (i * 37 + T * (8 + i % 4 * 2)) % (SHORE + 4); px(g, (x + LW) % LW, y, 1, 1, i % 5 ? 'rgba(255,255,255,.85)' : '#ffffff'); }
+    const C = ['#ff4f5e', '#2fd67a', '#ffd36b', '#4fa3ff'];
+    for (let x = 0, i = 0; x < LW; x += 9, i++) { const y = 12 + Math.round(6 * Math.sin(Math.PI * ((x % (LW / 3)) / (LW / 3)))); px(g, x, y, 9, 1, 'rgba(40,70,40,.8)'); const on = ((i + Math.floor(T * 2)) % 3) !== 0; px(g, x + 4, y + 1, 2, 2, on ? C[i % 4] : '#333a50'); }
+    if (t === 'anio') fuegos(g, 4);
+  } else if (t === 'patrias' || t === 'grito') {
+    papelPicado(g, ['#1e9e5a', '#f1ece2', '#e0303a']);
+    if (t === 'grito') fuegos(g, 3);
+  } else if (t === 'aniv') {
+    const C = ['#ff4f9a', '#ffd36b', '#7af0b0', '#83c8ff', '#c08aff'];
+    for (let i = 0; i < 9; i++) { const x = (i * 71 + 30) % LW + Math.sin(T + i) * 4, y = SHORE + 10 - ((T * 11 + i * 37) % (SHORE + 30)); px(g, x - 3, y - 4, 6, 7, C[i % 5]); px(g, x - 2, y - 5, 4, 1, C[i % 5]); px(g, x - 2, y + 3, 4, 1, C[i % 5]); px(g, x - 2, y - 3, 1, 2, '#ffffff'); for (let j = 0; j < 6; j++) px(g, x + (j % 2), y + 2 + j, 1, 1, 'rgba(230,230,240,.6)'); }
+  }
 }
 
 // ---------- el sol del oro virtual: una esfera de pixel art que gira, con franjas que bajan ----------
@@ -3407,7 +3634,7 @@ function drawLabels() {
     if (!focus && ctx.measureText(label).width + 30 > zw && narrow) label = `${CLS[k].scene.split(' ')[0]} ${Math.round(c.pct)}%`;
     const ip = narrow ? 1 : 1.25, tw = ctx.measureText(label).width + 22 + 12 * ip - 4;
     let lx = focus ? Math.max(10, Math.min(W - tw - 10, zx + 6)) : Math.max(4, Math.min(W - tw - 4, zx + 4));
-    const sub = focus && c.valor ? (k === 'RENTA_FIJA' ? 'intereses ' : 'hoy ') + signed2(c.hoy) : '';   // la vista completa solo dice barrio y %
+    const sub = focus && c.valor && !window.JVIS ? (k === 'RENTA_FIJA' ? 'intereses ' : 'hoy ') + signed2(c.hoy) : '';   // la vista completa solo dice barrio y %
     let ly = 10; while (!free(lx, ly, tw, 20) && ly < 120) ly += 28;
     placed.push([lx, ly, tw, 20]);
     const zAlert = c.items.some(i => ALERT.has(i.activo));
@@ -3507,7 +3734,7 @@ requestAnimationFrame(frame);
 // Vista desde arriba o inclinada, pines, ficha de lugar, recorrido guiado y vista de calle.
 const VL = { onSelect() {}, onFocus() {}, resize() {}, clear() {}, build() {}, burst() {} };
 
-// ================= Gobierno del pueblo: crónica del día, decretos y carta del gobernador =================
+// ================= Gobierno de la ciudad: crónica del día, decretos y carta del gobernador =================
 // Los sucesos son narrativa: se eligen según cuánto subió o bajó cada activo hoy (estable durante el día).
 let SIM = null;
 const GOV = (() => {
@@ -3521,10 +3748,10 @@ const GOV = (() => {
   // ---------- sucesos por tipo de barrio ----------
   const P = {
     fabrica: {
-      up: ['{L} recibió un pedido nuevo y sus obreros sacaron turno extra.', 'Llegó maquinaria nueva a {L}: hoy produjo más que ayer.', 'Los comerciantes del reino compraron más productos de {L}.', '{L} cerró un buen trato con un pueblo vecino.', 'Los ingenieros de {L} mejoraron la línea de producción.'],
-      upBig: ['¡Contrato récord! {L} venderá su producción a todo el reino.', '{L} inauguró una línea nueva y el pueblo salió a celebrar.', 'Un invento de los ingenieros de {L} se volvió la sensación del mercado.', 'Caravanas de compradores hicieron fila frente a {L}.'],
+      up: ['{L} recibió un pedido nuevo y sus obreros sacaron turno extra.', 'Llegó maquinaria nueva a {L}: hoy produjo más que ayer.', 'Los comerciantes del reino compraron más productos de {L}.', '{L} cerró un buen trato con una ciudad vecina.', 'Los ingenieros de {L} mejoraron la línea de producción.'],
+      upBig: ['¡Contrato récord! {L} venderá su producción a todo el reino.', '{L} inauguró una línea nueva y la ciudad salió a celebrar.', 'Un invento de los ingenieros de {L} se volvió la sensación del mercado.', 'Caravanas de compradores hicieron fila frente a {L}.'],
       down: ['Se descompuso una máquina en {L} y la producción se frenó un poco.', 'Los proveedores de {L} llegaron tarde por la lluvia.', 'Un pedido de {L} se canceló a última hora.', 'Faltó materia prima en {L} y trabajaron a medio turno.'],
-      downBig: ['Huelga en {L}: los obreros pararon y la producción se detuvo.', 'Un apagón dejó a oscuras a {L} durante horas.', 'Se inundó la bodega de {L}; nadie salió herido, pero hubo pérdidas.', 'Un pueblo vecino dejó de comprarle a {L}.']
+      downBig: ['Huelga en {L}: los obreros pararon y la producción se detuvo.', 'Un apagón dejó a oscuras a {L} durante horas.', 'Se inundó la bodega de {L}; nadie salió herido, pero hubo pérdidas.', 'Una ciudad vecina dejó de comprarle a {L}.']
     },
     inmueble: {
       up: ['Nuevos inquilinos firmaron contrato en {L}.', 'Las rentas de {L} se cobraron completas y a tiempo.', '{L} se llenó de visitantes.', 'Remodelaron la entrada de {L} y ahora todos quieren estar ahí.'],
@@ -3544,7 +3771,7 @@ const GOV = (() => {
   // decisiones del gobernador: el activo recibió presupuesto nuevo este mes
   const DEC = {
     up: ['Tu decreto dio frutos: el presupuesto que mandaste a {L} ya trabaja y hoy rindió.', '{L}, donde construiste este mes, tuvo un buen día.'],
-    upBig: ['Mandaste presupuesto a {L} y hoy fue de lo que más creció.', 'El pueblo celebra tu decreto: {L} se disparó justo después de que invertiste ahí.'],
+    upBig: ['Mandaste presupuesto a {L} y hoy fue de lo que más creció.', 'La ciudad celebra tu decreto: {L} se disparó justo después de que invertiste ahí.'],
     down: ['{L} tuvo un mal día, pero tu decreto es de largo plazo: las obras siguen.', 'Bajó {L}, donde construiste este mes.']
   };
   const fam = it => it.key === 'FIBRAS' ? 'inmueble' : it.key === 'BITCOIN' ? 'boveda' : 'fabrica';
@@ -3575,10 +3802,10 @@ const GOV = (() => {
   }
   function headline() {
     const M = model, ayer = M.total - M.hoy, pct = ayer > 0 ? M.hoy / ayer * 100 : 0, amt = mxn.format(Math.abs(M.hoy));
-    if (pct >= 1) return { text: `¡Día de fiesta en el pueblo! El tesoro creció ${amt}.`, tone: 'up' };
-    if (M.hoy >= 0) return { text: `Día próspero en el pueblo: el tesoro creció ${amt}.`, tone: 'up' };
-    if (pct > -1) return { text: `Día gris en el pueblo: el tesoro bajó ${amt}.`, tone: 'down' };
-    return { text: `Día de tormenta en el pueblo: el tesoro bajó ${amt}.`, tone: 'down' };
+    if (pct >= 1) return { text: `¡Día de fiesta en la ciudad! El tesoro creció ${amt}.`, tone: 'up' };
+    if (M.hoy >= 0) return { text: `Día próspero en la ciudad: el tesoro creció ${amt}.`, tone: 'up' };
+    if (pct > -1) return { text: `Día gris en la ciudad: el tesoro bajó ${amt}.`, tone: 'down' };
+    return { text: `Día de tormenta en la ciudad: el tesoro bajó ${amt}.`, tone: 'down' };
   }
   // lo más importante del día: los edificios que más se movieron, más un resumen de las obras públicas
   function feed() {
@@ -3593,13 +3820,13 @@ const GOV = (() => {
   }
   const chgTxt = it => it.key === 'RENTA_FIJA' ? (it.tasa != null && it.tasa !== '' ? it.tasa + '% anual' : 'intereses') : (it.cambio_dia >= 0 ? '▲ ' : '▼ ') + Math.abs(it.cambio_dia).toFixed(2) + '%';
   // ---------- noticias por sector (cada grupo de tus bandas: Estados Unidos, desarrollados, FIBRAs, oro virtual, bonos…) ----------
-  // {L} es el lugar del pueblo ("las fábricas de Estados Unidos", "el barrio de Inmuebles"…); las frases no dependen del género del sujeto.
+  // {L} es el lugar de la ciudad ("las fábricas de Estados Unidos", "el barrio de Inmuebles"…); las frases no dependen del género del sujeto.
   const NEWS = {
     fabrica: {
-      up: ['Pedidos nuevos en {L}: los obreros sacaron turno extra.', 'Llegó maquinaria nueva a {L} y la producción subió.', 'Los comerciantes del reino compraron más productos de {L}.', 'Buen día en {L}: se cerraron tratos con pueblos vecinos.', 'Los ingenieros mejoraron las líneas de producción en {L}.'],
+      up: ['Pedidos nuevos en {L}: los obreros sacaron turno extra.', 'Llegó maquinaria nueva a {L} y la producción subió.', 'Los comerciantes del reino compraron más productos de {L}.', 'Buen día en {L}: se cerraron tratos con ciudades vecinas.', 'Los ingenieros mejoraron las líneas de producción en {L}.'],
       upBig: ['¡Contrato récord para {L}! Venderán su producción a todo el reino.', 'Fiesta en {L}: inauguraron una línea de producción nueva.', 'Caravanas de compradores hicieron fila frente a {L}.', 'Un invento salido de {L} es la sensación del mercado.'],
       down: ['Se descompuso maquinaria en {L} y la producción bajó un poco.', 'Faltó materia prima en {L}: hoy se trabajó a medio turno.', 'Lluvia en los caminos: los proveedores llegaron tarde a {L}.', 'Se cancelaron algunos pedidos en {L}.'],
-      downBig: ['Huelga en {L}: la producción se detuvo.', 'Apagón en {L}: horas sin producir.', 'Un pueblo vecino dejó de comprarle a {L}.', 'Se inundaron bodegas en {L}; no hubo heridos, pero sí pérdidas.']
+      downBig: ['Huelga en {L}: la producción se detuvo.', 'Apagón en {L}: horas sin producir.', 'Una ciudad vecina dejó de comprarle a {L}.', 'Se inundaron bodegas en {L}; no hubo heridos, pero sí pérdidas.']
     },
     inmueble: {
       up: ['Nuevos inquilinos firmaron contrato en {L}.', 'Las rentas de {L} se cobraron completas y a tiempo.', 'Remodelaron {L} y ahora todos quieren estar ahí.', 'Mucha gente de visita hoy en {L}.'],
@@ -3618,7 +3845,7 @@ const GOV = (() => {
   };
   const NEWSDEC = {
     up: ['Tu decreto dio frutos: el presupuesto que mandaste a {L} hoy rindió.', '{L}, donde construiste este mes, tuvo un buen día.'],
-    upBig: ['Mandaste presupuesto a {L} y hoy fue de lo que más creció.', 'El pueblo celebra tu decreto: {L} se disparó justo después de que invertiste ahí.'],
+    upBig: ['Mandaste presupuesto a {L} y hoy fue de lo que más creció.', 'La ciudad celebra tu decreto: {L} se disparó justo después de que invertiste ahí.'],
     down: ['Mal día en {L}, pero tu decreto es de largo plazo: las obras siguen.', 'Bajó {L}, donde construiste este mes.']
   };
   const famK = k => k === 'FIBRAS' ? 'inmueble' : k === 'BITCOIN' ? 'boveda' : k === 'RENTA_FIJA' ? 'obra' : 'fabrica';
@@ -3661,7 +3888,7 @@ const GOV = (() => {
       <div class="gz-tick" tabindex="0" aria-label="Noticias del día por barrio"><div class="gz-track"><div class="gz-run">${run}</div><div class="gz-run" aria-hidden="true">${run}</div></div></div>
       <details class="gz-more"><summary>Ver todas las noticias</summary>
         <ul class="gz">${list.map(n => `<li class="${n.tone}" style="--c:${CLS[n.x.key].color}"><span class="dot"></span><div><b>${esc(n.text)}</b><span>${esc(n.x.title)} · <i class="${n.x.hoy >= 0 ? 'pos' : 'neg'}">${secChg(n.x)}</i>${n.decree ? ' · <em>tu decreto</em>' : ''}</span></div></li>`).join('')}</ul>
-        <p class="foot">Noticias por barrio, inspiradas en cómo se movió hoy cada grupo de tu tesoro: son narrativa del pueblo, no noticias reales. "Tu decreto" marca los barrios que recibieron presupuesto este mes.</p></details>`;
+        <p class="foot">Noticias por barrio, inspiradas en cómo se movió hoy cada grupo de tu tesoro: son narrativa de la ciudad, no noticias reales. "Tu decreto" marca los barrios que recibieron presupuesto este mes.</p></details>`;
     const r = box.querySelector('.gz-run');
     requestAnimationFrame(() => { box.style.setProperty('--gz-dur', Math.max(18, Math.round(r.scrollWidth / 55)) + 's'); });
   }
@@ -3740,12 +3967,12 @@ const GOV = (() => {
       cols: ['OBRA / ACTIVO', 'TÍTULOS', 'PRECIO HOY', 'TU PRECIO\nLÍMITE', 'MONTO SEGÚN\nTUS METAS'],
       boxes: [['LO QUE APORTAS', mxn.format(S.amt), 'tu aportación de este mes'],
         ['SIN ASIGNAR', mxn.format(S.rest), S.rest < 1 ? 'se usó toda tu aportación' : 'no alcanza para otro título'],
-        ['TESORO DEL PUEBLO', mxn.format(M.total), lv.next ? `faltan ${short(lv.next[0] - M.total)} para ${lv.next[1]}` : 'nivel máximo']],
-      gline: g => `${g.now == null ? 'Captura tu portafolio para ver cómo está hoy' : 'Hoy ocupa ' + pct1(g.now) + ' del pueblo'}  ·  con esta compra ${pct1(g.after)}  ·  tu meta ${pct1(g.ideal)}`,
+        ['TESORO DE LA CIUDAD', mxn.format(M.total), lv.next ? `faltan ${short(lv.next[0] - M.total)} para ${lv.next[1]}` : 'nivel máximo']],
+      gline: g => `${g.now == null ? 'Captura tu portafolio para ver cómo está hoy' : 'Hoy ocupa ' + pct1(g.now) + ' de la ciudad'}  ·  con esta compra ${pct1(g.after)}  ·  tu meta ${pct1(g.ideal)}`,
       file: 'Carta-de-aportacion-' + ymd(now) + '.pdf' };
   }
 
-  // ---------- papel del pueblo (fondo de todas las cartas), dibujado en canvas ----------
+  // ---------- papel de la ciudad (fondo de todas las cartas), dibujado en canvas ----------
   let paperURL = null;
   function paper() {
     if (paperURL) return paperURL;
@@ -3771,7 +3998,7 @@ const GOV = (() => {
       c.fillStyle = '#fcf7ea'; c.fillRect(-3.2, -3.2, 6.4, 6.4); c.strokeStyle = '#8b6a3c'; c.lineWidth = .4; c.strokeRect(-3.2, -3.2, 6.4, 6.4);
       c.fillStyle = cols[i]; c.fillRect(-1.8, -1.8, 3.6, 3.6); c.restore();
     });
-    // escudo del pueblo con laureles
+    // escudo de la ciudad con laureles
     const ex = 105, ey = 26;
     [-1, 1].forEach(sd => {
       const pt = a => [ex + sd * 14.5 * Math.cos(a), ey + 2 + 13 * Math.sin(a)];
@@ -3864,7 +4091,7 @@ const GOV = (() => {
   // ---------- cosecha del tesoro (venta) ----------
   // Dos intenciones:
   //  · disfrutar: sacar dinero para ti. Sin tope: primero sale de donde el tesoro rebasa tu meta y el resto parejo de todos
-  //    los barrios, para que el pueblo conserve las proporciones que definiste.
+  //    los barrios, para que la ciudad conserve las proporciones que definiste.
   //  · reordenar: vender solo lo que rebasa tu meta en cada barrio y llevarlo a los que quedaron abajo.
   let SELL = null, sellTouched = false, tesInit = false, sellTimer = null;
   let sellMode = 'disfrutar';
@@ -3968,7 +4195,7 @@ const GOV = (() => {
     return { mode: joy ? 'disfrutar' : 'reordenar', req, A, maxA, total, rowsG, items, dest, buys, buyRest, gain, T, T2, fromOver, overG: groups.filter(g => isOverG(g) && excG(g, T) > 1) };
   }
 
-  // ---------- rebalanceo: con el dinero que ya tienes, dejar el pueblo como lo planeaste en Tus metas ----------
+  // ---------- rebalanceo: con el dinero que ya tienes, dejar la ciudad como la planeaste en Tus metas ----------
   // Por barrio y por parte (en Fábricas: EE.UU., Desarrollados, Emergentes; en los demás: cada instrumento con peso).
   // Lo que cuenta pero no está en tus metas se queda igual, salvo que el barrio rebase su meta y no alcance con lo demás.
   const REBAL_MIN = T => Math.max(50, T * 0.002);
@@ -4046,7 +4273,7 @@ const GOV = (() => {
     const T = P.T, pc = v => (Math.round(v * 10) / 10).toFixed(1) + '%';
     if (P.total < 1 && !P.buys.length) {
       SELL = null;
-      out.innerHTML = `<p class="foot" style="margin-top:6px"><b>Tu pueblo ya está como lo planeaste.</b> Ningún barrio ni parte se aleja de su meta más de ${mxn.format(P.lim)}, así que no hay nada que mover.</p>${P.avisos.map(a => `<p class="foot">${a}</p>`).join('')}`;
+      out.innerHTML = `<p class="foot" style="margin-top:6px"><b>Tu ciudad ya está como la planeaste.</b> Ningún barrio ni parte se aleja de su meta más de ${mxn.format(P.lim)}, así que no hay nada que mover.</p>${P.avisos.map(a => `<p class="foot">${a}</p>`).join('')}`;
       return;
     }
     SELL = P;
@@ -4068,7 +4295,7 @@ const GOV = (() => {
       });
     });
     const notes = [];
-    notes.push(`Se mueven <b>${mxn.format(P.total)}</b> dentro del pueblo: se vende donde hay de más y se compra donde falta. El tesoro sigue valiendo ${mxn.format(T)}.`);
+    notes.push(`Se mueven <b>${mxn.format(P.total)}</b> dentro de la ciudad: se vende donde hay de más y se compra donde falta. El tesoro sigue valiendo ${mxn.format(T)}.`);
     if (P.buyRest >= 1) notes.push(`Quedan ${mxn.format(P.buyRest)} sin asignar porque no completan otro título; déjalos para la próxima aportación.`);
     if (P.gain >= 1) notes.push(`Ganancia estimada sobre tu precio promedio: ${mxn.format(P.gain)}. Vender con ganancia puede causar impuestos; tu casa de bolsa te da la constancia.`);
     else if (P.gain <= -1) notes.push(`Esta venta realiza una pérdida estimada de ${mxn.format(-P.gain)} sobre tu precio promedio.`);
@@ -4092,7 +4319,7 @@ const GOV = (() => {
     }
     out.innerHTML = (lista ? `<div class="mlist">${lista}</div>` : `<div class="tbl"><table><thead><tr><th>Barrio / parte</th><th style="text-align:right">Hoy</th><th style="text-align:right">Tu meta</th><th style="text-align:right">Después</th><th style="text-align:right">Vende</th><th style="text-align:right">Compra</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${rows}</tbody></table></div>`) + `
       ${notes.map(n => `<p class="foot" style="margin-top:6px">${n}</p>`).join('')}
-      <p class="foot" style="margin-top:6px">Las diferencias menores a ${mxn.format(P.lim)}, o que no completan un título, no se mueven: así no se vende y recompra por centavos. Precio límite de venta: ${LIMV()}% arriba del precio de hoy; de compra: ${DESC()}% abajo (los de la Aportación del mes). Primero se vende y, con el dinero que entra, se compra. Después actualiza la Tesorería del pueblo.</p>
+      <p class="foot" style="margin-top:6px">Las diferencias menores a ${mxn.format(P.lim)}, o que no completan un título, no se mueven: así no se vende y recompra por centavos. Precio límite de venta: ${LIMV()}% arriba del precio de hoy; de compra: ${DESC()}% abajo (los de la Aportación del mes). Primero se vende y, con el dinero que entra, se compra. Después actualiza la Tesorería de la ciudad.</p>
       <p class="foot" style="margin-top:6px">${pie()}</p>
       <div class="simact"><button type="button" id="btnSellPdf">Descargar carta (PDF)</button><button type="button" class="ghost" id="btnSellPrint">Imprimir carta</button></div>`;
     $('btnSellPdf').onclick = () => { const L = sellLetterData(); if (L) savePdf(L, $('btnSellPdf')); };
@@ -4108,7 +4335,7 @@ const GOV = (() => {
     if (sellMode === 'disfrutar') {
       return `<p class="foot" style="margin-top:6px">Escribe cuánto quieres sacar y toca <b>Calcular</b>. ${sg.amt >= 1
         ? `Según tus metas, primero sale de donde el tesoro rebasa tu límite (hoy hasta ${mxn.format(sg.amt)} en ${names}) y el resto parejo de todos los barrios.`
-        : 'Hoy ningún barrio rebasa el límite que definiste, así que sale parejo de todos los barrios y el pueblo conserva tus proporciones.'}</p>`;
+        : 'Hoy ningún barrio rebasa el límite que definiste, así que sale parejo de todos los barrios y la ciudad conserva tus proporciones.'}</p>`;
     }
     if (sg.amt >= 1) return `<p class="foot" style="margin-top:6px">Según tus metas, ${names} rebasa el límite que definiste por <b>${mxn.format(sg.amt)}</b>. Toca <b>Calcular</b> para ver los títulos.</p>`;
     return `<p class="foot" style="margin-top:6px">Hoy ningún barrio rebasa el límite que definiste: no hay nada que reordenar. Si quieres sacar dinero para ti, elige <b>Para disfrutarlo</b>.</p>`;
@@ -4169,15 +4396,15 @@ const GOV = (() => {
       ${P.buyRest >= 1 ? `<tr><td><b>Sin asignar</b> <span class="muted">no alcanza para otro título</span></td><td class="n"><b>${mxn.format(P.buyRest)}</b></td><td></td></tr>` : ''}</tbody></table></div>
       <p class="foot" style="margin-top:6px">Primero se vende y, con el dinero que entra, se compra. Tu precio límite de compra es el de la Aportación del mes (${DESC()}% abajo del precio de hoy).</p>` : '';
     const notes = [];
-    if (joy) notes.push(`<b>${mxn.format(P.total)}</b> para ti. El tesoro queda en ${mxn.format(P.T - P.total)} y sigue trabajando${P.fromOver >= 1 ? `; ${mxn.format(P.fromOver)} salen de lo que sobraba, así que el pueblo además queda más ordenado` : ''}.`);
-    if (P.req > P.maxA + 1) notes.push(joy ? `No puedes sacar más de lo que vale el pueblo: se ajustó a ${mxn.format(P.maxA)}.` : `Según tus metas, lo que rebasa es ${mxn.format(P.maxA)}; el cálculo para reordenar no pasa de ahí. Para sacar más, elige Para disfrutarlo.`);
+    if (joy) notes.push(`<b>${mxn.format(P.total)}</b> para ti. El tesoro queda en ${mxn.format(P.T - P.total)} y sigue trabajando${P.fromOver >= 1 ? `; ${mxn.format(P.fromOver)} salen de lo que sobraba, así que la ciudad además queda más ordenada` : ''}.`);
+    if (P.req > P.maxA + 1) notes.push(joy ? `No puedes sacar más de lo que vale la ciudad: se ajustó a ${mxn.format(P.maxA)}.` : `Según tus metas, lo que rebasa es ${mxn.format(P.maxA)}; el cálculo para reordenar no pasa de ahí. Para sacar más, elige Para disfrutarlo.`);
     if (Math.abs(P.total - P.A) >= 1) notes.push(joy ? `Se redondea a títulos completos: la venta queda en ${mxn.format(P.total)}.` : `La venta queda en ${mxn.format(P.total)}: se ajustó a títulos completos y para que cuadre exacto con lo que se compra (sin vender y recomprar lo mismo).`);
     if (P.gain >= 1) notes.push(`Ganancia estimada sobre tu precio promedio: ${mxn.format(P.gain)}. Vender con ganancia puede causar impuestos; tu casa de bolsa te da la constancia.`);
     else if (P.gain <= -1) notes.push(`Esta venta realiza una pérdida estimada de ${mxn.format(-P.gain)} sobre tu precio promedio.`);
     out.innerHTML = `<div class="tbl"><table><thead><tr><th scope="col">#</th><th>Barrio / obra</th><th style="text-align:right">Hoy</th><th style="text-align:right">Tu meta</th><th style="text-align:right">Después</th><th style="text-align:right">Vende</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${rows}</tbody></table></div>
       ${notes.map(n => `<p class="foot" style="margin-top:6px">${n}</p>`).join('')}
       ${dest}
-      <p class="foot" style="margin-top:6px">${joy ? 'Primero sale de donde el tesoro rebasa tu meta y el resto parejo de todos los barrios.' : 'Solo se vende lo que rebasa tu meta y ningún barrio queda abajo de ella.'} Tu precio límite de venta es el que escribiste arriba (${LIMV()}% arriba del precio de hoy). Después de vender, actualiza la Tesorería del pueblo.</p>
+      <p class="foot" style="margin-top:6px">${joy ? 'Primero sale de donde el tesoro rebasa tu meta y el resto parejo de todos los barrios.' : 'Solo se vende lo que rebasa tu meta y ningún barrio queda abajo de ella.'} Tu precio límite de venta es el que escribiste arriba (${LIMV()}% arriba del precio de hoy). Después de vender, actualiza la Tesorería de la ciudad.</p>
       <p class="foot" style="margin-top:6px">${pie()}</p>
       <div class="simact"><button type="button" id="btnSellPdf">Descargar carta (PDF)</button><button type="button" class="ghost" id="btnSellPrint">Imprimir carta</button></div>`;
     $('btnSellPdf').onclick = () => { const L = sellLetterData(); if (L) savePdf(L, $('btnSellPdf')); };
@@ -4187,22 +4414,22 @@ const GOV = (() => {
     const s = [], nm = clean((raw && raw.nombre) || '').split(' ')[0], hi = nm ? 'Gobernador ' + nm : 'Gobernador';
     const place = g => placeOf(g.key || g.members[0].key, g.name);
     if (P.mode === 'disfrutar') {
-      s.push(`${hi}: el pueblo prosperó gracias a tu trabajo y hoy te entrega ${mxn.format(P.total)} de su cosecha. Disfrútalos: para eso se construyó.`);
+      s.push(`${hi}: la ciudad prosperó gracias a tu trabajo y hoy te entrega ${mxn.format(P.total)} de su cosecha. Disfrútalos: para eso se construyó.`);
       if (P.fromOver >= 1 && P.overG[0]) s.push(`Según tus metas, salen primero de ${P.overG.map(place).join(' y ')}, donde el tesoro rebasaba tu meta${P.total - P.fromOver >= 1 ? ', y el resto parejo de todos los barrios' : ''}.`);
-      else s.push('Según tus metas, salen parejo de todos los barrios y el pueblo conserva tus proporciones.');
+      else s.push('Según tus metas, salen parejo de todos los barrios y la ciudad conserva tus proporciones.');
       s.push(`El tesoro queda en ${mxn.format(P.T - P.total)} y sigue trabajando para ti.`);
       return s.join(' ');
     }
     if (P.units) {
       const ven = P.groups.filter(r => r.inv >= 1).map(r => place(r.g)), com = P.groups.filter(r => r.bought >= 1).map(r => place(r.g));
-      s.push(`${hi}: para que el pueblo quede como lo planeaste en tus metas, se mueven ${mxn.format(P.total)} con el mismo tesoro que ya tienes.`);
+      s.push(`${hi}: para que la ciudad quede como lo planeaste en tus metas, se mueven ${mxn.format(P.total)} con el mismo tesoro que ya tienes.`);
       if (ven.length) s.push(`Se vende donde hay de más: ${ven.join(', ')}.`);
       if (com.length) s.push(`Con ese dinero se compra donde falta: ${com.join(', ')}.`);
       s.push('Ningún edificio se destruye: las obras solo cambian de barrio.');
       return s.join(' ');
     }
     const top = P.rowsG[0];
-    s.push(`${hi}: ${place(top.g)} tiene ${pct1(top.now)} del pueblo y tu meta es ${pct1(top.g.tG)}.`);
+    s.push(`${hi}: ${place(top.g)} tiene ${pct1(top.now)} de la ciudad y tu meta es ${pct1(top.g.tG)}.`);
     const others = P.rowsG.slice(1).map(r => place(r.g));
     s.push(`Según tus metas, la venta para reordenar es de ${mxn.format(P.total)}${others.length ? ', junto con ' + others.join(' y ') : ''}.`);
     if (P.dest[0]) s.push(`Con tus metas, ese dinero iría a${place(P.dest[0].g).replace(/^el /, 'l ').replace(/^(?!l )/, ' ')}${P.dest[1] ? ' y ' + place(P.dest[1].g) : ''}, que quedaron abajo de su meta.`);
@@ -4237,7 +4464,7 @@ const GOV = (() => {
     const notes = [];
     if (spentT - P.total >= 1) notes.push(`A precio de hoy la venta deja ${mxn.format(P.total)}; si las órdenes se llenan a tu precio límite, serían unos ${mxn.format(spentT)}.`);
     if (!joy && (P.buys || []).length) notes.push(`Primero se vende y, con el dinero que entra, se compra lo marcado como "Comprar"${P.buyRest >= 1 ? `; quedan ${mxn.format(P.buyRest)} sin asignar` : ''}. Tu precio límite de compra: ${DESC()}% abajo del precio de hoy.`);
-    if (joy) notes.push('Cuando se venda, el dinero queda en tu cuenta de la casa de bolsa y de ahí lo pasas a tu banco. Después actualiza la Tesorería del pueblo con tus nuevos títulos.');
+    if (joy) notes.push('Cuando se venda, el dinero queda en tu cuenta de la casa de bolsa y de ahí lo pasas a tu banco. Después actualiza la Tesorería de la ciudad con tus nuevos títulos.');
     if (P.gain >= 1) notes.push(`Ganancia estimada sobre tu precio promedio: ${mxn.format(P.gain)}. Vender con ganancia puede causar impuestos; tu casa de bolsa te da la constancia fiscal.`);
     else if (P.gain <= -1) notes.push(`Esta venta realiza una pérdida estimada de ${mxn.format(-P.gain)} sobre tu precio promedio.`);
     notes.push(`Tu precio límite de venta: ${LIMV()}% arriba del precio de hoy (lo definiste tú; 0% es el precio de hoy). Si el precio no llega a ese nivel, la orden no se ejecuta. Las obras públicas se retiran por monto.`);
@@ -4248,14 +4475,14 @@ const GOV = (() => {
       boxes: joy
         ? [['TU COSECHA', mxn.format(P.total), 'el fruto de tu esfuerzo, para disfrutarlo'],
           ['DE LO QUE SOBRABA', P.fromOver >= 1 ? mxn.format(P.fromOver) : '—', P.fromOver >= 1 ? 'sale de barrios arriba de tu meta' : 'se toma parejo de todos los barrios'],
-          ['TESORO DEL PUEBLO', mxn.format(P.T - P.total), 'queda trabajando para ti']]
+          ['TESORO DE LA CIUDAD', mxn.format(P.T - P.total), 'queda trabajando para ti']]
         : [['LO QUE SE MUEVE', mxn.format(P.total), 'se vende donde sobra y se compra donde falta'],
           ['BARRIOS QUE SE AJUSTAN', String(P.mov || P.rowsG.length), 'para quedar como en tus metas'],
-          ['TESORO DEL PUEBLO', mxn.format(M.total), 'no cambia: el dinero se reinvierte en el pueblo']],
-      gline: g => g.compra ? `Compra con el dinero de la venta  ·  tu meta ${pct1(g.ideal)}` : `Hoy ocupa ${pct1(g.now)} del pueblo  ·  después ${pct1(g.after)}  ·  tu meta ${pct1(g.ideal)}`,
+          ['TESORO DE LA CIUDAD', mxn.format(M.total), 'no cambia: el dinero se reinvierte en la ciudad']],
+      gline: g => g.compra ? `Compra con el dinero de la venta  ·  tu meta ${pct1(g.ideal)}` : `Hoy ocupa ${pct1(g.now)} de la ciudad  ·  después ${pct1(g.after)}  ·  tu meta ${pct1(g.ideal)}`,
       file: (joy ? 'Carta-de-cosecha-' : 'Carta-de-rebalanceo-') + ymd(now) + '.pdf' };
   }
-  // se llama en cada actualización del pueblo
+  // se llama en cada actualización de la ciudad
   function sellHint() {
     if (!tesInit) {
       tesInit = true;
@@ -4311,7 +4538,7 @@ const GOV = (() => {
     font('times', 'bold', 22, C.head); txt('Carta del Gobernador', 105, 50, { align: 'center' });
     font('helvetica', 'normal', 9.5, C.soft);
     txt(`${L.sub} · ${fechaLarga(L.now)} de ${L.now.getFullYear()}`, 105, 56.5, { align: 'center' });
-    txt(`${L.name ? 'Gobierno de ' + L.name + ' · ' : ''}Pueblo nivel ${L.lvl}`, 105, 61.5, { align: 'center' });
+    txt(`${L.name ? 'Gobierno de ' + L.name + ' · ' : ''}Ciudad nivel ${L.lvl}`, 105, 61.5, { align: 'center' });
     doc.setDrawColor(...C.gold); doc.setLineWidth(.35); doc.line(48, 65.5, 99, 65.5); doc.line(111, 65.5, 162, 65.5);
     doc.setFillColor(...C.gold); doc.triangle(105, 63.6, 107, 65.5, 105, 67.4, 'F'); doc.triangle(105, 63.6, 103, 65.5, 105, 67.4, 'F');
     // la historia del gobernador (corta)
@@ -4379,7 +4606,7 @@ const GOV = (() => {
     doc.setDrawColor(...C.soft); doc.setLineWidth(.3); doc.line(22, 243, 78, 243);
     font('helvetica', 'normal', 7.5, C.soft); txt('Firma del Gobernador', 50, 247, { align: 'center' });
     font('helvetica', 'normal', 6.6, C.soft); txt('Sello de la ciudad', 176, 257.2, { align: 'center' });
-    font('helvetica', 'normal', 6.2, C.soft); txt('Ciudad Marea · herramienta educativa y de visualización. Los sucesos del pueblo son narrativa.', 20, 256.8);
+    font('helvetica', 'normal', 6.2, C.soft); txt('Ciudad Marea · herramienta educativa y de visualización. Los sucesos de la ciudad son narrativa.', 20, 256.8);
     const np = doc.internal.getNumberOfPages();
     if (np > 1) for (let p = 1; p <= np; p++) { doc.setPage(p); font('helvetica', 'normal', 7, C.soft); txt(`Página ${p} de ${np}`, 190, 15, { align: 'right' }); }
   }
@@ -4392,7 +4619,7 @@ const GOV = (() => {
     const rows = L.groups.map(g => `<tr class="gpg" style="--c:${CLS[g.key].color}"><td colspan="4"><i></i>${esc(g.title)}<small>${esc(L.gline(g))}</small></td><td class="n">${mxn.format(g.inv)}</td></tr>`
       + g.items.map(x => `<tr><td><b>${esc(x.name)}</b><small>${esc([x.kind, x.desc].filter(Boolean).join(' · '))}</small></td><td class="n">${esc(x.units)}</td><td class="n">${x.price ? pf(x.price) : '—'}</td><td class="n tp">${x.key === 'RENTA_FIJA' ? (x.tasa != null && x.tasa !== '' ? 'tasa ' + x.tasa + '%' : 'tasa vigente') : (x.tp ? pf(x.tp) + `<small>${x.dp}% ${x.dir || L.dir} de hoy</small>` : '—')}</td><td class="n"><b>${mxn.format(x.amtT)}</b></td></tr>`).join('')).join('');
     el.innerHTML = `<div class="gp-page"><img src="${bg}" alt=""><img class="gp-seal" src="${seal()}" alt=""><div class="gp-in">
-      <h1>Carta del Gobernador</h1><p class="gp-sub">${esc(L.sub)} · ${fechaLarga(L.now)} de ${L.now.getFullYear()}<br>${L.name ? 'Gobierno de ' + esc(L.name) + ' · ' : ''}Pueblo nivel ${esc(L.lvl)}</p>
+      <h1>Carta del Gobernador</h1><p class="gp-sub">${esc(L.sub)} · ${fechaLarga(L.now)} de ${L.now.getFullYear()}<br>${L.name ? 'Gobierno de ' + esc(L.name) + ' · ' : ''}Ciudad nivel ${esc(L.lvl)}</p>
       <p class="gp-st">${esc(L.story)}</p>
       <div class="gp-bx">${L.boxes.map(([k, v, c2]) => `<div><small>${esc(k)}</small><b>${esc(v)}</b><span>${esc(c2)}</span></div>`).join('')}</div>
       <table><thead><tr>${L.cols.map((c2, i) => { const t = c2.replace(/\n/g, ' '); return `<th${i ? ' class="n"' : ''}>${esc(t.charAt(0) + t.slice(1).toLowerCase())}</th>`; }).join('')}</tr></thead><tbody>${rows}<tr class="gpt"><td colspan="4">${esc(L.totalLbl)}</td><td class="n">${mxn.format(L.spentT)}</td></tr></tbody></table>
@@ -4789,7 +5016,7 @@ function wireWizard(box) {
   };
 }
 
-// [módulos del pueblo]
+// [módulos de la ciudad]
 
 // Si hay una sesión abierta en esta pestaña, pregunta antes de entrar con ella
 (() => {
@@ -4828,7 +5055,7 @@ window.MENU = (() => {
   // Aportación del mes, Cosecha del tesoro y Portafolio se pueden desplegar o retraer (se recuerda en este dispositivo)
   const sellPanel = $('sellPanel');
   [[simPanel, 'aportacion', 'Escribe un monto y la ciudad calcula cómo repartirlo según tus metas. Toca <b>Mostrar</b> para abrir la calculadora.'],
-   [sellPanel, 'cosecha', 'Calcula de qué barrios sacar dinero según tus metas, o rebalancea todo el pueblo con lo que ya tienes. Toca <b>Mostrar</b> para abrir la calculadora.'],
+   [sellPanel, 'cosecha', 'Calcula de qué barrios sacar dinero según tus metas, o rebalancea todo la ciudad con lo que ya tienes. Toca <b>Mostrar</b> para abrir la calculadora.'],
    [pfView, 'portafolio_vista', 'Tus instrumentos, su valor y su ganancia. Toca <b>Mostrar</b> para ver la tabla.']].forEach(([el, k, t]) => {
     if (!el) return;
     if (!el.querySelector(':scope > .phead')) { const h = el.querySelector(':scope > h2'); if (h) { const d = mk('div', 'phead'); h.before(d); d.appendChild(h); } }
@@ -4914,7 +5141,7 @@ window.MENU = (() => {
     const fecha = d => { const p = String(d || '').split('-'); return p.length === 3 ? `${+p[2]} de ${MESES[+p[1] - 1]}` : esc(String(d || '')); };
     const pagos = [...(ev.rentas || []).map(e => `<li style="--c:var(--fib)"><b>Hoy · día de rentas: ${esc(e.it ? e.it.activo : e.objetivo || 'FIBRAs')}</b>${e.mensaje ? `<span>${esc(e.mensaje)}</span>` : ''}</li>`),
       ...(ev.upcoming || []).map(e => `<li style="--c:var(--ren)"><b>${fecha(e.inicio)} · ${e.tipo === 'RENTAS' ? 'día de rentas' : e.tipo === 'TORMENTA' ? 'aviso de tormenta' : 'aviso'}${e.objetivo ? ': ' + esc(e.objetivo) : ''}</b>${e.mensaje ? `<span>${esc(e.mensaje)}</span>` : ''}</li>`)];
-    prodView.innerHTML = `<h2>Producción del pueblo</h2>
+    prodView.innerHTML = `<h2>Producción de la ciudad</h2>
       <p class="muted" style="margin:0">Lo que tus edificios generan con el tiempo: intereses de las obras públicas, rentas de las FIBRAs y dividendos de las fábricas. Son estimaciones con tasas de referencia de tu hoja, no pagos garantizados.</p>
       <div class="hud mn-hud"><div class="stat"><div class="k">Al día</div><div class="v">${money2(totY / 365)}</div></div><div class="stat"><div class="k">Al mes</div><div class="v">${money2(totY / 12)}</div></div><div class="stat"><div class="k">Al año</div><div class="v">${money(totY)}</div></div>
       ${byK.map(x => `<div class="stat" style="border-left:3px solid ${CLS[x.k].color}"><div class="k">${KIND[x.k][0]} al año</div><div class="v">${money(x.v)}</div></div>`).join('')}</div>
@@ -4992,6 +5219,684 @@ window.MENU = (() => {
 // ================= Ciudad Marea: menú lateral, Fundación, Ronda del mercado y Créditos de Marea =================
 // Va encima de la ciudad que ya existe (la escena no cambia). Reacomoda los paneles en pantallas nuevas.
 // Los créditos se guardan en el USUARIO (Marea.gs); el servidor decide cuánto vale cada acción.
+// ================= Vecinos: los representantes de cada barrio =================
+// Caras en pixel art (32×36) dibujadas en código, con 8 estados animados y frases que dependen de lo que pasó.
+window.VECINOS = (() => {
+  const DK = '#1a1020', W = '#ffffff';
+  const PERS = {
+    ACCIONES: { n: 'Chela', rol: 'La ingeniera de Fábricas', skin: '#d9a066', sh: '#b9824e', body: '#2f5fb3', body2: '#f08a2c', hair: '#4a2a18', bar: '#f2b544' },
+    FIBRAS: { n: 'Don Ramiro', rol: 'El casero de Inmuebles', skin: '#c98e5a', sh: '#a8703f', body: '#7a2438', body2: '#f1ece2', hair: '#9aa0a8', bar: '#ef7b6c' },
+    RENTA_FIJA: { n: 'El Inge Tacho', rol: 'El ingeniero de Obras públicas', skin: '#e0b088', sh: '#c08f68', body: '#3a6ea8', body2: '#ff7a1a', hair: '#2a1a12', bar: '#4fc3b0' },
+    BITCOIN: { n: 'Lupita', rol: 'La minera del Oro virtual', skin: '#b97a4a', sh: '#9a6037', body: '#1a1430', body2: '#f7931a', hair: '#7a3cff', bar: '#f7931a' } };
+  const ESTADOS = ['feliz', 'euforia', 'broma', 'triste', 'llorando', 'fiesta', 'preocupado', 'orgulloso'];
+  const NOMBRE_EST = { feliz: 'Feliz', euforia: 'Eufórico', broma: 'Bromista', triste: 'Triste', llorando: 'Llorando', fiesta: 'De fiesta', preocupado: 'Preocupado', orgulloso: 'Orgulloso' };
+  // cara de cada estado: ojos, cejas, boca y extras
+  const CARA = {
+    feliz: { e: 'happy', b: 'up', m: 'grin', blush: 1 },
+    euforia: { e: 'star', b: 'up', m: 'laugh', blush: 1, fx: 'sparkle', bob: 2.2 },
+    broma: { e: 'wink', b: 'flat', m: 'tongue', fx: 'ja' },
+    triste: { e: 'sad', b: 'sad', m: 'frown', fx: 'cloud' },
+    llorando: { e: 'cry', b: 'sad', m: 'wail', fx: 'tears', bob: 1.4, shake: 1 },
+    fiesta: { e: 'happy', b: 'up', m: 'laugh', blush: 1, fx: 'confetti', hat: 1, bob: 1.6 },
+    preocupado: { e: 'wide', b: 'worry', m: 'wavy', fx: 'sweat' },
+    orgulloso: { e: 'smug', b: 'up', m: 'smirk', blush: 1, fx: 'ding' } };
+  const FR = {
+    ACCIONES: {
+      feliz: ['¡Las máquinas cantan! Fábricas sube {p} hoy y ni tuve que darles un golpecito.', 'Producción {p} arriba. Hoy sí me alcanza para el refresco de las once.'],
+      euforia: ['¡{p}! ¡Prendan las chimeneas, que esto es fiesta industrial!', '¡{a} anda volando! Agárrenlo antes de que se nos pegue al techo.'],
+      broma: ['Día tranquilo. Las máquinas hacen "mmm", como yo antes del café.', 'Nada se movió. Aproveché para aceitar las tuercas… y mis rodillas.'],
+      triste: ['Fábricas baja {p}. Hoy las máquinas andan de malas, como yo los lunes.', 'Bajamos {p}. Las fábricas no se van a ningún lado, nomás hacen pausa.'],
+      llorando: ['¡Buaaa! ¡{p}! … Ya, ya. Las fábricas siguen aquí, nomás llueve adentro.', 'Se me mojó hasta el casco. Pero ninguna fábrica se cayó, nada más el precio.'],
+      fiesta: ['¡Llegó dividendo de {a}! Hoy las tuercas van con salsa.', '¡Pagaron! Que suene la sirena de la fábrica… pero bonito.'],
+      preocupado: ['Oigan, Fábricas ya se salió de su franja. Ni yo como tanto en la posada.', 'Andamos fuera del plan. En la ceremonia lo acomodamos, sin pánico.'],
+      orgulloso: ['¡Aportaste este mes! Con esto le pongo otro turno a la fábrica.', 'Otro mes cumplido. La constancia no se oxida.'] },
+    FIBRAS: {
+      feliz: ['Los inquilinos pagaron puntual e Inmuebles sube {p}. Hoy invito los tamales.', 'Sube {p}. Eso me pasa por ser buen casero.'],
+      euforia: ['¡{p}! Voy a pintar la fachada… bueno, nomás la puerta.', '¡{a} subió como renta en la Roma!'],
+      broma: ['Día calmado. Conté mis llaves: siguen siendo 47 y no sé de qué son 12.', 'Un inquilino preguntó si aceptamos mascotas. Le dije que solo FIBRAs.'],
+      triste: ['Inmuebles baja {p}. Los edificios siguen de pie, nomás el precio anda de malas.', 'Bajamos {p}. Tranquilos, las rentas siguen llegando.'],
+      llorando: ['¡Ay, mis edificios! {p}… (se suena con el bigote). El ladrillo no se moja por dentro.', 'Tormenta en el barrio. Pero un casero de verdad no vende la casa porque llovió.'],
+      fiesta: ['¡{a} pagó la renta! ¡Hay fiesta en el barrio y el mariachi lo pago yo!', '¡Rentas cobradas! Esto es lo bonito de ser casero.'],
+      preocupado: ['Inmuebles se salió de su franja. Ni mi bigote anda tan desacomodado.', 'Andamos fuera del plan. En la ceremonia lo arreglamos.'],
+      orgulloso: ['¡Aportaste! Ya casi alcanza para otro departamentito.', 'Mes cumplido, mijo. Así se construye un barrio.'] },
+    RENTA_FIJA: {
+      feliz: ['Obras públicas sube {p}. Despacito y seguro, como debe ser.', 'Los intereses llegaron puntuales. A diferencia del microbús.'],
+      euforia: ['¡Subimos {p}! Para nosotros esto es como ganar el mundial.', '¡{p}! Me voy a aflojar el chaleco un centímetro.'],
+      broma: ['Hoy cobramos intereses. Mañana también. Pasado mañana… adivinaron.', 'Aquí no hay drama. Nuestro deporte extremo es revisar la tasa.'],
+      triste: ['Bajamos {p}. Ni el bache de mi calle es tan hondo.', 'Bajita la cosa, {p}. Los intereses siguen corriendo.'],
+      llorando: ['¿Tormenta en Obras públicas? Eso no… (revisa los planos) …ah, sí puede pasar. Snif.', 'Lloro, pero de forma ordenada y con casco.'],
+      fiesta: ['Cayeron intereses. No es fiesta, es puntualidad. Pero sí traje pastel.', 'Pago puntual de {a}. Así me gustan las cosas.'],
+      preocupado: ['Obras públicas se salió de su franja. Voy a poner conos naranjas alrededor.', 'Nos salimos del plano. En la ceremonia lo acomodamos con regla y escuadra.'],
+      orgulloso: ['Aportación registrada. Te pondría una placa conmemorativa.', 'Otro mes cumplido. Esto es infraestructura de la buena.'] },
+    BITCOIN: {
+      feliz: ['¡Oro virtual sube {p}! Estoy tranquila. No, no estoy tranquila. ¡AAAH!', 'Sube {p}. Ya le dije a mi gato que somos ricos (no somos ricos).'],
+      euforia: ['¡¡{p}!! ¡A LA LUNA! Bueno, a la azotea, pero ¡A LA AZOTEA!', '¡{a} se volvió loco! Yo también, poquito.'],
+      broma: ['Hoy bitcoin no se movió. Raro. Le estoy tomando la temperatura.', 'Día tranquilo en el oro virtual. Sospechoso. Muy sospechoso.'],
+      triste: ['Bajamos {p}. Estoy bien. Estoy… bien. ¿Alguien tiene un abrazo?', 'Baja {p}. El oro virtual hace esto; es su forma de ser.'],
+      llorando: ['¡¡BUAAA!! ¡{p}! …Ok, ya lloré. Es oro virtual: sube como cohete y baja como piñata.', 'Mis lágrimas son digitales, pero igual mojan.'],
+      fiesta: ['¿Dividendos? Aquí no hay, pero yo celebro por solidaridad.', '¡Fiesta en la ciudad! Traje luces de neón.'],
+      preocupado: ['Oro virtual se salió de su franja. Yo también me paso a veces, pero de café.', 'Fuera del plan. En la ceremonia lo regresamos a su lugar.'],
+      orgulloso: ['¡Aportaste este mes! Tu constancia brilla más que mi visor.', 'Mes cumplido. Eso sí no lo mueve el mercado.'] } };
+
+  // ---------- dibujo ----------
+  function cara(k, est, t, g, ox = 0, oy = 0) {
+    const P = PERS[k], C = CARA[est];
+    const px = (x, y, c) => { g.fillStyle = c; g.fillRect(ox + x, oy + y, 1, 1); };
+    const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(ox + x, oy + y, w, h); };
+    const bob = Math.round(Math.sin(t * (C.bob ? 7 : 2.4)) * (C.bob || .6)), sx = C.shake ? Math.round(Math.sin(t * 40) * .6) : 0, y0 = 2 + bob;
+    const blink = !['happy', 'cry', 'star', 'smug'].includes(C.e) && (t % 3.6) < .12;
+    // efectos detrás
+    if (C.fx === 'cloud') { const cx = 16 + Math.round(Math.sin(t) * 2); R(cx - 6, 0, 12, 3, '#8a97b8'); R(cx - 4, -1, 8, 1, '#8a97b8'); for (let i = 0; i < 4; i++) { const yy = 3 + ((t * 18 + i * 3) % 6 | 0); px(cx - 5 + i * 3, yy, '#83c8ff'); } }
+    // cuerpo
+    R(5 + sx, 29 + y0 - 2, 22, 7, P.body); R(14 + sx, 27 + y0 - 2, 4, 2, P.skin);
+    if (k === 'ACCIONES') { R(9 + sx, 29 + y0 - 2, 2, 7, '#5f8fe0'); R(21 + sx, 29 + y0 - 2, 2, 7, '#5f8fe0'); R(13 + sx, 28 + y0 - 2, 6, 2, P.body2); }
+    if (k === 'FIBRAS') { R(13 + sx, 28 + y0 - 2, 6, 8, P.body2); R(15 + sx, 30 + y0 - 2, 2, 1, DK); R(24 + sx, 31 + y0 - 2, 2, 2, '#ffc46b'); px(25 + sx, 30 + y0 - 2, '#ffc46b'); }
+    if (k === 'RENTA_FIJA') { R(5 + sx, 29 + y0 - 2, 22, 7, P.body2); R(13 + sx, 28 + y0 - 2, 6, 8, P.body); R(5 + sx, 31 + y0 - 2, 8, 1, '#ffe14a'); R(19 + sx, 31 + y0 - 2, 8, 1, '#ffe14a'); }
+    if (k === 'BITCOIN') { R(5 + sx, 29 + y0 - 2, 22, 2, P.body2); const b = ['.##.', '#..#', '.##.', '#..#', '.##.']; b.forEach((r, j) => { for (let i = 0; i < 4; i++) if (r[i] === '#') px(14 + i + sx, 31 + j + y0 - 2, P.body2); }); }
+    // pelo largo atrás (Lupita) y trenzas (Chela)
+    if (k === 'BITCOIN') { R(6 + sx, 9 + y0, 20, 19, P.hair); }
+    if (k === 'ACCIONES') { R(5 + sx, 14 + y0, 3, 12, P.hair); R(24 + sx, 14 + y0, 3, 12, P.hair); px(6 + sx, 26 + y0, '#f08a2c'); px(25 + sx, 26 + y0, '#f08a2c'); }
+    // cabeza: óvalo con contorno y sombra
+    const cx = 16, cy = 18 + y0, rx = 9, ry = 10;
+    const inn = (x, y) => ((x - cx + .5) / rx) ** 2 + ((y - cy + .5) / ry) ** 2 <= 1;
+    for (let y = cy - ry - 1; y <= cy + ry + 1; y++) for (let x = cx - rx - 1; x <= cx + rx + 1; x++) {
+      if (inn(x, y)) px(x + sx, y, x > cx + 4 ? P.sh : P.skin);
+      else if (inn(x - 1, y) || inn(x + 1, y) || inn(x, y - 1) || inn(x, y + 1)) px(x + sx, y, DK);
+    }
+    R(6 + sx, cy - 1, 1, 3, P.skin); R(25 + sx, cy - 1, 1, 3, P.sh);   // orejas
+    const ex = [12 + sx, 20 + sx], ey = cy - 1;
+    // ojos
+    ex.forEach((x, i) => {
+      const e = blink ? 'line' : C.e === 'wink' ? (i ? 'happy' : 'open') : C.e;
+      if (e === 'open' || e === 'sad') { R(x - 2, ey - 2, 4, 4, W); const py = e === 'sad' ? ey : ey - 1; R(x - 1 + (i ? -1 : 0), py, 2, 2, DK); px(x - 1 + (i ? -1 : 0), py, '#6a7aa8'); if (e === 'sad' && i) { const s2 = (t * .9) % 1; px(x + 2, ey + 2 + s2 * 4, '#5ac8ff'); px(x + 2, ey + 3 + s2 * 4, '#5ac8ff'); } }
+      else if (e === 'wide') { R(x - 2, ey - 2, 4, 4, W); px(x - 1 + i, ey - 1, DK); }
+      else if (e === 'happy') { px(x - 2, ey + 1, DK); px(x - 1, ey, DK); px(x, ey - 1, DK); px(x + 1, ey, DK); px(x + 2, ey + 1, DK); }
+      else if (e === 'line') R(x - 1, ey, 3, 1, DK);
+      else if (e === 'smug') { R(x - 2, ey - 1, 4, 1, P.sh); R(x - 2, ey, 4, 1, DK); px(x - 1 + (i ? 0 : 1), ey + 1, DK); }
+      else if (e === 'star') { const c = (t * 6 | 0) % 2 ? '#ffe14a' : '#fff6a8'; R(x - 2, ey, 5, 1, c); R(x, ey - 2, 1, 5, c); px(x - 1, ey - 1, c); px(x + 1, ey - 1, c); px(x - 1, ey + 1, c); px(x + 1, ey + 1, c); }
+      else if (e === 'cry') { const d = i ? -1 : 1; px(x - 2 * d, ey - 2, DK); px(x - d, ey - 1, DK); px(x, ey, DK); px(x + d, ey + 1, DK); px(x - d, ey + 1, DK); px(x - 2 * d, ey + 2, DK); px(x + 2 * d, ey + 1, DK); }
+    });
+    // cejas
+    const brow = C.b, bc = k === 'FIBRAS' ? '#d8dde4' : k === 'BITCOIN' ? P.hair : DK, bh = k === 'FIBRAS' ? 2 : 1;
+    ex.forEach((x, i) => { const inner = i ? -1 : 1; for (let d = -2; d <= 2; d++) {
+      let y = ey - 3; if (brow === 'up') y -= (Math.abs(d) < 2 ? 1 : 0); if (brow === 'sad') y -= (d * inner > 0 ? 1 : 0); if (brow === 'worry') y -= (d * inner > 0 ? 2 : d * inner === 0 ? 1 : 0); if (brow === 'angry') y += (d * inner > 0 ? 1 : 0);
+      R(x + d, y - (C.e === 'wide' ? 1 : 0), 1, bh, bc); } });
+    // chapitas
+    if (C.blush) { R(8 + sx, cy + 2, 2, 1, '#ff7aa8'); R(22 + sx, cy + 2, 2, 1, '#ff7aa8'); }
+    // boca
+    const mx = 16 + sx, my = cy + 5, red = '#5a0a1a', pink = '#ff6b8a';
+    const m = C.m;
+    if (m === 'grin') { px(mx - 5, my - 1, DK); px(mx + 5, my - 1, DK); R(mx - 4, my, 9, 1, DK); R(mx - 4, my + 1, 9, 2, red); R(mx - 3, my + 1, 7, 1, W); R(mx - 3, my + 3, 7, 1, DK); R(mx - 1, my + 2, 3, 1, pink); }
+    else if (m === 'laugh') { const o = (t * 10 | 0) % 2; R(mx - 5, my - 1, 11, 1, DK); R(mx - 5, my, 1, 3 + o, DK); R(mx + 5, my, 1, 3 + o, DK); R(mx - 4, my, 9, 4 + o, red); R(mx - 4, my, 9, 1, W); R(mx - 2, my + 2 + o, 5, 2, pink); R(mx - 3, my + 4 + o, 7, 1, DK); }
+    else if (m === 'frown') { px(mx - 4, my + 3, DK); px(mx - 3, my + 2, DK); R(mx - 2, my + 1, 5, 1, DK); px(mx + 3, my + 2, DK); px(mx + 4, my + 3, DK); px(mx, my + 2, '#7a3a3a'); }
+    else if (m === 'wail') { const o = (t * 9 | 0) % 2; R(mx - 3, my - 1, 7, 1, DK); R(mx - 4, my, 9, 5 + o, red); R(mx - 4, my, 1, 5 + o, DK); R(mx + 4, my, 1, 5 + o, DK); R(mx - 3, my, 7, 1, W); R(mx - 2, my + 3 + o, 5, 2, pink); R(mx - 3, my + 5 + o, 7, 1, DK); }
+    else if (m === 'wavy') { for (let d = -3; d <= 3; d++) px(mx + d, my + 1 + ((d + 3 + (t * 6 | 0)) % 2), DK); }
+    else if (m === 'tongue') { px(mx - 3, my, DK); R(mx - 2, my + 1, 5, 1, DK); px(mx + 3, my, DK); R(mx + 1, my + 2, 2, 2, pink); px(mx + 1, my + 3, '#d94a6a'); }
+    else if (m === 'smirk') { R(mx - 2, my + 1, 4, 1, DK); px(mx + 2, my, DK); px(mx + 3, my - 1, DK); }
+    // bigote de Don Ramiro
+    if (k === 'FIBRAS') { const lift = m === 'laugh' || m === 'grin' ? -1 : 0; R(mx - 5, my - 2 + lift, 11, 2, '#d8dde4'); px(mx - 6, my - 1 + lift + 1, '#d8dde4'); px(mx + 6, my - 1 + lift + 1, '#d8dde4'); R(mx - 4, my - 3 + lift, 3, 1, '#d8dde4'); R(mx + 2, my - 3 + lift, 3, 1, '#d8dde4'); }
+    // lentes del Inge Tacho
+    if (k === 'RENTA_FIJA') { ex.forEach(x => { R(x - 3, ey - 2, 6, 1, DK); R(x - 3, ey + 2, 6, 1, DK); R(x - 3, ey - 2, 1, 5, DK); R(x + 2, ey - 2, 1, 5, DK); }); R(ex[0] + 3, ey - 1, ex[1] - ex[0] - 5, 1, DK); }
+    // lentes oscuros cuando está orgulloso
+    if (est === 'orgulloso') { const gl = (t * 1.2) % 2; R(ex[0] - 3, ey - 2, ex[1] - ex[0] + 7, 1, DK); [ex[0], ex[1]].forEach(x => { R(x - 3, ey - 1, 6, 3, DK); R(x - 2, ey + 2, 4, 1, DK); }); const gx = ex[0] - 2 + Math.round(gl * 12); if (gl < 1) { px(gx, ey - 1, W); px(gx + 1, ey, '#9ab'); } }
+    // sombreros y pelo de arriba
+    const hy = cy - ry;
+    if (k === 'ACCIONES') { for (let y = 0; y < 6; y++) { const w = Math.round(Math.sqrt(1 - ((5 - y) / 6) ** 2) * 10); R(16 - w + sx, hy - 4 + y, w * 2, 1, y < 2 ? '#ffe14a' : '#f2c21a'); } R(4 + sx, hy + 2, 24, 2, '#d9a512'); R(4 + sx, hy + 3, 24, 1, '#a87a0a'); R(15 + sx, hy - 4, 2, 6, '#ffe98a'); }
+    if (k === 'FIBRAS') { R(8 + sx, hy - 2, 16, 4, '#6a4a2a'); R(7 + sx, hy, 18, 2, '#6a4a2a'); R(16 + sx, hy + 2, 11, 2, '#4a321a'); R(8 + sx, hy - 2, 16, 1, '#8a6a3a'); R(6 + sx, cy - 4, 2, 6, P.hair); R(24 + sx, cy - 4, 2, 6, P.hair); }
+    if (k === 'RENTA_FIJA') { for (let y = 0; y < 6; y++) { const w = Math.round(Math.sqrt(1 - ((5 - y) / 6) ** 2) * 10); R(16 - w + sx, hy - 4 + y, w * 2, 1, y < 2 ? '#ffffff' : '#e6ecf2'); } R(4 + sx, hy + 2, 24, 2, '#c9d2dc'); R(6 + sx, hy, 20, 1, '#ff7a1a'); }
+    if (k === 'BITCOIN') { R(8 + sx, hy - 1, 16, 4, P.hair); R(7 + sx, hy + 1, 4, 3, P.hair); R(18 + sx, hy + 1, 7, 2, P.hair); const vc = (t * 3 | 0) % 2 ? '#83f2f7' : '#5ad6e6'; R(7 + sx, hy - 2, 18, 2, vc); px(8 + sx, hy - 2, W); }
+    // gorro de fiesta
+    if (C.hat) { const hx = 19 + sx, hy2 = hy - 9; for (let j = 0; j < 8; j++) R(hx - (j >> 1), hy2 + j, (j >> 1) * 2 + 1, 1, j % 3 === 0 ? '#ff7aa8' : '#7af0b0'); px(hx, hy2 - 1, '#ffe14a'); }
+    // efectos delante
+    if (C.fx === 'tears') {
+      [ex[0] - 2, ex[1] + 2].forEach((x, i) => { const d = i ? 1 : -1;
+        for (let yy = ey + 2; yy < cy + 9; yy++) R(x + (yy > ey + 6 ? d : 0), yy, 1, 1, (yy + (t * 16 | 0)) % 3 ? '#5ac8ff' : '#b8ecff');
+        for (let j = 0; j < 7; j++) { const ph = (t * 1.7 + j / 7) % 1, xx = x + d * (1 + ph * 11), yy = ey + 1 - ph * 3 + ph * ph * 16; R(xx, yy, 2, 1, ph < .5 ? '#8adcff' : '#5ac8ff'); } });
+      R(4, 36, 24, 1, '#5ac8ff66'); }
+    if (C.fx === 'sweat') { const s = (t * .8) % 1, yy = hy + 4 + s * 8; R(24 + sx, yy, 2, 3, '#83c8ff'); px(24 + sx, yy - 1, '#83c8ff'); px(25 + sx, yy, W); }
+    if (C.fx === 'sparkle') { for (let i = 0; i < 4; i++) { const a = t * 2 + i * Math.PI / 2, x = 16 + Math.cos(a) * 15, y = 16 + Math.sin(a) * 14; const c = i % 2 ? '#ffe14a' : '#83f2f7'; px(x, y, c); px(x - 1, y, c + '88'); px(x + 1, y, c + '88'); px(x, y - 1, c + '88'); px(x, y + 1, c + '88'); } }
+    if (C.fx === 'confetti') { const cols = ['#ff7aa8', '#7af0b0', '#ffe14a', '#83c8ff', '#f7931a']; for (let i = 0; i < 14; i++) { const x = (i * 7 + 3) % 32, y = ((t * (10 + i % 4 * 3) + i * 5) % 38) - 2; R(x, y, 1 + (i % 2), 1, cols[i % 5]); } }
+    if (C.fx === 'ding') { const s = (t % 1.6) < .5; if (s) { px(mx + 4, my - 2, W); px(mx + 5, my - 3, W); px(mx + 3, my - 3, W); px(mx + 4, my - 4, W); px(mx + 4, my - 3, '#fff6a8'); } }
+    if (C.fx === 'ja') { const on = (t % 1.2) < .7; if (on) { const J = ['.#..#.', '.#.#.#', '.#.###', '##.#.#']; J.forEach((r, j) => { for (let i = 0; i < 6; i++) if (r[i] === '#') px(25 + i, 4 + j, '#ffe14a'); }); } }
+  }
+  function frase(k, est, vars = {}) {
+    const L = FR[k][est], s = L[Math.floor(Math.random() * L.length)];
+    return s.replace(/\{p\}/g, vars.p || '').replace(/\{a\}/g, vars.a || 'tu inversión');
+  }
+  return { PERS, ESTADOS, NOMBRE_EST, FR, cara, frase };
+})();
+
+// ---------- la tira de vecinos debajo de la ciudad ----------
+window.VECINOS_UI = (() => {
+  const V = window.VECINOS, JORD = ['ACCIONES', 'FIBRAS', 'RENTA_FIJA', 'BITCOIN'];
+  const listo = () => typeof model !== 'undefined' && model && model.classes && model.total > 0;
+  const pctS = n => (n >= 0 ? '+' : '−') + Math.abs(n).toFixed(1) + '%';
+  const mes = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
+  // qué le pasó hoy a cada barrio → estado y datos para la frase
+  function estado(k) {
+    const M = window.JVIEW || model, c = M.classes[k], items = c.items.filter(i => i.valor > 0);
+    const chg = c.chg || 0, top = items.slice().sort((a, b) => Math.abs(b.hoy || 0) - Math.abs(a.hoy || 0))[0];
+    const a = top ? (SHORTN && SHORTN[top.activo]) || top.activo : '';
+    const hoyS = new Date().toISOString().slice(0, 10), lim = new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10);
+    const divRec = (raw && raw.dividendos || []).filter(d => !d.proximo && d.fecha <= hoyS && d.fecha >= lim).find(d => items.some(i => i.activo === d.activo));
+    const fuera = typeof BD !== 'undefined' && BD.some(b => (b.state === 'over' || b.state === 'under') && b.items.some(i => i.key === k));
+    const aporto = typeof ST !== 'undefined' && ST && ST.contribMonths && ST.contribMonths.has(mes());
+    const tormenta = typeof zones !== 'undefined' && zones[k] && zones[k].storm;
+    if (!items.length) return { e: 'broma', p: '', a };
+    if (divRec) return { e: 'fiesta', p: pctS(chg), a: (SHORTN && SHORTN[divRec.activo]) || divRec.activo };
+    if (k !== 'RENTA_FIJA') {
+      if (tormenta || chg <= -2) return { e: 'llorando', p: pctS(chg), a };
+      if (chg <= -0.3) return { e: 'triste', p: pctS(chg), a };
+    }
+    if (fuera) return { e: 'preocupado', p: pctS(chg), a };
+    if (k !== 'RENTA_FIJA' && chg >= 2) return { e: 'euforia', p: pctS(chg), a };
+    if (aporto && Math.random() < .35) return { e: 'orgulloso', p: pctS(chg), a };
+    if (k === 'RENTA_FIJA') return { e: Math.random() < .5 ? 'feliz' : 'broma', p: pctS(Math.max(0, chg)), a };
+    if (chg >= 0.3) return { e: 'feliz', p: pctS(chg), a };
+    return { e: 'broma', p: pctS(chg), a };
+  }
+  let box = null, cur = null, timer = null, hablaT = null, est = {};
+  function pintar(b) {
+    box = b; if (!b) return;
+    if (!listo() || window.JVIS) { b.innerHTML = ''; b.hidden = true; return; }
+    b.hidden = false;
+    JORD.forEach(k => { est[k] = estado(k); });
+    if (!b.querySelector('.jvecs')) {
+      b.innerHTML = `<div class="jvecbub" id="jVecBub" hidden><button type="button" class="jvecx" aria-label="Cerrar">×</button><b></b><p></p></div>
+        <div class="jvecs" role="group" aria-label="Vecinos de la ciudad">${JORD.map(k => `<button type="button" class="jvec" data-k="${k}" style="--c:${V.PERS[k].bar}" aria-label="${V.PERS[k].n}, ${V.PERS[k].rol}"><canvas width="32" height="38"></canvas><span>${V.PERS[k].n}</span><i class="jvdot" hidden></i></button>`).join('')}</div>`;
+      b.querySelectorAll('.jvec').forEach(x => x.onclick = () => { hablar(x.dataset.k, true); if (typeof setFocus === 'function' && !window.JVIS) setFocus(x.dataset.k); });
+      b.querySelector('.jvecx').onclick = () => { b.querySelector('#jVecBub').hidden = true; cur = null; };
+      if (!timer) timer = setInterval(() => { if (!document.body.contains(b) || b.hidden || document.hidden) return; const vis = b.querySelector('.jvecs').getBoundingClientRect(); if (vis.bottom < 0 || vis.top > innerHeight) return; const k = JORD[Math.floor(Math.random() * 4)]; if (!cur || Math.random() < .5) hablar(k, false); }, 16000);
+      const still = matchMedia('(prefers-reduced-motion: reduce)').matches, t0 = performance.now();
+      (function fr(now) { if (!document.body.contains(b)) return; if (!b.hidden && !document.hidden) { const t = still ? 1.3 : (now - t0) / 1000; b.querySelectorAll('.jvec').forEach((x, i) => { const g = x.querySelector('canvas').getContext('2d'); g.clearRect(0, 0, 32, 38); V.cara(x.dataset.k, (est[x.dataset.k] || {}).e || 'feliz', t + i * .4, g); }); } if (!still) requestAnimationFrame(fr); })(t0);
+    }
+    b.querySelectorAll('.jvec').forEach(x => { const e = est[x.dataset.k].e; x.querySelector('.jvdot').hidden = !['fiesta', 'llorando', 'preocupado', 'euforia'].includes(e); x.dataset.e = e; });
+    if (cur) hablar(cur, false, true);
+  }
+  function hablar(k, tap, quieto) {
+    if (!box) return; const bub = box.querySelector('#jVecBub'); if (!bub) return;
+    const P = V.PERS[k], s = est[k] || estado(k);
+    cur = k; bub.hidden = false; bub.style.setProperty('--c', P.bar);
+    bub.querySelector('b').textContent = P.n + ' · ' + P.rol.toLowerCase();
+    bub.querySelector('p').textContent = V.frase(k, s.e, { p: s.p, a: s.a });
+    box.querySelectorAll('.jvec').forEach(x => x.classList.toggle('on', x.dataset.k === k));
+    if (!quieto) { bub.classList.remove('pop'); void bub.offsetWidth; bub.classList.add('pop'); }
+    clearTimeout(hablaT); if (!tap) hablaT = setTimeout(() => { if (cur === k) { bub.hidden = true; cur = null; box.querySelectorAll('.jvec').forEach(x => x.classList.remove('on')); } }, 12000);
+  }
+  return { pintar, hablar, estado };
+})();
+
+// ================= Juego: resumen al abrir, sobres de cartas y simulador de crisis =================
+// El álbum y la última visita se guardan en este dispositivo (por usuario). Los sobres se ganan con constancia.
+window.JUEGO = (() => {
+  const $j = id => document.getElementById(id);
+  const fmt = n => '$' + Math.round(n).toLocaleString('es-MX');
+  const fmtS = n => (n >= 0 ? '+' : '−') + '$' + Math.abs(Math.round(n)).toLocaleString('es-MX');
+  const pct = n => (n >= 0 ? '+' : '−') + Math.abs(n).toFixed(1) + '%';
+  const st = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+  const JORD = ['ACCIONES', 'FIBRAS', 'RENTA_FIJA', 'BITCOIN'];
+  const BAR = { ACCIONES: { n: 'Fábricas', c: '#f2b544' }, FIBRAS: { n: 'Inmuebles', c: '#ef7b6c' }, RENTA_FIJA: { n: 'Obras públicas', c: '#4fc3b0' }, BITCOIN: { n: 'Oro virtual', c: '#f7931a' } };
+  const listo = () => typeof model !== 'undefined' && model && model.items && model.classes;
+  const quien = () => (typeof raw !== 'undefined' && raw && (raw.usuario || raw.nombre)) || (typeof token !== 'undefined' && token ? 'u' : 'demo');
+  const K = n => 'cm_' + n + '_' + quien();
+  function pixSVG(k, col, sz) {
+    const rows = PIXICO[k]; if (!rows) return ''; let r = '';
+    rows.forEach((row, j) => { for (let i = 0; i < row.length; i++) if (row[i] !== '.') r += `<rect x="${i}" y="${j}" width="1.02" height="1.02" fill="${row[i] === 'o' ? '#fff3c4' : col}"/>`; });
+    return `<svg class="jpx" viewBox="0 0 12 12" width="${sz}" height="${sz}" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
+  }
+  const WX = { sol: ['....o.......', '.o..o..o....', '..o###o.....', '..#ooo#.....', 'oo#ooo#oo...', '..#ooo#.....', '..o###o.....', '.o..o..o....', '....o.......'],
+    lluvia: ['..xxxx......', '.x####x.....', 'x######xx...', 'x########x..', '.xxxxxxxx...', '..a..a..a...', '.a..a..a....', '............', '............'] };
+  function wxSVG(k) {
+    const pal = { o: '#ffd36b', '#': k === 'lluvia' ? '#c3cbe0' : '#ffb347', x: '#8a97b8', a: '#83c8ff' }; let r = '';
+    WX[k].forEach((row, j) => { for (let i = 0; i < row.length; i++) if (row[i] !== '.') r += `<rect x="${i}" y="${j}" width="1.02" height="1.02" fill="${pal[row[i]]}"/>`; });
+    return `<svg class="jpx wx" viewBox="0 0 11 9" width="18" height="15" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
+  }
+
+  // ================= resumen al abrir =================
+  // Compara con la última vez que abriste la app en este dispositivo. Lo que aportaste no cuenta como ganancia.
+  let revisado = false;
+  function foto() { const c = {}; JORD.forEach(k => { const x = model.classes[k]; c[k] = [x.valor, x.costo]; }); return { t: Date.now(), c }; }
+  function alAbrir() {
+    if (revisado || !listo() || !(raw && (raw.posiciones || []).length)) return;
+    revisado = true;
+    let ya = false; try { ya = sessionStorage.getItem(K('visto')) === '1'; sessionStorage.setItem(K('visto'), '1'); } catch (e) {}
+    const prev = st.get(K('visita'), null), now = foto();
+    st.set(K('visita'), now);
+    if (ya || !prev || !prev.c || now.t - prev.t < 3 * 3600e3) { quizaSimulacro(); return; }
+    const filas = JORD.map(k => { const [v0, c0] = prev.c[k] || [0, 0], [v, c] = now.c[k]; const ap = c - c0, g = (v - v0) - ap, base = v0 + Math.max(0, ap); return { k, v, g, ap, p: base > 0 ? g / base * 100 : 0 }; }).filter(f => f.v > 0 || Math.abs(f.g) >= 1);
+    const g = filas.reduce((a, f) => a + f.g, 0), ap = filas.reduce((a, f) => a + f.ap, 0);
+    if (!filas.length || filas.every(f => Math.abs(f.g) < 1)) { quizaSimulacro(); return; }
+    const tot0 = JORD.reduce((a, k) => a + ((prev.c[k] || [0])[0]), 0), tot = JORD.reduce((a, k) => a + now.c[k][0], 0);
+    const h = (now.t - prev.t) / 3600e3, hace = h < 24 ? `hace ${Math.round(h)} h` : `hace ${Math.round(h / 24)} ${Math.round(h / 24) === 1 ? 'día' : 'días'}`;
+    let v = $j('jVeil'); if (!v) { v = document.createElement('div'); v.id = 'jVeil'; v.className = 'jveil'; v.hidden = true; document.body.appendChild(v); v.addEventListener('click', e => { if (e.target === v) cerrarPop(); }); }
+    v.innerHTML = `<div class="jpop" role="dialog" aria-modal="true" aria-labelledby="jPopT"><div class="jph"><b id="jPopT">Desde tu última visita</b><span>${hace}</span></div>
+      <div class="jtot"><span class="o">${fmt(tot0)}</span><span class="o">→</span><span class="n">${fmt(tot)}</span></div>
+      <span class="jdel ${g >= 0 ? 'up' : 'dn'}">${g >= 0 ? 'Ganaste' : 'Perdiste'} ${fmtS(g).replace(/^[+−]/, '')}</span>${ap >= 1 ? `<p class="jap">Además aportaste ${fmt(ap)} nuevos.</p>` : ''}
+      <div class="jrows">${filas.map(f => `<div class="jrow"><div class="ic" style="background:${BAR[f.k].c}22">${pixSVG(f.k, BAR[f.k].c, 22)}${wxSVG(f.g >= 0 ? 'sol' : 'lluvia')}</div><div class="nm">${BAR[f.k].n}<small>${fmt(f.v)}</small></div><div class="dv ${f.g >= 0 ? 'jup' : 'jdn'}">${fmtS(f.g)}<small>${pct(f.p)}</small></div></div>`).join('')}</div>
+      <button type="button" class="mbtn pri" id="jPopOk">Ver mi ciudad</button></div>`;
+    const abrir = (n = 0) => { const m = $j('mModal'); if (m && !m.hidden && n < 20) { setTimeout(() => abrir(n + 1), 1500); return; } v.hidden = false; requestAnimationFrame(() => v.classList.add('on')); $j('jPopOk').onclick = cerrarPop; $j('jPopOk').focus(); };
+    setTimeout(abrir, 900);
+  }
+  function cerrarPop() { const v = $j('jVeil'); if (!v || v.hidden) return; v.classList.remove('on'); setTimeout(() => { v.hidden = true; quizaSimulacro(); }, 250); }
+
+  // ================= cartas =================
+  const ICONS = {
+phone:['...xxxxxx...','...x####x...','...x#oo#x...','...x#oo#x...','...x####x...','...x#aa#x...','...x#aa#x...','...x####x...','...x####x...','...x#xx#x...','...x####x...','...xxxxxx...'],
+cloud:['............','....xxxx....','...x####x...','.xxx#oo##x..','x###o####xx.','x#########x.','x##########x','.xxxxxxxxxx.','.....a......','....aaa.....','.....a......','............'],
+box:['............','..xxxxxxxx..','.x###aa###x.','x####aa####x','xxxxxxxxxxxx','x####aa####x','x####aa####x','x##########x','x##o#######x','x##########x','xxxxxxxxxxxx','............'],
+chip:['..a.a.a.a...','.xxxxxxxxx..','ax#######xa.','.x#xxxxx#x..','ax#xooox#xa.','.x#xooox#x..','ax#xooox#xa.','.x#xxxxx#x..','ax#######xa.','.xxxxxxxxx..','..a.a.a.a...','............'],
+glass:['..xxxx......','.x#oo#x.....','x#o...#x....','x#....#x....','x#....#x....','.x####x.....','..xxxx#x....','......x#x...','.......x#x..','........x#x.','.........xx.','............'],
+bubble:['............','.xxxxxxxxx..','x#########x.','x#o#o#o###x.','x#########x.','x###aaaa##x.','x#########x.','.xxxx#xxxx..','....x#x.....','....xx......','............','............'],
+car:['............','............','...xxxxx....','..x#oo#ox...','.x########x.','x##########x','x#o######o#x','xxxxxxxxxxxx','.xax....xax.','..x......x..','............','............'],
+bottle:['....xxx.....','....x#x.....','....x#x.....','...x###x....','..x#####x...','..x#o###x...','..xaaaaax...','..xaoaaax...','..x#####x...','..x#o###x...','..x#####x...','...xxxxx....'],
+cart:['x...........','xx..........','.x#########x','.x#o#o#o#o#x','.x#########x','..x#######x.','..xxxxxxxxx.','...x.....x..','..xax...xax.','...x.....x..','............','............'],
+play:['xxxxxxxxxxxx','x##########x','x###o######x','x###oo#####x','x###ooo####x','x###oo#####x','x###o######x','x##########x','xxxxxxxxxxxx','....xaax....','..xxxxxxxx..','............'],
+card:['............','............','xxxxxxxxxxxx','x##########x','xxxxxxxxxxxx','x##########x','x#oo#######x','x#oo###aa##x','x##########x','xxxxxxxxxxxx','............','............'],
+tower:['.....x......','....xxx.....','...x###x....','...x#o#x....','...x###x....','...x#o#x....','..x#####x...','..x#o#o#x...','..x#####x...','..x#o#o#x...','..x#####x...','xxxxxxxxxxxx'],
+mall:['............','....xxxx....','...x####x...','xxxxxxxxxxxx','x##########x','x#aaaaaaaa#x','x##########x','x#oo#xx#oo#x','x#oo#xx#oo#x','x####xx####x','xxxxxxxxxxxx','............'],
+mixed:['..x.....x...','.x#x...x#x..','.x#x.x.x#x..','.xox.x.xox..','.x#xx#xx#x..','.x#x#o#x#x..','.xox###xox..','.x#x#o#x#x..','xxxxxxxxxxxx','x#aaaaaaaa#x','x##########x','xxxxxxxxxxxx'],
+nave:['............','............','..xxxxxxxx..','.x########x.','x##########x','xxxxxxxxxxxx','x#oo#oo#oo#x','x##########x','x#xx#xx#xx#x','x#xx#xx#xx#x','xxxxxxxxxxxx','............'],
+arch:['....xxxx....','...x#oo#x...','..x######x..','.xxxxxxxxxx.','.x#x#xx#x#x.','.x#x#xx#x#x.','.x#x#xx#x#x.','.x#x#xx#x#x.','xxxxxxxxxxxx','x##########x','xxxxxxxxxxxx','............'],
+wheat:['.....a......','....aoa.....','.....a......','....aoa..a..','.....a..aoa.','..a..a...a..','.aoa.a..aa..','..a.aa.a....','....a.a.....','.....a......','xxxxxxxxxxxx','x##########x'],
+train:['............','..xxxxxxxx..','.x########x.','x#oo#oo#oo#x','x#oo#oo#oo#x','x##########x','x#aaaaaaaa#x','x##########x','.xxxxxxxxxx.','..xox..xox..','xxxxxxxxxxxx','x.x.x.x.x.x.'],
+bridge:['............','............','xxxxxxxxxxxx','############','xxxxxxxxxxxx','.x#x.x#x.x#x','.x#x.x#x.x#x','.x#x.x#x.x#x','.x#x.x#x.x#x','aaaaaaaaaaaa','............','............'],
+station:['............','xxxxxxxxxxxx','x##########x','.xaaaaaaaax.','.x########x.','.x#oo##oo#x.','.x#oo##oo#x.','.x###xx###x.','.x###xx###x.','xxxxxxxxxxxx','............','............'],
+map:['............','oo..........','oo#.........','..##........','...##.......','....###.....','......##....','.......##...','........#...','........##oo','.........#oo','............'],
+coin:['...xxxxxx...','..x######x..','.x##o#o###x.','x##oooo####x','x##o###o###x','x##oooo####x','x##o###o###x','x##oooo####x','.x##o#o###x.','..x######x..','...xxxxxx...','............'],
+blocks:['............','xxxx....xxxx','x##x....x##x','x#ox.aa.x#ox','x##xaaaax##x','xxxx.aa.xxxx','.....aa.....','....xxxx....','....x##x....','....x#ox....','....x##x....','....xxxx....'],
+pizza:['xxxxxxxxxxxx','x##########x','.x#a##a###x.','.x########x.','..x#a##a#x..','..x######x..','...x#a##x...','...x####x...','....x#ax....','....x##x....','.....xx.....','............'],
+key:['..xxxx......','.x####x.....','x##oo##x....','x#o..o#x....','x#o..o#xxxxx','x##oo#######','.x####xxx#x#','..xxxx...x.x','............','............','............','............'],
+news:['xxxxxxxxxxxx','x##########x','x#oooooooo#x','x##########x','x#aaaa#aaa#x','x#aaaa#aaa#x','x#aaaa#aaa#x','x##########x','x#aaa#aaaa#x','x#aaa#aaaa#x','x##########x','xxxxxxxxxxxx'],
+pick:['..xxxxxx....','.x######x...','x##xxxx##x..','xx..x#x..xx.','....x#x.....','....x#x.....','....x#x.....','....x#x.....','....x#x.....','....xxx.....','............','............'],
+split:['..xxx..xxx..','.x##x..x##x.','x#o#x..x#o#x','x##x....x##x','x#o#x..x#o#x','.x##x..x##x.','..xxx..xxx..','............','...a....a...','...aa..aa...','....aaaa....','............'],
+dot:['............','..xxxx......','.x....x.....','x..oo..x....','x..oo..x....','.x....x.....','..xxxx#x....','......x#x...','.......x#x..','........xx..','............','............'],
+ghost:['....xxxx....','...x####x...','..x######x..','..x#xxxx#x..','..x#x..x#x..','..x#xxxx#x..','..x######x..','.x########x.','x##########x','x##########x','xxxxxxxxxxxx','............'],
+flag:['x...........','x#########..','x#########..','xooooooooo..','xooooooooo..','x#########..','x#########..','x...........','x...........','xx..........','............','............'],
+chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....','x...#.#.....','x..#........','x.#.........','x#..........','xxxxxxxxxxxx','............','............']};
+  const SETS = {
+    acc: { n: 'Fábricas famosas', sh: 'Fábricas', c: '#f2b544', a: '#ffe7a8', pk: 'chip', bg: 'city' },
+    edi: { n: 'Edificios de tus FIBRAs', sh: 'Tus edificios', c: '#ef7b6c', a: '#ffd2c8', pk: 'tower', bg: 'sunset' },
+    obr: { n: 'Obras de México', sh: 'Obras de México', c: '#4fc3b0', a: '#c9fff3', pk: 'train', bg: 'rails' },
+    btc: { n: 'Oro virtual', sh: 'Oro virtual', c: '#f7931a', a: '#83f2f7', pk: 'coin', bg: 'cyber' } };
+  const L1 = 'Cómo gana dinero', L2 = 'Qué es', L3 = 'Lo que debes saber';
+  const CARDS = [
+ ['acc','Apple','AAPL','phone',2,L1,'Vende iPhone, Mac, iPad y relojes. El iPhone deja cerca de la mitad de sus ventas, y cada vez gana más con servicios como App Store, iCloud y Apple Music.','Por cada app que se vende en la App Store, Apple se queda con una comisión.'],
+ ['acc','Microsoft','MSFT','cloud',1,L1,'Renta su nube, Azure, a otras empresas y cobra suscripciones de Office y Windows. La nube ya es su negocio más grande.','Millones de empresas pagan cada mes por usar Word, Excel y Teams.'],
+ ['acc','Amazon','AMZN','box',2,L1,'Vende de todo en línea y cobra a otros vendedores por usar su tienda. Pero la mayor parte de su ganancia viene de AWS, su nube.','AWS es una parte chica de sus ventas, pero deja la mayoría de la utilidad.'],
+ ['acc','NVIDIA','NVDA','chip',3,L1,'Diseña los chips con los que se entrena la inteligencia artificial. La mayoría de sus ventas son chips para centros de datos.','No tiene fábricas propias: TSMC, en Taiwán, fabrica sus chips.'],
+ ['acc','Alphabet','GOOGL · Google','glass',1,L1,'Cuando buscas algo, Google muestra anuncios y cobra a la empresa cuando les das clic. La publicidad es la mayor parte de lo que gana; también YouTube y su nube.','Buscar es gratis porque el cliente es quien se anuncia.'],
+ ['acc','Meta','META','bubble',1,L1,'Facebook, Instagram y WhatsApp son gratis. Casi todo lo que gana viene de vender anuncios que aparecen entre las publicaciones.','Más de 3 mil millones de personas usan sus apps cada día.'],
+ ['acc','Tesla','TSLA','car',2,L1,'Vende autos eléctricos: es la mayor parte de sus ingresos. También vende baterías para casas y empresas, y créditos de emisiones a otras armadoras.','Tiene gigafábricas en Estados Unidos, Shanghái y Berlín.'],
+ ['acc','Coca-Cola','KO','bottle',1,L1,'Casi no embotella: vende el concentrado a embotelladoras como Coca-Cola FEMSA y Arca Continental, que preparan, envasan y reparten.','Lo que vende es la receta y la marca; el trabajo pesado lo hacen otros.'],
+ ['acc','Walmart de México','WALMEX','cart',1,L1,'Opera Bodega Aurrera, Walmart y Sam\'s Club. Gana poco por cada producto, pero vende muchísimo y muy seguido.','Es de las empresas que más gente emplea en México.'],
+ ['acc','Visa','V','card',2,L1,'No presta dinero: cobra una pequeña comisión cada vez que alguien paga con una tarjeta de su red.','Gana con cada pago, por pequeño que sea, sin arriesgar el dinero de los créditos.'],
+ ['edi','Mítikah','FUNO11 · CDMX','tower',2,L2,'Torre de oficinas y departamentos con centro comercial al sur de la Ciudad de México. Es una de las propiedades más visibles de Fibra Uno.','Su torre está entre las más altas de la ciudad.'],
+ ['edi','La primera FIBRA','FUNO11 · 2011','mall',1,L2,'Fibra Uno abrió en 2011 con 13 propiedades. Hoy tiene centros comerciales, oficinas y naves en más de 20 estados.','En 2024 tuvo ingresos por más de 28 mil millones de pesos.'],
+ ['edi','Toreo Parque Central','DANHOS13 · Valle de México','mixed',3,L2,'Centro comercial, hotel y tres torres de oficinas en un mismo lugar: más de 237 mil m² que se rentan.','Su hotel abrió en 2016.'],
+ ['edi','Torre Virreyes','DANHOS13 · Lomas-Palmas','tower',2,L2,'Oficinas triple A con casi 68 mil m² para empresas grandes en Lomas-Palmas, Ciudad de México.','Triple A es la categoría más alta de oficinas.'],
+ ['edi','Parque Alameda','DANHOS13 · Centro Histórico','arch',1,L2,'Centro comercial en el Centro Histórico de la Ciudad de México, frente al Palacio de Bellas Artes.','Tiene unos 16 mil m² que se rentan.'],
+ ['edi','Parque Delta','DANHOS13 · CDMX','mall',1,L2,'Centro comercial con unos 71 mil m². Está entre los del país con más visitantes y ventas por m².','Se amplió en 2016.'],
+ ['edi','Parques de Prologis','FIBRAPL14 · 6 mercados','nave',2,L2,'Más de 350 naves industriales en Ciudad de México, Guadalajara, Monterrey, Reynosa, Tijuana y Ciudad Juárez.','Se las renta a empresas de logística y manufactura.'],
+ ['edi','Nave en León','FMTY14 · Guanajuato','nave',2,L2,'En 2025 Fibra Mty sumó una nave en León para Mercado Libre. Se está enfocando en naves industriales y vendiendo oficinas.','En 2025 tenía rentado el 96% de sus espacios.'],
+ ['edi','Parque en Ciudad Juárez','FNOVA17 · Chihuahua','wheat',2,L2,'Compró 50 hectáreas en Ciudad Juárez para construir un parque industrial, por la llegada de fábricas al norte del país.','También tiene más de 1,600 hectáreas de tierras agroindustriales.'],
+ ['edi','Las naves de Fibra Uno','NEXT23 · Valle de México','nave',3,L2,'Fibra Next nació al separar las naves industriales de Fibra Uno. Tiene alrededor de 7.5 millones de m², la mayoría en el Valle de México.','Debutó en la Bolsa Mexicana en 2025.'],
+ ['obr','Tren CDMX–Pachuca','58 km · AIFA','train',1,L2,'Doble vía eléctrica de 58 km entre la Ciudad de México y Pachuca, pasando por el AIFA.','Se espera terminarlo en junio de 2027.'],
+ ['obr','Tren México–Querétaro','Buenavista → Querétaro','station',2,L2,'Saldrá de Buenavista y parará en Huehuetoca, Tula, San Juan del Río, El Marqués y La Corregidora.','La meta es terminarlo el 30 de septiembre de 2027.'],
+ ['obr','Tren Querétaro–Irapuato','Bajío','bridge',1,L2,'Sigue la ruta hacia el Bajío. Ya hay viaductos en construcción y obra en la estación de Celaya.','Con el tramo México–Querétaro suman 334 km.'],
+ ['obr','Tren Saltillo–Nuevo Laredo','396 km · Norte','map',2,L2,'396 km por el norte del país, pasando por Monterrey, hasta la frontera con Estados Unidos.','En Monterrey irá sobre un viaducto de acero de 9 km.'],
+ ['obr','Los trenes del norte','Alstom · 160 km/h','train',3,L2,'47 trenes de hasta 160 km/h. Los de ruta larga llevan 271 pasajeros y los metropolitanos, 632.','El primero llegaría en junio de 2027.'],
+ ['obr','La nueva red','2,400 km','map',2,L2,'El plan es construir unos 2,400 km de vías para pasajeros, con una inversión de alrededor de 750 mil millones de pesos.','Ya se preparan rutas de la CDMX a Guadalajara, San Miguel de Allende y Nuevo Laredo.'],
+ ['btc','21 millones','Límite fijo','coin',1,L3,'Solo existirán 21 millones de bitcoin. Nadie puede crear más, ni un gobierno ni un banco.','Ya se ha creado más del 90%.'],
+ ['btc','El halving','Cada 4 años','split',2,L3,'Cada 210 mil bloques, unos 4 años, se reduce a la mitad el bitcoin nuevo que reciben los mineros. El último fue en abril de 2024.','Hoy se crean 3.125 bitcoin por bloque.'],
+ ['btc','El bloque génesis','3 ene 2009','news',3,L3,'El primer bloque se minó el 3 de enero de 2009. Llevaba escrito el titular de un periódico sobre el rescate a los bancos.','Por eso muchos lo ven como una respuesta a la crisis de 2008.'],
+ ['btc','Pizza Day','22 may 2010','pizza',3,L3,'El 22 de mayo de 2010 alguien pagó 10,000 bitcoin por dos pizzas. Fue de las primeras compras con bitcoin.','Cada 22 de mayo se celebra el Bitcoin Pizza Day.'],
+ ['btc','El satoshi','0.00000001 BTC','dot',1,L3,'Un bitcoin se divide en 100 millones de partes llamadas satoshis. Puedes comprar un pedacito: no necesitas uno entero.','Se llaman así por el creador de bitcoin.'],
+ ['btc','Satoshi Nakamoto','Seudónimo','ghost',2,L3,'Así firmó el creador de bitcoin. Publicó el documento que lo explica el 31 de octubre de 2008 y dejó de participar hacia 2011.','Nadie sabe con certeza quién es.'],
+ ['btc','Un bloque cada 10 minutos','Blockchain','blocks',1,L3,'Las operaciones se juntan en bloques encadenados. Sale uno nuevo cada 10 minutos en promedio y los anteriores ya no se pueden cambiar.','Cada bloque guarda una huella del anterior.'],
+ ['btc','La minería','Prueba de trabajo','pick',1,L3,'Computadoras de todo el mundo compiten resolviendo un problema matemático. La que gana agrega el bloque y recibe bitcoin nuevo.','Hacer trampa costaría muchísima energía; eso protege la red.'],
+ ['btc','Tu llave privada','Seguridad','key',2,L3,'Quien tiene la llave privada controla los bitcoin. Si la pierdes y no tienes respaldo, nadie te la puede recuperar.','Por eso mucha gente prefiere comprarlo en una plataforma o un ETF.'],
+ ['btc','ETF de bitcoin','Ene 2024','chart',2,L3,'Desde enero de 2024 hay ETF de bitcoin en Estados Unidos: se compran en la bolsa como una acción, sin manejar llaves.','Así fondos y bancos pudieron invertir en bitcoin más fácil.'],
+ ['btc','El Salvador','2021','flag',3,L3,'En 2021 fue el primer país en hacer del bitcoin moneda de curso legal. En 2025 dejó de ser obligatorio aceptarlo.','Fue un experimento que siguió todo el mundo.']
+].map((c, i) => ({ id: i, set: c[0], t: c[1], sub: c[2], ic: c[3], r: c[4], lbl: c[5], txt: c[6], dato: c[7] }));
+  CARDS.forEach(c => { c.tk = c.sub.split(' ·')[0].trim(); });
+  // Edificios: solo los de las FIBRAs que tienes (si no tienes ninguna de las que hay, se muestran todas)
+  function mazo(set) {
+    const L = CARDS.filter(c => c.set === set);
+    if (set !== 'edi' || !listo()) return L;
+    const mias = new Set(model.classes.FIBRAS.items.filter(i => i.valor > 0).map(i => String(i.activo).toUpperCase()));
+    const f = L.filter(c => mias.has(c.tk));
+    return f.length ? f : L;
+  }
+  const numera = L => L.forEach((c, i) => { c.no = i + 1; c.of = L.length; });
+  function drawIcon(g, name, x, y, s, col, acc, hi) {
+    const rows = ICONS[name]; if (!rows) return; const pal = { '#': col, o: hi || '#fff3c4', x: '#120c22', a: acc };
+    rows.forEach((r, j) => { for (let i = 0; i < r.length; i++) { const ch = r[i]; if (ch === '.') continue; g.fillStyle = pal[ch]; g.fillRect(x + i * s, y + j * s, s, s); } });
+  }
+  const hh = (a, b) => { let h = Math.imul(a * 374761393 + b * 668265263, 1274126177); h ^= h >>> 13; h = Math.imul(h, 1103515245); return ((h ^ h >>> 16) >>> 0) / 4294967296; };
+  function drawArt(cv, card) {
+    const g = cv.getContext('2d'), W = cv.width, H = cv.height, S = SETS[card.set], sd = card.id * 17; g.imageSmoothingEnabled = false;
+    if (S.bg === 'city') {
+      const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#0a1230'); gr.addColorStop(1, '#1c2348'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      for (let i = 0; i < 40; i++) { g.fillStyle = 'rgba(255,255,255,' + (.3 + hh(i, sd) * .5) + ')'; g.fillRect(Math.floor(hh(sd, i) * W), Math.floor(hh(i + 3, sd) * H * .5), 1, 1); }
+      let x = 0; while (x < W) { const w = 4 + Math.floor(hh(x, sd) * 7), h = 8 + Math.floor(hh(sd, x) * 16); g.fillStyle = '#0d1530'; g.fillRect(x, H - h, w, h); for (let yy = H - h + 2; yy < H - 1; yy += 3) for (let xx = x + 1; xx < x + w - 1; xx += 2) if (hh(xx, yy + sd) > .6) { g.fillStyle = '#f2b54488'; g.fillRect(xx, yy, 1, 1); } x += w + 1; }
+    } else if (S.bg === 'sunset') {
+      const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#2a1640'); gr.addColorStop(.6, '#7a3150'); gr.addColorStop(1, '#ef7b6c'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      g.fillStyle = '#ffc46b'; g.beginPath(); g.arc(W * .78, H * .62, 9, 0, 7); g.fill(); for (let yy = Math.floor(H * .62); yy < H * .62 + 9; yy += 3) { g.fillStyle = '#7a3150'; g.fillRect(W * .78 - 10, yy, 20, 1); }
+      let x = 0; while (x < W) { const w = 5 + Math.floor(hh(x, sd) * 6), h = 6 + Math.floor(hh(sd, x) * 12); g.fillStyle = '#2a1430'; g.fillRect(x, H - h, w, h); x += w; }
+    } else if (S.bg === 'rails') {
+      const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#123a4a'); gr.addColorStop(1, '#4fc3b0'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      g.fillStyle = '#1f5a52'; for (let x = 0; x < W; x++) { const y = H - 10 - Math.floor(4 * Math.sin((x + sd) / 9) + 3 * Math.sin((x + sd) / 4)); g.fillRect(x, y, 1, H - y); }
+      g.fillStyle = '#0d2a2a'; g.fillRect(0, H - 5, W, 5); g.fillStyle = '#8aa'; for (let x = 1; x < W; x += 4) g.fillRect(x, H - 5, 2, 1); g.fillStyle = '#cde'; g.fillRect(0, H - 4, W, 1);
+    } else {
+      g.fillStyle = '#050914'; g.fillRect(0, 0, W, H); g.strokeStyle = '#83f2f744'; g.lineWidth = 1;
+      for (let i = -8; i <= 8; i++) { g.beginPath(); g.moveTo(W / 2 + i * 3, H * .45); g.lineTo(W / 2 + i * 12, H); g.stroke(); }
+      for (let k = 0; k < 6; k++) { const y = Math.round(H * .45 + Math.pow(k / 6, 1.8) * H * .55); g.fillStyle = '#f7931a55'; g.fillRect(0, y, W, 1); }
+      const gr = g.createLinearGradient(0, 0, 0, H * .45); gr.addColorStop(0, '#0a0f2a'); gr.addColorStop(1, '#2a1430'); g.fillStyle = gr; g.fillRect(0, 0, W, H * .45);
+      for (let i = 0; i < 30; i++) { g.fillStyle = hh(i, sd) > .5 ? '#83f2f7' : '#f7931a'; g.fillRect(Math.floor(hh(sd, i) * W), Math.floor(hh(i, sd + 1) * H * .42), 1, 1); }
+    }
+    const cx = W / 2, cy = H / 2 - 2, hg = g.createRadialGradient(cx, cy, 2, cx, cy, 22); hg.addColorStop(0, S.c + '88'); hg.addColorStop(1, S.c + '00'); g.fillStyle = hg; g.fillRect(0, 0, W, H);
+    drawIcon(g, card.ic, Math.round(cx - 12), Math.round(cy - 12), 2, S.c, S.a);
+  }
+  function cardHTML(c) {
+    const S = SETS[c.set], stars = [1, 2, 3].map(i => `<i class="${i <= c.r ? 'on' : ''}"></i>`).join('');
+    return `<div class="jcard ${c.set} r${c.r}" style="--c:${S.c}"><div class="ins"><div class="band"><span>${S.sh}</span><span class="no">${String(c.no).padStart(2, '0')}/${c.of}</span></div>
+      <div class="art"><canvas width="64" height="38" data-jcard="${c.id}"></canvas></div>
+      <div class="body"><div class="ttl">${c.t}</div><div class="sub">${c.sub}</div><div class="lbl">${c.lbl}</div><p class="txt">${c.txt}</p><div class="dato">${c.dato}</div></div>
+      <div class="foot"><span>${['', 'Común', 'Rara', 'Épica'][c.r]}</span><span class="stars">${stars}</span></div></div></div>`;
+  }
+  const backHTML = (q) => `<div class="jback"><div class="ins"><canvas width="12" height="12" data-jback="1"></canvas><b>${q || 'CIUDAD MAREA'}</b><small>Cartas de la ciudad</small></div></div>`;
+  function pinta(root) {
+    root.querySelectorAll('canvas[data-jcard]').forEach(cv => drawArt(cv, CARDS[+cv.dataset.jcard]));
+    root.querySelectorAll('canvas[data-jback]').forEach(cv => { const g = cv.getContext('2d'); PIXICO.RENTA_FIJA.forEach((r, j) => { for (let i = 0; i < 12; i++) if (r[i] !== '.') { g.fillStyle = r[i] === 'o' ? '#fff3c4' : '#ffc46b'; g.fillRect(i, j, 1, 1); } }); });
+    root.querySelectorAll('canvas[data-jpk]').forEach(cv => { const S = SETS[cv.dataset.jpk]; const g = cv.getContext('2d'); g.clearRect(0, 0, 12, 12); drawIcon(g, S.pk, 0, 0, 1, '#fff3c4', S.c, S.c); });
+  }
+  // sobres: 4 de bienvenida + 1 por cada mes en que aportaste
+  const ganados = () => 4 + (typeof ST !== 'undefined' && ST && ST.contribMonths ? ST.contribMonths.size : 0);
+  const abiertos = () => st.get(K('abiertos'), 0);
+  const sobres = () => listo() ? Math.max(0, ganados() - abiertos()) : 0;
+  const album = () => new Set(st.get(K('album'), []));
+  let curSet = 'acc', box = null;
+  function cartas(b) {
+    box = b; if (!listo()) return;
+    const own = album(), n = sobres();
+    const foil = k => `<div class="jfoil" style="--c:${SETS[k].c}"><span class="br">CIUDAD MAREA</span><canvas width="12" height="12" data-jpk="${k}"></canvas><span class="pn">${SETS[k].n}</span></div>`;
+    const L = mazo(curSet); numera(L);
+    const tot = Object.keys(SETS).reduce((a, k) => a + mazo(k).length, 0), totOwn = Object.keys(SETS).reduce((a, k) => a + mazo(k).filter(c => own.has(c.id)).length, 0);
+    const nOwn = L.filter(c => own.has(c.id)).length;
+    b.innerHTML = `<div class="mlead"><h2>Sobres de cartas</h2><p>Ábrelos para descubrir cómo ganan dinero las empresas, los edificios de tus FIBRAs, las obras de México y los secretos del bitcoin.</p></div>
+      <article class="mcard" style="--c:#ffc46b"><div class="jsob"><b>${n}</b><span>${n === 1 ? 'sobre para abrir' : 'sobres para abrir'}${n ? ': elige cuál' : ''}</span></div>
+      <div class="jpacks">${Object.keys(SETS).map(k => `<button type="button" class="jpack" data-jpack="${k}" ${n ? '' : 'disabled'} aria-label="Abrir sobre ${SETS[k].n}">${foil(k)}<span class="cnt">${mazo(k).filter(c => own.has(c.id)).length}/${mazo(k).length} cartas</span></button>`).join('')}</div>
+      <p class="foot">Ganas un sobre por cada mes que registras tu aportación. Empiezas con 4 de regalo. El álbum se guarda en este dispositivo.</p></article>
+      <article class="mcard jalb" style="--c:${SETS[curSet].c}"><h3>Tu álbum <span class="foot" style="font-weight:500">${totOwn} de ${tot} cartas</span></h3>
+      <div class="jchips">${Object.keys(SETS).map(k => `<button type="button" class="jchip" style="--c:${SETS[k].c}" aria-pressed="${k === curSet}" data-jset="${k}">${SETS[k].sh} <span class="mono">${mazo(k).filter(c => own.has(c.id)).length}/${mazo(k).length}</span></button>`).join('')}</div>
+      <div class="jprog" style="--c:${SETS[curSet].c}"><i style="width:${nOwn / L.length * 100}%"></i></div>
+      <div class="jgrid">${L.map(c => `<button type="button" class="jthumb" data-jver="${c.id}" ${own.has(c.id) ? `aria-label="${c.t}"` : 'aria-label="Carta por descubrir" disabled'}>${own.has(c.id) ? cardHTML(c) : backHTML('?')}</button>`).join('')}</div></article>`;
+    pinta(b);
+    b.querySelectorAll('[data-jpack]').forEach(x => x.onclick = () => abrirSobre(x.dataset.jpack));
+    b.querySelectorAll('[data-jset]').forEach(x => x.onclick = () => { curSet = x.dataset.jset; cartas(b); });
+    b.querySelectorAll('[data-jver]').forEach(x => x.onclick = () => verCarta(CARDS[+x.dataset.jver]));
+  }
+  function stage() { let s = $j('jStage'); if (!s) { s = document.createElement('div'); s.id = 'jStage'; s.className = 'jstage'; s.hidden = true; s.setAttribute('role', 'dialog'); s.setAttribute('aria-modal', 'true'); s.innerHTML = '<div id="jStIn" style="display:flex;flex-direction:column;align-items:center;gap:16px;position:relative"></div><div class="hint" id="jStHint"></div><div class="bar" id="jStBar"></div>'; document.body.appendChild(s); s.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarStage(); }); } return s; }
+  function cerrarStage() { const s = $j('jStage'); if (s) { s.hidden = true; $j('jStIn').innerHTML = ''; $j('jStBar').innerHTML = ''; } if (box) cartas(box); if (typeof MAREA !== 'undefined') MAREA.render(); }
+  function verCarta(c) {
+    const s = stage(); s.hidden = false; numera(mazo(c.set));
+    $j('jStIn').innerHTML = `<div class="jflip open" style="cursor:default"><div class="in"><div class="face">${backHTML()}</div><div class="face front">${cardHTML(c)}</div></div></div>`; pinta($j('jStIn'));
+    $j('jStHint').textContent = ''; $j('jStBar').innerHTML = '<button type="button" class="mbtn" id="jCls">Cerrar</button>'; $j('jCls').onclick = cerrarStage; $j('jCls').focus();
+  }
+  function sacar(set) {
+    const L = mazo(set), own = album(), out = [];
+    for (let k = 0; k < 3; k++) {
+      let src = L.filter(c => !own.has(c.id) && !out.includes(c)); if (!src.length) src = L.filter(c => !out.includes(c)); if (!src.length) break;
+      const w = src.map(c => c.r === 3 ? 1 : c.r === 2 ? 2 : 3), tot = w.reduce((a, b) => a + b, 0); let r = Math.random() * tot, i = 0; while (r > w[i]) { r -= w[i]; i++; } out.push(src[i]);
+    }
+    return out;
+  }
+  function abrirSobre(set) {
+    if (!sobres()) return; const S = SETS[set], s = stage(); s.hidden = false; $j('jStBar').innerHTML = '<button type="button" class="mbtn" id="jCls">Ahora no</button>'; $j('jCls').onclick = cerrarStage;
+    $j('jStIn').innerHTML = `<button type="button" class="jpack jbig" id="jBp" aria-label="Rasgar sobre"><div class="jfoil" style="--c:${S.c}"><span class="br">CIUDAD MAREA</span><canvas width="12" height="12" data-jpk="${set}"></canvas><span class="pn">${S.n}</span></div></button>`;
+    pinta($j('jStIn')); $j('jStHint').textContent = 'Toca el sobre para abrirlo';
+    const bp = $j('jBp'); bp.focus(); let busy = false;
+    bp.onclick = () => {
+      if (busy) return; busy = true; bp.classList.add('shake'); $j('jStHint').textContent = ''; $j('jStBar').innerHTML = '';
+      setTimeout(() => {
+        bp.classList.remove('shake'); bp.classList.add('tear');
+        const got = sacar(set), own = album(), nuevo = got.map(c => !own.has(c.id)); got.forEach(c => own.add(c.id));
+        st.set(K('album'), [...own]); st.set(K('abiertos'), abiertos() + 1); numera(mazo(set));
+        setTimeout(() => revela(got, nuevo, 0), 450);
+      }, 900);
+    };
+  }
+  function revela(got, nuevo, i) {
+    const c = got[i];
+    $j('jStIn').innerHTML = `<div style="position:relative"><button type="button" class="jflip enter" id="jFc" aria-label="Voltear carta"><div class="in"><div class="face">${backHTML()}</div><div class="face front">${cardHTML(c)}</div></div></button></div>`;
+    pinta($j('jStIn')); $j('jStHint').textContent = 'Toca la carta para voltearla · ' + (i + 1) + ' de ' + got.length; $j('jStBar').innerHTML = '';
+    const fc = $j('jFc'); fc.focus();
+    fc.onclick = () => {
+      if (fc.classList.contains('open')) return; fc.classList.add('open');
+      setTimeout(() => { if (nuevo[i]) fc.parentElement.insertAdjacentHTML('afterbegin', '<span class="jnew">¡NUEVA!</span>'); }, 350);
+      $j('jStHint').textContent = nuevo[i] ? 'Carta nueva para tu álbum' : 'Esta ya la tenías';
+      $j('jStBar').innerHTML = `<button type="button" class="mbtn pri" id="jNx">${i < got.length - 1 ? 'Siguiente carta' : 'Guardar en el álbum'}</button>`;
+      const nx = $j('jNx'); nx.focus(); nx.onclick = () => { if (i < got.length - 1) revela(got, nuevo, i + 1); else { curSet = c.set; cerrarStage(); } };
+    };
+  }
+
+  // ================= simulador =================
+  // Niveles aproximados por mes (100 = inicio), redondeados de índices de referencia. Renta fija: tasa anual por tramos.
+  const SCN = [
+    { n: 'Crisis 2008', start: [2007, 9], m: 66, d: 'La crisis hipotecaria de Estados Unidos: los bancos dejaron de prestar y las bolsas del mundo cayeron más de la mitad. Bitcoin todavía no existía, así que ese barrio se queda igual.',
+      A: [[0, 100], [12, 58], [17, 45], [24, 68], [36, 75], [48, 72], [60, 88], [66, 100]], I: [[0, 100], [12, 62], [17, 30], [24, 52], [36, 65], [48, 68], [60, 85], [66, 92]], R: [[0, 7.5], [15, 4.5]], B: null },
+    { n: 'Pandemia 2020', start: [2020, 1], m: 24, d: 'El mundo se encerró por el covid. Las bolsas cayeron un tercio en un mes y se recuperaron en medio año; las FIBRAs tardaron mucho más porque oficinas y plazas se vaciaron.',
+      A: [[0, 100], [1, 68], [2, 78], [3, 82], [5, 95], [6, 100], [9, 110], [12, 125], [18, 135], [22, 140], [24, 130]], I: [[0, 100], [1, 60], [2, 58], [4, 62], [8, 70], [12, 78], [18, 82], [24, 85]], R: [[0, 7], [3, 5.5], [7, 4.3], [19, 5.5]],
+      B: [[0, 100], [1, 55], [3, 95], [6, 105], [9, 140], [10, 200], [12, 360], [14, 620], [17, 370], [21, 650], [24, 400]] },
+    { n: 'Subida de tasas 2022', start: [2022, 0], m: 26, d: 'La inflación obligó a subir las tasas de interés. Bajaron acciones y bitcoin, pero Cetes y cajitas pagaron más que en años.',
+      A: [[0, 100], [5, 82], [9, 75], [11, 84], [15, 90], [18, 92], [21, 88], [24, 104], [26, 108]], I: [[0, 100], [5, 90], [9, 92], [12, 100], [18, 110], [24, 120], [26, 120]], R: [[0, 6], [4, 8], [9, 10], [13, 11.2]],
+      B: [[0, 100], [5, 43], [10, 34], [12, 35], [15, 60], [18, 56], [21, 58], [24, 90], [26, 150]] }];
+  const MES3 = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  const lerp = (pts, m) => { for (let i = 1; i < pts.length; i++) if (m <= pts[i][0]) { const [a, va] = pts[i - 1], [b, vb] = pts[i]; return va + (vb - va) * (m - a) / (b - a); } return pts[pts.length - 1][1]; };
+  function series(sc) {
+    const N = sc.m, o = {}, arr = f => [...Array(N + 1)].map((_, m) => f(m));
+    o.ACCIONES = arr(m => lerp(sc.A, m) / 100); o.FIBRAS = arr(m => lerp(sc.I, m) / 100); o.BITCOIN = sc.B ? arr(m => lerp(sc.B, m) / 100) : arr(() => 1);
+    const r = [1]; for (let m = 1; m <= N; m++) { let rate = sc.R[0][1]; sc.R.forEach(([mm, v]) => { if (m - 1 >= mm) rate = v; }); r.push(r[m - 1] * (1 + rate / 100 / 12)); } o.RENTA_FIJA = r; return o;
+  }
+  const SIM = { i: 0, m: 0, ap: false, apM: 5000, play: null };
+  let VAL0 = {}, TOT0 = 0, SER = null, RUN = null, sbox = null;
+  function calc(ap) {
+    const sc = SCN[SIM.i], N = sc.m; SER = series(sc);
+    const u = {}; JORD.forEach(k => u[k] = VAL0[k]); const tot = [], inv = [], per = []; let invested = TOT0;
+    for (let m = 0; m <= N; m++) {
+      if (m > 0 && ap) { JORD.forEach(k => u[k] += ap * (TOT0 ? VAL0[k] / TOT0 : .25) / SER[k][m]); invested += ap; }
+      const pv = {}; let t = 0; JORD.forEach(k => { pv[k] = u[k] * SER[k][m]; t += pv[k]; }); tot.push(t); inv.push(invested); per.push(pv);
+    }
+    let low = 0; tot.forEach((v, m) => { if (v - inv[m] < tot[low] - inv[low]) low = m; });
+    let rec = null; for (let m = low; m <= N; m++) if (tot[m] >= inv[m] - .5) { rec = m; break; }
+    return { tot, inv, per, low, rec, ap };
+  }
+  const mLab = m => { const sc = SCN[SIM.i], t = sc.start[0] * 12 + sc.start[1] + m; return MES3[t % 12] + ' ' + Math.floor(t / 12); };
+  function simula(b) {
+    sbox = b; if (!listo()) return;
+    JORD.forEach(k => VAL0[k] = Math.max(0, model.classes[k].valor)); TOT0 = JORD.reduce((a, k) => a + VAL0[k], 0);
+    if (TOT0 <= 0) { b.innerHTML = `<div class="mlead"><h2>¿Qué hubiera pasado?</h2><p>Registra tu tesorería y aquí verás cómo le hubiera ido a tu dinero en crisis reales del pasado.</p></div>`; return; }
+    if (b.querySelector('#jTl')) { upd(); return; }
+    b.innerHTML = `<div class="mlead mlead-row"><div><h2>¿Qué hubiera pasado?</h2><p>Tu tesoro de hoy, viviendo una crisis real del pasado. Mira cuánto hubiera bajado y cuánto tardó en volver.</p></div><button type="button" class="mbtn" id="jSimCity">Ver el simulacro en mi ciudad</button></div>
+      <article class="mcard jsim" style="--c:#ffc46b">
+        <div class="jchips" id="jScn" role="group" aria-label="Crisis"></div><p class="foot" id="jScnD" style="font-size:13.5px;color:var(--fg)"></p>
+        <div class="jcity"><canvas id="jSc" width="230" height="78"></canvas></div>
+        <div class="jctrl"><button type="button" class="mbtn pri" id="jPlay">▶ Reproducir</button><input type="range" id="jTl" min="0" max="10" value="0" aria-label="Mes"><span class="mes" id="jMes"></span></div>
+        <div class="jchart"><canvas id="jCh"></canvas></div>
+        <div class="jkpis"><div class="jkpi"><small>Tu tesoro hoy</small><b id="jkNow"></b><span id="jkNowS"></span></div><div class="jkpi"><small>Ese mes</small><b id="jkCur"></b><span id="jkCurS"></span></div>
+          <div class="jkpi"><small>Lo más bajo</small><b class="jdn" id="jkLow"></b><span id="jkLowS"></span></div><div class="jkpi"><small>Volviste a tu dinero</small><b id="jkRec"></b><span id="jkRecS"></span></div></div>
+        <label class="jtog"><input type="checkbox" id="jAp"> Seguí aportando <input type="number" id="jApM" value="${SIM.apM}" min="0" step="500" aria-label="Aportación mensual"> al mes</label>
+        <div class="jlesson" id="jLes"></div>
+        <div><div class="jlbl" style="margin-bottom:6px">Cada barrio ese mes</div><div class="jbrr" id="jBrr"></div></div>
+        <p class="foot">Caídas y recuperaciones aproximadas de índices de referencia (acciones del mundo, bienes raíces, Cetes y bitcoin), redondeadas y sin tipo de cambio. En estas crisis el dólar subió, así que lo invertido en dólares cayó menos en pesos. Sirve para entender, no para predecir.</p>
+      </article>`;
+    $j('jAp').checked = SIM.ap; $j('jSimCity').onclick = () => simulacro();
+    $j('jPlay').onclick = () => { if (SIM.play) { parar(); return; } if (SIM.m >= SCN[SIM.i].m) SIM.m = 0; $j('jPlay').textContent = '❚❚ Pausa'; const step = Math.max(60, Math.round(4200 / SCN[SIM.i].m)); SIM.play = setInterval(() => { if (!document.body.contains($j('jTl'))) { parar(); return; } SIM.m++; $j('jTl').value = SIM.m; upd(); if (SIM.m >= SCN[SIM.i].m) parar(); }, step); };
+    $j('jTl').oninput = e => { parar(); SIM.m = +e.target.value; upd(); };
+    $j('jAp').onchange = e => { SIM.ap = e.target.checked; upd(); };
+    $j('jApM').oninput = e => { SIM.apM = Math.max(0, +e.target.value || 0); if (SIM.ap) upd(); };
+    upd();
+  }
+  function parar() { if (SIM.play) { clearInterval(SIM.play); SIM.play = null; } const p = $j('jPlay'); if (p) p.textContent = '▶ Reproducir'; }
+  function upd() {
+    const sc = SCN[SIM.i];
+    $j('jScn').innerHTML = SCN.map((s, i) => `<button type="button" class="jchip" style="--c:#ffc46b" aria-pressed="${i === SIM.i}" data-jscn="${i}">${s.n}</button>`).join('');
+    $j('jScn').querySelectorAll('[data-jscn]').forEach(x => x.onclick = () => { parar(); SIM.i = +x.dataset.jscn; SIM.m = 0; upd(); });
+    $j('jScnD').textContent = sc.d; const tl = $j('jTl'); tl.max = sc.m; if (SIM.m > sc.m) SIM.m = sc.m; tl.value = SIM.m;
+    const ap = SIM.ap ? SIM.apM : 0; RUN = calc(ap); const R = RUN, m = SIM.m;
+    $j('jMes').textContent = mLab(m);
+    $j('jkNow').textContent = fmt(TOT0); $j('jkNowS').textContent = 'al empezar, ' + mLab(0);
+    const d = R.tot[m] - R.inv[m]; $j('jkCur').textContent = fmt(R.tot[m]); $j('jkCur').className = d >= 0 ? 'jup' : 'jdn'; $j('jkCurS').textContent = (d >= 0 ? 'arriba de' : 'abajo de') + ' lo que pusiste por ' + fmt(Math.abs(d));
+    const ld = R.tot[R.low] - R.inv[R.low]; $j('jkLow').textContent = fmtS(ld); $j('jkLowS').textContent = pct(ld / R.inv[R.low] * 100) + ' en ' + mLab(R.low);
+    if (R.rec === null) { $j('jkRec').textContent = 'Todavía no'; $j('jkRec').className = 'jdn'; $j('jkRecS').textContent = 'al terminar el periodo'; }
+    else { $j('jkRec').textContent = R.rec === 0 ? 'Nunca bajó' : R.rec + ' meses'; $j('jkRec').className = 'jup'; $j('jkRecS').textContent = R.rec ? 'en ' + mLab(R.rec) : ''; }
+    let L = R.rec === null ? 'Al final del periodo tu tesoro seguía abajo, pero los edificios no se destruyen: quien no vendió seguía teniendo lo mismo para cuando el mercado regresó.'
+      : R.rec === 0 ? 'Tu tesoro nunca quedó abajo de lo que pusiste en este escenario.' : `Si no vendías en lo más bajo, en ${R.rec} meses volvías a tener tu dinero.`;
+    if (ap) { const r0 = calc(0).rec; if (R.rec !== null && (r0 === null || r0 > R.rec)) L += ` Siguiendo con tus aportaciones compraste más barato y te recuperaste ${r0 === null ? 'aunque sin aportar no alcanzabas' : (r0 - R.rec) + ' meses antes'}.`; }
+    else L += ' Prueba activar "Seguí aportando" para ver qué pasa si no te detienes.';
+    $j('jLes').textContent = L;
+    $j('jBrr').innerHTML = JORD.filter(k => VAL0[k] > 0).map(k => { const ch = SER[k][m] / SER[k][0] - 1, na = k === 'BITCOIN' && !sc.B;
+      return `<div class="jrow"><div class="ic" style="background:${BAR[k].c}22">${pixSVG(k, BAR[k].c, 20)}</div><div class="nm">${BAR[k].n}<small>${fmt(R.per[0][k])} → ${fmt(R.per[m][k])}</small></div><div class="dv ${na ? '' : ch >= 0 ? 'jup' : 'jdn'}">${na ? '<small>no existía</small>' : pct(ch * 100)}</div></div>`; }).join('');
+    chart(); city();
+  }
+  function chart() {
+    const cv = $j('jCh'), dpr = window.devicePixelRatio || 1, W = cv.clientWidth || 400, H = 210; cv.width = W * dpr; cv.height = H * dpr; const g = cv.getContext('2d'); g.scale(dpr, dpr);
+    const R = RUN, N = SCN[SIM.i].m, vals = R.tot.concat(R.inv), mn = Math.min(...vals) * .95, mx = Math.max(...vals) * 1.03, pl = 8, pr = 8, pt = 16, pb = 26;
+    const X = m => pl + (W - pl - pr) * m / N, Y = v => pt + (H - pt - pb) * (1 - (v - mn) / (mx - mn));
+    g.strokeStyle = '#2a3560'; g.lineWidth = 1; for (let i = 0; i < 4; i++) { const y = pt + (H - pt - pb) * i / 3; g.beginPath(); g.moveTo(pl, y); g.lineTo(W - pr, y); g.stroke(); }
+    for (let m = 0; m < N; m++) { g.fillStyle = R.tot[m] >= R.inv[m] ? 'rgba(125,255,176,.16)' : 'rgba(255,122,122,.18)'; g.beginPath(); g.moveTo(X(m), Y(R.inv[m])); g.lineTo(X(m + 1), Y(R.inv[m + 1])); g.lineTo(X(m + 1), Y(R.tot[m + 1])); g.lineTo(X(m), Y(R.tot[m])); g.closePath(); g.fill(); }
+    g.setLineDash([4, 4]); g.strokeStyle = '#9ba6c6'; g.beginPath(); R.inv.forEach((v, m) => m ? g.lineTo(X(m), Y(v)) : g.moveTo(X(m), Y(v))); g.stroke(); g.setLineDash([]);
+    g.strokeStyle = '#ffc46b'; g.lineWidth = 2.5; g.beginPath(); R.tot.forEach((v, m) => m ? g.lineTo(X(m), Y(v)) : g.moveTo(X(m), Y(v))); g.stroke();
+    g.fillStyle = '#ff7a7a'; g.beginPath(); g.arc(X(R.low), Y(R.tot[R.low]), 4, 0, 7); g.fill();
+    if (R.rec) { g.fillStyle = '#7dffb0'; g.beginPath(); g.arc(X(R.rec), Y(R.tot[R.rec]), 4, 0, 7); g.fill(); }
+    g.strokeStyle = '#eef1f8'; g.lineWidth = 1; g.beginPath(); g.moveTo(X(SIM.m), pt); g.lineTo(X(SIM.m), H - pb); g.stroke(); g.fillStyle = '#eef1f8'; g.beginPath(); g.arc(X(SIM.m), Y(R.tot[SIM.m]), 5, 0, 7); g.fill();
+    g.fillStyle = '#9ba6c6'; g.font = '11px "IBM Plex Mono",monospace'; g.textAlign = 'left'; g.fillText(mLab(0), pl, H - 8); g.textAlign = 'right'; g.fillText(mLab(N), W - pr, H - 8);
+    g.textAlign = 'left'; g.fillText(R.ap ? '- - lo que pusiste' : '- - tu dinero al inicio', pl, 11);
+  }
+  function city() {
+    const cv = $j('jSc'), g = cv.getContext('2d'), W = cv.width, H = cv.height, R = RUN, m = SIM.m; g.imageSmoothingEnabled = false;
+    const down = R.tot[m] < R.inv[m], gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, down ? '#141a2c' : '#1a2850'); gr.addColorStop(1, down ? '#26304a' : '#3a3a6a'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    const base = H - 10; if (!down) { g.fillStyle = '#ffc46b'; g.beginPath(); g.arc(W - 24, 22, 9, 0, 7); g.fill(); }
+    let x = 10; JORD.forEach((k, i) => {
+      const r = R.per[m][k] / Math.max(1, R.per[0][k]), c = BAR[k].c, dk = SER[k][m] < SER[k][0] - .001, x0 = x;
+      for (let b = 0; b < 3; b++) { const w = 12 + ((i * 5 + b * 3) % 6), h0 = 18 + ((i * 11 + b * 17) % 26), h = Math.max(6, Math.round(h0 * Math.min(1.6, Math.max(.35, r))));
+        g.fillStyle = '#0d1630'; g.fillRect(x, base - h, w, h); g.fillStyle = c; g.fillRect(x, base - h, w, 1);
+        for (let yy = base - h + 3; yy < base - 2; yy += 3) for (let xx = x + 2; xx < x + w - 2; xx += 3) if (hh(xx, yy) > (dk ? .75 : .35)) { g.fillStyle = c + 'cc'; g.fillRect(xx, yy, 1, 1); }
+        x += w + 2; }
+      if (dk) { g.fillStyle = '#8a97b8'; for (let q = 0; q < 3; q++) g.fillRect(x0 + q * 14, 6 + (q % 2) * 3, 14, 4); g.fillStyle = '#83c8ff88'; for (let q = 0; q < 12; q++) g.fillRect(x0 + ((q * 7 + m * 3) % Math.max(1, x - x0)), 12 + ((q * 11 + m * 5) % (base - 14)), 1, 3); }
+      x += 8; });
+    g.fillStyle = '#0a0f24'; g.fillRect(0, base, W, H - base); g.fillStyle = '#1d2752'; g.fillRect(0, base, W, 1);
+  }
+  window.addEventListener('resize', () => { if (sbox && document.body.contains($j('jCh')) && !$j('jCh').closest('[hidden]')) chart(); });
+
+  // ================= simulacro de tormenta (World 1-1: se aprende viéndolo) =================
+  // Tu ciudad vive en ~20 s una tormenta como la de 2020. Dice SIMULACRO todo el tiempo y al final todo vuelve a tus datos reales.
+  let simOn = false, simT = null, simEV = null;
+  const NARR = [[0, 'Así está tu ciudad hoy. Veamos qué pasaría con una tormenta como la de 2020.'], [1, '¡Llega la tormenta! En un mes las bolsas caen un tercio.'],
+    [2, 'Mira Obras públicas: casi no se moja. Por eso conviene tener de todo un poco.'], [4, 'Los edificios bajan de precio, pero ninguno se cae.'],
+    [6, 'Poco a poco regresa el sol.'], [10, 'Quien no vendió en la tormenta volvió a tener su dinero.']];
+  function banner(id, html) { let b = $j(id); if (!b) { b = document.createElement('div'); b.id = id; document.body.appendChild(b); } b.className = 'jbanner'; b.innerHTML = html; b.hidden = false; return b; }
+  function simulacro() {
+    if (simOn || !listo() || !(model.total > 0)) return;
+    if (VIS) salirVisita();
+    simOn = true; st.set(K('simulacro'), 1);
+    if (typeof MAREA !== 'undefined') MAREA.go('mercado');
+    const sc = SCN[1], S2 = series(sc), N = 12, base = model; simEV = EV; window.JQUIET = 1;
+    banner('jSimB', `<b class="jtag">SIMULACRO</b><span class="jbm" id="jSimM"></span><p id="jSimT"></p><button type="button" class="mbtn" id="jSimX">Saltar</button>`);
+    $j('jSimX').onclick = () => finSim(true);
+    let m = 0;
+    const paso = () => {
+      if (!simOn) return;
+      const proj = {}; base.items.forEach(i => { if (i.valor > 0) proj[i.activo] = { valor: i.valor * S2[i.key][m], costo: i.costo }; });
+      const V = buildModel(raw, proj);
+      V.items.forEach(i => { if (!proj[i.activo]) return; const ch = m ? (S2[i.key][m] / S2[i.key][m - 1] - 1) * 100 : 0; i.cambio_dia = ch; i.hoy = i.valor - i.valor / (1 + ch / 100); });
+      JORD.forEach(k => { const c = V.classes[k]; c.hoy = c.items.reduce((a, i) => a + (i.hoy || 0), 0); c.pct = base.classes[k].pct; });
+      V.hoy = JORD.reduce((a, k) => a + V.classes[k].hoy, 0);
+      EV = Object.assign({}, simEV || {}, { storms: m ? JORD.filter(k => S2[k][m] / S2[k][m - 1] < .9).map(k => ({ k })) : [] });
+      window.JVIEW = V; view = V; layout();
+      const t = sc.start[0] * 12 + sc.start[1] + m; $j('jSimM').textContent = MES3[t % 12] + ' ' + Math.floor(t / 12);
+      const nr = NARR.filter(x => x[0] <= m).pop(); if (nr) $j('jSimT').textContent = nr[1];
+      m++; simT = setTimeout(m <= N ? paso : () => finSim(false), m === 1 ? 2600 : m <= N ? 1500 : 1800);
+    };
+    paso();
+  }
+  function finSim(saltado) {
+    if (!simOn) return; simOn = false; clearTimeout(simT); window.JQUIET = 0; window.JVIEW = null; EV = simEV; view = model; layout();
+    const b = $j('jSimB'); if (b) b.hidden = true;
+    if (saltado) return;
+    const S2 = series(SCN[1]); let peor = 1, peorRF = 1;
+    for (let m = 0; m <= 12; m++) { const tot = JORD.reduce((a, k) => a + Math.max(0, model.classes[k].valor) * S2[k][m], 0) / Math.max(1, model.total); peor = Math.min(peor, tot); peorRF = Math.min(peorRF, S2.RENTA_FIJA[m]); }
+    let v = $j('jVeil'); if (!v) { v = document.createElement('div'); v.id = 'jVeil'; v.className = 'jveil'; v.hidden = true; document.body.appendChild(v); v.addEventListener('click', e => { if (e.target === v) cerrarPop(); }); }
+    v.innerHTML = `<div class="jpop" role="dialog" aria-modal="true" aria-labelledby="jSimF"><div class="jph"><b id="jSimF">Fin del simulacro</b><span>tus datos reales ya regresaron</span></div>
+      <p style="margin:10px 0 6px">En lo peor, tu ciudad hubiera bajado <b class="jdn">${pct((peor - 1) * 100)}</b>. Obras públicas ${peorRF >= 1 ? 'ni siquiera bajó' : 'apenas bajó ' + pct((peorRF - 1) * 100)}.</p>
+      <p style="margin:0 0 12px;color:var(--muted);font-size:13.5px">Ningún edificio se cayó: solo bajaron de precio y después se recuperaron. Eso es diversificar.</p>
+      <div class="mbtns" style="flex-wrap:nowrap"><button type="button" class="mbtn" id="jSimMas">Probar otras crisis</button><button type="button" class="mbtn pri" id="jPopOk">Entendido</button></div></div>`;
+    v.hidden = false; requestAnimationFrame(() => v.classList.add('on')); $j('jPopOk').onclick = cerrarPop; $j('jPopOk').focus();
+    $j('jSimMas').onclick = () => { cerrarPop(); if (typeof MAREA !== 'undefined') MAREA.go('simula'); };
+  }
+  const enMercado = () => !!document.querySelector('.mscr[data-scr="mercado"]:not([hidden])');
+  let simPend = false;
+  const tocaSim = () => !simOn && !VIS && listo() && (raw.posiciones || []).length && !st.get(K('simulacro'), 0) && enMercado() && !($j('jVeil') && !$j('jVeil').hidden) && !($j('mModal') && !$j('mModal').hidden);
+  function quizaSimulacro() { if (simPend || !tocaSim()) return; simPend = true; setTimeout(() => { simPend = false; if (tocaSim()) simulacro(); }, 1800); }
+
+  // ================= visitas entre ciudades =================
+  // Solo se ven formas y porcentajes. Tu código lo activas tú y lo puedes apagar cuando quieras.
+  let VIS = null, refGuard = null, visEV = null;
+  const esDemo = () => typeof DEMO !== 'undefined' && DEMO;
+  async function vapi(accion, data = {}) {
+    if (!esDemo()) return api(accion, data);
+    await new Promise(r => setTimeout(r, 250));
+    if (accion === 'visita_mia') return { ok: true, codigo: st.get('cm_vdemo', null) };
+    if (accion === 'visita_crear') { const c = data.nuevo || !st.get('cm_vdemo', null) ? 'MAR' + String(Math.floor(100 + Math.random() * 899)) : st.get('cm_vdemo'); st.set('cm_vdemo', c); return { ok: true, codigo: c }; }
+    if (accion === 'visita_quitar') { st.set('cm_vdemo', null); return { ok: true, codigo: null }; }
+    if (accion === 'visitar') {
+      if (String(data.codigo || '').toUpperCase() !== 'PRIMO1') throw new Error('Ese código no existe o ya no está activo. En la demo prueba con PRIMO1.');
+      return { ok: true, nombre: 'Primo', racha: 4, items: [{ activo: 'VUAA', clase: 'ACCIONES', cambio_dia: 1.1, pct: 38 }, { activo: 'VEA', clase: 'ACCIONES', cambio_dia: .6, pct: 4 }, { activo: 'FUNO11', clase: 'FIBRAS', cambio_dia: -0.8, pct: 6 }, { activo: 'FIBRAPL14', clase: 'FIBRAS', cambio_dia: -.3, pct: 4 }, { activo: 'Cetes 28', clase: 'RENTA_FIJA', cambio_dia: 0, pct: 18 }, { activo: 'Renta fija 1', clase: 'RENTA_FIJA', subclase: 'Propia', cambio_dia: 0, pct: 12 }, { activo: 'Bitcoin', clase: 'BITCOIN', cambio_dia: -2.4, pct: 18 }] };
+    }
+    throw new Error('Acción desconocida.');
+  }
+  function veil(html) { let v = $j('jVeil'); if (!v) { v = document.createElement('div'); v.id = 'jVeil'; v.className = 'jveil'; v.hidden = true; document.body.appendChild(v); v.addEventListener('click', e => { if (e.target === v) cerrarPop(); }); } v.innerHTML = html; v.hidden = false; requestAnimationFrame(() => v.classList.add('on')); return v; }
+  async function visitas() {
+    veil(`<div class="jpop" role="dialog" aria-modal="true" aria-labelledby="jVisT" style="width:min(380px,100%)"><div class="jph"><b id="jVisT">Visitas</b><button type="button" class="mbtn" id="jVx" style="min-height:32px;padding:4px 10px">Cerrar</button></div>
+      <p class="jap" style="margin:8px 0 12px">Quien visita tu ciudad ve formas, porcentajes, cómo le fue hoy a cada barrio y tu racha. Nunca ve cuánto dinero tienes.</p>
+      <div class="jvbox"><div class="jlbl">Tu código de visita</div><div id="jVmia" class="jap">Cargando…</div></div>
+      <div class="jvbox"><div class="jlbl">Visitar una ciudad</div><form id="jVf" class="jvform"><input id="jVc" maxlength="8" autocomplete="off" autocapitalize="characters" placeholder="Código de 6 letras" aria-label="Código de visita"><button type="submit" class="mbtn pri">Visitar</button></form><p class="jap" id="jVerr" role="alert"></p></div></div>`);
+    $j('jVx').onclick = cerrarPop;
+    $j('jVf').onsubmit = async e => { e.preventDefault(); const c = $j('jVc').value.trim(); if (!c) return; $j('jVerr').textContent = 'Buscando esa ciudad…'; try { const d = await vapi('visitar', { codigo: c }); cerrarPop(); entrarVisita(d); } catch (err) { $j('jVerr').textContent = err.message || String(err); } };
+    const pinta = c => { const m = $j('jVmia'); if (!m) return;
+      m.innerHTML = c ? `<div class="jvcode"><b>${c}</b><button type="button" class="mbtn" id="jVcp">Copiar</button></div><div class="mbtns" style="margin-top:8px"><button type="button" class="mbtn" id="jVnew">Cambiar código</button><button type="button" class="mbtn no" id="jVoff">Desactivar</button></div><p class="jap">Compártelo solo con quien quieras que te visite.</p>`
+        : `<p class="jap" style="margin:0 0 8px">Nadie puede visitar tu ciudad hasta que crees un código.</p><button type="button" class="mbtn pri" id="jVon">Crear mi código</button>`;
+      const on = async nuevo => { try { pinta((await vapi('visita_crear', { nuevo })).codigo); } catch (err) { m.textContent = err.message; } };
+      if (c) { $j('jVcp').onclick = async () => { try { await navigator.clipboard.writeText(c); $j('jVcp').textContent = 'Copiado'; } catch (e) { const r = document.createRange(); r.selectNodeContents(m.querySelector('b')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); } };
+        $j('jVnew').onclick = () => on(true); $j('jVoff').onclick = async () => { try { pinta((await vapi('visita_quitar')).codigo); } catch (err) { m.textContent = err.message; } }; }
+      else $j('jVon').onclick = () => on(false); };
+    try { pinta((await vapi('visita_mia')).codigo); } catch (err) { const m = $j('jVmia'); if (m) m.textContent = err.message || String(err); }
+  }
+  function entrarVisita(d) {
+    if (simOn) finSim(true);
+    const items = (d.items || []).filter(i => i.pct > 0);
+    const cat = items.map(i => ({ activo: i.activo, clase: i.clase, subclase: i.subclase || '', indice: i.indice || '', moneda: i.moneda || '', cambio_dia: +i.cambio_dia || 0, retirado: false, propia: i.subclase === 'Propia' }));
+    const pos = items.map(i => { const v = i.pct * 10000; return { activo: i.activo, clase: i.clase, valor: v, costo: v, ganancia: 0, cambio_hoy: v * (+i.cambio_dia || 0) / (100 + (+i.cambio_dia || 0)) }; });
+    const V = buildModel({ catalogo: cat, posiciones: pos });
+    if (!refGuard) refGuard = Object.assign({}, refMax);
+    JORD.forEach(k => { refMax[k] = Math.max(1, ...V.classes[k].items.map(i => i.valor)); });
+    if (!VIS) visEV = EV; EV = Object.assign({}, visEV || {}, { storms: [] });
+    VIS = d; window.JVIS = 1; window.JQUIET = 1; window.JVIEW = V; document.body.classList.add('m-visita');
+    if (typeof MAREA !== 'undefined') MAREA.go('mercado');
+    view = V; layout(); if (typeof resize === 'function') resize();
+    const chips = JORD.filter(k => V.classes[k].valor > 0).map(k => { const c = V.classes[k], ch = c.chg || 0; return `<span class="jvchip" style="--c:${BAR[k].c}">${pixSVG(k, BAR[k].c, 14)}${BAR[k].n} ${Math.round(c.pct)}%<i class="${ch >= 0 ? 'jup' : 'jdn'}">${k === 'RENTA_FIJA' ? '' : pct(ch)}</i></span>`; }).join('');
+    banner('jVisB', `<b class="jtag" style="background:#83f2f7">DE VISITA</b><span class="jbm">La ciudad de ${String(d.nombre || 'un vecino').replace(/[<>&"]/g, '')}${d.racha ? ` · racha de ${d.racha} ${d.racha === 1 ? 'mes' : 'meses'}` : ''}</span><div class="jvchips">${chips}</div><button type="button" class="mbtn pri" id="jVback">Volver a mi ciudad</button>`);
+    $j('jVback').onclick = salirVisita;
+  }
+  function salirVisita() {
+    if (!VIS) return; VIS = null; window.JVIS = 0; window.JQUIET = 0; window.JVIEW = null; document.body.classList.remove('m-visita');
+    if (refGuard) { Object.assign(refMax, refGuard); refGuard = null; } EV = visEV; view = model; if (listo()) layout();
+    const b = $j('jVisB'); if (b) b.hidden = true;
+  }
+  function reset() { revisado = false; parar(); if (simOn) finSim(true); salirVisita(); if (sbox) sbox.innerHTML = ''; }
+  return { alAbrir, cartas, simula, sobres, reset, simulacro, quizaSimulacro, visitas, salirVisita, visitando: () => !!VIS, simulando: () => simOn };
+})();
+
 window.MAREA = (() => {
   const wrap = $('app').querySelector('.wrap'), header = wrap.querySelector('header.top');
   const mk = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
@@ -5012,6 +5917,8 @@ window.MAREA = (() => {
     infra: '<path d="M6 21V4h1.5M6 4h13l-3 4M7.5 4l4 4M16 8v4"/><rect x="14" y="12" width="4" height="3"/><path d="M3 21h11"/>',
     ayto: '<path d="M3 10 12 4l9 6M5.5 10v8M10 10v8M14 10v8M18.5 10v8M3 20.5h18"/>',
     bitacora: '<rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+    cartas: '<rect x="3.5" y="6" width="10" height="14" rx="1.5" transform="rotate(-10 8.5 13)"/><rect x="10" y="4" width="10" height="14" rx="1.5" transform="rotate(8 15 11)"/><path d="M15 9.5l1 2 2 .3-1.5 1.4.4 2-1.9-1-1.9 1 .4-2-1.5-1.4 2-.3z"/>',
+    simula: '<path d="M3 5v15h18"/><path d="M6 9l4 6 3-3 3 4 4-8"/><path d="M16 4h4v4"/>',
     ACCIONES: '<path d="M3 20V10l5 3V10l5 3V6h3v-2h3v16z"/>', FIBRAS: '<rect x="5" y="3" width="9" height="18" rx="1"/><path d="M14 9h5v12h-5M8 7h1M11 7h1M8 11h1M11 11h1M8 15h1M11 15h1"/>',
     RENTA_FIJA: '<path d="M3 10 12 4l9 6M5.5 10v8M10 10v8M14 10v8M18.5 10v8M3 20.5h18"/>', BITCOIN: '<circle cx="12" cy="12" r="8.5"/><path d="M10 7.5v9M13 7.5v9M9 8.5h4.5a2 2 0 0 1 0 4H9h5a2 2 0 0 1 0 4H9"/>',
     BOLSA: '<path d="M4 20h16M6 20V10M18 20V10M12 20v-6M3 10l9-6 9 6z"/>',
@@ -5064,9 +5971,12 @@ window.MAREA = (() => {
     tesoreria: 'Cada mes registras lo que tienes y aportas algo nuevo. La misión te dice dónde conviene poner la aportación para acercarte a tu plan. Cualquier monto cuenta para tu racha.',
     ingresos: 'Tus inversiones también te pagan: los CETES dan intereses, las FIBRAs reparten rentas y algunos ETFs dan dividendos. Aquí ves un estimado de cuánto produce tu ciudad.',
     ayto: 'Tus metas, el cierre del mes y, en marzo y septiembre, la ceremonia de reordenamiento.',
-    bitacora: 'Tus créditos y los reportes de tu ciudad mes a mes.'
+    bitacora: 'Tus créditos y los reportes de tu ciudad mes a mes.',
+    cartas: 'Abre sobres y colecciona cartas que explican cómo ganan dinero las empresas, los edificios de tus FIBRAs, las obras de México y el bitcoin. Ganas un sobre por cada mes que registras tu aportación.',
+    simula: 'Tu dinero de hoy pasando por una crisis real del pasado: cuánto hubiera bajado y cuánto tardó en volver, con y sin aportaciones. Es aproximado y sirve para entender, no para predecir.'
   };
   const SCR = [['fundacion', 'Fundación', 'Fundar'], ['mercado', 'Mercado', 'Mercado'], ['plano', 'Plano', 'Plano'], ['tesoreria', 'Tesorería', 'Tesorería'], ['ingresos', 'Ingresos', 'Ingresos'],
+    ['cartas', 'Cartas', 'Cartas'], ['simula', 'Simulador', 'Simular'],
     ['ayto', 'Ayuntamiento', 'Cabildo'], ['bitacora', 'Bitácora', 'Bitácora']];
   const VISTA = { mercado: 'pf', tesoreria: 'ed', ingresos: 'prod', bitacora: 'rep', ayto: 'cierre' };   // vista de consulta de cada pantalla
   const OLD = { ciudad: 'mercado', portafolio: 'mercado', edificios: 'tesoreria', produccion: 'ingresos', misiones: 'tesoreria', reportes: 'bitacora', ayuntamiento: 'ayto' };
@@ -5080,7 +5990,8 @@ window.MAREA = (() => {
     <div class="mstat mracha"><span class="msi">${ico('flame')}</span><div><small>Racha</small><b id="mRacha">—</b></div></div>
     <button type="button" class="mbell" id="mBell" aria-label="Pendientes">${ico('bell')}<span id="mBellN" hidden></span></button>
     <button type="button" class="mlink" id="mQue">¿Qué es esto?</button>
-    <button type="button" class="mlink" id="mGuia">¿Cómo se juega?</button>`);
+    <button type="button" class="mlink" id="mGuia">¿Cómo se juega?</button>
+    <button type="button" class="mlink" id="mVis">Visitas</button>`);
   header.appendChild(top);
   const S = {};
   SCR.forEach(([id]) => { S[id] = mk('div', 'mscr'); S[id].dataset.scr = id; S[id].hidden = true; });
@@ -5089,14 +6000,16 @@ window.MAREA = (() => {
   const help = () => null;   // la ayuda de cada pantalla ahora sale con el botón "¿Qué es esto?" del encabezado
   const put = (id, ...els) => els.filter(Boolean).forEach(e => S[id].appendChild(e));
   const box = id => { const e = mk('div', 'mbox'); e.id = id; return e; };
-  const B = { fund: box('mFund'), perf: box('mPerf'), ronda: box('mRonda'), plano: box('mPlano'), tes: box('mTes'), ing: box('mIng'), ayto: box('mAyto'), log: box('mLog') };
+  const B = { fund: box('mFund'), perf: box('mPerf'), ronda: box('mRonda'), plano: box('mPlano'), tes: box('mTes'), ing: box('mIng'), ayto: box('mAyto'), log: box('mLog'), cartas: box('mCartas'), simula: box('mSimula'), vec: box('mVec') };
   put('fundacion', help('fundacion'), B.fund);
-  put('mercado', wrap.querySelector('.under'), $('stage'), $('gaceta'), $('zoominfo'), $('events'), wrap.querySelector('.live'), B.perf, B.ronda, wrap.querySelector('.hud'), $('pfView'), $('districts'));
+  put('mercado', wrap.querySelector('.under'), $('stage'), B.vec, $('gaceta'), $('zoominfo'), $('events'), wrap.querySelector('.live'), B.perf, B.ronda, wrap.querySelector('.hud'), $('pfView'), $('districts'));
   put('plano', help('plano'), B.plano, $('bands'));
   put('tesoreria', help('tesoreria'), B.tes, wrap.querySelector('.two'), $('edSearch'), $('portafolio'));
   put('ingresos', help('ingresos'), B.ing, $('prodView'));
   put('ayto', help('ayto'), B.ayto, $('ceremony'), $('metas'), $('cierrePanel'), $('simPanel'), $('sellPanel'));
   put('bitacora', help('bitacora'), B.log, $('repView'));
+  put('cartas', B.cartas);
+  put('simula', B.simula);
   let cur = 'mercado';
   const nav = $('mNav');
 
@@ -5604,7 +6517,7 @@ window.MAREA = (() => {
     return {
       fundacion: F.etapa < 3, mercado: ['BOLSA', ...ORDER].some(k => !claimed(`ronda:${k}:${hoy}`)), plano: hasMetas() && !claimed('plano:' + lunes()),
       tesoreria: !(ST && ST.savedThisMonth) || (MI && MI.type === 'obra' && !MI.done), ingresos: !claimed('ingresos:' + mes),
-      ayto: !!(CE && CE.active && !CE.done) || !hasMetas()
+      ayto: !!(CE && CE.active && !CE.done) || !hasMetas(), cartas: JUEGO.sobres() > 0
     };
   }
   function pintar() {
@@ -5617,7 +6530,7 @@ window.MAREA = (() => {
     $('mRacha').textContent = ST ? `${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}` : '—';
     const n = Object.values(P).filter(Boolean).length; $('mBellN').textContent = n; $('mBellN').hidden = !n;
   }
-  const PANT = { fundacion: () => rFund(), mercado: () => { rPerf(); rRonda(); }, plano: () => rPlano(), tesoreria: () => rTes(), ingresos: () => rIng(), ayto: () => rAyto(), bitacora: () => rLog() };
+  const PANT = { fundacion: () => rFund(), mercado: () => { rPerf(); rRonda(); VECINOS_UI.pintar(B.vec); }, plano: () => rPlano(), tesoreria: () => rTes(), ingresos: () => rIng(), ayto: () => rAyto(), bitacora: () => rLog(), cartas: () => JUEGO.cartas(B.cartas), simula: () => JUEGO.simula(B.simula) };
   let elegido = !!(location.hash || '').slice(1), guiado = false;
   function render() {
     onOff();
@@ -5630,7 +6543,7 @@ window.MAREA = (() => {
       PANT[cur]();
       if (VISTA[cur] && window.MENU) MENU.render(VISTA[cur]);
     } catch (e) { console.error(e); }
-    revisaGuia(); revisaFiesta();
+    revisaGuia(); revisaFiesta(); JUEGO.alAbrir(); if (cur === 'mercado') JUEGO.quizaSimulacro();
   }
   // la guía espera a saber quién eres (créditos y progreso del usuario) antes de decidir si sale
   function revisaGuia() {
@@ -5639,6 +6552,7 @@ window.MAREA = (() => {
   }
   function go(id, sub) {
     if (!S[id]) id = 'mercado';
+    if (id !== 'mercado') JUEGO.salirVisita();
     cur = id; SCR.forEach(([k]) => { S[k].hidden = k !== id; });
     try { if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id); } catch (_) {}
     render();
@@ -5665,7 +6579,7 @@ window.MAREA = (() => {
     else if (d.reg !== undefined && t.classList.contains('mbtn')) { go('tesoreria', 'portafolio'); if (typeof GOV !== 'undefined' && GOV.openTesoreria) GOV.openTesoreria(); }
   });
   $('mBell').onclick = () => {
-    const P = pendientes(), T = { fundacion: 'Sigue fundando tu ciudad', mercado: 'Termina la Ronda del mercado de hoy', plano: 'Revisa el Plano de esta semana', tesoreria: 'Actualiza la Tesorería y cumple tu misión del mes', ingresos: 'Revisa los ingresos del mes', infra: 'Ya te alcanza para una obra nueva', ayto: hasMetas() ? 'Completa la ceremonia de reordenamiento' : 'Define tus metas' };
+    const P = pendientes(), T = { fundacion: 'Sigue fundando tu ciudad', mercado: 'Termina la Ronda del mercado de hoy', plano: 'Revisa el Plano de esta semana', tesoreria: 'Actualiza la Tesorería y cumple tu misión del mes', ingresos: 'Revisa los ingresos del mes', cartas: 'Tienes sobres de cartas sin abrir', infra: 'Ya te alcanza para una obra nueva', ayto: hasMetas() ? 'Completa la ceremonia de reordenamiento' : 'Define tus metas' };
     const L = Object.keys(T).filter(k => P[k]);
     modal(`<div class="mmhead"><div><h2>Pendientes</h2><small>Lo que te da créditos ahora</small></div><button type="button" class="mbtn" data-close>Cerrar</button></div>${L.length ? L.map(k => `<button type="button" class="mbtn mpend" data-go="${k}">${ico(k)}<span>${T[k]}</span></button>`).join('') : '<p>Todo al día.</p>'}`);
     $('mModal').querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', cerrar));
@@ -5699,6 +6613,7 @@ window.MAREA = (() => {
     if (auto) $('mGno').onclick = noGuia;
   }
   $('mGuia').onclick = () => guia(0);
+  $('mVis').onclick = () => JUEGO.visitas();
   $('mQue').onclick = () => { const t = (SCR.find(x => x[0] === cur) || [, ''])[1]; modal(`<div class="mmhead"><div><small>¿Qué es esto?</small><h2>${t}</h2></div><button type="button" class="mbtn" data-close>Cerrar</button></div><p class="mguia">${AYUDA[cur] || ''}</p>`); };
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrar(); const g = $('mGloss'); if (g) g.hidden = true; } });
   // los saltos que hacía el menú anterior ahora llevan a las pantallas nuevas
@@ -5708,7 +6623,7 @@ window.MAREA = (() => {
     const h = (location.hash || '').slice(1), F = has() ? fundInfo() : { etapa: 3 };
     go(S[h] ? h : OLD[h] || (F.etapa < 3 ? 'fundacion' : 'mercado'));
   }
-  function reset() { enCurso.clear(); E = null; cargado = null; rawVisto = null; elegido = false; guiado = false; fiestaRevisada = false; revisaFiesta.aviso = false; cur = 'mercado'; }
+  function reset() { JUEGO.reset(); enCurso.clear(); E = null; cargado = null; rawVisto = null; elegido = false; guiado = false; fiestaRevisada = false; revisaFiesta.aviso = false; cur = 'mercado'; }
   function onOff() { document.body.classList.toggle('m-on', !$('app').hidden); }
   new MutationObserver(onOff).observe($('app'), { attributes: true, attributeFilter: ['hidden'] });
   inicio();
