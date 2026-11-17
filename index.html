@@ -886,6 +886,24 @@ details.mcalc p{margin:6px 0 0}
 .mt-auto input{margin-top:3px;flex:none}
 .mt-auto small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
 .mt-wi input[readonly]{opacity:.75}
+/* ventanas de decisión (tutorial de la Fundación) */
+.vguia.vg-ev{display:block;position:relative;padding:0;margin:26px 0 12px;background:none;border:0}
+.vguia.vg-ev canvas{animation:none!important;width:100%;height:100%;border:0;border-radius:0;background:none}
+.vg-ev .ev-ban{position:absolute;left:-4px;top:-20px;z-index:2;background:linear-gradient(180deg,#e9d9b4,#b89c6a);color:#3a2614;font-family:var(--f-display,system-ui);font-size:15px;letter-spacing:.02em;padding:9px 30px 8px;clip-path:polygon(0 18%,3% 0,96% 6%,100% 30%,97% 100%,4% 92%,0 70%);box-shadow:0 4px 0 #0006;min-width:44%;text-align:center}
+.vg-ev .ev-box{background:#05070f;border:2px solid #000;border-radius:14px;padding:36px 16px 16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:18px;box-shadow:0 10px 30px #0008}
+.vg-ev .ev-art{position:relative;border-radius:12px;overflow:hidden;border:3px solid #2b2240;background:#120c22;aspect-ratio:120/90;align-self:start}
+.vg-ev .ev-art canvas{display:block;image-rendering:pixelated}
+.vg-ev .vg-globo{left:34%;right:auto;top:30%}
+.vg-ev .ev-txt{min-width:0;display:flex;flex-direction:column}
+.vg-ev .vg-t{font-size:15.5px;min-height:4.4em;margin:6px 0 8px}
+.vg-ev .ev-ops{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.vguia.vg-ev .ev-ops .vg-op{display:block;width:100%;min-height:0;text-align:left;font:inherit;font-size:14px;font-weight:400;line-height:1.35;color:#ecebf5;background:#1d4a52;border:0;border-radius:0;padding:10px 26px 10px 22px;clip-path:polygon(2.5% 0,97.5% 0,100% 50%,97.5% 100%,2.5% 100%,0 50%);cursor:pointer;transition:background .15s,transform .15s}
+.vguia.vg-ev .ev-ops .vg-op:hover,.vguia.vg-ev .ev-ops .vg-op:focus-visible{background:#2a6670;transform:translateX(4px);outline:none;border:0}
+.vguia.vg-ev .ev-ops .vg-op b{color:#fff;font-weight:800}
+.vguia.vg-ev .ev-ops .vg-op .ok{color:#6ee39a}.vguia.vg-ev .ev-ops .vg-op .bad{color:#ff7d7d}.vguia.vg-ev .ev-ops .vg-op .cr{color:#ffd166;font-weight:700}
+.vguia.vg-ev .ev-ops .vg-op.sec{background:#2a2f45}
+@media (max-width:720px){.vg-ev .ev-box{grid-template-columns:1fr;padding-top:32px}.vg-ev .ev-ban{min-width:70%;font-size:13px}}
+@media (prefers-reduced-motion:reduce){.vguia.vg-ev .ev-ops .vg-op{transition:none}}
 </style>
 </head>
 <body>
@@ -5746,7 +5764,47 @@ window.VECINOS_UI = (() => {
 // Una emoción por frase (cambia de una frase a otra) y nunca se dice cuál es: la cara, el salto y el globito lo dicen.
 // lines: [{ k: 'ACCIONES', e: 'feliz', t: 'texto (HTML)' }]. Si e es una lista se usa la primera que no repita la frase anterior del mismo vecino.
 window.VGUIA = (() => {
-  const pos = {}, REG = {}, visto = {}, t0 = performance.now();
+  const pos = {}, REG = {}, OPT = {}, visto = {}, t0 = performance.now();
+  // ---------- escenas de las ventanas (120×90, pixel art dibujado en código) ----------
+  const ESC = (() => {
+    let g; const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), w, h); };
+    const cielo = (a, b) => { const gr = g.createLinearGradient(0, 0, 0, 90); gr.addColorStop(0, a); gr.addColorStop(1, b); g.fillStyle = gr; g.fillRect(0, 0, 120, 90); };
+    const estrellas = (t, n) => { for (let i = 0; i < n; i++) { const x = (i * 37) % 120, y = (i * 23) % 40; if ((t * 2 + i) % 5 > 1.2) R(x, y, 1, 1, '#ffffffaa'); } };
+    const humo = (x, y, t, j) => { for (let s = 0; s < 5; s++) { const p = ((t * .35 + s / 5 + j * .3) % 1), r = 2 + p * 6; g.fillStyle = `rgba(220,210,230,${.55 * (1 - p)})`; g.beginPath(); g.arc(x + Math.sin(p * 6 + j) * 4 + p * 10, y - p * 34, r, 0, 7); g.fill(); } };
+    const fuegos = t => { for (let k = 0; k < 3; k++) { const p = (t * .6 + k / 3) % 1, cx = 50 + k * 28, cy = 30 - k * 4, c = ['#ff7aa8', '#7af0b0', '#ffe14a'][k]; if (p > .3) for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5, r = (p - .3) * 26; R(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 1, 1, c); } else R(cx, 70 - p * 130, 1, 3, c); } };
+    const S = {
+      fab(t) { cielo('#3a1d4a', '#f08a4c'); estrellas(t, 10); R(0, 70, 120, 20, '#2a1a2e');
+        [[38, 30, 22], [62, 22, 30], [96, 34, 20]].forEach(([x, w, h], j) => { R(x, 70 - h - 12, w, h + 12, ['#4b2e45', '#5a3550', '#46293f'][j]); for (let k = 0; k < w - 4; k += 6) R(x + 3 + k, 70 - h - 4, 3, 3, (t * 3 + k + j) % 4 > 1 ? '#ffcf5a' : '#7a4b3a');
+          const cx = x + w - 7; R(cx, 70 - h - 30, 5, 18, '#3a2233'); R(cx - 1, 70 - h - 31, 7, 2, '#2a1726'); humo(cx + 2, 70 - h - 32, t, j); });
+        for (let i = 0; i < 8; i++) { const an = t * 1.6 + i * Math.PI / 4; R(108 + Math.cos(an) * 7 - 1, 80 + Math.sin(an) * 7 - 1, 3, 3, '#c7a24a'); } R(105, 77, 7, 7, '#8a6a2a'); },
+      inm(t) { cielo('#0f1840', '#4b3b7a'); estrellas(t, 18); g.fillStyle = '#f4f0d0'; g.beginPath(); g.arc(100, 14, 6, 0, 7); g.fill(); R(0, 74, 120, 16, '#1a1530');
+        [[36, 18, 52, '#3b2f5e'], [56, 22, 64, '#4a3a70'], [80, 16, 44, '#35295a'], [98, 20, 56, '#423468']].forEach(([x, w, h, c], j) => { R(x, 74 - h, w, h, c); R(x, 74 - h, w, 2, '#6b5a9a');
+          for (let yy = 74 - h + 5; yy < 70; yy += 6) for (let xx = x + 3; xx < x + w - 3; xx += 5) R(xx, yy, 3, 3, Math.sin(xx * 3.1 + yy * 1.7 + Math.floor(t / 2 + j)) > -.1 ? '#ffd27a' : '#2a2246'); });
+        const k = Math.sin(t * 3) * 1.5; R(70, 30 + k, 9, 3, '#ffd166'); R(77, 28 + k, 4, 7, '#ffd166'); R(78, 30 + k, 2, 3, '#4a3a70'); },
+      bank(t) { cielo('#14324a', '#3fa38f'); estrellas(t, 6); R(0, 74, 120, 16, '#123029');
+        R(40, 36, 70, 38, '#d8d2c0'); g.fillStyle = '#c6bfa8'; g.beginPath(); g.moveTo(36, 37); g.lineTo(75, 18); g.lineTo(114, 37); g.fill();
+        for (let i = 0; i < 6; i++) { R(44 + i * 11, 41, 5, 30, '#efe9d6'); R(44 + i * 11, 41, 1, 30, '#bdb59c'); }
+        R(38, 71, 74, 3, '#a89f86'); R(58, 24, 34, 6, '#a89f86'); g.fillStyle = '#123029'; g.font = '6px monospace'; g.fillText('CETES', 62, 29);
+        for (let i = 0; i < 6; i++) { const p = (t * .5 + i / 6) % 1, x = 20 + (i * 17) % 90, y = 6 + p * 70; R(x, y, 4, 4, '#ffd166'); R(x + 1, y + 1, 2, 2, '#c99a2e'); } },
+      muralla(t) { cielo('#1a2a4a', '#5b7fb0'); estrellas(t, 8); R(0, 74, 120, 16, '#1b2438');
+        for (let x = 40; x < 120; x += 10) { R(x, 40, 9, 34, '#8a8f9e'); R(x, 40, 9, 1, '#b8bccb'); R(x + 2, 34, 5, 6, '#8a8f9e'); for (let y = 46; y < 72; y += 6) R(x + (y / 6 % 2 ? 1 : 4), y, 4, 1, '#6e7383'); }
+        const lvl = 30 + (Math.sin(t * .8) * .5 + .5) * 22; R(56, 14, 5, 22, '#e9edf5'); R(57, 36 - lvl * .5, 3, lvl * .5, '#ff5a5a'); R(55, 34, 7, 5, '#ff5a5a');
+        R(92, 18, 14, 9, '#ffd166'); g.fillStyle = '#5a3a10'; g.font = '6px monospace'; g.fillText('UDI', 93, 25); R(98, 27, 2, 13, '#c99a2e'); },
+      mina(t) { cielo('#140a26', '#3a1d5a'); estrellas(t, 20); R(0, 74, 120, 16, '#22142e');
+        g.fillStyle = '#2e1d40'; g.beginPath(); g.moveTo(30, 74); g.lineTo(80, 24); g.lineTo(125, 74); g.fill(); R(66, 54, 22, 20, '#120a1c'); R(64, 52, 26, 3, '#6b4a2e'); R(64, 52, 3, 22, '#6b4a2e'); R(87, 52, 3, 22, '#6b4a2e');
+        const b = Math.sin(t * 2) * 2; g.fillStyle = 'rgba(247,147,26,.25)'; g.beginPath(); g.arc(77, 36 + b, 12, 0, 7); g.fill(); g.fillStyle = '#f7931a'; g.beginPath(); g.arc(77, 36 + b, 8, 0, 7); g.fill(); R(75, 31 + b, 2, 10, '#fff2d6'); R(75, 31 + b, 5, 2, '#fff2d6'); R(75, 35 + b, 5, 2, '#fff2d6'); R(75, 39 + b, 5, 2, '#fff2d6');
+        for (let i = 0; i < 5; i++) { const a = t * 1.5 + i * 1.26; R(77 + Math.cos(a) * 16, 36 + b + Math.sin(a) * 10, 1, 1, '#ffe6a8'); } },
+      plano(t) { cielo('#0f2a52', '#1d4a8a'); g.fillStyle = 'rgba(160,200,255,.12)'; for (let x = 0; x < 120; x += 6) g.fillRect(x, 0, 1, 90); for (let y = 0; y < 90; y += 6) g.fillRect(0, y, 120, 1);
+        g.strokeStyle = 'rgba(220,235,255,.85)'; g.lineWidth = 1; [[46, 40, 14, 34], [64, 28, 12, 46], [80, 46, 16, 28], [100, 54, 12, 20]].forEach(([x, y, w, h], j) => { const p = Math.min(1, Math.max(0, (t * .5 % 4) - j * .6)); g.strokeRect(x + .5, 74 - h * p + .5, w, h * p); });
+        R(40, 74, 76, 1, '#dbe8ff'); R(100 + Math.sin(t) * 6, 12, 10, 2, '#ffd166'); R(104 + Math.sin(t) * 6, 6, 2, 8, '#ffd166'); },
+      fiesta(t) { S.plano(t); fuegos(t); }
+    };
+    return { dibuja(n, ctx, t) { g = ctx; (S[n] || S.plano)(t); } };
+  })();
+  // movimiento del vecino dentro de la escena según su emoción (al empezar cada frase)
+  const mov = (e, s) => { const k = Math.max(0, 1 - s / .7), w = Math.sin(s * 18);
+    return e === 'euforia' || e === 'fiesta' ? { dx: 0, dy: -Math.abs(Math.sin(s * 9)) * 9 * k } : e === 'feliz' ? { dx: 0, dy: -Math.abs(Math.sin(s * 9)) * 3 * k } : e === 'preocupado' || e === 'llorando' ? { dx: w * 2 * k, dy: e === 'llorando' ? 2 * k : 0 }
+      : e === 'broma' ? { dx: Math.sin(s * 8) * 3 * k, dy: 0 } : e === 'triste' ? { dx: 0, dy: 4 * k } : e === 'orgulloso' ? { dx: 0, dy: -2 * k, z: 1 + .12 * k } : { dx: 0, dy: 0 }; };
   let corriendo = false;
   const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   // globito sobre la cabeza al empezar cada frase (como los íconos de reacción de los juegos)
@@ -5758,17 +5816,22 @@ window.VGUIA = (() => {
   }
   function cuerpo(id) {
     const lines = REG[id], i = Math.min(pos[id] || 0, lines.length - 1), L = lines[i], P = VECINOS.PERS[L.k];
-    const ult = i === lines.length - 1;
+    const ult = i === lines.length - 1, O = OPT[id];
+    if (O) return `<div class="ev-ban">${O.titulo}</div><div class="ev-box"><div class="ev-art"><canvas width="120" height="90" aria-hidden="true"></canvas><span class="vg-globo" aria-hidden="true">${GLOBO[L.e] || '!'}</span></div>
+      <div class="ev-txt"><small><b>${P.n}</b></small><p class="vg-t" aria-live="polite">${L.t}</p>
+        <div class="vg-nav">${i > 0 ? '<button type="button" class="vg-prev" aria-label="Lo anterior">‹</button>' : ''}<span class="vg-dots" aria-hidden="true">${lines.map((_, j) => `<i class="${j === i ? 'on' : j < i ? 'ya' : ''}"></i>`).join('')}</span>${ult ? (lines.length > 1 ? '<button type="button" class="vg-re">Otra vez</button>' : '') : '<button type="button" class="vg-next">Sigue ›</button>'}</div>
+        ${O.ops ? `<div class="ev-ops">${O.ops}</div>` : ''}</div></div>`;
     return `<div class="vg-cara"><canvas width="32" height="38" aria-hidden="true"></canvas><span class="vg-globo" aria-hidden="true">${GLOBO[L.e] || '!'}</span></div>
       <div class="vg-b"><small><b>${P.n}</b></small>
         <p class="vg-t" aria-live="polite">${L.t}</p>
         <div class="vg-nav">${i > 0 ? '<button type="button" class="vg-prev" aria-label="Lo anterior">‹</button>' : ''}<span class="vg-dots" aria-hidden="true">${lines.map((_, j) => `<i class="${j === i ? 'on' : j < i ? 'ya' : ''}"></i>`).join('')}</span>${ult ? (lines.length > 1 ? '<button type="button" class="vg-re">Otra vez</button>' : '') : '<button type="button" class="vg-next">Sigue ›</button>'}</div></div>`;
   }
-  function html(id, lines) {
+  function html(id, lines, ev) {
     if (!lines || !lines.length) return '';
+    if (ev) OPT[id] = ev; else delete OPT[id];
     REG[id] = normaliza(lines); if (pos[id] == null || pos[id] >= lines.length) pos[id] = 0;
     const L = REG[id][pos[id]], P = VECINOS.PERS[L.k];
-    return `<div class="vguia" data-vg="${id}" data-e="${L.e}" style="--c:${P.bar}">${cuerpo(id)}</div>`;
+    return `<div class="vguia${ev ? ' vg-ev' : ''}" data-vg="${id}" data-e="${L.e}" style="--c:${P.bar}">${cuerpo(id)}</div>`;
   }
   // el texto aparece letra por letra, con pausas en la puntuación; un clic en el texto lo completa
   function escribe(el) {
@@ -5795,7 +5858,7 @@ window.VGUIA = (() => {
     pos[id] = d === 0 ? 0 : Math.max(0, Math.min(n - 1, (pos[id] || 0) + d));
     const L = REG[id][pos[id]];
     el.style.setProperty('--c', VECINOS.PERS[L.k].bar); el.dataset.e = L.e;
-    el.innerHTML = cuerpo(id);
+    el.innerHTML = cuerpo(id); el.dataset.t = performance.now();
     el.classList.remove('vg-in'); void el.offsetWidth; el.classList.add('vg-in');
     visto[id + ':' + pos[id]] = 1; conectar(el); escribe(el);
   }
@@ -5809,7 +5872,16 @@ window.VGUIA = (() => {
   function pinta(el, now) {
     const id = el.dataset.vg, lines = REG[id]; if (!lines) return;
     const L = lines[Math.min(pos[id] || 0, lines.length - 1)], cv = el.querySelector('canvas'); if (!cv) return;
-    const g = cv.getContext('2d'); g.clearRect(0, 0, 32, 38); VECINOS.cara(L.k, L.e, still() ? 1.2 : (now - t0) / 1000, g);
+    const g = cv.getContext('2d'), t = still() ? 1.2 : (now - t0) / 1000;
+    if (OPT[id]) {   // ventana: escena + el vecino parado en ella
+      g.imageSmoothingEnabled = false; ESC.dibuja(OPT[id].escena, g, t);
+      const m = still() ? { dx: 0, dy: 0 } : mov(L.e, (now - (+el.dataset.t || t0)) / 1000), z = m.z || 1, w = 40 * z, h = 47.5 * z;
+      el._off = el._off || Object.assign(document.createElement('canvas'), { width: 32, height: 38 }); const o = el._off.getContext('2d'); o.clearRect(0, 0, 32, 38); VECINOS.cara(L.k, L.e, t, o);
+      g.fillStyle = 'rgba(0,0,0,.4)'; g.beginPath(); g.ellipse(24, 85, 15 - Math.min(6, -m.dy * .5), 3, 0, 0, 7); g.fill();
+      g.drawImage(el._off, Math.round(4 + m.dx - (w - 40) / 2), Math.round(37 + m.dy - (h - 47.5)), Math.round(w), Math.round(h));
+      return;
+    }
+    g.clearRect(0, 0, 32, 38); VECINOS.cara(L.k, L.e, t, g);
   }
   function cuadro(now) {
     const els = document.querySelectorAll('.vguia');
@@ -5818,7 +5890,7 @@ window.VGUIA = (() => {
     requestAnimationFrame(cuadro);
   }
   function wire(root) {
-    (root || document).querySelectorAll('.vguia').forEach(el => { const key = el.dataset.vg + ':' + (pos[el.dataset.vg] || 0); conectar(el); if (!visto[key]) { visto[key] = 1; el.classList.add('vg-in'); escribe(el); } });   // si la pantalla se vuelve a pintar, no repite la entrada
+    (root || document).querySelectorAll('.vguia').forEach(el => { const key = el.dataset.vg + ':' + (pos[el.dataset.vg] || 0); if (!el.dataset.t) el.dataset.t = performance.now(); conectar(el); if (!visto[key]) { visto[key] = 1; el.classList.add('vg-in'); escribe(el); } });   // si la pantalla se vuelve a pintar, no repite la entrada
     if (!corriendo && !still()) { corriendo = true; requestAnimationFrame(cuadro); }
   }
   const L = (k, e, t) => ({ k, e, t });
@@ -6943,6 +7015,9 @@ window.MAREA = (() => {
     };
     return L[p.k] || [];
   }
+  // opciones de las ventanas: [qué haces] lo que ganas en verde, lo que cuesta en rojo, créditos en dorado
+  const OP = (attrs, label, cuerpo, sec) => `<button type="button" class="vg-op mbtn${sec ? ' sec' : ''}" ${attrs}><b>[${label}]</b> ${cuerpo}</button>`;
+  const ESC_PASO = { CETES: 'bank', UDI: 'muralla', ETF: 'fab', FIBRA: 'inm', BTC: 'mina' }, ESC_BARRIO = { RENTA_FIJA: 'bank', ACCIONES: 'fab', FIBRAS: 'inm', BITCOIN: 'mina' };
   const riesgo = n => `<span class="mriesgo" aria-label="Riesgo ${n} de 5" title="Riesgo ${n} de 5">${[1, 2, 3, 4, 5].map(k => `<i class="${k <= n ? 'on' : ''}"></i>`).join('')}</span>`;
   function rFund() {
     const F = fundInfo(), M = model, T = M.total, meta = META2, P = F.etapa < 3 && hasMetas() ? planFund() : { falta: 0, por: {}, avisos: [] };
@@ -6952,12 +7027,12 @@ window.MAREA = (() => {
       <div class="mfbar"><i style="width:${Math.min(100, T / META2 * 100)}%"></i></div>
       <div class="mfsteps"><span class="${F.etapa > 1 ? 'ok' : 'on'}">Etapa 1 · un edificio por barrio</span><span class="${F.etapa > 2 ? 'ok' : F.etapa === 2 ? 'on' : ''}">Etapa 2 · ${money(META2)}</span><span class="${F.etapa === 3 ? 'on' : ''}">Ciudad fundada</span></div></article>`;
     if (!hasMetas()) {
-      B.fund.innerHTML = prog + `<article class="mcard hl" style="--c:#f8a43c"><h3>Paso 0 · Elige tu plan</h3>${VGUIA.html('fund-0', [
-          VGUIA.L('ACCIONES', ['euforia', 'fiesta'], `¡Bienvenido a la Fundación! Vamos a levantar una ciudad de ${money(META2)}, piso por piso, de lo más seguro a lo más arriesgado.`),
-          VGUIA.L('ACCIONES', ['preocupado', 'broma'], 'Pero antes necesitamos tu plan: qué parte de tu dinero va en cada barrio. Sin plano no hay obra; eso hasta yo lo sé.'),
-          VGUIA.L('FIBRAS', ['orgulloso', 'feliz'], 'Te lo armamos entre los cuatro en Tus metas. Hay estrategias ya hechas; luego le mueves a tu gusto.'),
-          VGUIA.L('BITCOIN', ['euforia', 'broma'], '¡Ándale, dale al botón! Ya quiero ver mi barrio.')])}
-        <button type="button" class="mbtn pri" data-go="ayto:metas">Elegir mi plan <small>+10</small></button></article>`;
+      B.fund.innerHTML = prog + VGUIA.html('fund-0', [
+          VGUIA.L('ACCIONES', 'euforia', `¡Bienvenido a la Fundación! Vamos a levantar una ciudad de ${money(META2)}, piso por piso, de lo más seguro a lo más arriesgado.`),
+          VGUIA.L('ACCIONES', 'preocupado', 'Pero antes necesitamos tu plan: qué parte de tu dinero va en cada barrio. Sin plano no hay obra; eso hasta yo lo sé.'),
+          VGUIA.L('FIBRAS', 'orgulloso', 'Te lo armamos entre los cuatro en Tus metas. Hay estrategias ya hechas; luego le mueves a tu gusto.'),
+          VGUIA.L('BITCOIN', 'broma', '¡Ándale, dale al botón! Ya quiero ver mi barrio.')],
+        { titulo: 'Paso 0 · Tu plan', escena: 'plano', ops: OP('data-go="ayto:metas"', 'Elegir mi plan', '<span class="ok">Lo armamos juntos en Tus metas.</span> <span class="cr">+10 créditos</span>') });
       VGUIA.wire(B.fund);
       return;
     }
@@ -6969,11 +7044,13 @@ window.MAREA = (() => {
         const head = `<div class="mlh"><span class="mln" style="--c:${col}">${n + 1}</span><div class="mlt"><b>${p.n}${p.opcional ? ' <small class="muted">(opcional)</small>' : ''}</b><small>${p.ed}${!st && m >= 1 ? ' · ' + money(m) + ' en tu plan' : ''}</small></div>${riesgo(p.riesgo)}${estado}</div>`;
         if (!cur) return `<li class="${st ? 'done' : 'lock'}" style="--c:${col}">${head}</li>`;
         return `<li class="cur" style="--c:${col}">${head}
-          ${VGUIA.html('fund-' + p.k + (m >= 1 ? '' : '-0'), guiaFund(p, P, m))}
+          ${VGUIA.html('fund-' + p.k + (m >= 1 ? '' : '-0'), guiaFund(p, P, m), { titulo: `${n + 1} · ${p.ed}`, escena: ESC_PASO[p.k],
+            ops: m >= 1 ? OP(`data-reg="${p.g}"`, 'Ya lo tengo', '<span class="ok">Regístralo en la Tesorería y aparece tu edificio.</span> <span class="cr">+15 créditos</span>')
+                + OP(`data-calc="${Math.round(P.falta)}"`, 'Ver el reparto completo', `<span class="ok">Abre la calculadora con ${money(P.falta)}.</span>`, true)
+                + OP(`data-salta="${p.k}"`, 'No va en mi plan', '<span class="bad">Este piso se queda sin edificio.</span> <span class="cr">+15 créditos</span>', true)
+              : OP(`data-salta="${p.k}"`, 'Entendido, sigo', '<span class="ok">Pasas al siguiente piso.</span> <span class="cr">+15 créditos</span>') })}
           ${m >= 1 ? `<p class="foot" style="margin:4px 0">Lo que te toca en este paso:</p>${listaPaso(P, p.k)}
-            <p class="foot">Es el mismo cálculo de la Aportación del mes con ${money(P.falta)}. Los precios cambian cada día, así que el número de títulos puede variar un poco.</p>
-            <div class="mbtns"><button type="button" class="mbtn pri" data-reg="${p.g}">Registrar mi compra en la Tesorería <small>+15</small></button><button type="button" class="mbtn" data-calc="${Math.round(P.falta)}">Ver el reparto completo en la calculadora</button><button type="button" class="mlink" data-salta="${p.k}">No va en mi plan por ahora (también da +15)</button></div>`
-          : `<div class="mbtns"><button type="button" class="mbtn" data-salta="${p.k}">Entendido, sigo <small>+15</small></button></div>`}</li>`;
+            <p class="foot">Es el mismo cálculo de la Aportación del mes con ${money(P.falta)}. Los precios cambian cada día, así que el número de títulos puede variar un poco.</p>` : ''}</li>`;
       }).join('');
       const falta = P.avisos.length ? `<p class="foot">${P.avisos.join(' ')}</p>` : '';
       B.fund.innerHTML = `<div class="mlead"><h2>Funda tu ciudad</h2><p>Tu plan para una ciudad de ${money(META2)}, de lo más seguro a lo más arriesgado. Cada decisión da los mismos créditos, compres o no.</p></div>${prog}${falta}<ol class="mladder">${lad}</ol>`;
@@ -6983,8 +7060,11 @@ window.MAREA = (() => {
       const g2 = VGUIA.html('fund-e2', [VGUIA.L('ACCIONES', ['fiesta', 'euforia'], `¡Ya tienes un edificio en cada barrio! Ahora a crecerlos hasta tu ciudad de ${money(META2)}.`),
         ...(top && !top.nv2 ? [VGUIA.L(vk, ['preocupado', 'broma'], `${CLS[vk].scene} va más atrás: ${money(top.valor)} de ${money(top.obj)}. ¡Échale la mano a mi barrio, porfa!`)] : []),
         VGUIA.L('RENTA_FIJA', ['orgulloso', 'feliz'], 'Cada barrio sube a nivel 2 cuando llega a la parte que le toca en tu plan. Los porcentajes salen de tus metas, que siguen la hoja de la ciudad.'),
-        VGUIA.L('BITCOIN', ['broma', 'euforia'], '¿El truco? Lo nuevo va primero al barrio que va más atrás. Así ni tienes que deshacerte de nada.')]);
-      B.fund.innerHTML = `<div class="mlead"><h2>Haz crecer tus barrios</h2>${g2}${P.falta >= 1 ? `<div class="mbtns"><button type="button" class="mbtn pri" data-calc="${P.falta}">Calcular cómo repartir los ${money(P.falta)} que faltan</button></div>` : ''}</div>${prog}
+        VGUIA.L('BITCOIN', ['broma', 'euforia'], '¿El truco? Lo nuevo va primero al barrio que va más atrás. Así ni tienes que deshacerte de nada.')],
+        { titulo: 'Etapa 2 · Haz crecer tus barrios', escena: ESC_BARRIO[vk] || 'plano',
+          ops: (top && !top.nv2 ? OP(`data-reg="${vk}"`, `Ayudar a ${CLS[vk].scene}`, '<span class="ok">Registra tu aportación en la Tesorería.</span>') : '')
+            + (P.falta >= 1 ? OP(`data-calc="${P.falta}"`, 'Calcular el reparto', `<span class="ok">Cómo repartir los ${money(P.falta)} que faltan.</span>`, true) : '') });
+      B.fund.innerHTML = `<div class="mlead"><h2>Haz crecer tus barrios</h2>${g2}</div>${prog}
         <div class="mgrid">${F.niveles.map(n => { const r = Math.min(1, n.valor / n.obj), sug = top === n && !n.nv2, p = PASOS.find(q => q.g === n.k);
           return `<article class="mcard ${sug ? 'hl' : ''}" style="--c:${CLS[n.k].color}"><div class="mrow-top"><span class="mbadge">${ico(n.k)}</span>${riesgo(n.k === 'RENTA_FIJA' ? 1 : p.riesgo)}</div>
             <h3>${CLS[n.k].scene} <span class="mpill" style="--c:${n.nv2 ? 'var(--ok)' : CLS[n.k].color}">Nivel ${n.nv2 ? 2 : 1}</span></h3>
@@ -6994,7 +7074,7 @@ window.MAREA = (() => {
       B.fund.innerHTML = `<div class="mlead"><h2>Tu ciudad está fundada</h2>${VGUIA.html('fund-e3', [VGUIA.L('ACCIONES', ['fiesta', 'euforia'], '¡LO LOGRASTE! ¡Ciudad fundada! Chela no llora… Chela está sudando de los ojos.'),
           VGUIA.L('FIBRAS', ['llorando', 'orgulloso'], 'Yo sí lloro, y con orgullo. Ahora los niveles de la ciudad cambian su aspecto.'),
           VGUIA.L('RENTA_FIJA', ['orgulloso', 'feliz'], 'Y los créditos siguen saliendo de la constancia: aporta cada mes y la ciudad sigue creciendo.'),
-          VGUIA.L('BITCOIN', ['euforia', 'fiesta'], '¡Fiesta en todos los barrios!')])}</div>${prog}
+          VGUIA.L('BITCOIN', ['euforia', 'fiesta'], '¡Fiesta en todos los barrios!')], { titulo: 'Ciudad fundada', escena: 'fiesta', ops: OP('data-go="mercado"', 'Ver mi ciudad', '<span class="ok">Date una vuelta por tus barrios.</span>') })}</div>${prog}
         <article class="mcard"><h3>Niveles de tu ciudad</h3>${NIVELES.map(([m, t], k) => `<div class="mrow"><span>${t}</span><b class="${k < nv ? 'pos' : 'muted'}">${money(m)}${k === nv - 1 ? ' · aquí estás' : ''}</b></div>`).join('')}</article>`;
     }
     VGUIA.wire(B.fund);
