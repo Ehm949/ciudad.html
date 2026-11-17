@@ -511,10 +511,6 @@ body.marea header.top .who{order:1}
 .mriesgo{display:inline-flex;gap:3px}
 .mriesgo i{width:8px;height:14px;border-radius:2px;background:#2a3560}
 .mriesgo i.on{background:linear-gradient(180deg,#ffc46b,#ef7b6c)}
-.mwhy{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
-.mwhy>div{background:rgba(0,0,0,.18);border-radius:12px;padding:10px 12px}
-.mwhy b{font-size:13px;color:#ffc46b}
-.mwhy p{font-size:14px;margin-top:2px!important}
 .mlv{height:8px;border-radius:4px;background:#10172c;overflow:hidden}
 .mlv i{display:block;height:100%;background:var(--c);border-radius:4px}
 
@@ -848,6 +844,34 @@ details.mcalc p{margin:6px 0 0}
 #labPanel .lb[aria-pressed=true]{border-color:#ff9ac8;color:#ff9ac8}
 #labPanel .lnota{font-size:12.5px;color:var(--muted);margin:0}
 #labPanel button:focus-visible,#labBtn:focus-visible{outline:2px solid #ffc46b;outline-offset:2px}
+/* guías de los vecinos */
+.vguia{--c:#ffc46b;display:flex;gap:12px;align-items:flex-start;margin:10px 0 12px;padding:10px 12px;border-radius:16px;background:color-mix(in srgb,var(--c) 10%,var(--panel2,#141c33));border:1px solid color-mix(in srgb,var(--c) 40%,var(--line,#2a3558))}
+.vguia canvas{width:72px;height:86px;image-rendering:pixelated;flex:none;border-radius:12px;background:radial-gradient(circle at 50% 45%,color-mix(in srgb,var(--c) 35%,#1c2646),#10172c);border:1px solid color-mix(in srgb,var(--c) 45%,var(--line,#2a3558))}
+.vguia .vg-b{min-width:0;flex:1}
+.vguia small{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--c);font-weight:800}
+.vguia small b{font-weight:800}
+.vguia .vg-e{display:inline-block}
+.vguia.vg-cambio .vg-e{animation:vgPop .45s ease}
+.vguia .vg-t{margin:4px 0 8px;font-size:15px;line-height:1.45;min-height:3em}
+.vguia.vg-in .vg-t{animation:vgIn .35s ease}
+.vguia.vg-in canvas{animation:vgSalto .4s ease}
+.vguia .vg-nav{display:flex;align-items:center;gap:8px}
+.vguia .vg-dots{display:flex;gap:4px;flex:1}
+.vguia .vg-dots i{width:7px;height:7px;border-radius:50%;background:color-mix(in srgb,var(--c) 25%,transparent)}
+.vguia .vg-dots i.ya{background:color-mix(in srgb,var(--c) 55%,transparent)}
+.vguia .vg-dots i.on{background:var(--c);transform:scale(1.25)}
+.vguia button{font:inherit;font-size:13px;font-weight:700;border-radius:999px;padding:5px 12px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);background:transparent;color:inherit;cursor:pointer}
+.vguia .vg-next{background:var(--c);color:#1a1020;border-color:var(--c)}
+.vguia .vg-prev{padding:5px 10px}
+@keyframes vgIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes vgSalto{0%{transform:none}35%{transform:translateY(-6px) rotate(-3deg)}70%{transform:translateY(1px) rotate(2deg)}100%{transform:none}}
+@keyframes vgPop{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+@media (max-width:520px){.vguia canvas{width:56px;height:67px}.vguia .vg-t{font-size:14px}}
+@media (prefers-reduced-motion:reduce){.vguia.vg-in .vg-t,.vguia.vg-in canvas,.vguia.vg-cambio .vg-e{animation:none}}
+.mt-auto{display:flex;gap:10px;align-items:flex-start;margin:8px 0;padding:10px 12px;border-radius:12px;border:1px dashed var(--line,#2a3558);cursor:pointer}
+.mt-auto input{margin-top:3px;flex:none}
+.mt-auto small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.mt-wi input[readonly]{opacity:.75}
 </style>
 </head>
 <body>
@@ -1852,8 +1876,18 @@ if (!DEMO_CATALOGO.some(c => c.activo === 'FIBRATC14')) DEMO_CATALOGO.push({ act
 DEMO_CATALOGO.forEach(c => { const f = DEMO_FICHAS[c.activo]; if (f) Object.assign(c, { indice: f[0], costo_pct: f[1], costo_url: f[2], moneda: f[3], costo_fecha: f[4] }); });
 DEMO_CATALOGO.forEach(c => { const cc = { VUAA: 'EE.UU.', VTI: 'EE.UU.', IVVPESO: 'EE.UU.', VIG: 'EE.UU.', VEA: 'Desarrollados', VWO: 'Emergentes' }[c.activo]; if (cc) c.cuenta_como = cc; });
 const DEMO_CONF = { 'Acciones': { uno: 'VT', varios: ['VUAA', 'VEA', 'VWO'], ejemplo: { VUAA: 60, VEA: 30, VWO: 10 }, tol_uno: 7.5, tol_inst: { VUAA: 5, VEA: 3.5, VWO: 1.25 } },
-  'FIBRAs': { uno: 'FIBRATC14', varios: ['FUNO11', 'FIBRAPL14', 'DANHOS13', 'FNOVA17', 'FMTY14', 'NEXT23'], pesos: { FUNO11: 25, FIBRAPL14: 20, DANHOS13: 15, FNOVA17: 15, FMTY14: 10, NEXT23: 15 }, tol: 5 },
-  'Renta fija': { varios: ['Bondia', 'Cetes 91 días', 'Cetes 182 días', 'Cetes 364 días', 'Udibonos'], pesos: { 'Bondia': 20, 'Cetes 91 días': 20, 'Cetes 182 días': 20, 'Cetes 364 días': 20, 'Udibonos': 20 }, tol: 5 }, 'Cripto': { uno: 'Bitcoin', tol: 1.25 } };
+  'FIBRAs': { uno: 'FIBRATC14', varios: ['FUNO11', 'FIBRAPL14', 'DANHOS13', 'FNOVA17', 'FMTY14', 'NEXT23'], pesos: { FUNO11: 28.1, FIBRAPL14: 23.9, DANHOS13: 14.6, FNOVA17: 1.8, FMTY14: 28.4, NEXT23: 3.2 }, tol: 5 },
+  'Renta fija': { varios: ['Bondia', 'Cetes 91 días', 'Cetes 182 días', 'Cetes 364 días', 'Udibonos'], pesos: { 'Bondia': 10, 'Cetes 91 días': 10, 'Cetes 182 días': 15, 'Cetes 364 días': 15, 'Udibonos': 50 }, tol: 5 }, 'Cripto': { uno: 'Bitcoin', tol: 1.25 } };
+// pesos de la pestaña Pesos internos (como los manda el servidor), reescalados a 100 dentro de cada barrio
+function demoPesos(tabla) {
+  const de = (g, lista) => { const pw = {}; (tabla || []).filter(p => p.grupo === g && lista.includes(p.activo)).forEach(p => { pw[p.activo] = +p.peso_pct || 0; });
+    const sp = Object.values(pw).reduce((a, b) => a + b, 0), out = {}; if (sp > 0) Object.keys(pw).forEach(k => { out[k] = Math.round(pw[k] / sp * 10000) / 100; }); return out; };
+  const f = de('FIBRAs', DEMO_CONF.FIBRAs.varios), r = de('Renta fija', DEMO_CONF['Renta fija'].varios), a = de('Acciones', DEMO_CONF.Acciones.varios);
+  if (Object.keys(f).length) DEMO_CONF.FIBRAs.pesos = f; if (Object.keys(r).length) DEMO_CONF['Renta fija'].pesos = r; if (Object.keys(a).length) DEMO_CONF.Acciones.ejemplo = a;
+}
+// metas que siguen a la ciudad: el reparto se lee de los pesos actuales
+const demoAuto = m => { if (!m.auto || m.modo !== 'varios') return m; const C = DEMO_CONF[m.grupo] || {}, A = m.grupo === 'Acciones', w = A ? C.ejemplo : C.pesos;
+  return { ...m, reparto: Object.entries(w || {}).filter(([, v]) => v > 0).map(([activo, peso_pct]) => ({ activo, peso_pct, tolerancia_pts: A ? C.tol_inst[activo] : null })) }; };
 function demoApi(accion, data) {
   if (accion === 'metas_plantilla') {
     const t = DEMO_PLANT.find(x => x.id === data.plantilla);
@@ -1866,10 +1900,10 @@ function demoApi(accion, data) {
     const t = DEMO_PLANT.find(x => x.id === data.plantilla), orig = (demoMetas[0] && demoMetas[0].plantilla || '').replace(/ · editada$/, '');
     const tag = data.plantilla === 'blanco' ? 'en blanco' : t ? t.id + ' ' + t.nombre + ' v' + t.version : orig ? orig + ' · editada' : 'propia';
     demoMetas = data.metas.map(m => { const C = DEMO_CONF[m.grupo], A = m.grupo === 'Acciones';
-      return { grupo: m.grupo, objetivo_pct: m.objetivo_pct, modo: m.modo, vehiculo: m.modo === 'uno' ? C.uno : '', plantilla: tag,
+      return { grupo: m.grupo, objetivo_pct: m.objetivo_pct, modo: m.modo, auto: !!m.auto && m.modo === 'varios', vehiculo: m.modo === 'uno' ? C.uno : '', plantilla: tag,
         tolerancia_pts: A ? (m.modo === 'varios' ? null : C.tol_uno) : C.tol,
         reparto: m.modo === 'varios' ? m.reparto.filter(x => x.peso_pct > 0).map(x => ({ ...x, tolerancia_pts: A ? C.tol_inst[x.activo] : null })) : [] }; });
-    return { ok: true, metas: demoMetas };
+    return { ok: true, metas: demoMetas.map(demoAuto) };
   }
   if (accion === 'login') return { ok: true, token: 'demo', nombre: 'Inversor de ejemplo', cambiar: String(data.pin) === '123456' };   // en la demostración, 123456 simula una contraseña corta
   if (accion === 'registro') return { ok: true, token: 'demo', nombre: data.nombre || 'Inversor de ejemplo' };
@@ -1886,7 +1920,7 @@ function demoApi(accion, data) {
   const hoy = new Date(), fin = new Date(Date.now() + 2 * 864e5), prox = new Date(Date.now() + 20 * 864e5);
   return {
     ok: true, nombre: 'Inversor de ejemplo', catalogo: DEMO_CATALOGO.concat(demoRfpCat()), posiciones: demoPos.map(demoCompute).concat(demoRfpPos()), juego: {},
-    metas: demoMetas, plantillas: DEMO_PLANT, metas_inicial: DEMO_CONF, precios_hora: new Date().toISOString(),
+    metas: demoMetas.map(demoAuto), plantillas: DEMO_PLANT, metas_inicial: DEMO_CONF, precios_hora: new Date().toISOString(),
     historial: demoHist,
     dividendos: (() => { const p = demoPos.find(x => x.activo === 'FIBRAPL14'), t = p ? +p.titulos || 0 : 0, b = Math.round(t * 0.7766 * 100) / 100, r = Math.round(b * 30) / 100; const c = Math.round(t * 0.12 * 100) / 100; return t ? [{ activo: 'FIBRAPL14', fecha: ymd(hoy), resultado_fiscal: 0.7766, reembolso_capital: 0.12, por_titulo: 0.8966, retencion_pct: 30, nota: 'Ejemplo', titulos: t, bruto_rf: b, bruto_rc: c, bruto: Math.round((b + c) * 100) / 100, retencion: r, neto: Math.round((b + c - r) * 100) / 100, aprox: false, proximo: false }] : []; })(),
     eventos: [
@@ -4967,11 +5001,12 @@ function fichaHtml(acts, n) {
 }
 // ---------- estado del asistente ----------
 function wizardFrom(metas) {
-  const w = { step: 'inicio', origin: '', tplFab: null, pct: {}, modo: {}, rep: {} };
+  const w = { step: 'inicio', origin: '', tplFab: null, pct: {}, modo: {}, rep: {}, auto: {} };
   GRUPOS.forEach(([n]) => {
     const m = metas.find(x => x.grupo === n) || {};
     w.pct[n] = numTxt(m.objetivo_pct ?? 0) || '0';
     w.modo[n] = m.modo === 'tres' ? 'varios' : (m.modo || '');
+    w.auto[n] = metas.length ? !!m.auto : true;   // cuentas nuevas: los pesos siguen la hoja de la ciudad
     w.rep[n] = {}; (m.reparto || []).forEach(x => { w.rep[n][x.activo] = numTxt(x.peso_pct); });
   });
   return w;
@@ -4983,7 +5018,7 @@ function wzBack() { const s = wzSteps(), i = s.indexOf(WZ.step); wzGo(s[Math.max
 // reparto inicial al elegir la versión de varios instrumentos (igual para todos)
 function repInicial(n) {
   const C = MC(n);
-  if (n === 'Acciones') { const f = WZ.tplFab || C.ejemplo || {}; return Object.fromEntries((C.varios || []).map(a => [a, numTxt(f[a] ?? 0)])); }
+  if (n === 'Acciones') { const f = (!WZ.auto.Acciones && WZ.tplFab) || C.ejemplo || {}; return Object.fromEntries((C.varios || []).map(a => [a, numTxt(f[a] ?? 0)])); }
   if (n === 'FIBRAs' || n === 'Renta fija') { const p = C.pesos || {}; return Object.fromEntries((C.varios || []).map(a => [a, p[a] != null ? numTxt(p[a]) : ''])); }
   return Object.fromEntries((C.varios || []).map(a => [a, '']));
 }
@@ -4993,59 +5028,122 @@ function pesosHtml(n, list, txt) {
       <span class="mt-wi"><input type="number" min="0" max="100" step="0.5" inputmode="decimal" data-w="${esc(a)}" value="${WZ.rep[n][a] ?? ''}" aria-label="Peso de ${esc(a)} dentro de ${esc(n)}">%</span></label>`; }).join('')}
     <p class="foot" style="margin:0" id="mtWsum"></p></div>`;
 }
+// ---------- los vecinos te guían ----------
+const GL = (k, e, t) => VGUIA.L(k, e, t);
+const DESC = { VT: 'acciones de miles de empresas de todo el mundo: Estados Unidos, Europa, Japón, México, China…', VUAA: 'las 500 empresas más grandes de Estados Unidos', VEA: 'empresas de países desarrollados fuera de EE.UU.: Europa, Japón, Canadá, Australia', VWO: 'empresas de países emergentes: China, India, Brasil, México y más',
+  FIBRATC14: 'un solo fondo con las FIBRAs más grandes de la Bolsa Mexicana', FUNO11: 'la FIBRA más grande de México: oficinas, centros comerciales y naves industriales', FIBRAPL14: 'naves industriales y de logística', DANHOS13: 'oficinas y centros comerciales en la Ciudad de México',
+  FNOVA17: 'inmuebles con contratos de renta largos', FMTY14: 'naves industriales y oficinas, sobre todo en el norte del país', NEXT23: 'naves industriales y de logística' };
+const descDe = a => DESC[a] || itemOf(a).indice || itemOf(a).descripcion || '';
+const repTxt = (n, list) => list.map(a => `<b>${esc(a)}</b> ${numTxt(WZ.rep[n][a]) || 0}%`).join(', ');
+const autoTxt = n => WZ.auto[n] ? 'Esos porcentajes vienen de la hoja de la ciudad y se actualizan solos cuando la cambiamos. Tú no tienes que hacer nada.' : 'Esos porcentajes ahora son tuyos: ya no siguen a la hoja de la ciudad. Si quieres que vuelvan a actualizarse solos, prende «Seguir los porcentajes de la ciudad».';
+function guiaPaso() {
+  const st = WZ.step, C = GRUPOS.some(g => g[0] === st) ? MC(st) : {}, modo = WZ.modo[st];
+  if (st === 'inicio') return [GL('ACCIONES', ['euforia', 'feliz'], '¡Hola, hola! Soy Chela, de Fábricas. Aquí escribimos las reglas de tu ciudad: qué parte de tu dinero vive en cada barrio.'),
+    GL('FIBRAS', ['broma', 'orgulloso'], 'Don Ramiro, para servirle. Tranquilo: nada se guarda hasta el final. Puedes ir y venir como inquilino indeciso.'),
+    GL('RENTA_FIJA', ['preocupado', 'orgulloso'], 'Inge Tacho reportándose. Si no sabes por dónde empezar, toma una estrategia ya hecha y luego le mueves. Así trabajamos los ingenieros: plano primero, ajustes después.'),
+    GL('BITCOIN', ['fiesta', 'broma', 'euforia'], '¡Y yo soy Lupita! Elige abajo y nos vemos en mi barrio… si me dejas un lugarcito.')];
+  if (st === 'pct') return [GL('RENTA_FIJA', ['orgulloso', 'broma'], 'Ahora sí, números. Cada barrio recibe un porcentaje y entre los cuatro deben sumar 100%. Ni 99 ni 101: ¡cien!'),
+    GL('RENTA_FIJA', ['feliz', 'preocupado'], 'Más Obras públicas = ciudad tranquila. Más Fábricas e Inmuebles = más crecimiento… y también más sustos.'),
+    GL('BITCOIN', ['triste', 'llorando', 'broma'], 'Si un barrio queda en 0%, nos saltamos su pregunta. Sin rencores… bueno, poquitos.')];
+  if (st === 'Acciones') {
+    if (!modo) return [GL('ACCIONES', ['euforia', 'fiesta'], 'Bienvenido a Fábricas: aquí tu dinero se vuelve socio de empresas de todo el mundo. Y tengo una pregunta importantísima…'),
+      GL('ACCIONES', ['feliz', 'orgulloso'], '<b>Versión fácil:</b> un solo instrumento que ya trae miles de empresas de todos los continentes. Ventaja: revisas una sola cosa y él solito reparte entre regiones. Desventaja: tú no decides cuánto va a cada región.'),
+      GL('ACCIONES', ['broma', 'euforia'], '<b>Versión divertida:</b> tres instrumentos, uno por cada parte del mundo. Ventaja: tú mandas cuánto pesa cada región. Desventaja: son tres piezas que rebalancear y más decisiones… ¡y más diversión!'),
+      GL('FIBRAS', ['broma', 'orgulloso'], 'Si es tu primera vez, la fácil no tiene nada de vergonzoso, ¿eh?'),
+      GL('ACCIONES', ['preocupado', 'feliz'], '¡Don Ramiro, no me gane la palabra! Elige abajo y te digo qué te toca.')];
+    if (modo === 'uno') return [GL('ACCIONES', ['fiesta', 'euforia'], `¡Versión fácil! Tu instrumento es <b>${esc(C.uno)}</b>.`),
+      GL('ACCIONES', ['orgulloso', 'feliz'], `¿Qué trae? ${esc(descDe(C.uno))} Todo en uno. Si una región se cae, las demás aguantan.`),
+      GL('ACCIONES', ['broma', 'feliz'], 'Y como es una sola pieza, rebalancear Fábricas es facilísimo. Dale «Siguiente» cuando quieras.')];
+    return [GL('ACCIONES', ['euforia', 'fiesta'], `¡Versión divertida! Te tocan tres: ${repTxt('Acciones', C.varios)}.`),
+      ...C.varios.map((a, j) => GL('ACCIONES', [['orgulloso', 'feliz'], ['broma', 'euforia'], ['preocupado', 'orgulloso']][j % 3], `<b>${esc(a)}</b>: ${esc(descDe(a))}.`)),
+      GL('ACCIONES', ['orgulloso', 'broma'], '¿Por qué tres? Para que tú decidas cuánto pesa cada parte del mundo. ' + autoTxt('Acciones'))];
+  }
+  if (st === 'FIBRAs') {
+    const n = (C.varios || []).length;
+    if (!modo) return [GL('FIBRAS', ['orgulloso', 'feliz'], 'Pásele, pásele. Don Ramiro, casero de Inmuebles. Aquí te vuelves dueño de un pedacito de edificios que se rentan… sin destapar ni un solo baño.'),
+      ...(C.uno ? [GL('FIBRAS', ['feliz', 'preocupado'], '<b>Versión fácil:</b> un solo fondo que trae a las FIBRAs grandes de México. Ventaja: cero complicaciones. Desventaja: el fondo cobra su comisión anual encima de lo que cobra cada FIBRA, y no tiene la misma exención de ISR que las FIBRAs directas. Pregúntale a tu contador.')] : []),
+      GL('FIBRAS', ['euforia', 'broma'], `<b>Versión divertida:</b> tienes cada FIBRA directamente. Ventaja: te llegan sus rentas directo y, como persona física en México, la ganancia cuando te deshaces de ellas en bolsa está exenta de ISR (art. 188, fr. X, LISR). Desventaja: son ${n} piezas que rebalancear.`),
+      GL('BITCOIN', ['broma'], '¡Don Ramiro y sus rentas! Ni que fuera el dueño de media colonia.'),
+      GL('FIBRAS', ['orgulloso', 'broma'], 'Media no, Lupita: un pedacito de muchas. Ándale, elige abajo y te digo qué te toca.')];
+    if (modo === 'uno') return [GL('FIBRAS', ['fiesta', 'orgulloso'], `¡Listo! Tu instrumento es <b>${esc(C.uno)}</b>: ${esc(descDe(C.uno))}.`),
+      GL('FIBRAS', ['feliz', 'broma'], 'Un boleto y entras a todos los edificios. Tú solo vigilas uno; yo me encargo de cobrar… bueno, el fondo se encarga.')];
+    const lista = C.varios.slice().sort((a, b) => num(WZ.rep.FIBRAs[b], 0) - num(WZ.rep.FIBRAs[a], 0)), mitad = Math.ceil(lista.length / 2);
+    return [GL('FIBRAS', ['euforia', 'fiesta'], `¡Eso, a la antigüita! Te tocan ${n} FIBRAs.`),
+      GL('FIBRAS', ['orgulloso', 'feliz'], lista.slice(0, mitad).map(a => `<b>${esc(a)}</b> ${numTxt(WZ.rep.FIBRAs[a]) || 0}%: ${esc(descDe(a))}`).join('. ') + '.'),
+      GL('FIBRAS', ['broma', 'preocupado'], lista.slice(mitad).map(a => `<b>${esc(a)}</b> ${numTxt(WZ.rep.FIBRAs[a]) || 0}%: ${esc(descDe(a))}`).join('. ') + '.'),
+      GL('FIBRAS', ['orgulloso', 'broma'], '¿Por qué varias? Unas rentan naves industriales, otras oficinas y centros comerciales: si a una le va mal, otra aguanta.'),
+      GL('FIBRAS', ['feliz', 'orgulloso'], 'Los porcentajes de las FIBRAs los revisa la ciudad cada mes. ' + autoTxt('FIBRAs'))];
+  }
+  if (st === 'Renta fija') {
+    const top = (C.varios || []).slice().sort((a, b) => num(WZ.rep['Renta fija'][b], 0) - num(WZ.rep['Renta fija'][a], 0))[0];
+    return [GL('RENTA_FIJA', ['orgulloso', 'euforia'], 'Obras públicas, ¡mi barrio! Aquí le prestas al gobierno y él te paga intereses. Lo más seguro de la ciudad, con casco y todo.'),
+      GL('RENTA_FIJA', ['feliz', 'broma'], '<b>Bondia</b> es tu dinero de bolsillo: lo tienes de vuelta al día siguiente. Los <b>Cetes</b> son préstamos a 3, 6 o 12 meses: desde el primer día sabes cuánto vas a ganar.'),
+      GL('RENTA_FIJA', ['preocupado', 'orgulloso'], '¿Y los <b>Udibonos</b>? Mi arma secreta contra la inflación: su valor sube con los precios. Si las tortillas suben, ellos también. ¡Justicia tortillera!'),
+      GL('RENTA_FIJA', ['euforia', 'feliz'], `Tu reparto: ${repTxt('Renta fija', C.varios)}.${top ? ` Este mes le toca más a <b>${esc(top)}</b>.` : ''}`),
+      GL('BITCOIN', ['broma'], '¿Puros préstamos al gobierno? ¡Qué aburrido, Inge!'),
+      GL('RENTA_FIJA', ['orgulloso', 'broma'], 'Aburrido pero seguro, Lupita. ' + autoTxt('Renta fija'))];
+  }
+  if (st === 'Cripto') return [GL('BITCOIN', ['euforia', 'fiesta'], `¡Mi barrio! Oro virtual. Aquí solo vive uno: <b>${esc(C.uno || 'Bitcoin')}</b>.`),
+    GL('BITCOIN', ['preocupado', 'llorando'], 'Te soy honesta: varias veces ha perdido más de la mitad de su valor. ¡Varias! Ponle solo lo que aguantarías ver caer.'),
+    GL('BITCOIN', ['broma', 'orgulloso'], '¿Por qué tenerlo? No depende de ningún gobierno ni empresa. Es el chile de la salsa: una pizca, no el frasco entero.')];
+  return [GL('FIBRAS', ['orgulloso', 'feliz'], 'Revisa la tabla: así quedan las reglas de tu ciudad.'),
+    GL('RENTA_FIJA', ['broma', 'preocupado'], 'La tolerancia la ponemos nosotros: es cuánto se puede alejar cada barrio antes de que suene el semáforo. ¡Piii!'),
+    GL('ACCIONES', ['euforia', 'fiesta'], 'Cuando le des «Guardar», la ciudad empieza a calcular con ellas. ¡Y luego nos vamos a la Fundación a construir!')];
+}
+const guiaHtml = () => VGUIA.html('wz-' + WZ.step + '-' + (WZ.modo[WZ.step] || 'x'), guiaPaso());
+const autoHtml = n => `<label class="mt-auto"><input type="checkbox" id="wzAuto"${WZ.auto[n] ? ' checked' : ''}><span><b>Seguir los porcentajes de la ciudad</b><small>Vienen de la hoja de la ciudad y se actualizan solos cuando cambian${n === 'FIBRAs' ? ' (las FIBRAs, cada mes)' : ''}. Apágalo para escribir los tuyos.</small></span></label>`;
 // ---------- ventanas ----------
 function stepHtml() {
   const s = wzSteps(), i = s.indexOf(WZ.step), total = s.length, plant = raw.plantillas || [];
-  const head = (t, sub) => `<p class="wz-k">Paso ${i + 1} de ${total}</p><h3 class="wz-t">${t}</h3>${sub ? `<p class="muted" style="margin:0">${sub}</p>` : ''}`;
+  const head = (t, sub) => `<p class="wz-k">Paso ${i + 1} de ${total}</p><h3 class="wz-t">${t}</h3>${sub ? `<p class="muted" style="margin:0">${sub}</p>` : ''}${guiaHtml()}`;
   const opt = (name, v, t, body, on) => `<label class="mt-opt wz-opt"><input type="radio" name="${name}" value="${esc(v)}" autocomplete="off"${on ? ' checked' : ''}><span><b>${t}</b>${body}</span></label>`;
   if (WZ.step === 'inicio') {
     const tplTxt = t => GRUPOS.map(([n, k], j) => `${CLS[k].scene} ${t.pct[j]}%`).join(' · ') + (t.fabricas ? `<br>Fábricas con tres instrumentos: ${Object.entries(t.fabricas).map(([a, v]) => `${a} ${v}%`).join(' · ')}` : '');
-    return head('¿Con qué estrategia quieres empezar?', 'Puedes copiar los porcentajes de una estrategia y cambiarlos en el siguiente paso, o empezar en blanco y escribir los tuyos.')
+    return head('¿Con qué estrategia quieres empezar?', '')
       + `<div class="mt-pick">${plant.map(t => opt('wzIni', t.id, esc(t.nombre), `<small>${tplTxt(t)}</small>`, WZ.origin === t.id)).join('')}
         ${opt('wzIni', 'blanco', 'Estrategia en blanco', '<small>Los cuatro barrios en 0%: tú escribes tus porcentajes.</small>', WZ.origin === 'blanco')}
         ${metasList().length ? opt('wzIni', 'actual', 'Seguir con mis metas actuales', '<small>Parte de lo que ya tienes guardado y cámbialo en los siguientes pasos.</small>', WZ.origin === 'actual') : ''}</div>`;
   }
   if (WZ.step === 'pct') {
-    return head('¿Qué parte de tu tesoro quieres en cada barrio?', 'Los cuatro barrios deben sumar 100%. Los barrios en 0% se saltan en los siguientes pasos.')
+    return head('¿Qué parte de tu tesoro quieres en cada barrio?', '')
       + `<div class="wz-pct">${GRUPOS.map(([n, k]) => { const h = model.total ? model.classes[k].valor / model.total * 100 : null;
         return `<label class="wz-prow" style="--c:${CLS[k].color}"><span class="mt-name"><span class="dot"></span><b>${CLS[k].scene}</b><small>${esc(n)}${h != null ? ' · hoy ' + pct1(h) : ''}</small></span>
           <span class="mt-wi"><input type="number" min="0" max="100" step="0.5" inputmode="decimal" data-g="${esc(n)}" value="${WZ.pct[n]}" aria-label="Meta de ${esc(CLS[k].scene)} en %">%</span></label>`; }).join('')}
         <p class="foot" style="margin:0" id="mtGsum"></p></div>`;
   }
   if (WZ.step === 'Acciones') {
-    const C = MC('Acciones'), varios = WZ.modo.Acciones === 'varios';
-    return head('Fábricas: ¿cómo quieres cubrirlas?', `Tu meta para Fábricas es ${pct1(num(WZ.pct.Acciones, 0))} del tesoro.`)
-      + `<div class="wz-modes">${opt('wzModo', 'uno', 'Versión fácil · un instrumento', `<small>${esc(C.uno)} cubre automáticamente el 100% de Fábricas.</small>${fichaHtml([C.uno])}`, WZ.modo.Acciones === 'uno')}
-        ${opt('wzModo', 'varios', 'Versión divertida · tres instrumentos', `<small>Repartes Fábricas entre ${C.varios.join(', ')}.</small>${fichaHtml(C.varios)}`, varios)}</div>`
-      + (varios ? `<p class="wz-k" style="margin-top:6px">Reparto dentro de Fábricas</p><p class="foot" style="margin:0">${WZ.tplFab ? 'Reparto de la plantilla que elegiste' : `Reparto inicial ${C.varios.map(a => (C.ejemplo || {})[a] + '% ' + a).join(', ')}, igual para todos los usuarios, tomado de las proporciones del esquema Swensen`}. No considera tu situación: cámbialo como quieras.</p>${pesosHtml('Acciones', C.varios, i => (SLOT_DEF[i.activo] ? (i.cuenta_como || SLOT_DEF[i.activo]) + ' · ' : '') + (i.descripcion || ''))}${cuentanTxt('Acciones', C.varios) ? `<p class="wz-note">${cuentanTxt('Acciones', C.varios)}</p>` : ''}` : '');
+    const C = MC('Acciones'), modo = WZ.modo.Acciones;
+    return head('Fábricas: ¿versión fácil o divertida?', `Tu meta para Fábricas es ${pct1(num(WZ.pct.Acciones, 0))} del tesoro.`)
+      + `<div class="wz-modes">${opt('wzModo', 'uno', 'Versión fácil · un instrumento', '<small>Ventaja: una sola pieza que revisar. Desventaja: no eliges cuánto va a cada región.</small>', modo === 'uno')}
+        ${opt('wzModo', 'varios', 'Versión divertida · tres instrumentos', '<small>Ventaja: tú decides el peso de cada región. Desventaja: tres piezas que rebalancear.</small>', modo === 'varios')}</div>`
+      + (modo === 'uno' ? fichaHtml([C.uno]) : '')
+      + (modo === 'varios' ? `${fichaHtml(C.varios)}<p class="wz-k" style="margin-top:6px">Reparto dentro de Fábricas</p>${autoHtml('Acciones')}${pesosHtml('Acciones', C.varios, i => (SLOT_DEF[i.activo] ? (i.cuenta_como || SLOT_DEF[i.activo]) + ' · ' : '') + (i.descripcion || ''))}${cuentanTxt('Acciones', C.varios) ? `<p class="wz-note">${cuentanTxt('Acciones', C.varios)}</p>` : ''}` : '');
   }
   if (WZ.step === 'FIBRAs') {
-    const C = MC('FIBRAs'), varios = WZ.modo.FIBRAs === 'varios', u = itemOf(C.uno);
-    const costo = u.costo_pct != null && u.costo_pct !== '' ? u.costo_pct + '%' : 'su costo anual';
-    return head('Inmuebles: ¿cómo quieres cubrirlos?', `Tu meta para Inmuebles es ${pct1(num(WZ.pct.FIBRAs, 0))} del tesoro.`)
-      + `<div class="wz-modes">${C.uno ? opt('wzModo', 'uno', 'Versión fácil · un ETF de FIBRAs', `<small>${esc(C.uno)} cubre automáticamente el 100% de Inmuebles.</small>${fichaHtml([C.uno])}
-          <p class="wz-note">Lo que dejas de lado: además de lo que cobra cada FIBRA, el ETF cobra ${esc(costo)} al año. Y la exención de ISR para personas físicas al vender en bolsa es para los certificados de FIBRAs (art. 188, fr. X, LISR); un ETF tiene otro tratamiento fiscal. Confírmalo con tu contador.</p>`, WZ.modo.FIBRAs === 'uno') : ''}
-        ${opt('wzModo', 'varios', 'Versión divertida · FIBRAs una por una', `<small>Tienes cada FIBRA directamente y repartes Inmuebles entre ellas.</small>
-          <p class="wz-note">Recibes las distribuciones de cada FIBRA, y como persona física residente en México la ganancia por venderlas en bolsa está exenta de ISR (art. 188, fr. X, LISR). Rebalanceas ${C.varios.length} instrumentos.</p>`, varios)}</div>`
-      + (varios ? `<p class="wz-k" style="margin-top:6px">Reparto dentro de Inmuebles</p><p class="foot" style="margin:0">Los pesos iniciales son los mismos para todos los usuarios. Cámbialos como quieras; deben sumar 100%.</p>${pesosHtml('FIBRAs', C.varios)}` : '');
+    const C = MC('FIBRAs'), modo = WZ.modo.FIBRAs;
+    return head('Inmuebles: ¿versión fácil o divertida?', `Tu meta para Inmuebles es ${pct1(num(WZ.pct.FIBRAs, 0))} del tesoro.`)
+      + `<div class="wz-modes">${C.uno ? opt('wzModo', 'uno', 'Versión fácil · un solo fondo', '<small>Ventaja: cero complicaciones. Desventaja: comisión extra del fondo y otro trato fiscal.</small>', modo === 'uno') : ''}
+        ${opt('wzModo', 'varios', 'Versión divertida · varias FIBRAs', '<small>Ventaja: rentas directas y exención de ISR al venderlas en bolsa. Desventaja: más piezas que rebalancear.</small>', modo === 'varios')}</div>`
+      + (modo === 'uno' ? fichaHtml([C.uno]) : '')
+      + (modo === 'varios' ? `<p class="wz-k" style="margin-top:6px">Reparto dentro de Inmuebles</p>${autoHtml('FIBRAs')}${pesosHtml('FIBRAs', C.varios)}` : '');
   }
   if (WZ.step === 'Renta fija') {
     const C = MC('Renta fija');
-    return head('Obras públicas: ¿cómo repartes tu renta fija?', `Tu meta para Obras públicas es ${pct1(num(WZ.pct['Renta fija'], 0))} del tesoro. Decide qué parte va a cada opción; deben sumar 100%.`)
-      + `<p class="foot" style="margin:0">Los pesos iniciales son los mismos para todos los usuarios. Cámbialos como quieras.</p>` + pesosHtml('Renta fija', C.varios, i => (RF_TXT[i.activo] || i.descripcion || '') + (i.tasa != null && i.tasa !== '' ? ` Tasa en tu hoja: ${i.tasa}% anual.` : ''));
+    return head('Obras públicas: tu renta fija', `Tu meta para Obras públicas es ${pct1(num(WZ.pct['Renta fija'], 0))} del tesoro.`)
+      + autoHtml('Renta fija') + pesosHtml('Renta fija', C.varios, i => (RF_TXT[i.activo] || i.descripcion || '') + (i.tasa != null && i.tasa !== '' ? ` Tasa en tu hoja: ${i.tasa}% anual.` : ''));
   }
   if (WZ.step === 'Cripto') {
     const C = MC('Cripto');
-    return head('Oro virtual', `Tu meta para Oro virtual es ${pct1(num(WZ.pct.Cripto, 0))} del tesoro. Este barrio se cubre solo con ${esc(C.uno)}.`) + fichaHtml([C.uno]) + (cuentanTxt('Cripto', C.uno) ? `<p class="wz-note">${cuentanTxt('Cripto', C.uno)}</p>` : '');
+    return head('Oro virtual', `Tu meta para Oro virtual es ${pct1(num(WZ.pct.Cripto, 0))} del tesoro.`) + fichaHtml([C.uno]) + (cuentanTxt('Cripto', C.uno) ? `<p class="wz-note">${cuentanTxt('Cripto', C.uno)}</p>` : '');
   }
-  return head('Revisa y guarda tus metas', 'Así quedan tus reglas. La ciudad calcula con ellas; nada cuenta hasta que pulses Guardar.') + resumenHtml(WZ);
+  return head('Revisa y guarda tus metas', '') + resumenHtml(WZ);
 }
 // resumen (también es la vista cuando ya guardaste)
-function cubreTxt(n, modo, rep) {
+function cubreTxt(n, modo, rep, auto) {
   const C = MC(n);
   if (modo === 'uno') { const c = n === 'Cripto' ? cuentanTxt(n, C.uno) : ''; return esc(C.uno) + ' (100%)' + (c ? `<br><small class="muted">${c}</small>` : ''); }
   if (modo === 'varios') { const on = Object.entries(rep || {}).filter(([, v]) => num(v, 0) > 0), c = n === 'Acciones' ? cuentanTxt(n, on.map(x => x[0])) : '';
-    return (on.map(([a, v]) => `${esc(a)} ${numTxt(v)}%`).join(' · ') || '—') + (c ? `<br><small class="muted">${c}</small>` : ''); }
+    return (on.map(([a, v]) => `${esc(a)} ${numTxt(v)}%`).join(' · ') || '—') + (auto ? '<br><small class="muted">Sigue los porcentajes de la ciudad: se actualizan solos.</small>' : '') + (c ? `<br><small class="muted">${c}</small>` : ''); }
   return '<span class="muted">sin elegir</span>';
 }
 function tolTxt(n, modo, rep) {
@@ -5056,7 +5154,7 @@ function tolTxt(n, modo, rep) {
 function resumenHtml(w) {
   return `<div class="tbl"><table class="wz-sum"><thead><tr><th>Barrio</th><th style="text-align:right">Tu meta</th><th>Cómo lo cubres</th><th>Tolerancia fija (pts)</th></tr></thead><tbody>
     ${GRUPOS.map(([n, k]) => { const p = num(w.pct[n], 0);
-      return `<tr><td><span class="dot" style="--c:${CLS[k].color};margin-right:6px"></span><b>${CLS[k].scene}</b> <span class="muted">${esc(n)}</span></td><td class="n">${pct1(p)}</td><td>${p > 0 ? cubreTxt(n, w.modo[n], w.rep[n]) : '<span class="muted">—</span>'}</td><td class="muted">${p > 0 ? tolTxt(n, w.modo[n], w.rep[n]) : '—'}</td></tr>`; }).join('')}
+      return `<tr><td><span class="dot" style="--c:${CLS[k].color};margin-right:6px"></span><b>${CLS[k].scene}</b> <span class="muted">${esc(n)}</span></td><td class="n">${pct1(p)}</td><td>${p > 0 ? cubreTxt(n, w.modo[n], w.rep[n], w.auto && w.auto[n]) : '<span class="muted">—</span>'}</td><td class="muted">${p > 0 ? tolTxt(n, w.modo[n], w.rep[n]) : '—'}</td></tr>`; }).join('')}
     </tbody></table></div>
     <p class="foot" style="margin:0">La tolerancia es fija: cuántos puntos del tesoro total se puede alejar cada barrio (o cada instrumento de Fábricas en la versión de tres) antes de marcarlo en el semáforo. Los instrumentos que tengas y no estén aquí se quedan como están: cuentan en su barrio, pero el cálculo no compra ni vende de ellos.</p>`;
 }
@@ -5092,7 +5190,11 @@ function renderMetasIn() {
     if (!WZ) WZ = wizardFrom(metas);
     if (WZ.step === 'Renta fija') WZ.modo['Renta fija'] = 'varios';
     if (WZ.step === 'Cripto') WZ.modo.Cripto = 'uno';
-    if (GRUPOS.some(g => g[0] === WZ.step) && WZ.modo[WZ.step] === 'varios' && !Object.values(WZ.rep[WZ.step] || {}).some(v => v !== '' && v != null)) WZ.rep[WZ.step] = repInicial(WZ.step);
+    if (GRUPOS.some(g => g[0] === WZ.step) && WZ.modo[WZ.step] === 'varios') {
+      const n = WZ.step;
+      if (WZ.auto[n]) { const r0 = repInicial(n); if (Object.values(r0).some(v => v !== '' && v != null)) WZ.rep[n] = r0; else WZ.auto[n] = false; }   // si la hoja no trae pesos, que los escriba
+      if (!Object.values(WZ.rep[n] || {}).some(v => v !== '' && v != null)) WZ.rep[n] = repInicial(n);
+    }
     const s = wzSteps(), i = s.indexOf(WZ.step), last = WZ.step === 'resumen';
     box.classList.remove('collapsed');
     box.innerHTML = `<div class="phead"><h2>Tus metas</h2><span class="pill hi">${metas.length ? 'Cambiando tus metas' : 'Pendiente'}</span></div>
@@ -5101,6 +5203,7 @@ function renderMetasIn() {
       <div class="err" id="mtErr">${WZ.err || ''}</div>
       <div class="simact">${i > 0 ? '<button type="button" class="ghost" id="wzBack">Atrás</button>' : ''}${last ? '<button type="button" id="mtSave">Guardar mis metas</button>' : '<button type="button" id="wzNext">Siguiente</button>'}${metas.length ? '<button type="button" class="ghost" id="wzCancel">Cancelar</button>' : ''}</div>`;
     wireWizard(box);
+    if (window.VGUIA) VGUIA.wire(box);
     return;
   }
   // ya guardadas: resumen y botón para cambiarlas
@@ -5121,17 +5224,18 @@ function wireWizard(box) {
     WZ.origin = r.value;
     const t = (raw.plantillas || []).find(x => x.id === r.value);
     GRUPOS.forEach(([n], j) => { WZ.pct[n] = String(t ? t.pct[j] : 0); });
-    WZ.tplFab = t && t.fabricas ? t.fabricas : null;
+    WZ.tplFab = t && t.fabricas ? t.fabricas : null; WZ.auto.Acciones = !WZ.tplFab;
     WZ.rep.Acciones = {};   // el reparto de Fábricas se vuelve a llenar con el de la plantilla al elegir la versión de tres
     wzNext();
   });
   box.querySelectorAll('input[name=wzModo]').forEach(r => r.onchange = () => {
     const n = WZ.step; WZ.modo[n] = r.value;
     if (r.value === 'varios' && !Object.values(WZ.rep[n] || {}).some(v => v !== '' && v != null)) WZ.rep[n] = repInicial(n);
-    if (r.value === 'uno') wzNext(); else renderMetas();
+    renderMetas();
   });
   box.querySelectorAll('input[data-g]').forEach(i => i.addEventListener('input', () => { WZ.pct[i.dataset.g] = i.value; showSums(); }));
-  box.querySelectorAll('input[data-w]').forEach(i => i.addEventListener('input', () => { WZ.rep[WZ.step][i.dataset.w] = i.value; showSums(); }));
+  box.querySelectorAll('input[data-w]').forEach(i => { if (WZ.auto[WZ.step]) i.readOnly = true; i.addEventListener('input', () => { WZ.rep[WZ.step][i.dataset.w] = i.value; showSums(); }); });
+  if ($('wzAuto')) $('wzAuto').onchange = e => { const n = WZ.step; WZ.auto[n] = e.target.checked; if (WZ.auto[n]) WZ.rep[n] = repInicial(n); renderMetas(); };
   showSums();
   if ($('wzBack')) $('wzBack').onclick = wzBack;
   if ($('wzCancel')) $('wzCancel').onclick = () => { metasEdit = false; WZ = null; renderMetas(); };
@@ -5140,7 +5244,7 @@ function wireWizard(box) {
     if (metasBusy) return;
     for (const st of wzSteps().slice(1, -1)) { const keep = WZ.step; WZ.step = st; const e = wzCheck(); WZ.step = keep; if (e) { $('mtErr').textContent = e; return; } }
     const lista = GRUPOS.map(([n]) => { const p = num(WZ.pct[n], 0), modo = p > 0 ? WZ.modo[n] : '';
-      return { grupo: n, objetivo_pct: p, modo, reparto: modo === 'varios' ? Object.entries(WZ.rep[n] || {}).map(([a, v]) => ({ activo: a, peso_pct: num(v, 0) })) : [] }; });
+      return { grupo: n, objetivo_pct: p, modo, auto: modo === 'varios' && n !== 'Cripto' && !!WZ.auto[n], reparto: modo === 'varios' ? Object.entries(WZ.rep[n] || {}).map(([a, v]) => ({ activo: a, peso_pct: num(v, 0) })) : [] }; });
     metasBusy = true; $('mtSave').disabled = true; $('mtSave').dataset.t = $('mtSave').textContent; $('mtSave').textContent = 'Guardando…';
     try {
       const r = await api('guardar_metas', { metas: lista, plantilla: WZ.origin === 'actual' ? '' : (WZ.origin || '') });
@@ -5611,6 +5715,62 @@ window.VECINOS_UI = (() => {
     if (!cur) setTimeout(() => { if (!cur && host && !host.hidden) { const k = JORD.filter(k => est[k] && est[k].tiene).sort((a, b) => Math.abs((model.classes[b].chg || 0)) - Math.abs((model.classes[a].chg || 0)))[0]; if (k) hablar(k, false, 'noticia'); } }, 2500);
   }
   return { pintar, hablar, estado, ocultar };
+})();
+// ================= Guías: un vecino (o varios) te explica algo línea por línea =================
+// lines: [{ k: 'ACCIONES', e: 'feliz' | ['broma', 'euforia'], t: 'texto (HTML)' }]. Con varias emociones, la cara va cambiando sola.
+window.VGUIA = (() => {
+  const pos = {}, REG = {}, t0 = performance.now();
+  let corriendo = false;
+  const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const emo = (L, t) => { const a = Array.isArray(L.e) ? L.e : [L.e || 'feliz']; return a[Math.floor(Math.max(0, t) / 1.5) % a.length] || a[0]; };
+  function cuerpo(id) {
+    const lines = REG[id], i = Math.min(pos[id] || 0, lines.length - 1), L = lines[i], P = VECINOS.PERS[L.k];
+    const ult = i === lines.length - 1;
+    return `<canvas width="32" height="38" aria-hidden="true"></canvas>
+      <div class="vg-b"><small><b>${P.n}</b> · <span class="vg-e">${VECINOS.NOMBRE_EST[emo(L, 0)]}</span></small>
+        <p class="vg-t" aria-live="polite">${L.t}</p>
+        <div class="vg-nav">${i > 0 ? '<button type="button" class="vg-prev" aria-label="Lo anterior">‹</button>' : ''}<span class="vg-dots" aria-hidden="true">${lines.map((_, j) => `<i class="${j === i ? 'on' : j < i ? 'ya' : ''}"></i>`).join('')}</span>${ult ? (lines.length > 1 ? '<button type="button" class="vg-re">Otra vez</button>' : '') : '<button type="button" class="vg-next">Sigue ›</button>'}</div></div>`;
+  }
+  function html(id, lines) {
+    if (!lines || !lines.length) return '';
+    REG[id] = lines; if (pos[id] == null || pos[id] >= lines.length) pos[id] = 0;
+    const P = VECINOS.PERS[lines[pos[id]].k];
+    return `<div class="vguia" data-vg="${id}" style="--c:${P.bar}">${cuerpo(id)}</div>`;
+  }
+  function mover(el, d) {
+    const id = el.dataset.vg, n = REG[id].length;
+    pos[id] = d === 0 ? 0 : Math.max(0, Math.min(n - 1, (pos[id] || 0) + d));
+    el.style.setProperty('--c', VECINOS.PERS[REG[id][pos[id]].k].bar);
+    el.innerHTML = cuerpo(id); el.dataset.t = performance.now();
+    el.classList.remove('vg-in'); void el.offsetWidth; el.classList.add('vg-in');
+    conectar(el);
+  }
+  function conectar(el) {
+    const b = s => el.querySelector(s);
+    if (b('.vg-next')) b('.vg-next').onclick = () => mover(el, 1);
+    if (b('.vg-prev')) b('.vg-prev').onclick = () => mover(el, -1);
+    if (b('.vg-re')) b('.vg-re').onclick = () => mover(el, 0);
+    pinta(el, performance.now());
+  }
+  function pinta(el, now) {
+    const id = el.dataset.vg, lines = REG[id]; if (!lines) return;
+    const L = lines[Math.min(pos[id] || 0, lines.length - 1)], cv = el.querySelector('canvas'); if (!cv) return;
+    const t = still() ? 1.2 : (now - t0) / 1000, e = emo(L, (now - (+el.dataset.t || t0)) / 1000);
+    const g = cv.getContext('2d'); g.clearRect(0, 0, 32, 38); VECINOS.cara(L.k, e, t, g);
+    const s = el.querySelector('.vg-e'), nom = VECINOS.NOMBRE_EST[e]; if (s && s.textContent !== nom) { s.textContent = nom; el.classList.remove('vg-cambio'); void el.offsetWidth; el.classList.add('vg-cambio'); }
+  }
+  function cuadro(now) {
+    const els = document.querySelectorAll('.vguia');
+    if (!els.length) { corriendo = false; return; }
+    els.forEach(el => pinta(el, now));
+    requestAnimationFrame(cuadro);
+  }
+  function wire(root) {
+    (root || document).querySelectorAll('.vguia').forEach(el => { if (!el.dataset.t) el.dataset.t = performance.now(); conectar(el); });
+    if (!corriendo && !still()) { corriendo = true; requestAnimationFrame(cuadro); }
+  }
+  const L = (k, e, t) => ({ k, e, t });
+  return { html, wire, L };
 })();
 
 // ================= Obra: la escena de construcción al registrar en la Tesorería =================
@@ -6352,13 +6512,22 @@ window.LAB = (() => {
     guardar();
     return r;
   }
+  // los pesos sugeridos reales (pestaña Pesos internos): única lectura al servidor, sin sesión y sin datos de nadie
+  async function pesosReales() {
+    let t = null; try { t = JSON.parse(ss.get('cm_lab_pesos') || 'null'); } catch (_) {}
+    if (t) { demoPesos(t); return false; }
+    if (!CONFIG.API_URL) return false;
+    try { const r = await fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ accion: 'pesos_publicos' }) }); const j = await r.json();
+      if (j && j.ok && Array.isArray(j.pesos) && j.pesos.length) { ss.set('cm_lab_pesos', JSON.stringify(j.pesos)); demoPesos(j.pesos); return true; } } catch (_) {}
+    return false;
+  }
   async function entrar(pin) {
     if (pin !== CLAVE) throw new Error('Esa no es la clave del laboratorio.');
-    ss.set('cm_lab', '1'); DEMO = true; cargar();
+    ss.set('cm_lab', '1'); DEMO = true; cargar(); await pesosReales();
     const r = await window.api('login', { usuario: 'laboratorio', pin });
     return r;
   }
-  function salir() { ss.set('cm_lab', null); DEMO = !CONFIG.API_URL; window.CM_TEMP = undefined; const p = document.getElementById('labPanel'); if (p) p.remove(); const b = document.getElementById('labBtn'); if (b) b.remove(); }
+  function salir() { ss.set('cm_lab', null); ss.set('cm_lab_pesos', null); DEMO = !CONFIG.API_URL; window.CM_TEMP = undefined; const p = document.getElementById('labPanel'); if (p) p.remove(); const b = document.getElementById('labBtn'); if (b) b.remove(); }
   // ---------- acciones del panel ----------
   const borrarLocal = () => { try { Object.keys(localStorage).filter(k => k.startsWith('cm_') && k.endsWith('_' + NOMBRE)).forEach(k => localStorage.removeItem(k)); Object.keys(sessionStorage).filter(k => k.endsWith('_' + NOMBRE)).forEach(k => sessionStorage.removeItem(k)); } catch (_) {} };
   async function recargar(msg) { guardar(); try { apply(await window.api('datos')); } catch (e) { aviso(e.message); return; } if (window.MAREA) MAREA.render(); if (msg) aviso(msg); pintarPanel(); }
@@ -6375,7 +6544,7 @@ window.LAB = (() => {
     demoHist = rows; recargar(`Racha simulada: ${n} ${n === 1 ? 'mes' : 'meses'} aportando.`);
   }
   async function metas(id) {
-    if (id) { const r = demoApi('metas_plantilla', { plantilla: id }); const ms = r.metas.map(x => ({ grupo: x.grupo, objetivo_pct: x.objetivo_pct, modo: x.grupo === 'Acciones' ? 'varios' : 'uno', reparto: x.grupo === 'Acciones' ? [{ activo: 'VUAA', peso_pct: 60 }, { activo: 'VEA', peso_pct: 30 }, { activo: 'VWO', peso_pct: 10 }] : [] }));
+    if (id) { const r = demoApi('metas_plantilla', { plantilla: id }); const ms = r.metas.map(x => ({ grupo: x.grupo, objetivo_pct: x.objetivo_pct, modo: x.grupo === 'Acciones' || x.grupo === 'Renta fija' ? 'varios' : 'uno', auto: x.grupo === 'Acciones' || x.grupo === 'Renta fija', reparto: x.grupo === 'Acciones' ? Object.entries(DEMO_CONF.Acciones.ejemplo).map(([activo, peso_pct]) => ({ activo, peso_pct })) : x.grupo === 'Renta fija' ? Object.entries(DEMO_CONF['Renta fija'].pesos).map(([activo, peso_pct]) => ({ activo, peso_pct })) : [] }));
       demoApi('guardar_metas', { metas: ms, plantilla: id }); }
     else demoMetas = [];
     recargar(id ? 'Metas puestas con una plantilla.' : 'Metas borradas.');
@@ -6446,7 +6615,7 @@ window.LAB = (() => {
       else if (a === 'salir') logout(false);
     });
   }
-  function inicio() { if (!on()) return; DEMO = true; cargar(); panel(); }
+  function inicio() { if (!on()) return; DEMO = true; cargar(); panel(); pesosReales().then(nuevo => { if (nuevo && raw) recargar(); }); }
   return { on, entrar, salir, api, panel, inicio, guardar, CLAVE };
 })();
 
@@ -6684,6 +6853,44 @@ window.MAREA = (() => {
     go('ayto', 'simPanel');
     const inp = $('simAmt'); if (inp) { inp.value = Math.round(m); if (typeof renderSim === 'function') renderSim(); }
   }
+  // ---------- los vecinos te guían en la Fundación (nunca dicen «compra» ni «vende») ----------
+  const VK = { CETES: 'RENTA_FIJA', UDI: 'RENTA_FIJA', ETF: 'ACCIONES', FIBRA: 'FIBRAS', BTC: 'BITCOIN' };
+  function guiaFund(p, P, m) {
+    const G = (k, e, t) => VGUIA.L(k, e, t), k = VK[p.k], l = P.por[p.k] || [];
+    const lst = l.map(x => `<b>${esc(x.i.activo)}</b> (${money(x.amt)}${x.units > 0 && +x.i.precio_mxn > 0 ? `, ${x.units} ${x.units === 1 ? 'título' : 'títulos'}` : ''})`).join(', ');
+    const toca = m >= 1 ? `Para tu ciudad de ${money(META2)}, aquí te tocan <b>${money(m)}</b>: ${lst}.` : '';
+    const nada = [G(k, ['triste', 'broma'], `Tu plan no trae ${p.n} ahorita. ¡Snif! Nos saltamos este piso sin rencores.`)];
+    const L = {
+      CETES: [G(k, ['euforia', 'fiesta'], '¡Primer ladrillo! Bienvenido al Banco de CETES. Aquí empieza toda ciudad seria… y la tuya va a ser seria. Bueno, medio seria.'),
+        G(k, ['broma', 'feliz'], 'Los CETES son prestarle al gobierno por poquito tiempo. Lo bonito: desde el primer día sabes exactito cuánto vas a ganar. ¡Cero sorpresas!'),
+        G(k, ['preocupado', 'triste'], 'Lo feo: si la inflación se pone brava, lo que ganas de verdad puede quedar casi en cero. Ay, mis números…'),
+        ...(m >= 1 ? [G(k, ['orgulloso', 'euforia'], toca), G(k, ['broma', 'orgulloso'], 'Ese reparto sale de tus metas, y tus metas siguen la hoja de la ciudad. Yo nomás obedezco a los números.')] : nada),
+        G('BITCOIN', ['broma', 'euforia'], '¿Puros préstamos al gobierno? ¡Qué aburrido, Inge!'),
+        G(k, ['orgulloso', 'fiesta'], 'Aburrido pero seguro, Lupita. Se consiguen en Cetesdirecto o en tu casa de bolsa, desde montos chiquitos. Luego los apuntas en la Tesorería y ¡pum!, edificio nuevo.')],
+      UDI: [G(k, ['euforia', 'orgulloso'], '¡Piso dos! La Muralla contra la inflación. Aquí viven los Udibonos, mis consentidos.'),
+        G(k, ['feliz', 'broma'], 'Su valor sube con los precios: si las tortillas suben, tus Udibonos también. ¡Justicia tortillera!'),
+        G(k, ['preocupado', 'llorando'], 'Ojo: si te deshaces de ellos antes de que venzan, su precio puede subir o bajar. No llores… bueno, tantito sí.'),
+        ...(m >= 1 ? [G(k, ['orgulloso', 'fiesta'], toca)] : nada),
+        G(k, ['feliz', 'euforia'], 'Igual que los CETES: Cetesdirecto o tu casa de bolsa. Luego a la Tesorería, ¡ya te la sabes!')],
+      ETF: [G(k, ['fiesta', 'euforia'], '¡Llegamos a Fábricas! Aquí tu dinero se vuelve socio de cientos de empresas a la vez. ¡Socio! ¡Tú!'),
+        G(k, ['orgulloso', 'feliz'], 'En plazos largos las acciones han crecido más que la renta fija… aunque nadie lo garantiza, ¿eh?'),
+        G(k, ['preocupado', 'triste'], 'En un mal año pueden caer 20% o más. Es para dinero que no vas a necesitar en varios años. Respira hondo conmigo: uno, dos…'),
+        ...(m >= 1 ? [G(k, ['euforia', 'orgulloso'], toca), G(k, ['broma', 'feliz'], l.length > 1 ? 'Uno por cada parte del mundo, con los pesos de tu plan. Si una región se pone triste, las otras la animan.' : 'Un solo fondo con el mundo entero adentro. Práctico, como yo.')] : nada),
+        G('FIBRAS', ['broma'], '¿Y mis rentas para cuándo, Chela?'),
+        G(k, ['broma', 'fiesta'], '¡Paciencia, Don Ramiro, usted sigue! Esto se consigue en tu casa de bolsa; muchas te dejan tener fracciones. Luego, Tesorería y ¡chimenea nueva!')],
+      FIBRA: [G(k, ['orgulloso', 'euforia'], 'Pásele, pásele. Bienvenido a Inmuebles: aquí eres casero de edificios de verdad, sin que nadie te hable a las 3 de la mañana porque se tapó el baño.'),
+        G(k, ['fiesta', 'feliz'], 'Recibes parte de las rentas, normalmente cada trimestre. ¡Dinerito que llega solito!'),
+        G(k, ['preocupado', 'triste'], 'Pero su precio sube y baja como el de una acción, y si los inquilinos se van, las rentas bajan. Ay, los inquilinos…'),
+        ...(m >= 1 ? [G(k, ['euforia', 'orgulloso'], toca), G(k, ['orgulloso', 'broma'], 'Ese reparto entre FIBRAs lo marca la hoja de la ciudad y se revisa cada mes. Unas rentan naves industriales, otras oficinas y centros comerciales: si a una le va mal, otra aguanta.')] : nada),
+        G(k, ['feliz', 'fiesta'], 'Se consiguen en tu casa de bolsa, como una acción. Luego a la Tesorería, mijo, y le pongo su letrero.')],
+      BTC: [G(k, ['euforia', 'fiesta'], '¡Por fin mi barrio! Oro virtual. Bitcoin. ¡BITCOIN!'),
+        G(k, ['broma', 'feliz'], 'Algunas personas tienen un pedacito porque no depende de ningún gobierno ni empresa. Es opcional, eh. No me ofendo… bueno, poquito.'),
+        G(k, ['llorando', 'preocupado'], 'La verdad verdadera: varias veces ha perdido más de la mitad de su valor. ¡Más de la mitad! Pon solo lo que estarías dispuesto a perder.'),
+        ...(m >= 1 ? [G(k, ['orgulloso', 'euforia'], toca + ' Va por monto: puedes tener un pedacito chiquito de bitcoin.')] : nada),
+        G(k, ['fiesta', 'broma'], 'Se consigue en una plataforma de criptomonedas regulada. Y luego… ¡Tesorería! ¡Mina nueva!')]
+    };
+    return L[p.k] || [];
+  }
   const riesgo = n => `<span class="mriesgo" aria-label="Riesgo ${n} de 5" title="Riesgo ${n} de 5">${[1, 2, 3, 4, 5].map(k => `<i class="${k <= n ? 'on' : ''}"></i>`).join('')}</span>`;
   function rFund() {
     const F = fundInfo(), M = model, T = M.total, meta = META2, P = F.etapa < 3 && hasMetas() ? planFund() : { falta: 0, por: {}, avisos: [] };
@@ -6693,8 +6900,13 @@ window.MAREA = (() => {
       <div class="mfbar"><i style="width:${Math.min(100, T / META2 * 100)}%"></i></div>
       <div class="mfsteps"><span class="${F.etapa > 1 ? 'ok' : 'on'}">Etapa 1 · un edificio por barrio</span><span class="${F.etapa > 2 ? 'ok' : F.etapa === 2 ? 'on' : ''}">Etapa 2 · ${money(META2)}</span><span class="${F.etapa === 3 ? 'on' : ''}">Ciudad fundada</span></div></article>`;
     if (!hasMetas()) {
-      B.fund.innerHTML = prog + `<article class="mcard hl" style="--c:#f8a43c"><h3>Paso 0 · Elige tu plan</h3><p>Tu plan dice qué parte de tu dinero va en cada barrio. Con él sabrás cuánto poner en cada edificio. Puedes empezar con una plantilla (por ejemplo Mixta o Mayoría renta fija) y cambiarla cuando quieras.</p>
+      B.fund.innerHTML = prog + `<article class="mcard hl" style="--c:#f8a43c"><h3>Paso 0 · Elige tu plan</h3>${VGUIA.html('fund-0', [
+          VGUIA.L('ACCIONES', ['euforia', 'fiesta'], `¡Bienvenido a la Fundación! Vamos a levantar una ciudad de ${money(META2)}, piso por piso, de lo más seguro a lo más arriesgado.`),
+          VGUIA.L('ACCIONES', ['preocupado', 'broma'], 'Pero antes necesitamos tu plan: qué parte de tu dinero va en cada barrio. Sin plano no hay obra; eso hasta yo lo sé.'),
+          VGUIA.L('FIBRAS', ['orgulloso', 'feliz'], 'Te lo armamos entre los cuatro en Tus metas. Hay estrategias ya hechas; luego le mueves a tu gusto.'),
+          VGUIA.L('BITCOIN', ['euforia', 'broma'], '¡Ándale, dale al botón! Ya quiero ver mi barrio.')])}
         <button type="button" class="mbtn pri" data-go="ayto:metas">Elegir mi plan <small>+10</small></button></article>`;
+      VGUIA.wire(B.fund);
       return;
     }
     if (F.etapa === 1) {
@@ -6705,26 +6917,35 @@ window.MAREA = (() => {
         const head = `<div class="mlh"><span class="mln" style="--c:${col}">${n + 1}</span><div class="mlt"><b>${p.n}${p.opcional ? ' <small class="muted">(opcional)</small>' : ''}</b><small>${p.ed}${!st && m >= 1 ? ' · ' + money(m) + ' en tu plan' : ''}</small></div>${riesgo(p.riesgo)}${estado}</div>`;
         if (!cur) return `<li class="${st ? 'done' : 'lock'}" style="--c:${col}">${head}</li>`;
         return `<li class="cur" style="--c:${col}">${head}
-          <div class="mwhy"><div><b>¿Por qué se invierte aquí?</b><p>${p.por}</p></div><div><b>¿Qué puede pasar?</b><p>${p.pasa}</p></div><div><b>¿Dónde se compra?</b><p>${p.donde}</p></div></div>
-          ${m >= 1 ? `<p>Para que tu ciudad llegue a <b>${money(META2)}</b> con tu plan, en este paso compra <b>${money(m)}</b>:</p>${listaPaso(P, p.k)}
-            <p class="foot">Es el mismo cálculo de la Aportación del mes con ${money(P.falta)}. Los precios cambian cada día, así que el número de títulos puede variar un poco. Cuando compres, registra tus títulos o tu saldo en la Tesorería y este edificio aparecerá en tu ciudad.</p>
+          ${VGUIA.html('fund-' + p.k + (m >= 1 ? '' : '-0'), guiaFund(p, P, m))}
+          ${m >= 1 ? `<p class="foot" style="margin:4px 0">Lo que te toca en este paso:</p>${listaPaso(P, p.k)}
+            <p class="foot">Es el mismo cálculo de la Aportación del mes con ${money(P.falta)}. Los precios cambian cada día, así que el número de títulos puede variar un poco.</p>
             <div class="mbtns"><button type="button" class="mbtn pri" data-reg="${p.g}">Registrar mi compra en la Tesorería <small>+15</small></button><button type="button" class="mbtn" data-calc="${Math.round(P.falta)}">Ver el reparto completo en la calculadora</button><button type="button" class="mlink" data-salta="${p.k}">No va en mi plan por ahora (también da +15)</button></div>`
-          : `<p>Tu plan no incluye ${p.n.toLowerCase()}. Puedes seguir sin invertir aquí.</p><div class="mbtns"><button type="button" class="mbtn" data-salta="${p.k}">Entendido, sigo <small>+15</small></button></div>`}</li>`;
+          : `<div class="mbtns"><button type="button" class="mbtn" data-salta="${p.k}">Entendido, sigo <small>+15</small></button></div>`}</li>`;
       }).join('');
       const falta = P.avisos.length ? `<p class="foot">${P.avisos.join(' ')}</p>` : '';
-      B.fund.innerHTML = `<div class="mlead"><h2>Funda tu ciudad</h2><p>Tu plan para una ciudad de ${money(META2)}, de lo más seguro a lo más arriesgado. En cada paso te decimos qué comprar, cuántos títulos y por qué; tú decides. Cada decisión da los mismos créditos, compres o no.</p></div>${prog}${falta}<ol class="mladder">${lad}</ol>`;
+      B.fund.innerHTML = `<div class="mlead"><h2>Funda tu ciudad</h2><p>Tu plan para una ciudad de ${money(META2)}, de lo más seguro a lo más arriesgado. Cada decisión da los mismos créditos, compres o no.</p></div>${prog}${falta}<ol class="mladder">${lad}</ol>`;
     } else if (F.etapa === 2) {
       const top = F.niveles.slice().sort((a, b) => a.valor / a.obj - b.valor / b.obj)[0];
-      B.fund.innerHTML = `<div class="mlead"><h2>Haz crecer tus barrios</h2><p>Cada barrio sube a nivel 2 cuando llega a la parte que le toca en tu plan con una ciudad de ${money(META2)}. Sube primero el que va más atrás.</p>${P.falta >= 1 ? `<div class="mbtns"><button type="button" class="mbtn pri" data-calc="${P.falta}">Calcular cómo repartir los ${money(P.falta)} que faltan</button></div>` : ''}</div>${prog}
+      const vk = top && !top.nv2 ? top.k : 'ACCIONES';
+      const g2 = VGUIA.html('fund-e2', [VGUIA.L('ACCIONES', ['fiesta', 'euforia'], `¡Ya tienes un edificio en cada barrio! Ahora a crecerlos hasta tu ciudad de ${money(META2)}.`),
+        ...(top && !top.nv2 ? [VGUIA.L(vk, ['preocupado', 'broma'], `${CLS[vk].scene} va más atrás: ${money(top.valor)} de ${money(top.obj)}. ¡Échale la mano a mi barrio, porfa!`)] : []),
+        VGUIA.L('RENTA_FIJA', ['orgulloso', 'feliz'], 'Cada barrio sube a nivel 2 cuando llega a la parte que le toca en tu plan. Los porcentajes salen de tus metas, que siguen la hoja de la ciudad.'),
+        VGUIA.L('BITCOIN', ['broma', 'euforia'], '¿El truco? Lo nuevo va primero al barrio que va más atrás. Así ni tienes que deshacerte de nada.')]);
+      B.fund.innerHTML = `<div class="mlead"><h2>Haz crecer tus barrios</h2>${g2}${P.falta >= 1 ? `<div class="mbtns"><button type="button" class="mbtn pri" data-calc="${P.falta}">Calcular cómo repartir los ${money(P.falta)} que faltan</button></div>` : ''}</div>${prog}
         <div class="mgrid">${F.niveles.map(n => { const r = Math.min(1, n.valor / n.obj), sug = top === n && !n.nv2, p = PASOS.find(q => q.g === n.k);
           return `<article class="mcard ${sug ? 'hl' : ''}" style="--c:${CLS[n.k].color}"><div class="mrow-top"><span class="mbadge">${ico(n.k)}</span>${riesgo(n.k === 'RENTA_FIJA' ? 1 : p.riesgo)}</div>
             <h3>${CLS[n.k].scene} <span class="mpill" style="--c:${n.nv2 ? 'var(--ok)' : CLS[n.k].color}">Nivel ${n.nv2 ? 2 : 1}</span></h3>
             <div class="mrow"><span>${money(n.valor)} de ${money(n.obj)}</span><b>${Math.round(r * 100)}%</b></div><div class="mlv"><i style="width:${r * 100}%"></i></div>
             ${n.nv2 ? '<p class="foot">Listo para esta etapa.</p>' : `${sug ? `<p class="foot"><b>Siguiente recomendado por tu plan.</b> ${POR_QUE(n.k)}</p>` : ''}<button type="button" class="mbtn ${sug ? 'pri' : ''}" data-reg="${n.k}">Registrar aportación</button>`}</article>`; }).join('')}</div>`;
     } else {
-      B.fund.innerHTML = `<div class="mlead"><h2>Tu ciudad está fundada</h2><p>Los niveles de la ciudad cambian su aspecto; los créditos siguen saliendo de la constancia.</p></div>${prog}
+      B.fund.innerHTML = `<div class="mlead"><h2>Tu ciudad está fundada</h2>${VGUIA.html('fund-e3', [VGUIA.L('ACCIONES', ['fiesta', 'euforia'], '¡LO LOGRASTE! ¡Ciudad fundada! Chela no llora… Chela está sudando de los ojos.'),
+          VGUIA.L('FIBRAS', ['llorando', 'orgulloso'], 'Yo sí lloro, y con orgullo. Ahora los niveles de la ciudad cambian su aspecto.'),
+          VGUIA.L('RENTA_FIJA', ['orgulloso', 'feliz'], 'Y los créditos siguen saliendo de la constancia: aporta cada mes y la ciudad sigue creciendo.'),
+          VGUIA.L('BITCOIN', ['euforia', 'fiesta'], '¡Fiesta en todos los barrios!')])}</div>${prog}
         <article class="mcard"><h3>Niveles de tu ciudad</h3>${NIVELES.map(([m, t], k) => `<div class="mrow"><span>${t}</span><b class="${k < nv ? 'pos' : 'muted'}">${money(m)}${k === nv - 1 ? ' · aquí estás' : ''}</b></div>`).join('')}</article>`;
     }
+    VGUIA.wire(B.fund);
   }
   async function saltar(k) {
     if (!E) return;
