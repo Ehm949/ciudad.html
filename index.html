@@ -778,6 +778,9 @@ body.m-visita .mscr[data-scr="mercado"] > :not(#stage){display:none!important}
 @media (max-width:600px){.jglobo{width:min(230px,78%)}.jglobo canvas{width:44px;height:52px}.jglobo p{font-size:12px}}
 @media (prefers-reduced-motion:reduce){.jglobo.pop{animation:none}}
 body.m-visita #lvlTag{display:none!important}
+
+.jfxrow{margin-top:-4px}
+.jfxrow[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -797,7 +800,7 @@ body.m-visita #lvlTag{display:none!important}
     <div class="err" id="lgErr"></div>
     <button type="submit" id="lgBtn">Entrar a la ciudad</button>
     <button type="button" class="ghost" id="btnSignup">Crear mi cuenta</button>
-    <div class="demo-note" id="demoNote" hidden>Modo demostración: no hay servidor configurado. Escribe cualquier usuario y PIN para entrar con datos de ejemplo.</div>
+    <div class="demo-note" id="demoNote" hidden>Modo demostración: no hay servidor configurado. Escribe cualquier usuario y contraseña para entrar con datos de ejemplo.</div>
   </form>
   <form class="card" id="signupForm" hidden autocomplete="on">
     <p class="gate-k">Funda tu ciudad</p>
@@ -809,7 +812,7 @@ body.m-visita #lvlTag{display:none!important}
     <label for="suPin2">Repite la contraseña<input id="suPin2" type="password" autocomplete="new-password" minlength="8" maxlength="64" required></label>
     <label for="suCode">Código de invitación<input id="suCode" autocomplete="off" maxlength="40"></label>
     <p class="pw-hint">Al menos 8 caracteres. Puedes mezclar palabras, números o símbolos.</p>
-    <p class="aviso-corto" id="suAvisoCorto">Usamos tu nombre, usuario y lo que captures de tu portafolio (datos patrimoniales) para mostrarte tu ciudad y calcular con tus metas. El administrador puede verlos; no los vendemos. Para limitar su uso o borrar tu cuenta, escribe a <a href="mailto:fondomareainternacional@gmail.com">fondomareainternacional@gmail.com</a>. Responsable: Eduardo Hernández Martínez, <mark>[DOMICILIO]</mark>. <a id="suAviso" href="aviso-privacidad.html" target="_blank" rel="noopener">Aviso completo</a>.</p>
+    <p class="aviso-corto" id="suAvisoCorto">Usamos tu nombre, usuario y lo que captures de tu portafolio (datos patrimoniales) para mostrarte tu ciudad y calcular con tus metas. El administrador puede verlos; no los vendemos. Para limitar su uso o borrar tu cuenta, escribe a <a href="mailto:fondomareainternacional@gmail.com">fondomareainternacional@gmail.com</a>. Responsable: Eduardo Hernández Martínez. <a id="suAviso" href="aviso-privacidad.html" target="_blank" rel="noopener">Aviso completo</a>.</p>
     <label class="chk" for="suAcepta"><input type="checkbox" id="suAcepta" aria-required="true"><span>Leí el aviso de privacidad y doy mi consentimiento expreso para tratar mis datos patrimoniales para estas finalidades.</span></label>
     <div class="err" id="suErr"></div>
     <button type="submit" id="suBtn">Crear mi cuenta y entrar</button>
@@ -842,7 +845,7 @@ body.m-visita #lvlTag{display:none!important}
         <canvas id="city" role="img" aria-label="Ciudad animada con cuatro barrios: acciones, FIBRAs, renta fija y bitcoin"></canvas>
         <div class="badge" id="lvlTag"></div>
         <div class="badge" id="sampleTag" hidden>Datos de ejemplo</div>
-        <button class="ghost small back" id="btnBack" type="button" hidden>← Todo la ciudad</button>
+        <button class="ghost small back" id="btnBack" type="button" hidden>← Toda la ciudad</button>
         <div class="badge hint" id="hint">Toca un barrio para recorrerlo</div>
       </div>
     </div>
@@ -906,7 +909,7 @@ body.m-visita #lvlTag{display:none!important}
       <details id="calcBox"><summary style="cursor:pointer;font-weight:700">Así se calcula el tesoro de la ciudad</summary><div id="calc" style="margin-top:10px"></div></details>
       <form id="pfForm" style="display:flex;flex-direction:column;gap:14px"></form>
     </section>
-    <p class="foot">Ciudad Marea es una herramienta educativa y de visualización: convierte tu portafolio en una ciudad y calcula con las metas y reglas que tú defines. No es una recomendación de inversión ni una oferta de compra o venta. Las noticias de la ciudad son narrativa inspirada en cómo se movió cada barrio, no noticias reales; las animaciones son representaciones y nada de esto es una promesa de resultados.</p>
+    <p class="foot">Ciudad Marea es una herramienta educativa y de visualización: convierte tu portafolio en una ciudad y calcula con las metas y reglas que tú defines. No es una recomendación de inversión ni una oferta de compra o venta. Lo que cuentan los vecinos es narrativa inspirada en cómo se movió cada barrio, no noticias reales; las animaciones son representaciones y nada de esto es una promesa de resultados.</p>
   </div>
 </div>
 <div class="celebrate" id="celebrate" hidden></div>
@@ -5052,7 +5055,7 @@ window.MENU = (() => {
   // Aportación del mes, Cosecha del tesoro y Portafolio se pueden desplegar o retraer (se recuerda en este dispositivo)
   const sellPanel = $('sellPanel');
   [[simPanel, 'aportacion', 'Escribe un monto y la ciudad calcula cómo repartirlo según tus metas. Toca <b>Mostrar</b> para abrir la calculadora.'],
-   [sellPanel, 'cosecha', 'Calcula de qué barrios sacar dinero según tus metas, o rebalancea todo la ciudad con lo que ya tienes. Toca <b>Mostrar</b> para abrir la calculadora.'],
+   [sellPanel, 'cosecha', 'Calcula de qué barrios sacar dinero según tus metas, o rebalancea toda la ciudad con lo que ya tienes. Toca <b>Mostrar</b> para abrir la calculadora.'],
    [pfView, 'portafolio_vista', 'Tus instrumentos, su valor y su ganancia. Toca <b>Mostrar</b> para ver la tabla.']].forEach(([el, k, t]) => {
     if (!el) return;
     if (!el.querySelector(':scope > .phead')) { const h = el.querySelector(':scope > h2'); if (h) { const d = mk('div', 'phead'); h.before(d); d.appendChild(h); } }
@@ -5726,24 +5729,42 @@ chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....
   // Niveles aproximados por mes (100 = inicio), redondeados de índices de referencia. Renta fija: tasa anual por tramos.
   const SCN = [
     { n: 'Crisis 2008', start: [2007, 9], m: 66, d: 'La crisis hipotecaria de Estados Unidos: los bancos dejaron de prestar y las bolsas del mundo cayeron más de la mitad. Bitcoin todavía no existía, así que ese barrio se queda igual.',
-      A: [[0, 100], [12, 58], [17, 45], [24, 68], [36, 75], [48, 72], [60, 88], [66, 100]], I: [[0, 100], [12, 62], [17, 30], [24, 52], [36, 65], [48, 68], [60, 85], [66, 92]], R: [[0, 7.5], [15, 4.5]], B: null },
+      A: [[0, 100], [12, 58], [17, 45], [24, 68], [36, 75], [48, 72], [60, 88], [66, 100]], I: [[0, 100], [12, 62], [17, 30], [24, 52], [36, 65], [48, 68], [60, 85], [66, 92]], R: [[0, 7.5], [15, 4.5]], B: null,
+      D: [[0, 100], [10, 97], [14, 124], [17, 140], [26, 119], [30, 114], [50, 118], [66, 118]], p0: 10.9 },
     { n: 'Pandemia 2020', start: [2020, 1], m: 24, d: 'El mundo se encerró por el covid. Las bolsas cayeron un tercio en un mes y se recuperaron en medio año; las FIBRAs tardaron mucho más porque oficinas y plazas se vaciaron.',
       A: [[0, 100], [1, 68], [2, 78], [3, 82], [5, 95], [6, 100], [9, 110], [12, 125], [18, 135], [22, 140], [24, 130]], I: [[0, 100], [1, 60], [2, 58], [4, 62], [8, 70], [12, 78], [18, 82], [24, 85]], R: [[0, 7], [3, 5.5], [7, 4.3], [19, 5.5]],
-      B: [[0, 100], [1, 55], [3, 95], [6, 105], [9, 140], [10, 200], [12, 360], [14, 620], [17, 370], [21, 650], [24, 400]] },
+      B: [[0, 100], [1, 55], [3, 95], [6, 105], [9, 140], [10, 200], [12, 360], [14, 620], [17, 370], [21, 650], [24, 400]], D: [[0, 100], [2, 129], [4, 119], [7, 113], [10, 106], [16, 107], [24, 109]], p0: 18.8 },
     { n: 'Subida de tasas 2022', start: [2022, 0], m: 26, d: 'La inflación obligó a subir las tasas de interés. Bajaron acciones y bitcoin, pero Cetes y cajitas pagaron más que en años.',
       A: [[0, 100], [5, 82], [9, 75], [11, 84], [15, 90], [18, 92], [21, 88], [24, 104], [26, 108]], I: [[0, 100], [5, 90], [9, 92], [12, 100], [18, 110], [24, 120], [26, 120]], R: [[0, 6], [4, 8], [9, 10], [13, 11.2]],
-      B: [[0, 100], [5, 43], [10, 34], [12, 35], [15, 60], [18, 56], [21, 58], [24, 90], [26, 150]] }];
+      B: [[0, 100], [5, 43], [10, 34], [12, 35], [15, 60], [18, 56], [21, 58], [24, 90], [26, 150]], D: [[0, 100], [3, 97], [6, 99], [9, 97], [12, 95], [16, 87], [18, 83], [23, 84], [26, 81]], p0: 20.5 },
+    { n: 'Dólar +20%', hip: true, start: null, m: 12, d: 'Escenario inventado: los mercados no se mueven, solo el dólar sube 20% en medio año. Así se ve cuánto de tu ciudad vive en dólares.',
+      A: [[0, 100], [12, 100]], I: [[0, 100], [12, 100]], R: [[0, 9]], B: [[0, 100], [12, 100]], D: [[0, 100], [6, 120], [12, 120]], p0: null },
+    { n: 'Dólar −20%', hip: true, start: null, m: 12, d: 'Escenario inventado: los mercados no se mueven, solo el peso se fortalece y el dólar baja 20%. Lo que tienes en dólares vale menos en pesos aunque no haya pasado nada en la bolsa.',
+      A: [[0, 100], [12, 100]], I: [[0, 100], [12, 100]], R: [[0, 9]], B: [[0, 100], [12, 100]], D: [[0, 100], [6, 80], [12, 80]], p0: null }];
+  // qué parte de cada barrio está en dólares (según la moneda del catálogo; bitcoin siempre cuenta como dólares)
+  let USD = { ACCIONES: 1, FIBRAS: 0, RENTA_FIJA: 0, BITCOIN: 1 };
+  function usdShares() {
+    const o = { ACCIONES: 0, FIBRAS: 0, RENTA_FIJA: 0, BITCOIN: 0 };
+    JORD.forEach(k => { const its = model.classes[k].items.filter(i => i.valor > 0), tot = its.reduce((a, i) => a + i.valor, 0);
+      if (!tot) { o[k] = k === 'ACCIONES' || k === 'BITCOIN' ? 1 : 0; return; }
+      const mon = i => String(i.moneda || (i.cat && i.cat.moneda) || '');
+      const usd = its.filter(i => k === 'BITCOIN' || /USD|D[OÓ]LAR/i.test(mon(i)) || (k === 'ACCIONES' && !mon(i))).reduce((a, i) => a + i.valor, 0);
+      o[k] = usd / tot; });
+    return o;
+  }
   const MES3 = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
   const lerp = (pts, m) => { for (let i = 1; i < pts.length; i++) if (m <= pts[i][0]) { const [a, va] = pts[i - 1], [b, vb] = pts[i]; return va + (vb - va) * (m - a) / (b - a); } return pts[pts.length - 1][1]; };
-  function series(sc) {
+  function series(sc, conDolar) {
     const N = sc.m, o = {}, arr = f => [...Array(N + 1)].map((_, m) => f(m));
-    o.ACCIONES = arr(m => lerp(sc.A, m) / 100); o.FIBRAS = arr(m => lerp(sc.I, m) / 100); o.BITCOIN = sc.B ? arr(m => lerp(sc.B, m) / 100) : arr(() => 1);
+    const D = m => conDolar && sc.D ? lerp(sc.D, m) / 100 : 1, fx = (k, m) => (1 - USD[k]) + USD[k] * D(m);
+    o.DOLAR = arr(m => D(m));
+    o.ACCIONES = arr(m => lerp(sc.A, m) / 100 * fx('ACCIONES', m)); o.FIBRAS = arr(m => lerp(sc.I, m) / 100 * fx('FIBRAS', m)); o.BITCOIN = sc.B ? arr(m => lerp(sc.B, m) / 100 * fx('BITCOIN', m)) : arr(() => 1);
     const r = [1]; for (let m = 1; m <= N; m++) { let rate = sc.R[0][1]; sc.R.forEach(([mm, v]) => { if (m - 1 >= mm) rate = v; }); r.push(r[m - 1] * (1 + rate / 100 / 12)); } o.RENTA_FIJA = r; return o;
   }
-  const SIM = { i: 0, m: 0, ap: false, apM: 5000, play: null };
+  const SIM = { i: 0, m: 0, ap: false, apM: 5000, play: null, fx: true };
   let VAL0 = {}, TOT0 = 0, SER = null, RUN = null, sbox = null;
-  function calc(ap) {
-    const sc = SCN[SIM.i], N = sc.m; SER = series(sc);
+  function calc(ap, sinDolar) {
+    const sc = SCN[SIM.i], N = sc.m; SER = series(sc, SIM.fx && !sinDolar);
     const u = {}; JORD.forEach(k => u[k] = VAL0[k]); const tot = [], inv = [], per = []; let invested = TOT0;
     for (let m = 0; m <= N; m++) {
       if (m > 0 && ap) { JORD.forEach(k => u[k] += ap * (TOT0 ? VAL0[k] / TOT0 : .25) / SER[k][m]); invested += ap; }
@@ -5753,10 +5774,10 @@ chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....
     let rec = null; for (let m = low; m <= N; m++) if (tot[m] >= inv[m] - .5) { rec = m; break; }
     return { tot, inv, per, low, rec, ap };
   }
-  const mLab = m => { const sc = SCN[SIM.i], t = sc.start[0] * 12 + sc.start[1] + m; return MES3[t % 12] + ' ' + Math.floor(t / 12); };
+  const mLab = m => { const sc = SCN[SIM.i]; if (!sc.start) return m === 0 ? 'hoy' : 'mes ' + m; const t = sc.start[0] * 12 + sc.start[1] + m; return MES3[t % 12] + ' ' + Math.floor(t / 12); };
   function simula(b) {
     sbox = b; if (!listo()) return;
-    JORD.forEach(k => VAL0[k] = Math.max(0, model.classes[k].valor)); TOT0 = JORD.reduce((a, k) => a + VAL0[k], 0);
+    JORD.forEach(k => VAL0[k] = Math.max(0, model.classes[k].valor)); TOT0 = JORD.reduce((a, k) => a + VAL0[k], 0); USD = usdShares();
     if (TOT0 <= 0) { b.innerHTML = `<div class="mlead"><h2>¿Qué hubiera pasado?</h2><p>Registra tu tesorería y aquí verás cómo le hubiera ido a tu dinero en crisis reales del pasado.</p></div>`; return; }
     if (b.querySelector('#jTl')) { upd(); return; }
     b.innerHTML = `<div class="mlead mlead-row"><div><h2>¿Qué hubiera pasado?</h2><p>Tu tesoro de hoy, viviendo una crisis real del pasado. Mira cuánto hubiera bajado y cuánto tardó en volver.</p></div><button type="button" class="mbtn" id="jSimCity">Ver el simulacro en mi ciudad</button></div>
@@ -5768,11 +5789,13 @@ chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....
         <div class="jkpis"><div class="jkpi"><small>Tu tesoro hoy</small><b id="jkNow"></b><span id="jkNowS"></span></div><div class="jkpi"><small>Ese mes</small><b id="jkCur"></b><span id="jkCurS"></span></div>
           <div class="jkpi"><small>Lo más bajo</small><b class="jdn" id="jkLow"></b><span id="jkLowS"></span></div><div class="jkpi"><small>Volviste a tu dinero</small><b id="jkRec"></b><span id="jkRecS"></span></div></div>
         <label class="jtog"><input type="checkbox" id="jAp"> Seguí aportando <input type="number" id="jApM" value="${SIM.apM}" min="0" step="500" aria-label="Aportación mensual"> al mes</label>
+        <label class="jtog"><input type="checkbox" id="jFx"> Con el dólar: lo que tienes en dólares se convierte a pesos con el tipo de cambio de esos meses</label>
+        <div class="jrow jfxrow" id="jFxRow"><div class="ic" style="background:#7dffb022"><b style="font-family:var(--f-data);color:#7dffb0">$</b></div><div class="nm">Dólar<small id="jFxS"></small></div><div class="dv" id="jFxD"></div></div>
         <div class="jlesson" id="jLes"></div>
         <div><div class="jlbl" style="margin-bottom:6px">Cada barrio ese mes</div><div class="jbrr" id="jBrr"></div></div>
-        <p class="foot">Caídas y recuperaciones aproximadas de índices de referencia (acciones del mundo, bienes raíces, Cetes y bitcoin), redondeadas y sin tipo de cambio. En estas crisis el dólar subió, así que lo invertido en dólares cayó menos en pesos. Sirve para entender, no para predecir.</p>
+        <p class="foot">Caídas, recuperaciones y tipo de cambio aproximados, redondeados de índices de referencia (acciones del mundo, bienes raíces, Cetes, bitcoin y el peso contra el dólar). Sirve para entender, no para predecir.</p>
       </article>`;
-    $j('jAp').checked = SIM.ap; $j('jSimCity').onclick = () => simulacro();
+    $j('jAp').checked = SIM.ap; $j('jFx').checked = SIM.fx; $j('jFx').onchange = e => { SIM.fx = e.target.checked; upd(); }; $j('jSimCity').onclick = () => simulacro();
     $j('jPlay').onclick = () => { if (SIM.play) { parar(); return; } if (SIM.m >= SCN[SIM.i].m) SIM.m = 0; $j('jPlay').textContent = '❚❚ Pausa'; const step = Math.max(60, Math.round(4200 / SCN[SIM.i].m)); SIM.play = setInterval(() => { if (!document.body.contains($j('jTl'))) { parar(); return; } SIM.m++; $j('jTl').value = SIM.m; upd(); if (SIM.m >= SCN[SIM.i].m) parar(); }, step); };
     $j('jTl').oninput = e => { parar(); SIM.m = +e.target.value; upd(); };
     $j('jAp').onchange = e => { SIM.ap = e.target.checked; upd(); };
@@ -5782,7 +5805,7 @@ chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....
   function parar() { if (SIM.play) { clearInterval(SIM.play); SIM.play = null; } const p = $j('jPlay'); if (p) p.textContent = '▶ Reproducir'; }
   function upd() {
     const sc = SCN[SIM.i];
-    $j('jScn').innerHTML = SCN.map((s, i) => `<button type="button" class="jchip" style="--c:#ffc46b" aria-pressed="${i === SIM.i}" data-jscn="${i}">${s.n}</button>`).join('');
+    $j('jScn').innerHTML = SCN.map((s, i) => `<button type="button" class="jchip" style="--c:${s.hip ? '#7dffb0' : '#ffc46b'}" aria-pressed="${i === SIM.i}" data-jscn="${i}">${s.n}</button>`).join('');
     $j('jScn').querySelectorAll('[data-jscn]').forEach(x => x.onclick = () => { parar(); SIM.i = +x.dataset.jscn; SIM.m = 0; upd(); });
     $j('jScnD').textContent = sc.d; const tl = $j('jTl'); tl.max = sc.m; if (SIM.m > sc.m) SIM.m = sc.m; tl.value = SIM.m;
     const ap = SIM.ap ? SIM.apM : 0; RUN = calc(ap); const R = RUN, m = SIM.m;
@@ -5796,6 +5819,21 @@ chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....
       : R.rec === 0 ? 'Tu tesoro nunca quedó abajo de lo que pusiste en este escenario.' : `Si no vendías en lo más bajo, en ${R.rec} meses volvías a tener tu dinero.`;
     if (ap) { const r0 = calc(0).rec; if (R.rec !== null && (r0 === null || r0 > R.rec)) L += ` Siguiendo con tus aportaciones compraste más barato y te recuperaste ${r0 === null ? 'aunque sin aportar no alcanzabas' : (r0 - R.rec) + ' meses antes'}.`; }
     else L += ' Prueba activar "Seguí aportando" para ver qué pasa si no te detienes.';
+    // el dólar: cuánto cambió y cuánto amortiguó (o restó)
+    const dm = SER.DOLAR[m], dN = sc.D ? lerp(sc.D, sc.m) / 100 : 1, usdTot = TOT0 ? JORD.reduce((a, k) => a + VAL0[k] * USD[k], 0) / TOT0 : 0;
+    $j('jFxRow').hidden = !sc.D;
+    if (sc.D) {
+      const px = v => '$' + (sc.p0 * v).toFixed(2);
+      $j('jFxS').textContent = (sc.p0 ? px(1) + ' → ' + px(dm) + ' por dólar' : 'índice 100 → ' + Math.round(dm * 100)) + ' · ' + Math.round(usdTot * 100) + '% de tu ciudad está en dólares';
+      $j('jFxD').innerHTML = SIM.fx ? `<span class="${dm >= 1 ? 'jup' : 'jdn'}">${pct((dm - 1) * 100)}</span>` : '<small>apagado</small>';
+      if (SIM.fx && usdTot > 0) {
+        const sin = calc(ap, true), lowSin = (sin.tot[sin.low] - sin.inv[sin.low]) / sin.inv[sin.low] * 100, lowCon = ld / R.inv[R.low] * 100; calc(ap);
+        if (sc.hip) L += dN >= 1 ? ` Sin que la bolsa se moviera, tu ciudad vale más en pesos porque el ${Math.round(usdTot * 100)}% está en dólares. Es la otra cara: cuando el peso se fortalece, pasa lo contrario.`
+          : ` Sin que la bolsa se moviera, tu ciudad vale menos en pesos porque el ${Math.round(usdTot * 100)}% está en dólares. Por eso conviene tener también cosas en pesos, como Obras públicas e Inmuebles.`;
+        else if (dN > 1.03 && lowCon > lowSin + .5) L += ` El dólar subió ${pct((dN - 1) * 100)} en esos meses y amortiguó el golpe: sin el tipo de cambio, lo más bajo habría sido ${pct(lowSin)} en vez de ${pct(lowCon)}.`;
+        else if (dN < .97) L += ` En esta crisis el peso se fortaleció (el dólar bajó ${pct((dN - 1) * 100)}), así que lo que tienes en dólares valió menos en pesos. Apaga "Con el dólar" para comparar.`;
+      }
+    }
     $j('jLes').textContent = L;
     $j('jBrr').innerHTML = JORD.filter(k => VAL0[k] > 0).map(k => { const ch = SER[k][m] / SER[k][0] - 1, na = k === 'BITCOIN' && !sc.B;
       return `<div class="jrow"><div class="ic" style="background:${BAR[k].c}22">${pixSVG(k, BAR[k].c, 20)}</div><div class="nm">${BAR[k].n}<small>${fmt(R.per[0][k])} → ${fmt(R.per[m][k])}</small></div><div class="dv ${na ? '' : ch >= 0 ? 'jup' : 'jdn'}">${na ? '<small>no existía</small>' : pct(ch * 100)}</div></div>`; }).join('');
@@ -5814,6 +5852,9 @@ chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....
     g.strokeStyle = '#eef1f8'; g.lineWidth = 1; g.beginPath(); g.moveTo(X(SIM.m), pt); g.lineTo(X(SIM.m), H - pb); g.stroke(); g.fillStyle = '#eef1f8'; g.beginPath(); g.arc(X(SIM.m), Y(R.tot[SIM.m]), 5, 0, 7); g.fill();
     g.fillStyle = '#9ba6c6'; g.font = '11px "IBM Plex Mono",monospace'; g.textAlign = 'left'; g.fillText(mLab(0), pl, H - 8); g.textAlign = 'right'; g.fillText(mLab(N), W - pr, H - 8);
     g.textAlign = 'left'; g.fillText(R.ap ? '- - lo que pusiste' : '- - tu dinero al inicio', pl, 11);
+    if (SIM.fx && SCN[SIM.i].D) { const Dv = SER.DOLAR, dmn = Math.min(...Dv), dmx = Math.max(...Dv), Yd = v => pt + 18 + (H - pt - pb - 36) * (1 - (v - dmn) / Math.max(.01, dmx - dmn));
+      g.setLineDash([2, 3]); g.strokeStyle = '#7dffb0'; g.lineWidth = 1.5; g.beginPath(); Dv.forEach((v, m) => m ? g.lineTo(X(m), Yd(v)) : g.moveTo(X(m), Yd(v))); g.stroke(); g.setLineDash([]);
+      g.fillStyle = '#7dffb0'; g.textAlign = 'right'; g.fillText('· · dólar', W - pr, 11); }
   }
   function city() {
     const cv = $j('jSc'), g = cv.getContext('2d'), W = cv.width, H = cv.height, R = RUN, m = SIM.m; g.imageSmoothingEnabled = false;
@@ -6006,13 +6047,14 @@ window.MAREA = (() => {
   const META2 = 20000;   // la Fundación planea una ciudad de $20,000: alcanza para títulos completos en cada barrio
   const NIVELES = [[10000, 'Nivel 1'], [20000, 'Nivel 2'], [50000, 'Nivel 3'], [100000, 'Nivel 4'], [250000, 'Nivel 5'], [500000, 'Nivel 6'], [1000000, 'Nivel 7']];
   const RANGOS = [[0, 'Aprendiz'], [3, 'Administrador'], [6, 'Tesorero'], [12, 'Gobernador'], [24, 'Gobernador de la Marea'], [36, 'Leyenda de la Marea']];
+  const mesesCeremonia = () => { const ms = (String(J && J.meses_rebalanceo || '3,9').match(/\d+/g) || []).map(Number).filter(x => x >= 1 && x <= 12).map(x => MESES[x - 1]); return ms.length ? ms.length === 1 ? ms[0] : ms.slice(0, -1).join(', ') + ' y ' + ms[ms.length - 1] : 'los meses de ceremonia'; };
   const AYUDA = {
     fundacion: 'Así se funda tu ciudad: primero lo más seguro y al final lo más arriesgado. Cada paso te explica por qué se invierte ahí y qué puede pasar. Tú decides: puedes saltar lo que no esté en tu plan y ganas los mismos créditos.',
     mercado: 'Aquí ves cómo se movieron tus inversiones. Cada barrio es un tipo de inversión: si sube se encienden sus luces y si baja llueve. Es normal que el mercado suba y baje; lo importante es seguir tu plan.',
     plano: 'Tu plan dice qué parte de tu dinero va en cada tipo de inversión. La franja es el margen que aceptas. Si un barrio se sale de su franja, lo acomodas en la siguiente ceremonia.',
     tesoreria: 'Cada mes registras lo que tienes y aportas algo nuevo. La misión te dice dónde conviene poner la aportación para acercarte a tu plan. Cualquier monto cuenta para tu racha.',
     ingresos: 'Tus inversiones también te pagan: los CETES dan intereses, las FIBRAs reparten rentas y algunos ETFs dan dividendos. Aquí ves un estimado de cuánto produce tu ciudad.',
-    ayto: 'Tus metas, el cierre del mes y, en marzo y septiembre, la ceremonia de reordenamiento.',
+    ayto: () => 'Tus metas, el cierre del mes y, en ' + mesesCeremonia() + ', la ceremonia de reordenamiento.',
     bitacora: 'Tus créditos y los reportes de tu ciudad mes a mes.',
     cartas: 'Abre sobres y colecciona cartas que explican cómo ganan dinero las empresas, los edificios de tus FIBRAs, las obras de México y el bitcoin. Ganas un sobre por cada mes que registras tu aportación.',
     simula: 'Tu dinero de hoy pasando por una crisis real del pasado: cuánto hubiera bajado y cuánto tardó en volver, con y sin aportaciones. Es aproximado y sirve para entender, no para predecir.'
@@ -6356,11 +6398,16 @@ window.MAREA = (() => {
     B.plano.innerHTML = `<div class="mlead mlead-row"><div><h2>Plano de tu ciudad</h2><p>Cada barrio contra la ${term('Meta', 'meta')} que tú pusiste. La franja es tu ${term('Banda', 'banda')}: mientras el punto esté dentro, no hay que mover nada.</p></div>
       <button type="button" class="mbtn pri" data-plano="1" ${hecho ? 'disabled' : ''}>${hecho ? 'Revisado esta semana' : 'Confirmar revisión semanal'} <small>${hecho ? '' : '+10'}</small></button></div>
       <div class="mgrid">${ORDER.filter(k => model.classes[k].objetivo > 0 || model.classes[k].valor > 0).map(k => {
-        const c = model.classes[k], g = (model.groups || []).find(x => x.key === k), tol = g && g.tol != null ? +g.tol : BAND(), lo = Math.max(0, c.objetivo - tol), hi = c.objetivo + tol;
-        const mx = Math.max(60, Math.ceil((Math.max(c.pct, hi) + 5) / 10) * 10), ok = Math.abs(c.pct - c.objetivo) <= tol + 1e-9;
-        const est = ok ? ['En banda', 'var(--ok)'] : c.pct > hi ? ['Arriba de su banda', 'var(--warn)'] : ['Abajo de su banda', 'var(--warn)'];
+        const c = model.classes[k], g = (model.groups || []).find(x => x.key === k), porParte = !(g && g.tol != null), filas = porParte ? BD.filter(b => b.tol != null && b.items.some(i => i.key === k)) : [];
+        // si el barrio se mide por partes (Fábricas con tres instrumentos), el Plano usa las mismas tolerancias que el Semáforo
+        const tol = porParte ? (filas.length ? filas.reduce((a, b) => a + +b.tol, 0) : BAND()) : +g.tol, lo = Math.max(0, c.objetivo - tol), hi = c.objetivo + tol;
+        const mx = Math.max(60, Math.ceil((Math.max(c.pct, hi) + 5) / 10) * 10);
+        const corto = b => String(b.name).replace(/^[^·]+·\s*/, '').replace(/\s*\(.*\)\s*$/, '');
+        const malas = filas.filter(b => b.state === 'over' || b.state === 'under'), ok = porParte && filas.length ? !malas.length : Math.abs(c.pct - c.objetivo) <= tol + 1e-9;
+        const est = ok ? ['En banda', 'var(--ok)'] : porParte && filas.length ? [malas.map(b => corto(b) + (b.state === 'over' ? ' arriba' : ' abajo')).join(', '), 'var(--warn)'] : c.pct > hi ? ['Arriba de su banda', 'var(--warn)'] : ['Abajo de su banda', 'var(--warn)'];
+        const tolTxt = porParte && filas.length ? filas.map(b => corto(b) + ' ±' + b.tol).join(' · ') : '± ' + tol;
         return `<article class="mcard" style="--c:${CLS[k].color}"><h3><span class="mbadge">${ico(k)}</span>${CLS[k].scene} <span class="mpill" style="--c:${est[1]}">${est[0]}</span></h3>
-          <div class="mrow"><span>Hoy ${pct1(c.pct)} · meta ${pct1(c.objetivo)} ± ${tol}</span><b>${money(c.valor)}</b></div>
+          <div class="mrow"><span>Hoy ${pct1(c.pct)} · meta ${pct1(c.objetivo)} ${tolTxt}</span><b>${money(c.valor)}</b></div>
           <div class="mbar" role="img" aria-label="${CLS[k].scene}: ${pct1(c.pct)} contra meta ${pct1(c.objetivo)}"><div class="band" style="left:${lo / mx * 100}%;width:${(hi - lo) / mx * 100}%"></div><div class="goal" style="left:${c.objetivo / mx * 100}%"></div><div class="now" style="left:${Math.min(100, c.pct / mx * 100)}%"></div></div>
           <div class="mscale"><span>0%</span><span>${mx}%</span></div></article>`;
       }).join('')}</div><p class="foot">Abajo está el semáforo detallado de tus metas, instrumento por instrumento.</p>`;
@@ -6655,7 +6702,7 @@ window.MAREA = (() => {
   }
   $('mGuia').onclick = () => guia(0);
   $('mVis').onclick = () => JUEGO.visitas();
-  $('mQue').onclick = () => { const t = (SCR.find(x => x[0] === cur) || [, ''])[1]; modal(`<div class="mmhead"><div><small>¿Qué es esto?</small><h2>${t}</h2></div><button type="button" class="mbtn" data-close>Cerrar</button></div><p class="mguia">${AYUDA[cur] || ''}</p>`); };
+  $('mQue').onclick = () => { const t = (SCR.find(x => x[0] === cur) || [, ''])[1]; modal(`<div class="mmhead"><div><small>¿Qué es esto?</small><h2>${t}</h2></div><button type="button" class="mbtn" data-close>Cerrar</button></div><p class="mguia">${typeof AYUDA[cur] === 'function' ? AYUDA[cur]() : AYUDA[cur] || ''}</p>`); };
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrar(); const g = $('mGloss'); if (g) g.hidden = true; } });
   // los saltos que hacía el menú anterior ahora llevan a las pantallas nuevas
   window.goSec = (sec, elId) => go(OLD[sec] || sec, elId);
