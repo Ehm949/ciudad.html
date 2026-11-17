@@ -827,6 +827,27 @@ details.mcalc p{margin:6px 0 0}
 .jthumb .jcard .band .sello canvas{width:7px;height:7px}
 .jthumb .jcard.full .art{min-height:55%}
 @media (prefers-reduced-motion:reduce){.jcard .art .holo{animation:none}}
+
+/* laboratorio */
+#labBtn{position:fixed;z-index:300;left:max(12px,env(safe-area-inset-left,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 86px);font-family:var(--f-display);font-size:12px;letter-spacing:.08em;border:2px solid #ff4f9a;background:#1a0b1e;color:#ff9ac8;border-radius:12px;padding:8px 10px;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.5)}
+#labPanel{position:fixed;z-index:301;left:max(12px,env(safe-area-inset-left,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 132px);width:min(380px,calc(100vw - 24px));max-height:min(70vh,640px);overflow:auto;background:#130a1c;border:1px solid #ff4f9a88;border-radius:16px;padding:12px 14px;box-shadow:0 18px 50px rgba(0,0,0,.6);color:var(--fg)}
+#labPanel[hidden]{display:none}
+#labPanel .lh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+#labPanel .lh b{font-family:var(--f-display);font-weight:400;font-size:15px;color:#ff9ac8}
+#labPanel .lh span{font-size:11.5px;color:var(--muted);flex:1}
+#labPanel .lx{border:0;background:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1}
+#labPanel .lest{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
+#labPanel .lest span{font-size:11px;font-family:var(--f-data);background:#2a1430;border-radius:999px;padding:2px 8px}
+#labPanel .lmsg{font-size:12.5px;background:#2a1430;border-left:3px solid #ff9ac8;border-radius:0 8px 8px 0;padding:6px 8px;margin:6px 0}
+#labPanel h4{margin:12px 0 6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+#labPanel .lg{display:flex;flex-wrap:wrap;gap:6px}
+#labPanel .lb{font:inherit;font-size:12.5px;font-weight:700;border:1px solid #4a2a50;background:#22122a;color:var(--fg);border-radius:10px;padding:6px 9px;cursor:pointer}
+#labPanel .lb:hover{border-color:#ff9ac8}
+#labPanel .lb.pri{background:#ff4f9a;color:#1a0610;border-color:#ff4f9a}
+#labPanel .lb.no{border-color:#ff7a7a;color:#ff9a9a}
+#labPanel .lb[aria-pressed=true]{border-color:#ff9ac8;color:#ff9ac8}
+#labPanel .lnota{font-size:12.5px;color:var(--muted);margin:0}
+#labPanel button:focus-visible,#labBtn:focus-visible{outline:2px solid #ffc46b;outline-offset:2px}
 </style>
 </head>
 <body>
@@ -1650,7 +1671,8 @@ const CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbwQ27XpCTCNOmOPxSGCu7gB8UJx40QPaoAlyXx2rvORM31OER6X9GQABBMS88Do-wCGIw/exec'   // URL /exec de tu Apps Script. Vacío = modo demostración
 };
 CONFIG.AVISO_URL = CONFIG.AVISO_URL || 'aviso-privacidad.html';   // tu aviso de privacidad (archivo en el mismo sitio o liga completa)
-const DEMO = !CONFIG.API_URL;
+let DEMO = !CONFIG.API_URL;
+try { if (sessionStorage.getItem('cm_lab') === '1') DEMO = true; } catch (_) {}
 
 // Valores por defecto; los reales vienen de la pestaña Juego de tu hoja
 const JUEGO_DEF = {
@@ -1877,7 +1899,7 @@ function demoApi(accion, data) {
 // ================= API =================
 let token = null;
 async function api(accion, data = {}) {
-  if (DEMO) { await new Promise(r => setTimeout(r, 250)); return demoApi(accion, data); }
+  if (DEMO) { await new Promise(r => setTimeout(r, 250)); return window.LAB && LAB.on() ? LAB.api(accion, data) : demoApi(accion, data); }
   const res = await fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ accion, token, ...data }) });
   if (!res.ok) throw new Error('El servidor respondió ' + res.status + '. Inténtalo en un momento.');
   const j = await res.json();
@@ -2118,7 +2140,8 @@ $('loginForm').addEventListener('submit', async e => {
   e.preventDefault();
   const btn = $('lgBtn'); btn.disabled = true; $('lgErr').textContent = '';
   try {
-    const r = await api('login', { usuario: $('lgUser').value, pin: $('lgPin').value });
+    const esLab = $('lgUser').value.trim().toLowerCase() === 'laboratorio';
+    const r = esLab ? await LAB.entrar($('lgPin').value) : await api('login', { usuario: $('lgUser').value, pin: $('lgPin').value });
     resetState();
     token = r.token;
     try { sessionStorage.setItem('cm_token', token); sessionStorage.setItem('cm_name', r.nombre || $('lgUser').value); } catch (_) {}
@@ -2127,12 +2150,14 @@ $('loginForm').addEventListener('submit', async e => {
     await loadData();
     showApp();
     if (r.cambiar) AUTH.pedir(true);
+    if (esLab) LAB.panel();
   } catch (err) { $('lgErr').textContent = err.message; }
   btn.disabled = false;
 });
 $('btnOut').addEventListener('click', () => logout(false));
 async function logout(expired) {
   if (!expired) { try { await api('salir'); } catch (_) {} }
+  if (window.LAB && LAB.on()) LAB.salir();
   token = null;
   try { sessionStorage.removeItem('cm_token'); sessionStorage.removeItem('cm_name'); sessionStorage.removeItem('cm_datos'); } catch (_) {}
   resetState();
@@ -5137,6 +5162,7 @@ function wireWizard(box) {
   $('resume').hidden = false;
   $('btnResume').onclick = async () => {
     $('btnResume').disabled = true;
+    if (window.LAB && LAB.on()) { LAB.inicio(); setTimeout(() => LAB.panel(), 0); }
     token = t;
     let copia = null; try { copia = JSON.parse(sessionStorage.getItem('cm_datos') || 'null'); } catch (_) {}
     if (copia && copia.ok) {   // se pinta al instante con la copia y se actualiza en segundo plano
@@ -6283,6 +6309,147 @@ chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....
   return { alAbrir, cartas, simula, sobres, reset, simulacro, quizaSimulacro, visitas, salirVisita, visitando: () => !!VIS, simulando: () => simOn };
 })();
 
+// ================= Laboratorio: cuenta de administrador para probar como usuario nuevo =================
+// Entra con usuario "laboratorio". Todo pasa en este navegador con datos inventados: nunca toca tu hoja ni tu cuenta real.
+window.LAB = (() => {
+  const CLAVE = 'marea-lab';
+  const NOMBRE = 'Usuario de prueba';
+  const ss = { get: k => { try { return sessionStorage.getItem(k); } catch (_) { return null; } }, set: (k, v) => { try { v == null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); } catch (_) {} } };
+  const ls = { get: k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (_) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} } };
+  const BASE = DEMO_CATALOGO.map(c => ({ activo: c.activo, cambio_dia: c.cambio_dia }));
+  let S = null;   // estado del laboratorio
+  const on = () => ss.get('cm_lab') === '1';
+  function nuevo() {
+    return { div: false, evento: false, mkt: null, temp: '', fecha: Date.now(), pos: [], rfp: [], hist: [], metas: [], E: { creditos: 0, claves: [], construidos: ['BOLSA'], ceremonias: 0, movimientos: [], fund: {} } };
+  }
+  function guardar() {
+    if (!on()) return; const E = window.MAREA && MAREA.demoE ? MAREA.demoE() : null;
+    S.pos = demoPos; S.rfp = demoRfp; S.hist = demoHist; S.metas = demoMetas;
+    if (E) S.E = { creditos: E.creditos, claves: E.claves, construidos: E.construidos, ceremonias: E.ceremonias, movimientos: E.movimientos.slice(0, 40), fund: E.fund };
+    ls.set('cm_lab_estado', S);
+  }
+  function cargar() {
+    S = ls.get('cm_lab_estado') || nuevo();
+    demoPos = S.pos || []; demoRfp = S.rfp || []; demoHist = S.hist || []; demoMetas = S.metas || [];
+    const E = window.MAREA && MAREA.demoE ? MAREA.demoE() : null; if (E && S.E) Object.assign(E, S.E);
+    mercado(S.mkt, true); window.CM_TEMP = S.temp ? S.temp : undefined;
+  }
+  // el mercado de hoy: un % por barrio (o null = como viene en la demo)
+  function mercado(mkt, quieto) {
+    DEMO_CATALOGO.forEach(c => { const b = BASE.find(x => x.activo === c.activo); const k = classKey(c.clase);
+      c.cambio_dia = mkt && mkt[k] != null ? Math.round((mkt[k] + (b ? (b.cambio_dia || 0) * .15 : 0)) * 100) / 100 : b ? b.cambio_dia : 0; });
+    if (!quieto) { S.mkt = mkt; guardar(); }
+  }
+  // respuesta del servidor de prueba: la de la demo, pero con el nombre de prueba y sin pagos si no los pediste
+  function api(accion, data) {
+    if (accion === 'login' || accion === 'registro') return { ok: true, token: 'lab', nombre: NOMBRE };
+    const r = demoApi(accion, data);
+    if (r && r.posiciones) {
+      r.nombre = NOMBRE;
+      if (!S.div) r.dividendos = []; else r.dividendos = (r.dividendos || []).map(d => d.proximo ? d : Object.assign({}, d, { fecha: new Date().toISOString().slice(0, 10) }));
+      if (!S.evento) r.eventos = [];
+    }
+    guardar();
+    return r;
+  }
+  async function entrar(pin) {
+    if (pin !== CLAVE) throw new Error('Esa no es la clave del laboratorio.');
+    ss.set('cm_lab', '1'); DEMO = true; cargar();
+    const r = await window.api('login', { usuario: 'laboratorio', pin });
+    return r;
+  }
+  function salir() { ss.set('cm_lab', null); DEMO = !CONFIG.API_URL; window.CM_TEMP = undefined; const p = document.getElementById('labPanel'); if (p) p.remove(); const b = document.getElementById('labBtn'); if (b) b.remove(); }
+  // ---------- acciones del panel ----------
+  const borrarLocal = () => { try { Object.keys(localStorage).filter(k => k.startsWith('cm_') && k.endsWith('_' + NOMBRE)).forEach(k => localStorage.removeItem(k)); Object.keys(sessionStorage).filter(k => k.endsWith('_' + NOMBRE)).forEach(k => sessionStorage.removeItem(k)); } catch (_) {} };
+  async function recargar(msg) { guardar(); try { apply(await window.api('datos')); } catch (e) { aviso(e.message); return; } if (window.MAREA) MAREA.render(); if (msg) aviso(msg); pintarPanel(); }
+  async function desdeCero() {
+    S = nuevo(); ls.set('cm_lab_estado', S); borrarLocal(); demoPos = []; demoRfp = []; demoHist = []; demoMetas = []; mercado(null, true); window.CM_TEMP = undefined;
+    const E = MAREA.demoE(); Object.assign(E, S.E, { claves: [], movimientos: [], construidos: ['BOLSA'], fund: {} });
+    resetState(); await loadData(); if (window.MAREA) { MAREA.reset(); MAREA.render(); MAREA.go('fundacion'); }
+    aviso('Eres un usuario nuevo: terreno vacío, sin metas, sin racha y sin pagos.'); pintarPanel();
+  }
+  function racha(n) {
+    if (!demoPos.length) { aviso('Primero registra algo en la Tesorería.'); return; }
+    const rows = []; let mm = ym(new Date());
+    for (let i = 0; i < n; i++) { const f = 1 - i * .06; rows.unshift({ mes: mm, ...demoSnapshot(Math.max(.2, f), 1) }); mm = prevYm(mm); }
+    demoHist = rows; recargar(`Racha simulada: ${n} ${n === 1 ? 'mes' : 'meses'} aportando.`);
+  }
+  async function metas(id) {
+    if (id) { const r = demoApi('metas_plantilla', { plantilla: id }); const ms = r.metas.map(x => ({ grupo: x.grupo, objetivo_pct: x.objetivo_pct, modo: x.grupo === 'Acciones' ? 'varios' : 'uno', reparto: x.grupo === 'Acciones' ? [{ activo: 'VUAA', peso_pct: 60 }, { activo: 'VEA', peso_pct: 30 }, { activo: 'VWO', peso_pct: 10 }] : [] }));
+      demoApi('guardar_metas', { metas: ms, plantilla: id }); }
+    else demoMetas = [];
+    recargar(id ? 'Metas puestas con una plantilla.' : 'Metas borradas.');
+  }
+  function sembrar() {
+    demoPos = [{ activo: 'VUAA', titulos: 20, precio_promedio: 2200 }, { activo: 'FUNO11', titulos: 400, precio_promedio: 30 }, { activo: 'FIBRAPL14', titulos: 100, precio_promedio: 75 }, { activo: 'Cetes 91 días', saldo: 30000 }, { activo: 'Bitcoin', titulos: 0.01, precio_promedio: 1350000 }];
+    const cm = ym(new Date()); demoHist = demoHist.filter(r => r.mes !== cm).concat([{ mes: cm, ...demoSnapshot(1, 1) }]);
+    recargar('Portafolio de ejemplo cargado (sin pasar por la Tesorería).');
+  }
+  function reiniciarVisto(que) {
+    const k = { aperturas: ['cm_abre_'], resumen: ['cm_visita_'], cartas: ['cm_album_', 'cm_abiertos_'], simulacro: ['cm_simulacro_'] }[que] || [];
+    try { Object.keys(localStorage).filter(x => k.some(p => x.startsWith(p)) && x.endsWith(NOMBRE)).forEach(x => localStorage.removeItem(x)); Object.keys(sessionStorage).filter(x => x.startsWith('cm_visto_')).forEach(x => sessionStorage.removeItem(x)); } catch (_) {}
+    if (que === 'aperturas') { const E = MAREA.demoE(); E.fund = Object.assign({}, E.fund, { abiertas: [] }); }
+    if (que === 'resumen') { const f = { t: Date.now() - 2 * 864e5, c: {} }; ORDER.forEach(k => { const c = model.classes[k]; f.c[k] = [c.valor * (k === 'BITCOIN' ? 1.06 : k === 'ACCIONES' ? .985 : .995), c.costo]; }); ls.set('cm_visita_' + NOMBRE, f); }
+    guardar(); aviso({ aperturas: 'Las aperturas y presentaciones se reiniciaron. Recarga la página para verlas como la primera vez.', resumen: 'Simulé que tu última visita fue hace 2 días. Recarga la página para ver el resumen.', cartas: 'Álbum y sobres reiniciados.', simulacro: 'Simulacro reiniciado.' }[que]);
+  }
+  function escena(tipo) {
+    if (!window.ESCENA || !model || !model.total) { aviso('Primero registra algo en la Tesorería.'); return; }
+    const a = ESCENA.antes();
+    if (tipo === 'fundacion') { a.total = 0; a.m = {}; }
+    if (tipo === 'obra') { const it = model.items.filter(i => i.valor > 0).sort((x, y) => y.valor - x.valor)[0]; a.m[it.activo] = Object.assign({}, a.m[it.activo], { costo: it.costo * .7, valor: it.valor * .7 }); }
+    if (tipo === 'nuevo') { const it = model.items.filter(i => i.valor > 0).sort((x, y) => x.valor - y.valor)[0]; delete a.m[it.activo]; }
+    if (tipo === 'cosecha') { const it = model.items.filter(i => i.valor > 0).sort((x, y) => y.valor - x.valor)[0]; a.m[it.activo] = Object.assign({}, a.m[it.activo], { costo: it.costo * 1.4, valor: it.valor * 1.4 }); }
+    if (tipo === 'rebal') { const its = model.items.filter(i => i.valor > 0).sort((x, y) => y.valor - x.valor); if (its.length < 2) { aviso('Necesitas al menos dos inversiones.'); return; } a.m[its[0].activo] = Object.assign({}, a.m[its[0].activo], { costo: its[0].costo * 1.3, valor: its[0].valor * 1.3 }); a.m[its[1].activo] = Object.assign({}, a.m[its[1].activo], { costo: its[1].costo * .7, valor: its[1].valor * .7 }); }
+    cerrarPanel(); MAREA.go('mercado'); setTimeout(() => ESCENA.despues(a), 300);
+  }
+  // ---------- panel ----------
+  function aviso(t) { const p = document.getElementById('labMsg'); if (p) { p.textContent = t; p.hidden = false; } }
+  function cerrarPanel() { const p = document.getElementById('labPanel'); if (p) p.hidden = true; }
+  const B = (id, t, cls) => `<button type="button" class="lb${cls ? ' ' + cls : ''}" data-lab="${id}">${t}</button>`;
+  function pintarPanel() {
+    let p = document.getElementById('labPanel'); if (!p) return;
+    const nPos = demoPos.length + demoRfp.length, meses = (demoHist || []).length, mkt = S.mkt ? Object.entries(S.mkt).map(([k, v]) => v).join('/') : 'normal';
+    p.querySelector('#labEstado').innerHTML = `<span>${nPos} inversiones</span><span>${demoMetas.length ? 'con metas' : 'sin metas'}</span><span>${meses} ${meses === 1 ? 'mes' : 'meses'} de historial</span><span>pagos ${S.div ? 'sí' : 'no'}</span><span>mercado ${S.mkt ? 'manual' : 'normal'}</span>`;
+    p.querySelectorAll('[data-temp]').forEach(b => b.setAttribute('aria-pressed', String((S.temp || '') === b.dataset.temp)));
+  }
+  function panel() {
+    if (document.getElementById('labBtn')) return;
+    const b = document.createElement('button'); b.id = 'labBtn'; b.type = 'button'; b.textContent = 'LAB'; b.title = 'Laboratorio de pruebas'; document.body.appendChild(b);
+    const p = document.createElement('div'); p.id = 'labPanel'; p.hidden = true; p.setAttribute('role', 'dialog'); p.setAttribute('aria-label', 'Laboratorio de pruebas');
+    p.innerHTML = `<div class="lh"><b>Laboratorio</b><span>Datos inventados, solo en este navegador</span><button type="button" class="lx" data-lab="cerrar" aria-label="Cerrar">×</button></div>
+      <div class="lest" id="labEstado"></div><p class="lmsg" id="labMsg" hidden></p>
+      <h4>Empezar</h4><div class="lg">${B('cero', 'Usuario nuevo desde cero', 'pri')}${B('sembrar', 'Cargar portafolio de ejemplo')}</div>
+      <h4>Avance del usuario</h4><div class="lg">${B('metas', 'Poner metas (Swensen)')}${B('sinmetas', 'Quitar metas')}${B('r1', 'Racha 1 mes')}${B('r2', 'Racha 2 meses')}${B('r6', 'Racha 6 meses')}${B('r0', 'Sin historial')}${B('div', 'Llega un dividendo hoy')}${B('nodiv', 'Sin pagos')}</div>
+      <h4>Mercado de hoy</h4><div class="lg">${B('m_up2', 'Todo sube fuerte')}${B('m_up', 'Todo sube poco')}${B('m_flat', 'Día plano')}${B('m_dn', 'Todo baja poco')}${B('m_storm', 'Tormenta')}${B('m_btc', 'Solo bitcoin se desploma')}${B('m_norm', 'Como la demo')}</div>
+      <h4>Volver a ver como la primera vez</h4><div class="lg">${B('v_aper', 'Bienvenida y aperturas')}${B('v_res', 'Resumen "desde tu última visita"')}${B('v_cartas', 'Álbum y sobres')}</div>
+      <h4>Escenas de construcción</h4><div class="lg">${B('e_fund', 'Fundación')}${B('e_obra', 'Obra (compra)')}${B('e_nuevo', 'Edificio nuevo')}${B('e_cos', 'Cosecha (venta)')}${B('e_reb', 'Rebalanceo')}${B('e_sim', 'Simulacro de tormenta')}</div>
+      <h4>Temporada</h4><div class="lg">${[['', 'La de hoy'], ['muertos', 'Día de Muertos'], ['navidad', 'Navidad'], ['anio', 'Año nuevo'], ['patrias', 'Fiestas patrias'], ['grito', 'Noche del Grito'], ['aniv', 'Aniversario']].map(([v, t]) => `<button type="button" class="lb" data-temp="${v}" aria-pressed="false">${t}</button>`).join('')}</div>
+      <h4>Visitas</h4><p class="lnota">Para visitar una ciudad de prueba usa el código PRIMO1.</p>
+      <div class="lg" style="margin-top:10px">${B('salir', 'Salir del laboratorio', 'no')}</div>`;
+    document.body.appendChild(p);
+    b.onclick = () => { p.hidden = !p.hidden; if (!p.hidden) pintarPanel(); };
+    p.addEventListener('click', async e => {
+      const t = e.target.closest('[data-lab],[data-temp]'); if (!t) return;
+      if (t.dataset.temp != null) { S.temp = t.dataset.temp; window.CM_TEMP = S.temp || undefined; guardar(); pintarPanel(); aviso('Temporada: ' + t.textContent); return; }
+      const a = t.dataset.lab, MK = v => Object.fromEntries(ORDER.map(k => [k, typeof v === 'function' ? v(k) : v]));
+      if (a === 'cerrar') cerrarPanel();
+      else if (a === 'cero') desdeCero();
+      else if (a === 'sembrar') sembrar();
+      else if (a === 'metas') metas('S1'); else if (a === 'sinmetas') metas(null);
+      else if (a[0] === 'r' && /^r\d$/.test(a)) { const n = +a.slice(1); if (n) racha(n); else { demoHist = []; recargar('Sin historial: racha en cero.'); } }
+      else if (a === 'div') { S.div = true; S.evento = true; recargar('Hoy llega un dividendo de FIBRAPL14 (si tienes esa FIBRA).'); }
+      else if (a === 'nodiv') { S.div = false; S.evento = false; recargar('Sin pagos ni eventos.'); }
+      else if (a.startsWith('m_')) { const v = { m_up2: MK(k => k === 'RENTA_FIJA' ? 0 : 2.6), m_up: MK(k => k === 'RENTA_FIJA' ? 0 : .8), m_flat: MK(0), m_dn: MK(k => k === 'RENTA_FIJA' ? 0 : -.8), m_storm: MK(k => k === 'RENTA_FIJA' ? 0 : k === 'BITCOIN' ? -7 : -3.2), m_btc: MK(k => k === 'BITCOIN' ? -9 : .2), m_norm: null }[a]; mercado(v); recargar('Mercado de hoy cambiado.'); }
+      else if (a === 'v_aper') reiniciarVisto('aperturas'); else if (a === 'v_res') reiniciarVisto('resumen'); else if (a === 'v_cartas') { reiniciarVisto('cartas'); recargar(); }
+      else if (a === 'e_fund') escena('fundacion'); else if (a === 'e_obra') escena('obra'); else if (a === 'e_nuevo') escena('nuevo'); else if (a === 'e_cos') escena('cosecha'); else if (a === 'e_reb') escena('rebal');
+      else if (a === 'e_sim') { cerrarPanel(); JUEGO.simulacro(); }
+      else if (a === 'salir') logout(false);
+    });
+  }
+  function inicio() { if (!on()) return; DEMO = true; cargar(); panel(); }
+  return { on, entrar, salir, api, panel, inicio, guardar, CLAVE };
+})();
+
 window.MAREA = (() => {
   const wrap = $('app').querySelector('.wrap'), header = wrap.querySelector('header.top');
   const mk = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
@@ -7082,7 +7249,7 @@ window.MAREA = (() => {
   function onOff() { document.body.classList.toggle('m-on', !$('app').hidden); }
   new MutationObserver(onOff).observe($('app'), { attributes: true, attributeFilter: ['hidden'] });
   inicio();
-  return { render, go, fromOld, reset, inicio, estado: () => E };
+  return { render, go, fromOld, reset, inicio, estado: () => E, demoE: () => DEMO_E };
 })();
 
 </script>
