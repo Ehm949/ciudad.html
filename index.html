@@ -2880,13 +2880,14 @@ function txt3v(g, s, x, y, c) { for (let k = 0; k < s.length; k++) txt3(g, s[k],
 const BN = { body: '#122230', body2: '#0e1b26', edge: '#34586a', hi: '#4a7a8c', shade: '#08121a', panel: '#061018', led: '#8dffbf', ledD: '#2f7a5a', ledH: 'rgba(125,255,191,.28)', cyan: '#9fe8ff' };
 const TAGN = { 'Cetes 28 días': 'CETES 28D', 'Cetes 91 días': 'CETES 91D', 'Cetes 182 días': 'CETES 182D', 'Cetes 364 días': 'CETES 364D', Udibonos: 'UDIBONOS', Bondia: 'BONDIA' };
 const BNC = {};
+let RFX = 1;   // cuánto se pueden ensanchar los edificios de renta fija cuando su barrio tiene espacio de sobra
 function bonoFor(it, slot, hT) {
-  const key = [it.activo, Math.floor(slot), Math.round(hT / 8)].join('|');
+  const key = [it.activo, Math.floor(slot), Math.round(hT / 8), RFX.toFixed(2)].join('|');
   if (BNC[key]) return BNC[key];
   const a = it.activo.toLowerCase(), R = rng([...it.activo].reduce((s, ch) => s * 31 + ch.charCodeAt(0) | 0, 7));
   const kind = a.includes('udi') ? 'graficas' : a.includes('bondia') ? 'ticker' : 'datos';
   const label = (SHORTN[it.activo] || cleanUp(it.activo)).slice(0, 7);
-  const w = Math.max(16, Math.min(kind === 'boveda' ? 40 : 36, Math.round(slot - 3)));
+  const w = Math.max(16, Math.min(Math.round((kind === 'boveda' ? 40 : 36) * RFX), Math.round(slot - 3)));
   const bodyH = Math.round(kind === 'boveda' ? Math.max(24, Math.min(46, hT * .6)) : Math.max(34, hT));
   const roof = kind === 'boveda' ? 2 : 12, H = bodyH + roof, top = roof;
   const cv = document.createElement('canvas'); cv.width = w; cv.height = H; const g = cv.getContext('2d');
@@ -3220,6 +3221,14 @@ function crane(x, top) {
   px(wb, x - 22, top, 32, 2, '#e2b340'); px(wb, x + 6, top + 2, 4, 3, '#6a5a3a');
   return { x, top };
 }
+// sin bitcoin en el plan y sin bitcoin guardado: el barrio Oro virtual no se dibuja y su espacio es para los demás
+function sinOro() {
+  try {
+    const c = view && view.classes.BITCOIN; if (!c || c.valor > 0 || c.items.some(i => i.valor > 0)) return false;
+    if (typeof hasMetas !== 'function' || !hasMetas()) return false;
+    const m = metasList().find(x => x.grupo === 'Cripto'); return !m || !(num(m.objetivo_pct, 0) > 0);
+  } catch (_) { return false; }
+}
 function layout() {
   dirty = true;
   if (!view || spLeft || !SPI.cielo || !SPI.cielo.naturalWidth) return;
@@ -3228,7 +3237,8 @@ function layout() {
   wb.imageSmoothingEnabled = bgc.imageSmoothingEnabled = ljc.imageSmoothingEnabled = false; wb.clearRect(0, 0, LW, LH);
   bgc.clearRect(0, 0, LW, LH); bgc.drawImage(SPI.cielo, 27, 16, LW, SHORE, 0, 0, LW, SHORE);
   ljc.clearRect(0, 0, LW, LH); ljc.drawImage(SPI.lejos, 27, 16, LW, SHORE, 0, 0, LW, SHORE);
-  const MINP = 13, tot = ORDER.reduce((a, k) => a + Math.max(V.classes[k].pct, MINP), 0) || 1;
+  const ZO = ORDER.filter(k => k !== 'BITCOIN' || !sinOro());
+  const MINP = 13, tot = ZO.reduce((a, k) => a + Math.max(V.classes[k].pct, MINP), 0) || 1;
   const gmax = Math.max(1, ...V.items.map(i => i.valor));
   const used = { torres: new Set(), medios: new Set() };
   const dayPct = V.total - V.hoy > 0 ? V.hoy / (V.total - V.hoy) * 100 : 0;
@@ -3236,26 +3246,27 @@ function layout() {
   zones = {}; let x = 0;
   const MINB = { ACCIONES: 29, FIBRAS: 17, RENTA_FIJA: 19, BITCOIN: 14 };
   const nB = k => { const c = V.classes[k]; const o = c.items.filter(i => i.valor > 0).length + c.items.filter(i => !(i.valor > 0) && i.objetivo > 0 && !i.retirado).length; return o || Math.min(4, c.items.filter(i => !i.retirado).length); };
-  const ZW = {}; ORDER.forEach(k => ZW[k] = LW * Math.max(V.classes[k].pct, MINP) / tot);
+  const ZW = {}; ZO.forEach(k => ZW[k] = LW * Math.max(V.classes[k].pct, MINP) / tot);
   for (let p = 0; p < 4; p++) {   // si a un barrio no le caben sus edificios, se le da más ancho y se les quita a los demás
-    const need = {}; ORDER.forEach(k => need[k] = nB(k) * MINB[k] + 8);
-    const fixed = ORDER.filter(k => ZW[k] < need[k]); if (!fixed.length) break;
-    const fw = fixed.reduce((a, k) => a + need[k], 0), free = ORDER.filter(k => !fixed.includes(k)), fs = free.reduce((a, k) => a + ZW[k], 0) || 1;
+    const need = {}; ZO.forEach(k => need[k] = nB(k) * MINB[k] + 8);
+    const fixed = ZO.filter(k => ZW[k] < need[k]); if (!fixed.length) break;
+    const fw = fixed.reduce((a, k) => a + need[k], 0), free = ZO.filter(k => !fixed.includes(k)), fs = free.reduce((a, k) => a + ZW[k], 0) || 1;
     fixed.forEach(k => ZW[k] = need[k]); free.forEach(k => ZW[k] = Math.max(need[k], (LW - fw) * ZW[k] / fs));
-    const sum = ORDER.reduce((a, k) => a + ZW[k], 0); if (sum > LW) ORDER.forEach(k => ZW[k] *= LW / sum);
+    const sum = ZO.reduce((a, k) => a + ZW[k], 0); if (sum > LW) ZO.forEach(k => ZW[k] *= LW / sum);
   }
-  ORDER.forEach(k => {
+  ZO.forEach(k => {
     const c = V.classes[k], zw = ZW[k];
     const z = { k, x, w: zw, items: [], top: SHORE, flash: 0, bolt: 2 + R() * 4,
       down: k !== 'RENTA_FIJA' && c.hoy < 0, storm: stormAll || !!(EV && EV.storms && EV.storms.find(s => s.k === k)) };
     if (k === 'FIBRAS') niebla(x, zw);
     const tg = wb.createLinearGradient(0, 30, 0, SHORE); tg.addColorStop(0, CLS[k].color + '00'); tg.addColorStop(1, CLS[k].color + '1c');
     wb.fillStyle = tg; wb.fillRect(Math.round(x), 30, Math.round(zw), SHORE - 30);
-    if (k !== 'BITCOIN') for (let yy = 70; yy < SHORE; yy += 3) px(wb, x + zw - 1, yy, 1, 1, 'rgba(238,241,248,.12)');
+    if (k !== ZO[ZO.length - 1]) for (let yy = 70; yy < SHORE; yy += 3) px(wb, x + zw - 1, yy, 1, 1, 'rgba(238,241,248,.12)');
     let list = c.items.filter(i => i.valor > 0).sort((a, b) => b.valor - a.valor)
       .concat(c.items.filter(i => !(i.valor > 0) && i.objetivo > 0 && !i.retirado));
     if (!list.length) list = c.items.filter(i => !i.retirado).slice(0, 4);   // barrio sin edificios: se ven sus lotes vacíos
     const inner = zw - 6, n = list.length;
+    RFX = k === 'RENTA_FIJA' && n ? Math.max(1, Math.min(2, inner / n / 42)) : 1;
     if (n) {
       const minW = Math.min(k === 'BITCOIN' ? 12 : 15, inner / n);
       const wt = list.map(it => it.valor > 0 ? Math.max(.22, Math.sqrt(it.valor / gmax)) : .3);
@@ -3270,7 +3281,7 @@ function layout() {
         const b = { it, x: bx, w: slot, owned: it.valor > 0, kind: kindOf(k, it), top: SHORE - 20, cx: bx + slot / 2 };
         if (!b.owned) b.fw = Math.max(5, Math.round(slot - 2));
         else {
-          const hT = k === 'ACCIONES' ? 46 + 104 * hN : k === 'FIBRAS' ? 46 + 130 * hN : k === 'RENTA_FIJA' ? 30 + 70 * hN : 20 + 18 * Math.min(1, hN * 2);
+          const hT = k === 'ACCIONES' ? 46 + 104 * hN : k === 'FIBRAS' ? 46 + 130 * hN : k === 'RENTA_FIJA' ? (30 + 70 * hN) * (1 + (RFX - 1) * .7) : 20 + 18 * Math.min(1, hN * 2);
           b.hT = hT; b.mk = sl2 => k === 'RENTA_FIJA' ? bonoFor(it, sl2, hT) : k === 'BITCOIN' ? cristalFor(it, sl2, hT, it.cambio_dia < 0) : neonFor(it, k, sl2, hT, it.cambio_dia < 0);
           b.bd = b.mk(slot); b.fw = b.bd.foot.x1 - b.bd.foot.x0 + 1;
         }
@@ -3315,6 +3326,7 @@ function layout() {
     if (k === 'BITCOIN') { const r = sunRad(zw); z.top = Math.min(z.top, sunY(r) - r - 10); }   // la cámara también enfoca el sol
     zones[k] = z; x += zw;
   });
+  { const ch = document.querySelector('#chips [data-k="BITCOIN"]'); if (ch) ch.hidden = !zones.BITCOIN; if (focus && !zones[focus]) focus = null; }
   // malecón con faroles
   px(wb, 0, SHORE, LW, 4, '#0a0f24'); px(wb, 0, SHORE, LW, 1, '#1d2752');
   for (let xx = 6; xx < LW; xx += 18) { px(wb, xx, SHORE - 5, 1, 5, '#2a3558'); px(wb, xx - 1, SHORE - 6, 3, 1, '#ffd36b'); }
