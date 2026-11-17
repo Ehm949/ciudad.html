@@ -781,6 +781,32 @@ body.m-visita #lvlTag{display:none!important}
 
 .jfxrow{margin-top:-4px}
 .jfxrow[hidden]{display:none}
+
+.jlogros{list-style:none;margin:0 0 12px;padding:10px 12px;background:rgba(255,196,107,.08);border-radius:12px;display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600}
+.jflama{display:inline-block;animation:jflama .7s ease-in-out infinite alternate}
+@keyframes jflama{from{transform:scale(1) rotate(-6deg)}to{transform:scale(1.25) rotate(6deg)}}
+@media (prefers-reduced-motion:reduce){.jflama{animation:none}}
+
+/* apertura progresiva */
+.mtab.lock{opacity:.5}
+.mtab .mlock{position:absolute;top:4px;right:6px;width:14px;height:14px;color:var(--muted)}
+.mtab .mlock svg{width:100%;height:100%}
+.mlink.lock{opacity:.55}
+.mlink.lock::after{content:" 🔒";font-size:.85em}
+.jpres{--c:#ffc46b;display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
+.jpres canvas{width:96px;height:114px;image-rendering:pixelated;flex:none;border-radius:14px;background:radial-gradient(circle at 50% 45%,color-mix(in srgb,var(--c) 35%,#1c2646),#10172c);border:1px solid color-mix(in srgb,var(--c) 45%,var(--line))}
+.jpres small{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--c);font-weight:800}
+.jpres b{display:block;font-family:var(--f-display);font-weight:400;font-size:18px;margin:2px 0 6px}
+.jpres p{margin:0 0 6px;font-size:15px;line-height:1.4}
+.jpres .jcand{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;background:var(--panel2);color:var(--muted);flex:none}
+.jbrilla .goal{animation:jbrilla 1s ease-in-out 6 alternate}
+.jbrilla .band{animation:jbanda 1s ease-in-out 6 alternate}
+@keyframes jbrilla{to{box-shadow:0 0 0 3px #fff,0 0 18px 6px #ffc46b;transform:scaleY(1.3)}}
+@keyframes jbanda{to{background:rgba(255,196,107,.45)}}
+details.mcalc{margin-top:6px}
+details.mcalc summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:700}
+details.mcalc p{margin:6px 0 0}
+@media (prefers-reduced-motion:reduce){.jbrilla .goal,.jbrilla .band{animation:none}}
 </style>
 </head>
 <body>
@@ -2356,7 +2382,9 @@ $('pfForm').addEventListener('submit', async e => {
   if (rb) { toast.className = 'toast neg'; toast.textContent = !rb.nombre ? 'Ponle nombre a tu renta fija de otra plataforma.' : rb.saldo == null || isNaN(rb.saldo) || rb.saldo < 0 ? 'Revisa el saldo de ' + rb.nombre + '.' : 'Escribe la tasa anual de ' + rb.nombre + ' (entre 0 y 100%).'; return; }
   btn.disabled = true; toast.className = 'toast muted'; toast.textContent = 'Guardando…';
   try {
+    const antesObra = ESCENA.antes();
     apply(await api('guardar', { posiciones, rfp }));
+    ESCENA.despues(antesObra);
     $('toast').className = 'toast pos'; $('toast').textContent = 'Registrado. La ciudad ya se actualizó.';
     if (!window.goSec) $('stage').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
   } catch (err) { $('toast').className = 'toast neg'; $('toast').textContent = err.message; }
@@ -2475,9 +2503,10 @@ function renderSim() {
   if (rest >= 1) rows += `<tr><td></td><td><b>Sin asignar</b> <span class="muted">no alcanza para otro título</span></td>${hoyTd(null)}<td></td><td></td><td class="n"><b>${mxn.format(rest)}</b></td><td></td></tr>`;
   SIM = { amt, plan, rowsG, rest, restTit, NT, spent, avisos };
   out.innerHTML = `<div class="tbl"><table><thead><tr><th>#</th><th>Barrio / obra</th><th style="text-align:right">Hoy</th><th style="text-align:right">Tu meta</th><th style="text-align:right">Después</th><th style="text-align:right">Monto según tus metas</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${rows}</tbody></table></div>
-    ${avisos.map(a => `<p class="foot" style="margin-top:6px">${a}</p>`).join('')}
-    ${rest >= 1 ? `<p class="foot" style="margin-top:6px">Quedan ${mxn.format(rest)} sin asignar: no alcanzan para otro título y no elegiste instrumentos de monto libre (renta fija o cripto).</p>` : ''}
-    <p class="foot" style="margin-top:6px">Cómo se reparte: título por título, primero lo que más lejos está de tu meta; lo que no completa un título va a los instrumentos que aceptan cualquier monto (renta fija y cripto). Así se usa toda tu aportación.</p>
+    <p class="foot" style="margin-top:6px">Primero va a lo que más le falta para tu meta.${rest >= 1 ? ` Quedan ${mxn.format(rest)} sin asignar.` : ''}</p>
+    <details class="mcalc"><summary>¿Cómo se calcula?</summary>${avisos.map(a => `<p class="foot">${a}</p>`).join('')}
+    ${rest >= 1 ? `<p class="foot">Quedan ${mxn.format(rest)} sin asignar: no alcanzan para otro título y no elegiste instrumentos de monto libre (renta fija o cripto).</p>` : ''}
+    <p class="foot">Se reparte título por título, primero lo que más lejos está de tu meta; lo que no completa un título va a los instrumentos que aceptan cualquier monto (renta fija y cripto). Así se usa toda tu aportación.</p></details>
     <p class="foot" style="margin-top:6px">${GOV.pie()}</p>${GOV.simButtons()}`;
   GOV.wire();
 }
@@ -2752,7 +2781,7 @@ function niebla(x, zw) {
   wb.drawImage(t, Math.round(x), 0);
 }
 // ---------- edificios de renta fija: bóveda, torres de datos, pantallas con gráficas y ticker ----------
-const F3 = { A: '010101111101101', B: '110101110101110', C: '011100100100011', D: '110101101101110', E: '111100110100111', F: '111100110100100', G: '011100101101011', H: '101101111101101', I: '111010010010111', J: '001001001101010', K: '101101110101101', L: '100100100100111', M: '101111111101101', N: '110101101101101', O: '010101101101010', P: '110101110100100', Q: '010101101110011', R: '110101110101101', S: '011100010001110', T: '111010010010010', U: '101101101101111', V: '101101101101010', W: '101101101111101', X: '101101010101101', Y: '101101010010010', Z: '111001010100111', 0: '111101101101111', 1: '010110010010111', 2: '110001010100111', 3: '110001010001110', 4: '101101111001001', 5: '111100110001110', 6: '011100111101111', 7: '111001010010010', 8: '111101111101111', 9: '111101111001110', '.': '000000000000010', '-': '000000111000000', '+': '000010111010000', ':': '000010000010000', ' ': '000000000000000' };
+const F3 = { A: '010101111101101', B: '110101110101110', C: '011100100100011', D: '110101101101110', E: '111100110100111', F: '111100110100100', G: '011100101101011', H: '101101111101101', I: '111010010010111', J: '001001001101010', K: '101101110101101', L: '100100100100111', M: '101111111101101', N: '110101101101101', O: '010101101101010', P: '110101110100100', Q: '010101101110011', R: '110101110101101', S: '011100010001110', T: '111010010010010', U: '101101101101111', V: '101101101101010', W: '101101101111101', X: '101101010101101', Y: '101101010010010', Z: '111001010100111', 0: '111101101101111', 1: '010110010010111', 2: '110001010100111', 3: '110001010001110', 4: '101101111001001', 5: '111100110001110', 6: '011100111101111', 7: '111001010010010', 8: '111101111101111', 9: '111101111001110', '.': '000000000000010', '-': '000000111000000', '+': '000010111010000', ':': '000010000010000', ' ': '000000000000000', '$': '011110010011110', ',': '000000000010100' };
 function txt3(g, s, x, y, c) { for (let k = 0; k < s.length; k++) { const gl = F3[s[k]] || F3[' ']; for (let j = 0; j < 5; j++) for (let i = 0; i < 3; i++) if (gl[j * 3 + i] === '1') px(g, x + k * 4 + i, y + j, 1, 1, c); } }
 function txt3v(g, s, x, y, c) { for (let k = 0; k < s.length; k++) txt3(g, s[k], x, y + k * 6, c); }
 const BN = { body: '#122230', body2: '#0e1b26', edge: '#34586a', hi: '#4a7a8c', shade: '#08121a', panel: '#061018', led: '#8dffbf', ledD: '#2f7a5a', ledH: 'rgba(125,255,191,.28)', cyan: '#9fe8ff' };
@@ -3360,7 +3389,7 @@ function composeWorld() {
   });
   drawBonoAnims(g);
   drawCriptoAnims(g); drawFabricas(g);
-  drawTemporada(g);
+  drawObra(g); drawTemporada(g);
   if (FLAMA) emitters.forEach((e, i) => { drawFlama(g, e, i); drawDivisa(g, e, i); });
   else emitters.forEach((e, i) => { px(g, e.x - 1, e.y - 2, 2, 1, Math.sin(T * 3 + i * 1.7) > 0 ? '#ff2d55' : '#5a1020'); if (e.up) px(g, e.x - 1.5, e.y, 3, 1, `rgba(255,150,70,${.5 + .5 * Math.sin(T * 11 + i)})`); });
   // los barrios con lluvia se oscurecen
@@ -3374,6 +3403,67 @@ function composeWorld() {
     g.globalAlpha = .38 * (1 - y / (LH - SHORE)); g.drawImage(FB, 0, Math.floor(src), LW, 2, dx, SHORE + 4 + y, LW, 1);
   }
   g.globalAlpha = 1;
+}
+
+// ---------- obra: grúa, andamios, inauguración, carreta y grúa voladora (ver obra.js) ----------
+function edificioDe(k, activo) { const z = zones[k]; if (!z) return null; return z.items.find(b => b.bd && b.it && b.it.activo === activo && b.owned !== false) || z.items.find(b => b.bd && b.it && b.it.valor > 0) || null; }
+function drawGrua(g, x, yTop, yBase, lado, swing, carga) {
+  // mástil, pluma, contrapeso, cable y gancho; lado = 1 (derecha del edificio) o -1
+  px(g, x - 1, yTop - 16, 3, yBase - yTop + 16, '#f2b544'); for (let y = yTop - 14; y < yBase; y += 4) px(g, x - 1, y, 3, 1, '#a0701a');
+  px(g, x - 2, yBase - 1, 5, 1, '#2a2340');
+  const jib = 26; px(g, lado > 0 ? x - jib : x, yTop - 17, jib + 2, 2, '#f2b544'); px(g, lado > 0 ? x + 2 : x - 8, yTop - 17, 7, 3, '#5a4a70');
+  px(g, x, yTop - 21, 1, 5, '#f2b544'); px(g, lado > 0 ? x - jib : x, yTop - 19, jib, 1, '#a0701a');
+  const hx = x + lado * (-jib + 4 + Math.round(swing * (jib - 10))), hy = yTop - 15 + Math.round(carga * 10);
+  px(g, hx, yTop - 15, 1, hy - yTop + 15, '#ddd'); px(g, hx - 1, hy, 3, 2, '#ff7a1a');
+  if (carga < 1) { px(g, hx - 3, hy + 2, 7, 4, '#4fc3b0'); px(g, hx - 3, hy + 2, 7, 1, '#9ff0dc'); }
+}
+function drawObra(g) {
+  const O = window.JOBRA; if (!O) return; const dt = T - (O.t0 || T);
+  if (O.fase === 'carreta') {
+    const z = zones[O.k]; if (!z) return; const b = edificioDe(O.k, O.activo), x0 = b ? b.dx + Math.round(b.bd.w / 2) : z.x + z.w / 2;
+    const x = x0 + Math.min(1, dt / 2.8) * 120, y = SHORE - 7, w = (dt * 10 | 0);
+    px(g, x - 9, y, 18, 5, '#8a5a2a'); px(g, x - 9, y - 1, 18, 1, '#b07a3a'); px(g, x - 7, y - 3, 14, 2, '#f2b544'); for (let i = 0; i < 5; i++) px(g, x - 6 + i * 3, y - 4 - (i % 2), 2, 1, '#ffe14a');
+    [x - 6, x + 5].forEach(cx => { for (let a = 0; a < 8; a++) { const t = a / 8 * Math.PI * 2 + w * .4; px(g, cx + Math.cos(t) * 2.5, y + 5 + Math.sin(t) * 2.5, 1, 1, '#333'); } px(g, cx, y + 5, 1, 1, '#999'); });
+    px(g, x + 9, y + 1, 10, 1, '#5a4a30'); px(g, x + 18, y - 4, 3, 6, '#c98e5a'); px(g, x + 18, y - 6, 3, 2, '#2a1a08');   // el que jala
+    const lbl = '$' + Math.round(O.amt).toLocaleString('es-MX'); txt3(g, lbl, x - lbl.length * 2, y - 14 - Math.round(Math.sin(dt * 3)), '#ffe14a');
+    return;
+  }
+  if (O.fase === 'vuelo') {
+    const za = zones[O.from], zb = zones[O.to]; if (!za || !zb) return; const p = Math.min(1, dt / 2.2), xa = za.x + za.w / 2, xb = zb.x + zb.w / 2;
+    const x = xa + (xb - xa) * p, y = SHORE - 40 - Math.sin(p * Math.PI) * 70;
+    px(g, x - 5, y, 11, 7, '#4fc3b0'); px(g, x - 5, y, 11, 1, '#9ff0dc'); for (let yy = y + 2; yy < y + 7; yy += 2) for (let xx = x - 4; xx < x + 6; xx += 3) px(g, xx, yy, 1, 1, '#ffe14a');
+    px(g, x, y - 6, 1, 6, '#ddd'); px(g, x - 2, y - 8, 5, 2, '#ff7a1a');
+    for (let i = 0; i < 10; i++) { const q = p - i * .025; if (q < 0) continue; const xx = xa + (xb - xa) * q, yy = SHORE - 40 - Math.sin(q * Math.PI) * 70; g.globalAlpha = 1 - i / 10; px(g, xx, yy + 3, 1, 1, '#9ff0dc'); g.globalAlpha = 1; }
+    const lbl = '$' + Math.round(O.amt).toLocaleString('es-MX'); txt3(g, lbl, x - lbl.length * 2, y - 16, '#ffe14a');
+    return;
+  }
+  const b = edificioDe(O.k, O.activo); if (!b) return;
+  const bd = b.bd, x0 = b.dx + bd.foot.x0, x1 = b.dx + bd.foot.x1, top = b.dy + (bd.top || 0), base = SHORE, w = x1 - x0 + 1;
+  if (O.fase === 'build') {
+    // andamios en la parte que ya creció
+    g.globalAlpha = .75; for (let x = x0 - 2; x <= x1 + 2; x += 6) px(g, x, top - 2, 1, base - top + 2, '#c9a24a'); for (let y = base - 5; y > top - 2; y -= 5) px(g, x0 - 2, y, w + 4, 1, '#c9a24a'); g.globalAlpha = 1;
+    px(g, x0 - 3, top - 3, w + 6, 1, '#ffe14a');
+    drawGrua(g, x1 + 8, top, base, 1, .5 + .5 * Math.sin(dt * 1.3), (dt * .7) % 1);
+    // polvito al pie
+    for (let i = 0; i < 8; i++) { const q = (dt * 1.5 + i / 8) % 1; g.globalAlpha = (1 - q) * .6; px(g, x0 + (i * 7) % Math.max(1, w) + Math.round(q * 6 - 3), base - 1 - q * 8, 2, 2, '#c9c0b0'); g.globalAlpha = 1; }
+    // "+$X" que sube
+    const amt = Math.round((O.amt || 0) * Math.min(1, O.p || 0)); if (amt > 0) { const s = '+$' + amt.toLocaleString('es-MX'), q = (dt * .8) % 1; g.globalAlpha = 1 - q * .6; txt3(g, s, x0 + Math.round(w / 2) - s.length * 2, top - 28 - q * 10, '#7dffb0'); g.globalAlpha = 1; }
+    return;
+  }
+  if (O.fase === 'done' || O.fase === 'inaug') {
+    const q = Math.min(1, dt / .8); drawGrua(g, x1 + 8, top, base, 1, .5, 1);
+    if (dt < 1.2) for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2, r = 4 + dt * 18; g.globalAlpha = 1 - dt / 1.2; px(g, x0 + w / 2 + Math.cos(a) * r, top + Math.sin(a) * r * .5, 2, 1, i % 2 ? '#ffe14a' : '#7dffb0'); g.globalAlpha = 1; }
+    if (O.fase === 'inaug') {
+      // listón rojo al pie y letrero de inauguración
+      const corte = dt > 1.4, cx = x0 + w / 2;
+      if (!corte) { px(g, x0 - 4, base - 6, w + 8, 2, '#e0303a'); px(g, cx - 1, base - 8, 3, 6, '#ffb3b8'); }
+      else { const d = Math.min(12, (dt - 1.4) * 20); px(g, x0 - 4, base - 6 + d * .4, w / 2 + 2 - d, 2, '#e0303a'); px(g, cx + 2 + d, base - 6 + d * .4, w / 2 + 2 - d, 2, '#e0303a'); }
+      const s = 'INAUGURACION', sw = s.length * 4 + 4, sy = Math.max(30, top - 40) + Math.round(Math.sin(dt * 2) * 2);
+      px(g, cx - sw / 2, sy - 2, sw, 9, '#1a1430'); px(g, cx - sw / 2, sy - 2, sw, 1, '#ffe14a'); px(g, cx - sw / 2, sy + 6, sw, 1, '#ffe14a'); txt3(g, s, cx - sw / 2 + 2, sy, '#ffe14a');
+      px(g, cx - sw / 2, sy + 7, 1, top - 36 - sy, '#5a4a70'); px(g, cx + sw / 2 - 1, sy + 7, 1, top - 36 - sy, '#5a4a70');
+      const C = ['#ff7aa8', '#7af0b0', '#ffe14a', '#83c8ff', '#f7931a']; for (let i = 0; i < 16; i++) { const xx = x0 - 10 + (i * 11) % (w + 20), yy = top - 30 + ((dt * (14 + i % 4 * 4) + i * 7) % (base - top + 30)); px(g, xx, yy, 1 + (i % 2), 1, C[i % 5]); }
+    }
+  }
 }
 
 // ---------- temporadas: adornos según la fecha real (solo ambiente; no cambian nada del dinero) ----------
@@ -5249,7 +5339,8 @@ window.VECINOS = (() => {
       llorando: ['¡Buaaa! ¡{p}! … Ya, ya. Las fábricas siguen aquí, nomás llueve adentro.', 'Se me mojó hasta el casco. Pero ninguna fábrica se cayó, nada más el precio.'],
       fiesta: ['¡Llegó dividendo de {a}! Hoy las tuercas van con salsa.', '¡Pagaron! Que suene la sirena de la fábrica… pero bonito.'],
       preocupado: ['Oigan, Fábricas ya se salió de su franja. Ni yo como tanto en la posada.', 'Andamos fuera del plan. En la ceremonia lo acomodamos, sin pánico.'],
-      orgulloso: ['¡Aportaste este mes! Con esto le pongo otro turno a la fábrica.', 'Otro mes cumplido. La constancia no se oxida.'] },
+      orgulloso: ['¡Aportaste este mes! Con esto le pongo otro turno a la fábrica.', 'Otro mes cumplido. La constancia no se oxida.'],
+      obra: ['¡Obra nueva en {a}! Ya le puse casco hasta a la Chimuela.', '¡Creció {a}! El Beto quería cortar el listón, pero se lo gané.', 'Piso nuevo en {a}. Olía a pintura fresca y a futuro.'] },
     FIBRAS: {
       feliz: ['Los inquilinos pagaron puntual e Inmuebles sube {p}. Hoy invito los tamales.', 'Sube {p}. Eso me pasa por ser buen casero.'],
       euforia: ['¡{p}! Voy a pintar la fachada… bueno, nomás la puerta.', '¡{a} subió como renta en la Roma!'],
@@ -5258,7 +5349,8 @@ window.VECINOS = (() => {
       llorando: ['¡Ay, mis edificios! {p}… (se suena con el bigote). El ladrillo no se moja por dentro.', 'Tormenta en el barrio. Pero un casero de verdad no vende la casa porque llovió.'],
       fiesta: ['¡{a} pagó la renta! ¡Hay fiesta en el barrio y el mariachi lo pago yo!', '¡Rentas cobradas! Esto es lo bonito de ser casero.'],
       preocupado: ['Inmuebles se salió de su franja. Ni mi bigote anda tan desacomodado.', 'Andamos fuera del plan. En la ceremonia lo arreglamos.'],
-      orgulloso: ['¡Aportaste! Ya casi alcanza para otro departamentito.', 'Mes cumplido, mijo. Así se construye un barrio.'] },
+      orgulloso: ['¡Aportaste! Ya casi alcanza para otro departamentito.', 'Mes cumplido, mijo. Así se construye un barrio.'],
+      obra: ['¡{a} creció! Ya mandé hacer llaves nuevas; serán 48.', 'Obra terminada en {a}. La señora Chuy vino a ver y hasta prometió pagar.', 'Piso nuevo en {a}. Me sentí casero de verdad.'] },
     RENTA_FIJA: {
       feliz: ['Obras públicas sube {p}. Despacito y seguro, como debe ser.', 'Los intereses llegaron puntuales. A diferencia del microbús.'],
       euforia: ['¡Subimos {p}! Para nosotros esto es como ganar el mundial.', '¡{p}! Me voy a aflojar el chaleco un centímetro.'],
@@ -5267,7 +5359,8 @@ window.VECINOS = (() => {
       llorando: ['¿Tormenta en Obras públicas? Eso no… (revisa los planos) …ah, sí puede pasar. Snif.', 'Lloro, pero de forma ordenada y con casco.'],
       fiesta: ['Cayeron intereses. No es fiesta, es puntualidad. Pero sí traje pastel.', 'Pago puntual de {a}. Así me gustan las cosas.'],
       preocupado: ['Obras públicas se salió de su franja. Voy a poner conos naranjas alrededor.', 'Nos salimos del plano. En la ceremonia lo acomodamos con regla y escuadra.'],
-      orgulloso: ['Aportación registrada. Te pondría una placa conmemorativa.', 'Otro mes cumplido. Esto es infraestructura de la buena.'] },
+      orgulloso: ['Aportación registrada. Te pondría una placa conmemorativa.', 'Otro mes cumplido. Esto es infraestructura de la buena.'],
+      obra: ['Obra entregada en {a}: a tiempo y con planos. Lo anoté con pluma.', 'Creció {a}. Le puse conos naranjas de honor.', 'Inauguramos en {a}. Vinieron cuatro personas y el perro. Récord.'] },
     BITCOIN: {
       feliz: ['¡Oro virtual sube {p}! Estoy tranquila. No, no estoy tranquila. ¡AAAH!', 'Sube {p}. Ya le dije a mi gato que somos ricos (no somos ricos).'],
       euforia: ['¡¡{p}!! ¡A LA LUNA! Bueno, a la azotea, pero ¡A LA AZOTEA!', '¡{a} se volvió loco! Yo también, poquito.'],
@@ -5276,7 +5369,8 @@ window.VECINOS = (() => {
       llorando: ['¡¡BUAAA!! ¡{p}! …Ok, ya lloré. Es oro virtual: sube como cohete y baja como piñata.', 'Mis lágrimas son digitales, pero igual mojan.'],
       fiesta: ['¿Dividendos? Aquí no hay, pero yo celebro por solidaridad.', '¡Fiesta en la ciudad! Traje luces de neón.'],
       preocupado: ['Oro virtual se salió de su franja. Yo también me paso a veces, pero de café.', 'Fuera del plan. En la ceremonia lo regresamos a su lugar.'],
-      orgulloso: ['¡Aportaste este mes! Tu constancia brilla más que mi visor.', 'Mes cumplido. Eso sí no lo mueve el mercado.'] } };
+      orgulloso: ['¡Aportaste este mes! Tu constancia brilla más que mi visor.', 'Mes cumplido. Eso sí no lo mueve el mercado.'],
+      obra: ['¡Creció {a}! Satoshi inauguró subiéndose encima.', 'Obra nueva en {a}. Mi primo dice que él lo sugirió. No lo sugirió.', 'Más oro virtual en {a}. ¡Bailecito en la azotea!'] } };
 
   // ---------- dibujo ----------
   function cara(k, est, t, g, ox = 0, oy = 0) {
@@ -5428,6 +5522,7 @@ window.VECINOS_UI = (() => {
   function dicho(k, s, tipo) {
     if (tipo === 'noticia') { const t = noticia(k, s); if (t) return t; }
     if (tipo === 'saga') return capitulo(k, s);
+    if (tipo === 'obra') { const L = V.FR[k].obra; return L[Math.floor(Math.random() * L.length)].replace(/\{a\}/g, s.a || 'tu barrio'); }
     return V.frase(k, s.e, { p: s.p, a: s.a });
   }
   let host = null, cur = null, timer = null, hideT = null, est = {}, turno = 0, ultimo = null, raf = false;
@@ -5442,8 +5537,9 @@ window.VECINOS_UI = (() => {
   function seguir() { if (raf) return; raf = true; (function fr() { raf = false; if (!host || !document.body.contains(host)) return; const g = host.querySelector('#jGlobo'); if (g && !g.hidden) { colocar(); raf = true; requestAnimationFrame(fr); } })(); }
   function ocultar() { const g = host && host.querySelector('#jGlobo'); if (g) { g.classList.remove('pop'); g.hidden = true; } cur = null; }
   function hablar(k, tap, tipo) {
-    if (!host || !listo() || window.JVIS || window.JQUIET) return;
+    if (!host || !listo() || window.JVIS || (window.JQUIET && tipo !== 'obra')) return;
     est[k] = estado(k); const s = est[k]; if (!s.tiene) return;
+    if (tipo === 'obra') { s.e = 'orgulloso'; if (window.JOBRA && window.JOBRA.activo) s.a = (SHORTN && SHORTN[window.JOBRA.activo]) || window.JOBRA.activo; }
     const P = V.PERS[k], g = globo();
     tipo = tipo || (tap ? 'noticia' : ['noticia', 'saga', 'estado'][turno++ % 3]);
     g.querySelector('b').textContent = P.n; g.querySelector('p').textContent = dicho(k, s, tipo);
@@ -5469,6 +5565,117 @@ window.VECINOS_UI = (() => {
     if (!cur) setTimeout(() => { if (!cur && host && !host.hidden) { const k = JORD.filter(k => est[k] && est[k].tiene).sort((a, b) => Math.abs((model.classes[b].chg || 0)) - Math.abs((model.classes[a].chg || 0)))[0]; if (k) hablar(k, false, 'noticia'); } }, 2500);
   }
   return { pintar, hablar, estado, ocultar };
+})();
+
+// ================= Obra: la escena de construcción al registrar en la Tesorería =================
+// Se guarda primero y se anima después. Lo que subió de costo es una compra (una obra); lo que bajó, una cosecha.
+window.ESCENA = (() => {
+  const $o = id => document.getElementById(id);
+  const fmt = n => '$' + Math.round(n).toLocaleString('es-MX');
+  const JORD = ['ACCIONES', 'FIBRAS', 'RENTA_FIJA', 'BITCOIN'];
+  const BARN = { ACCIONES: 'Fábricas', FIBRAS: 'Inmuebles', RENTA_FIJA: 'Obras públicas', BITCOIN: 'Oro virtual' };
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const listo = () => typeof model !== 'undefined' && model && model.items;
+  function pixSVG(k, col, sz) { const rows = typeof PIXICO !== 'undefined' && PIXICO[k]; if (!rows) return ''; let r = ''; rows.forEach((row, j) => { for (let i = 0; i < row.length; i++) if (row[i] !== '.') r += `<rect x="${i}" y="${j}" width="1.02" height="1.02" fill="${row[i] === 'o' ? '#fff3c4' : col}"/>`; }); return `<svg class="jpx" viewBox="0 0 12 12" width="${sz}" height="${sz}" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`; }
+  let activa = false, timers = [], cancelar = null;
+  function antes() {
+    if (!listo()) return null;
+    const m = {}; model.items.forEach(i => { m[i.activo] = { valor: i.valor || 0, costo: i.costo || 0, key: i.key }; });
+    return { m, total: model.total, cred: typeof E !== 'undefined' && E ? E.creditos : null, racha: typeof ST !== 'undefined' && ST ? ST.s : null, sobres: typeof JUEGO !== 'undefined' ? JUEGO.sobres() : 0, mision: typeof MI !== 'undefined' && MI ? !!MI.done : false };
+  }
+  // compara instrumento por instrumento: costo arriba = compra, costo abajo = venta
+  function diff(a) {
+    const compras = [], ventas = [];
+    model.items.forEach(i => {
+      const p = a.m[i.activo] || { valor: 0, costo: 0 }, dc = (i.costo || 0) - p.costo, umbral = Math.max(50, p.costo * .005);
+      if (dc > umbral) compras.push({ it: i, k: i.key, amt: dc, nuevo: !(p.valor > 0), v0: p.valor, v1: i.valor });
+      else if (dc < -umbral) ventas.push({ it: i, k: i.key, amt: -dc, v0: p.valor, v1: i.valor });
+    });
+    compras.sort((x, y) => y.amt - x.amt); ventas.sort((x, y) => y.amt - x.amt);
+    return { compras, ventas, fundacion: !(a.total > 0) && compras.length > 0 };
+  }
+  const wait = ms => new Promise(r => { const t = setTimeout(r, ms); timers.push(t); });
+  function limpiar() { timers.forEach(clearTimeout); timers = []; window.JOBRA = null; window.JQUIET = 0; window.JVIEW = null; if (listo()) { view = model; layout(); } const b = $o('jObraB'); if (b) b.hidden = true; activa = false; }
+  function banner(html) { let b = $o('jObraB'); if (!b) { b = document.createElement('div'); b.id = 'jObraB'; document.body.appendChild(b); } b.className = 'jbanner'; b.innerHTML = html; b.hidden = false; return b; }
+  // modelo intermedio: los instrumentos de la lista crecen de v0 a v1 según t (0..1)
+  function paso(lista, t, base) {
+    const proj = {}; model.items.forEach(i => { if (i.valor > 0) proj[i.activo] = { valor: i.valor, costo: i.costo }; });
+    lista.forEach(x => { proj[x.it.activo] = { valor: Math.max(0, x.v0 + (x.v1 - x.v0) * t), costo: x.it.costo }; });
+    (base || []).forEach(x => { proj[x.it.activo] = { valor: Math.max(0, x.v0), costo: x.it.costo }; });
+    const V = buildModel(raw, proj); V.items.forEach(i => { const o = model.items.find(j => j.activo === i.activo); if (o) { i.cambio_dia = o.cambio_dia; i.hoy = o.hoy; } });
+    JORD.forEach(k => { V.classes[k].hoy = V.classes[k].items.reduce((s, i) => s + (i.hoy || 0), 0); }); V.hoy = JORD.reduce((s, k) => s + V.classes[k].hoy, 0);
+    window.JVIEW = V; view = V; layout();
+  }
+  const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  async function crecer(x, pendientes, dur) {
+    window.JOBRA = { activo: x.it.activo, k: x.k, fase: 'build', t0: T, nuevo: x.nuevo, amt: x.amt, p: 0 };
+    const n = Math.max(6, Math.round(dur / 220));
+    for (let i = 1; i <= n; i++) { if (!activa) return; const t = ease(i / n); window.JOBRA.p = t; if (window.CM_SONIDO) try { CM_SONIDO('piso', x.k); } catch (_) {}   // lugar listo para el sonido de cada piso
+      paso([Object.assign({}, x, { v1: x.v0 + (x.v1 - x.v0) })], t, pendientes); await wait(dur / n); }
+    window.JOBRA.fase = x.nuevo ? 'inaug' : 'done'; window.JOBRA.t0 = T;
+  }
+  function tarjeta(a, d) {
+    const cred = typeof E !== 'undefined' && E && a.cred != null ? E.creditos - a.cred : null, racha = typeof ST !== 'undefined' && ST ? ST.s : null, sub = typeof JUEGO !== 'undefined' ? JUEGO.sobres() - a.sobres : 0;
+    const porB = {}; d.compras.forEach(x => { porB[x.k] = (porB[x.k] || 0) + x.amt; }); const porV = {}; d.ventas.forEach(x => { porV[x.k] = (porV[x.k] || 0) + x.amt; });
+    const fila = (k, amt, c) => `<div class="jrow"><div class="ic" style="background:${c}22">${pixSVG(k, c, 20)}</div><div class="nm">${BARN[k]}<small>${(amt >= 0 ? d.compras : d.ventas).filter(x => x.k === k).map(x => ((SHORTN && SHORTN[x.it.activo]) || x.it.activo) + (amt >= 0 ? (x.nuevo ? ' (nuevo)' : '') : ' (vendido)')).join(', ')}</small></div><div class="dv ${amt >= 0 ? 'jup' : 'jdn'}">${amt >= 0 ? '+' : '−'}${fmt(Math.abs(amt))}</div></div>`;
+    const C = { ACCIONES: '#f2b544', FIBRAS: '#ef7b6c', RENTA_FIJA: '#4fc3b0', BITCOIN: '#f7931a' };
+    const titulo = d.fundacion ? '¡Tu ciudad quedó fundada!' : d.compras.length && d.ventas.length ? 'Rebalanceo terminado' : d.compras.length ? 'Obra terminada' : 'Cosecha recogida';
+    const logros = [];
+    if (typeof MI !== 'undefined' && MI && MI.done && !a.mision) logros.push('<li>✔ Cumpliste la misión del mes</li>');
+    if (racha != null && a.racha != null && racha > a.racha) logros.push(`<li><span class="jflama">🔥</span> Racha: ${racha} ${racha === 1 ? 'mes' : 'meses'} <b class="jup">+1</b></li>`);
+    else if (racha) logros.push(`<li><span class="jflama">🔥</span> Racha: ${racha} ${racha === 1 ? 'mes' : 'meses'}</li>`);
+    if (cred != null && cred > 0) logros.push(`<li>🪙 +${cred} Créditos de Marea</li>`);
+    if (sub > 0) logros.push(`<li>🎴 Te tocó ${sub === 1 ? 'un sobre' : sub + ' sobres'} de cartas</li>`);
+    let v = $o('jVeil'); if (!v) { v = document.createElement('div'); v.id = 'jVeil'; v.className = 'jveil'; v.hidden = true; document.body.appendChild(v); }
+    v.innerHTML = `<div class="jpop" role="dialog" aria-modal="true" aria-labelledby="jObT"><div class="jph"><b id="jObT">${titulo}</b><span>${new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })}</span></div>
+      <div class="jrows">${Object.keys(porB).map(k => fila(k, porB[k], C[k])).join('')}${Object.keys(porV).map(k => fila(k, -porV[k], C[k])).join('')}</div>
+      ${logros.length ? `<ul class="jlogros">${logros.join('')}</ul>` : ''}
+      <div class="mbtns" style="flex-wrap:nowrap">${sub > 0 ? '<button type="button" class="mbtn" id="jObSobre">Abrir el sobre</button>' : ''}<button type="button" class="mbtn pri" id="jObOk">Ver mi ciudad</button></div></div>`;
+    v.hidden = false; requestAnimationFrame(() => v.classList.add('on'));
+    const cerrar = () => { v.classList.remove('on'); setTimeout(() => { v.hidden = true; }, 250); };
+    $o('jObOk').onclick = cerrar; $o('jObOk').focus();
+    if ($o('jObSobre')) $o('jObSobre').onclick = () => { cerrar(); if (typeof MAREA !== 'undefined') MAREA.go('cartas'); };
+  }
+  async function escena(a, d) {
+    activa = true; window.JQUIET = 1;
+    if (typeof MAREA !== 'undefined') MAREA.go('mercado');
+    const B = banner(`<b class="jtag" style="background:#ffc46b">${d.fundacion ? 'FUNDACIÓN' : d.compras.length && d.ventas.length ? 'REBALANCEO' : d.compras.length ? 'OBRA' : 'COSECHA'}</b><span class="jbm" id="jObM"></span><p id="jObT2"></p><button type="button" class="mbtn" id="jObX">Saltar</button>`);
+    $o('jObX').onclick = () => { limpiar(); tarjeta(a, d); };
+    const M = $o('jObM'), P = $o('jObT2');
+    try {
+      if (d.fundacion) {
+        // la ciudad entera se construye desde cero, barrio por barrio
+        const todas = d.compras.slice(); paso(todas, 0); await wait(600);
+        for (const k of JORD) { const L = todas.filter(x => x.k === k); if (!L.length || !activa) continue;
+          M.textContent = BARN[k]; P.textContent = `Se levanta ${BARN[k]}: ${fmt(L.reduce((s, x) => s + x.amt, 0))}`; setFocus(k, true); VECINOS_UI.ocultar();
+          window.JOBRA = { activo: L[0].it.activo, k, fase: 'build', t0: T, nuevo: true, amt: L.reduce((s, x) => s + x.amt, 0), p: 0 };
+          const n = 8; for (let i = 1; i <= n; i++) { if (!activa) return; window.JOBRA.p = ease(i / n); paso(L, ease(i / n), todas.filter(x => x.k !== k && JORD.indexOf(x.k) > JORD.indexOf(k))); await wait(180); }
+          window.JOBRA.fase = 'inaug'; window.JOBRA.t0 = T; await wait(900); }
+        setFocus(null, true); await wait(1200);
+      } else if (d.compras.length) {
+        const x = d.compras[0], otras = d.compras.slice(1);
+        M.textContent = BARN[x.k]; P.textContent = `${x.nuevo ? 'Edificio nuevo' : 'Crece'} ${(SHORTN && SHORTN[x.it.activo]) || x.it.activo}: +${fmt(x.amt)}`;
+        paso([], 0, d.compras); setFocus(x.k, true); VECINOS_UI.ocultar(); await wait(900);
+        await crecer(x, otras, 3200); await wait(x.nuevo ? 1800 : 900);
+        if (activa) { VECINOS_UI.hablar(x.k, true, 'obra'); await wait(2200); }
+        for (const y of otras) { if (!activa) return; M.textContent = BARN[y.k]; P.textContent = `Y además, ${BARN[y.k]}: +${fmt(y.amt)}`; setFocus(y.k, true); VECINOS_UI.ocultar(); await crecer(y, otras.filter(z => otras.indexOf(z) > otras.indexOf(y)), 1000); await wait(500); }
+        // si también vendiste, la grúa ya llevó esos pisos: se recorta al final
+        if (d.ventas.length) { M.textContent = 'Rebalanceo'; P.textContent = 'La grúa llevó pisos de un barrio a otro.'; window.JOBRA = { fase: 'vuelo', t0: T, from: d.ventas[0].k, to: x.k, amt: d.ventas[0].amt }; paso([], 1); await wait(2400); }
+        setFocus(null, true); await wait(600);
+      } else if (d.ventas.length) {
+        const x = d.ventas[0]; M.textContent = BARN[x.k]; P.textContent = `Cosecha de ${(SHORTN && SHORTN[x.it.activo]) || x.it.activo}: ${fmt(x.amt)} rumbo a tu casa`;
+        setFocus(x.k, true); VECINOS_UI.ocultar(); window.JOBRA = { fase: 'carreta', t0: T, k: x.k, activo: x.it.activo, amt: x.amt, p: 0 }; await wait(3200);
+        setFocus(null, true); await wait(500);
+      }
+    } catch (e) { console.error('escena', e); } finally { if (activa) { limpiar(); try { tarjeta(a, d); } catch (e) { console.error('tarjeta', e); } } }
+  }
+  function despues(a) {
+    if (!a || !listo() || typeof JUEGO !== 'undefined' && (JUEGO.visitando() || JUEGO.simulando())) return;
+    const d = diff(a); if (!d.compras.length && !d.ventas.length) return;
+    if (reduce()) { tarjeta(a, d); return; }
+    setTimeout(() => escena(a, d), 400);
+  }
+  return { antes, despues, activa: () => activa, cancelar: limpiar };
 })();
 
 // ================= Juego: resumen al abrir, sobres de cartas y simulador de crisis =================
@@ -6602,17 +6809,80 @@ window.MAREA = (() => {
   function pendientes() {
     if (!has()) return {};
     const mes = mesActual(), hoy = ymd(new Date()), F = fundInfo();
-    return {
+    const P = {
       fundacion: F.etapa < 3, mercado: ['BOLSA', ...ORDER].some(k => !claimed(`ronda:${k}:${hoy}`)), plano: hasMetas() && !claimed('plano:' + lunes()),
       tesoreria: !(ST && ST.savedThisMonth) || (MI && MI.type === 'obra' && !MI.done), ingresos: !claimed('ingresos:' + mes),
       ayto: !!(CE && CE.active && !CE.done) || !hasMetas(), cartas: JUEGO.sobres() > 0
     };
+    Object.keys(P).forEach(id => { if (P[id] && typeof ABRE !== 'undefined' && ABRE[id] && !ABRE[id].ok()) P[id] = false; });
+    return P;
+  }
+  // ---------- apertura progresiva: cada pantalla se abre al avanzar y la presenta un vecino ----------
+  const quienA = () => (raw && (raw.usuario || raw.nombre)) || 'demo';
+  const pagosLlegados = () => ((raw && raw.dividendos) || []).some(d => !d.proximo && d.fecha && d.fecha <= new Date().toISOString().slice(0, 10));
+  const peorEnCrisis = () => { const c = model.classes; return (c.BITCOIN.valor * .5 > c.ACCIONES.valor * .35) ? 'BITCOIN' : c.ACCIONES.valor > 0 ? 'ACCIONES' : 'FIBRAS'; };
+  const ABRE = {
+    plano: { ok: () => hasMetas(), pista: 'Se abre cuando guardes tus metas en el Cabildo.', k: () => 'RENTA_FIJA', e: 'orgulloso',
+      fr: ['¡Ya tienes plano! Aquí comparo cada barrio contra la meta que tú pusiste.', 'Mientras el punto esté dentro de la franja, no hay que mover nada. Lo revisé con regla y escuadra.'], acc: 'Ver mi plano' },
+    ayto: { ok: () => true, pista: '', k: () => 'RENTA_FIJA', e: 'feliz', fr: [], acc: '' },
+    cartas: { ok: () => ((raw && raw.posiciones) || []).length > 0, pista: 'Se abre con tu primer registro en la Tesorería.', k: () => 'BITCOIN', e: 'euforia',
+      fr: ['¡Llegaron 4 sobres de bienvenida! Adentro hay cartas con secretos de la ciudad.', 'Cada mes que aportes te gana otro sobre. Satoshi ya quiere abrir uno.'], acc: 'Abrir mis sobres' },
+    ingresos: { ok: () => pagosLlegados(), pista: 'Se abre cuando llegue tu primer pago de rentas o dividendos.', k: () => 'FIBRAS', e: 'fiesta',
+      fr: ['¡Llegó tu primera renta! Aquí vas a ver todo lo que te paga tu ciudad.', 'Rentas, dividendos e intereses, cada uno en su día. Como debe ser, mijo.'], acc: 'Ver mis ingresos' },
+    simula: { ok: () => !!(ST && ST.contribMonths && ST.contribMonths.size >= 2), pista: 'Se abre cuando cumplas dos meses aportando.', k: () => peorEnCrisis(), e: 'preocupado',
+      fr: ['Ya llevas dos meses construyendo. ¿Quieres ver qué le pasaría a tu ciudad en una tormenta de verdad?', 'Spoiler: los edificios no se caen.'], acc: 'Probar el simulador' },
+    visitas: { ok: () => !!(ST && ST.s >= 1), pista: 'Las visitas se abren cuando tengas un mes de racha.', k: () => 'ACCIONES', e: 'feliz',
+      fr: ['¡Un mes de racha! Ya puedes recibir visitas y visitar otras ciudades.', 'Solo ven formas y porcentajes, nunca tu dinero. Como enseñar la fábrica sin enseñar la caja.'], acc: 'Ver visitas' } };
+  // ayto se abre junto con el plano (mismas metas), pero sin presentación propia
+  ABRE.ayto.ok = () => true;
+  const abierta = id => !ABRE[id] || ABRE[id].ok();
+  let vistas = null, presentando = false, ultPres = 0;
+  function cargarVistas() {
+    if (vistas) return vistas;
+    let loc = null; try { loc = JSON.parse(localStorage.getItem('cm_abre_' + quienA()) || 'null'); } catch (_) {}
+    const srv = E && E.fund && Array.isArray(E.fund.abiertas) ? E.fund.abiertas : null;
+    if (loc || srv) vistas = new Set([...(loc || []), ...(srv || [])]);
+    else { vistas = new Set(Object.keys(ABRE).filter(abierta)); if (((raw && raw.posiciones) || []).length) vistas.add('bienvenida'); guardarVistas(); }   // quien ya cumple todo entra con todo abierto, sin presentaciones
+    return vistas;
+  }
+  function guardarVistas() {
+    try { localStorage.setItem('cm_abre_' + quienA(), JSON.stringify([...vistas])); } catch (_) {}
+    if (!E) return; const fund = Object.assign({}, E.fund || {}, { abiertas: [...vistas] }); E.fund = fund;
+    mapi('marea_guardar', { fund }).then(r => { const f = E.fund; fusionar(r); E.fund = f; copiaE(); }).catch(() => {});
+  }
+  function presenta(id) {
+    const A = id === 'bienvenida' ? { k: () => 'ACCIONES', e: 'feliz', fr: ['¡Bienvenido! Soy Chela, de Fábricas. Tu ciudad empieza como un terreno vacío.', 'Registra lo que tienes en la Tesorería y te construimos tu primer edificio.'], acc: 'Empezar a construir' } : ABRE[id];
+    const k = A.k(), P = VECINOS.PERS[k];
+    presentando = true; vistas.add(id); guardarVistas();
+    modal(`<div class="jpres" style="--c:${P.bar}"><canvas width="32" height="38" id="jPresC"></canvas><div><small>${id === 'bienvenida' ? 'Tu ciudad' : 'Se abrió: ' + ((SCR.find(x => x[0] === id) || [, 'Visitas'])[1])}</small><b>${P.n}</b><p>${A.fr[0]}</p><p>${A.fr[1]}</p></div></div>
+      <div class="mbtns" style="justify-content:flex-end"><button type="button" class="mbtn" data-close>Luego</button><button type="button" class="mbtn pri" id="jPresGo">${A.acc}</button></div>`);
+    const cv = $('jPresC'), t0 = performance.now(), still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    (function fr(now) { if (!document.body.contains(cv)) { presentando = false; return; } const g = cv.getContext('2d'); g.clearRect(0, 0, 32, 38); VECINOS.cara(k, A.e, still ? 1.2 : (now - t0) / 1000, g); if (!still) requestAnimationFrame(fr); })(t0);
+    $('jPresGo').onclick = () => { cerrar(); presentando = false;
+      if (id === 'bienvenida') go(fundInfo().etapa < 3 ? 'fundacion' : 'tesoreria');
+      else if (id === 'visitas') JUEGO.visitas();
+      else { go(id); if (id === 'plano') { B.plano.classList.add('jbrilla'); setTimeout(() => B.plano.classList.remove('jbrilla'), 7000); } } };
+  }
+  function revisaAperturas() {
+    if (presentando || !model || !E) return; cargarVistas();
+    const m = $('mModal'); if ((m && !m.hidden) || (window.ESCENA && ESCENA.activa()) || (JUEGO.simulando && JUEGO.simulando())) return;
+    const v = $('jVeil'); if (v && !v.hidden) return;
+    if (!vistas.has('bienvenida')) { presenta('bienvenida'); ultPres = Date.now(); return; }
+    if (Date.now() - ultPres < 180000) return;   // una apertura a la vez: la siguiente espera unos minutos
+    const id = ['cartas', 'plano', 'ingresos', 'simula', 'visitas'].find(x => !vistas.has(x) && ABRE[x].ok());
+    if (id) { presenta(id); ultPres = Date.now(); }
+  }
+  function bloqueada(id) {
+    const A = ABRE[id], P = VECINOS.PERS[A.k()];
+    modal(`<div class="jpres" style="--c:#8a97b8"><div class="jcand" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div><div><small>Todavía cerrado</small><b>${id === 'visitas' ? 'Visitas' : (SCR.find(x => x[0] === id) || [, ''])[1]}</b><p>${A.pista}</p></div></div>
+      <div class="mbtns" style="justify-content:flex-end"><button type="button" class="mbtn pri" data-close>Entendido</button></div>`);
   }
   function pintar() {
     if (!has()) return;
     const P = pendientes(), F = fundInfo(), list = SCR.filter(([id]) => id !== 'fundacion' || F.etapa < 3);
     if (cur === 'fundacion' && F.etapa >= 3) cur = 'mercado';
-    nav.innerHTML = list.map(([id, n, s]) => `<button type="button" class="mtab" data-scr="${id}" aria-current="${cur === id ? 'page' : 'false'}" title="${n}">${ico(id)}<span class="ml">${n}</span><span class="ms">${s}</span>${P[id] ? '<i class="mdot" aria-label="pendiente"></i>' : ''}</button>`).join('');
+    nav.innerHTML = list.map(([id, n, s]) => { const lk = !abierta(id); return `<button type="button" class="mtab${lk ? ' lock' : ''}" data-scr="${id}" aria-current="${cur === id ? 'page' : 'false'}" title="${lk ? n + ' (cerrado)' : n}"${lk ? ' aria-disabled="true"' : ''}>${ico(id)}<span class="ml">${n}</span><span class="ms">${s}</span>${lk ? '<i class="mlock" aria-label="cerrado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></i>' : P[id] ? '<i class="mdot" aria-label="pendiente"></i>' : ''}</button>`; }).join('');
+    const vb = $('mVis'); if (vb) vb.classList.toggle('lock', !abierta('visitas'));
     nav.querySelectorAll('.mtab').forEach(b => b.onclick = () => go(b.dataset.scr));
     $('mCred').textContent = E ? E.creditos.toLocaleString('es-MX') : '—';
     $('mRacha').textContent = ST ? `${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}` : '—';
@@ -6631,15 +6901,16 @@ window.MAREA = (() => {
       PANT[cur]();
       if (VISTA[cur] && window.MENU) MENU.render(VISTA[cur]);
     } catch (e) { console.error(e); }
-    revisaGuia(); revisaFiesta(); JUEGO.alAbrir(); if (cur === 'mercado') JUEGO.quizaSimulacro();
+    revisaGuia(); revisaFiesta(); JUEGO.alAbrir(); setTimeout(revisaAperturas, 1200);
   }
   // la guía espera a saber quién eres (créditos y progreso del usuario) antes de decidir si sale
   function revisaGuia() {
     if (guiado || !has() || (!E && !(raw && raw.marea === null))) return;
-    guiado = true; if (guiaNueva()) setTimeout(() => guia(0, true), 700);
+    guiado = true;   // la guía de 4 ventanas ya no sale sola: la bienvenida y las aperturas la reparten por el camino
   }
   function go(id, sub) {
     if (!S[id]) id = 'mercado';
+    if (model && ABRE[id] && !abierta(id)) { bloqueada(id); return; }
     if (id !== 'mercado') JUEGO.salirVisita();
     cur = id; SCR.forEach(([k]) => { S[k].hidden = k !== id; });
     try { if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id); } catch (_) {}
@@ -6701,7 +6972,7 @@ window.MAREA = (() => {
     if (auto) $('mGno').onclick = noGuia;
   }
   $('mGuia').onclick = () => guia(0);
-  $('mVis').onclick = () => JUEGO.visitas();
+  $('mVis').onclick = () => abierta('visitas') ? JUEGO.visitas() : bloqueada('visitas');
   $('mQue').onclick = () => { const t = (SCR.find(x => x[0] === cur) || [, ''])[1]; modal(`<div class="mmhead"><div><small>¿Qué es esto?</small><h2>${t}</h2></div><button type="button" class="mbtn" data-close>Cerrar</button></div><p class="mguia">${typeof AYUDA[cur] === 'function' ? AYUDA[cur]() : AYUDA[cur] || ''}</p>`); };
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrar(); const g = $('mGloss'); if (g) g.hidden = true; } });
   // los saltos que hacía el menú anterior ahora llevan a las pantallas nuevas
