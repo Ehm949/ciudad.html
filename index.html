@@ -846,15 +846,15 @@ details.mcalc p{margin:6px 0 0}
 #labPanel button:focus-visible,#labBtn:focus-visible{outline:2px solid #ffc46b;outline-offset:2px}
 /* guías de los vecinos */
 .vguia{--c:#ffc46b;display:flex;gap:12px;align-items:flex-start;margin:10px 0 12px;padding:10px 12px;border-radius:16px;background:color-mix(in srgb,var(--c) 10%,var(--panel2,#141c33));border:1px solid color-mix(in srgb,var(--c) 40%,var(--line,#2a3558))}
-.vguia canvas{width:72px;height:86px;image-rendering:pixelated;flex:none;border-radius:12px;background:radial-gradient(circle at 50% 45%,color-mix(in srgb,var(--c) 35%,#1c2646),#10172c);border:1px solid color-mix(in srgb,var(--c) 45%,var(--line,#2a3558))}
+.vguia .vg-cara{position:relative;flex:none;padding-top:6px}
+.vguia canvas{width:72px;height:86px;image-rendering:pixelated;display:block;border-radius:12px;background:radial-gradient(circle at 50% 45%,color-mix(in srgb,var(--c) 35%,#1c2646),#10172c);border:1px solid color-mix(in srgb,var(--c) 45%,var(--line,#2a3558));transform-origin:50% 100%}
+.vguia .vg-globo{position:absolute;right:-8px;top:-4px;min-width:24px;height:22px;padding:0 5px;border-radius:11px;background:#fff;color:#1a1020;font:900 12px/22px var(--f-display,system-ui);text-align:center;box-shadow:0 2px 0 #0005;opacity:0;pointer-events:none}
+.vguia .vg-globo::after{content:"";position:absolute;left:5px;bottom:-5px;border:5px solid transparent;border-top-color:#fff;border-bottom:0}
+.vguia.vg-in .vg-globo{animation:vgGlobo 1.6s ease forwards}
 .vguia .vg-b{min-width:0;flex:1}
 .vguia small{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--c);font-weight:800}
-.vguia small b{font-weight:800}
-.vguia .vg-e{display:inline-block}
-.vguia.vg-cambio .vg-e{animation:vgPop .45s ease}
-.vguia .vg-t{margin:4px 0 8px;font-size:15px;line-height:1.45;min-height:3em}
-.vguia.vg-in .vg-t{animation:vgIn .35s ease}
-.vguia.vg-in canvas{animation:vgSalto .4s ease}
+.vguia .vg-t{margin:4px 0 8px;font-size:15px;line-height:1.45;min-height:3em;cursor:default}
+.vguia .vg-t b{color:var(--c)}
 .vguia .vg-nav{display:flex;align-items:center;gap:8px}
 .vguia .vg-dots{display:flex;gap:4px;flex:1}
 .vguia .vg-dots i{width:7px;height:7px;border-radius:50%;background:color-mix(in srgb,var(--c) 25%,transparent)}
@@ -863,11 +863,25 @@ details.mcalc p{margin:6px 0 0}
 .vguia button{font:inherit;font-size:13px;font-weight:700;border-radius:999px;padding:5px 12px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);background:transparent;color:inherit;cursor:pointer}
 .vguia .vg-next{background:var(--c);color:#1a1020;border-color:var(--c)}
 .vguia .vg-prev{padding:5px 10px}
-@keyframes vgIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-@keyframes vgSalto{0%{transform:none}35%{transform:translateY(-6px) rotate(-3deg)}70%{transform:translateY(1px) rotate(2deg)}100%{transform:none}}
-@keyframes vgPop{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+/* cada emoción entra con su propio movimiento */
+.vguia.vg-in[data-e=feliz] canvas{animation:vgBote .45s ease}
+.vguia.vg-in[data-e=euforia] canvas{animation:vgSalto .6s cubic-bezier(.3,1.6,.5,1)}
+.vguia.vg-in[data-e=fiesta] canvas{animation:vgGiro .7s ease}
+.vguia.vg-in[data-e=broma] canvas{animation:vgLadea .6s ease}
+.vguia.vg-in[data-e=orgulloso] canvas{animation:vgInfla .6s ease}
+.vguia.vg-in[data-e=preocupado] canvas{animation:vgTiembla .5s linear}
+.vguia.vg-in[data-e=triste] canvas{animation:vgCae .8s ease}
+.vguia.vg-in[data-e=llorando] canvas{animation:vgCae .5s ease,vgTiembla .4s linear .5s 2}
+@keyframes vgBote{40%{transform:translateY(-5px)}}
+@keyframes vgSalto{0%{transform:scale(1,1)}20%{transform:scale(1.12,.85)}50%{transform:translateY(-14px) scale(.92,1.1)}80%{transform:scale(1.06,.94)}100%{transform:none}}
+@keyframes vgGiro{30%{transform:translateY(-8px) rotate(-10deg)}65%{transform:translateY(-4px) rotate(8deg)}100%{transform:none}}
+@keyframes vgLadea{25%{transform:rotate(-8deg)}55%{transform:rotate(5deg)}80%{transform:rotate(-2deg)}}
+@keyframes vgInfla{40%{transform:scale(1.12)}70%{transform:scale(.97)}}
+@keyframes vgTiembla{0%,100%{transform:none}20%{transform:translateX(-3px)}40%{transform:translateX(3px)}60%{transform:translateX(-2px)}80%{transform:translateX(2px)}}
+@keyframes vgCae{40%{transform:translateY(5px) scale(1.04,.92)}100%{transform:none}}
+@keyframes vgGlobo{0%{opacity:0;transform:scale(.3) translateY(6px)}15%{opacity:1;transform:scale(1.15)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-4px)}}
 @media (max-width:520px){.vguia canvas{width:56px;height:67px}.vguia .vg-t{font-size:14px}}
-@media (prefers-reduced-motion:reduce){.vguia.vg-in .vg-t,.vguia.vg-in canvas,.vguia.vg-cambio .vg-e{animation:none}}
+@media (prefers-reduced-motion:reduce){.vguia canvas,.vguia .vg-globo{animation:none!important}.vguia .vg-globo{opacity:1}}
 .mt-auto{display:flex;gap:10px;align-items:flex-start;margin:8px 0;padding:10px 12px;border-radius:12px;border:1px dashed var(--line,#2a3558);cursor:pointer}
 .mt-auto input{margin-top:3px;flex:none}
 .mt-auto small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
@@ -5717,37 +5731,65 @@ window.VECINOS_UI = (() => {
   return { pintar, hablar, estado, ocultar };
 })();
 // ================= Guías: un vecino (o varios) te explica algo línea por línea =================
-// lines: [{ k: 'ACCIONES', e: 'feliz' | ['broma', 'euforia'], t: 'texto (HTML)' }]. Con varias emociones, la cara va cambiando sola.
+// Una emoción por frase (cambia de una frase a otra) y nunca se dice cuál es: la cara, el salto y el globito lo dicen.
+// lines: [{ k: 'ACCIONES', e: 'feliz', t: 'texto (HTML)' }]. Si e es una lista se usa la primera que no repita la frase anterior del mismo vecino.
 window.VGUIA = (() => {
-  const pos = {}, REG = {}, t0 = performance.now();
+  const pos = {}, REG = {}, visto = {}, t0 = performance.now();
   let corriendo = false;
   const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const emo = (L, t) => { const a = Array.isArray(L.e) ? L.e : [L.e || 'feliz']; return a[Math.floor(Math.max(0, t) / 1.5) % a.length] || a[0]; };
+  // globito sobre la cabeza al empezar cada frase (como los íconos de reacción de los juegos)
+  const GLOBO = { feliz: '♥', euforia: '!!', broma: 'ja', triste: '…', llorando: '…', fiesta: '♪', preocupado: '?!', orgulloso: '★' };
+  function normaliza(lines) {
+    let prev = null;
+    return lines.map(L => { const a = Array.isArray(L.e) ? L.e : [L.e || 'feliz'];
+      const e = a.find(x => !(prev && prev.k === L.k && prev.e === x)) || a[0]; prev = { k: L.k, e }; return { k: L.k, e, t: L.t }; });
+  }
   function cuerpo(id) {
     const lines = REG[id], i = Math.min(pos[id] || 0, lines.length - 1), L = lines[i], P = VECINOS.PERS[L.k];
     const ult = i === lines.length - 1;
-    return `<canvas width="32" height="38" aria-hidden="true"></canvas>
-      <div class="vg-b"><small><b>${P.n}</b> · <span class="vg-e">${VECINOS.NOMBRE_EST[emo(L, 0)]}</span></small>
+    return `<div class="vg-cara"><canvas width="32" height="38" aria-hidden="true"></canvas><span class="vg-globo" aria-hidden="true">${GLOBO[L.e] || '!'}</span></div>
+      <div class="vg-b"><small><b>${P.n}</b></small>
         <p class="vg-t" aria-live="polite">${L.t}</p>
         <div class="vg-nav">${i > 0 ? '<button type="button" class="vg-prev" aria-label="Lo anterior">‹</button>' : ''}<span class="vg-dots" aria-hidden="true">${lines.map((_, j) => `<i class="${j === i ? 'on' : j < i ? 'ya' : ''}"></i>`).join('')}</span>${ult ? (lines.length > 1 ? '<button type="button" class="vg-re">Otra vez</button>' : '') : '<button type="button" class="vg-next">Sigue ›</button>'}</div></div>`;
   }
   function html(id, lines) {
     if (!lines || !lines.length) return '';
-    REG[id] = lines; if (pos[id] == null || pos[id] >= lines.length) pos[id] = 0;
-    const P = VECINOS.PERS[lines[pos[id]].k];
-    return `<div class="vguia" data-vg="${id}" style="--c:${P.bar}">${cuerpo(id)}</div>`;
+    REG[id] = normaliza(lines); if (pos[id] == null || pos[id] >= lines.length) pos[id] = 0;
+    const L = REG[id][pos[id]], P = VECINOS.PERS[L.k];
+    return `<div class="vguia" data-vg="${id}" data-e="${L.e}" style="--c:${P.bar}">${cuerpo(id)}</div>`;
+  }
+  // el texto aparece letra por letra, con pausas en la puntuación; un clic en el texto lo completa
+  function escribe(el) {
+    const p = el.querySelector('.vg-t'); if (!p || still()) return;
+    const nodos = []; (function walk(n) { n.childNodes.forEach(c => c.nodeType === 3 ? nodos.push([c, c.textContent]) : walk(c)); })(p);
+    nodos.forEach(([n]) => { n.textContent = ''; });
+    let ni = 0, ci = 0, espera = 0; const tok = {}; el._tw = tok;
+    const fin = () => { nodos.forEach(([n, t]) => { n.textContent = t; }); el._tw = null; };
+    p.onclick = () => { if (el._tw === tok) fin(); };
+    (function paso() {
+      if (el._tw !== tok || !document.body.contains(el)) return;
+      if (espera > 0) { espera--; return requestAnimationFrame(paso); }
+      for (let k = 0; k < 2 && ni < nodos.length; k++) {
+        const [n, t] = nodos[ni]; const ch = t[ci++]; n.textContent = t.slice(0, ci);
+        if (ci >= t.length) { ni++; ci = 0; }
+        if (/[.!?…]/.test(ch)) { espera = 9; break; } if (/[,:;]/.test(ch)) { espera = 4; break; }
+      }
+      if (ni < nodos.length) requestAnimationFrame(paso); else el._tw = null;
+    })();
   }
   function mover(el, d) {
     const id = el.dataset.vg, n = REG[id].length;
+    if (el._tw) { el._tw = null; }
     pos[id] = d === 0 ? 0 : Math.max(0, Math.min(n - 1, (pos[id] || 0) + d));
-    el.style.setProperty('--c', VECINOS.PERS[REG[id][pos[id]].k].bar);
-    el.innerHTML = cuerpo(id); el.dataset.t = performance.now();
+    const L = REG[id][pos[id]];
+    el.style.setProperty('--c', VECINOS.PERS[L.k].bar); el.dataset.e = L.e;
+    el.innerHTML = cuerpo(id);
     el.classList.remove('vg-in'); void el.offsetWidth; el.classList.add('vg-in');
-    conectar(el);
+    visto[id + ':' + pos[id]] = 1; conectar(el); escribe(el);
   }
   function conectar(el) {
     const b = s => el.querySelector(s);
-    if (b('.vg-next')) b('.vg-next').onclick = () => mover(el, 1);
+    if (b('.vg-next')) b('.vg-next').onclick = () => { if (el._tw) { const p = b('.vg-t'); p && p.onclick && p.onclick(); return; } mover(el, 1); };
     if (b('.vg-prev')) b('.vg-prev').onclick = () => mover(el, -1);
     if (b('.vg-re')) b('.vg-re').onclick = () => mover(el, 0);
     pinta(el, performance.now());
@@ -5755,9 +5797,7 @@ window.VGUIA = (() => {
   function pinta(el, now) {
     const id = el.dataset.vg, lines = REG[id]; if (!lines) return;
     const L = lines[Math.min(pos[id] || 0, lines.length - 1)], cv = el.querySelector('canvas'); if (!cv) return;
-    const t = still() ? 1.2 : (now - t0) / 1000, e = emo(L, (now - (+el.dataset.t || t0)) / 1000);
-    const g = cv.getContext('2d'); g.clearRect(0, 0, 32, 38); VECINOS.cara(L.k, e, t, g);
-    const s = el.querySelector('.vg-e'), nom = VECINOS.NOMBRE_EST[e]; if (s && s.textContent !== nom) { s.textContent = nom; el.classList.remove('vg-cambio'); void el.offsetWidth; el.classList.add('vg-cambio'); }
+    const g = cv.getContext('2d'); g.clearRect(0, 0, 32, 38); VECINOS.cara(L.k, L.e, still() ? 1.2 : (now - t0) / 1000, g);
   }
   function cuadro(now) {
     const els = document.querySelectorAll('.vguia');
@@ -5766,7 +5806,7 @@ window.VGUIA = (() => {
     requestAnimationFrame(cuadro);
   }
   function wire(root) {
-    (root || document).querySelectorAll('.vguia').forEach(el => { if (!el.dataset.t) el.dataset.t = performance.now(); conectar(el); });
+    (root || document).querySelectorAll('.vguia').forEach(el => { const key = el.dataset.vg + ':' + (pos[el.dataset.vg] || 0); conectar(el); if (!visto[key]) { visto[key] = 1; el.classList.add('vg-in'); escribe(el); } });   // si la pantalla se vuelve a pintar, no repite la entrada
     if (!corriendo && !still()) { corriendo = true; requestAnimationFrame(cuadro); }
   }
   const L = (k, e, t) => ({ k, e, t });
