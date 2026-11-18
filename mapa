@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa de FIBRAs en México</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+:root{
+  --bg:#02060f; --panel:rgba(6,16,32,.78); --line:rgba(56,189,248,.28); --line2:rgba(56,189,248,.55);
+  --txt:#d8f3ff; --dim:#7fa6bf; --accent:#38e1ff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:Rajdhani,system-ui,sans-serif;overflow:hidden}
+#map{position:fixed;inset:0;width:100%;height:100%;cursor:grab;touch-action:none}
+#map:active{cursor:grabbing}
+/* scanlines + vignette */
+.fx{pointer-events:none;position:fixed;inset:0;z-index:2}
+.fx.scan{background:repeating-linear-gradient(to bottom,rgba(120,220,255,.035) 0 1px,transparent 1px 3px);mix-blend-mode:screen}
+.fx.vig{background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(0,0,0,.65) 100%)}
+.fx.sweep{background:linear-gradient(to bottom,transparent 0%,rgba(56,225,255,.06) 50%,transparent 100%);height:18vh;animation:sweep 9s linear infinite}
+@keyframes sweep{0%{transform:translateY(-20vh)}100%{transform:translateY(120vh)}}
+
+.hud{position:fixed;z-index:5;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid var(--line);box-shadow:0 0 0 1px rgba(56,225,255,.05) inset,0 10px 40px rgba(0,0,0,.5)}
+.hud::before,.hud::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--accent);opacity:.9}
+.hud::before{top:-2px;left:-2px;border-right:none;border-bottom:none}
+.hud::after{bottom:-2px;right:-2px;border-left:none;border-top:none}
+
+#panel{top:16px;left:16px;width:330px;max-height:calc(100% - 32px);overflow:auto;padding:16px 16px 12px}
+#panel::-webkit-scrollbar{width:6px}#panel::-webkit-scrollbar-thumb{background:var(--line2)}
+h1{font-family:Orbitron,sans-serif;font-weight:900;font-size:17px;letter-spacing:.14em;margin:0;color:#eafcff;text-shadow:0 0 12px rgba(56,225,255,.7)}
+.sub{font-size:12px;letter-spacing:.22em;color:var(--accent);text-transform:uppercase;margin:4px 0 12px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.kpi{border:1px solid var(--line);padding:6px 8px;background:rgba(56,225,255,.04)}
+.kpi b{display:block;font-family:Orbitron;font-size:16px;color:#fff}
+.kpi span{font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+.sec{font-family:Orbitron;font-size:10.5px;letter-spacing:.2em;color:var(--dim);margin:12px 0 6px;display:flex;align-items:center;gap:8px}
+.sec::after{content:"";flex:1;height:1px;background:var(--line)}
+input[type=search]{width:100%;background:rgba(0,10,25,.7);border:1px solid var(--line2);color:var(--txt);padding:8px 10px;font:inherit;font-size:15px;outline:none}
+input[type=search]:focus{box-shadow:0 0 0 2px rgba(56,225,255,.25)}
+.fibra{display:grid;grid-template-columns:16px 1fr auto;gap:10px;align-items:center;padding:7px 8px;border:1px solid transparent;cursor:pointer;user-select:none;transition:.15s}
+.fibra:hover{border-color:var(--line);background:rgba(56,225,255,.05)}
+.fibra.off{opacity:.35}
+.dot{width:12px;height:12px;border-radius:50%;box-shadow:0 0 10px currentColor;background:currentColor}
+.fibra .nm{font-weight:700;font-size:15px;letter-spacing:.04em}
+.fibra .ds{font-size:12.5px;color:var(--dim);line-height:1.15}
+.fibra .ct{font-family:Orbitron;font-size:11px;color:var(--dim);text-align:right}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line2);padding:3px 9px;font-size:13px;cursor:pointer;user-select:none;letter-spacing:.04em}
+.chip.off{opacity:.35;border-color:var(--line)}
+.legend{display:grid;gap:5px;font-size:13px;color:var(--dim)}
+.legend div{display:flex;align-items:center;gap:8px}
+.note{font-size:12px;color:var(--dim);line-height:1.35;margin-top:10px}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap}
+.btn{background:rgba(56,225,255,.06);border:1px solid var(--line2);color:var(--txt);font:600 13px Rajdhani;padding:5px 10px;cursor:pointer;letter-spacing:.06em}
+.btn:hover{background:rgba(56,225,255,.16)}
+
+#card{top:16px;right:16px;width:380px;padding:16px;display:none;max-height:calc(100% - 96px);overflow:auto}
+#card::-webkit-scrollbar{width:6px}#card::-webkit-scrollbar-thumb{background:var(--line2)}
+.tabs{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.tab{background:transparent;border:1px solid var(--c);color:var(--c);font:700 12px Orbitron;letter-spacing:.06em;padding:4px 8px;cursor:pointer;opacity:.55}
+.tab.on{opacity:1;background:color-mix(in srgb,var(--c) 18%,transparent)}
+.kc{margin:12px 0 4px}
+.co{padding:6px 0;border-bottom:1px dashed rgba(56,189,248,.12)}
+.co-h{display:flex;gap:8px;align-items:baseline}
+.co-r{font-family:Orbitron;font-size:10px;color:var(--dim);width:18px}
+.co-n{flex:1;font-weight:600;font-size:14.5px;color:#fff;line-height:1.15}
+.co-w{font-family:Orbitron;font-size:12px;color:#fff}
+.co-s{font-size:12px;color:var(--dim);margin-left:26px}
+.bar{display:block;height:4px;background:rgba(56,225,255,.08);margin:4px 0 2px 26px}
+.bar i{display:block;height:100%;box-shadow:0 0 8px currentColor}
+.sec-r{display:grid;grid-template-columns:130px 1fr 38px;gap:8px;align-items:center;font-size:13px;margin:3px 0}
+.sec-r .bar{margin:0}
+.sec-r b{font-family:Orbitron;font-size:11px;text-align:right}
+.more{margin-top:8px;width:100%}
+#card .tag{font-family:Orbitron;font-size:11px;letter-spacing:.18em;padding:2px 8px;display:inline-block;border:1px solid currentColor}
+#card h2{font-size:21px;margin:10px 0 2px;line-height:1.1;color:#fff}
+#card .loc{color:var(--accent);font-size:14px;letter-spacing:.04em}
+#card dl{display:grid;grid-template-columns:96px 1fr;gap:5px 10px;margin:12px 0 0;font-size:14px}
+#card dt{color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding-top:2px}
+#card dd{margin:0}
+#card .x{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer}
+#card .prec{margin-top:12px;font-size:12px;color:var(--dim);border-top:1px dashed var(--line);padding-top:8px}
+
+.sbox{position:relative}
+#results{display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);max-height:360px;overflow:auto;z-index:20;padding:4px 0;background:rgba(3,12,26,.97)}
+#results::before,#results::after{display:none}
+.rs-h{font-family:Orbitron;font-size:10px;letter-spacing:.18em;color:var(--dim);padding:6px 10px 2px}
+.rs{display:flex;justify-content:space-between;gap:8px;padding:6px 10px;cursor:pointer;border-left:2px solid transparent}
+.rs:hover{background:rgba(56,225,255,.08);border-left-color:var(--accent)}
+.rs b{display:block;font-size:14px;color:#fff;line-height:1.1}
+.rs span{font-size:11.5px;color:var(--dim)}
+.rs-w{display:flex;flex-direction:column;align-items:flex-end;font-style:normal}
+.rs-w i{font-style:normal;font-family:Orbitron;font-size:10px;white-space:nowrap}
+.rs-empty{padding:8px 10px;color:var(--dim);font-size:13px}
+.co.hl{background:rgba(253,224,71,.08);outline:1px solid rgba(253,224,71,.5)}
+.mx{color:#fde047}
+#money{display:none;top:50%;left:50%;transform:translate(-50%,-50%);width:min(520px,calc(100% - 24px));max-height:calc(100% - 40px);overflow:auto;padding:18px;z-index:30;background:rgba(4,14,30,.96)}
+.mt{font-family:Orbitron;font-size:15px;letter-spacing:.14em;margin:0 0 6px;color:#fde047;text-shadow:0 0 10px rgba(253,224,71,.5)}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
+.mgrid label{display:flex;align-items:center;gap:8px;border:1px solid var(--line);padding:4px 8px;font-weight:700;font-size:13px}
+.mgrid label span{width:76px}
+.mgrid input{flex:1;min-width:0;background:transparent;border:none;color:#fff;font:600 15px Rajdhani;outline:none;text-align:right}
+#money textarea,#expBox{width:100%;min-height:70px;background:rgba(0,10,25,.7);border:1px solid var(--line2);color:var(--txt);font:12px monospace;padding:8px;margin-top:6px}
+.vec{font-size:14px;margin:6px 0;line-height:1.3}
+#tip{position:fixed;z-index:6;pointer-events:none;background:rgba(2,10,22,.92);border:1px solid var(--line2);padding:6px 10px;font-size:14px;display:none;max-width:280px}
+#tip b{color:#fff}
+#hudbar{bottom:16px;right:16px;padding:8px 12px;display:flex;gap:14px;align-items:center;font-family:Orbitron;font-size:11px;color:var(--dim);letter-spacing:.12em}
+#hudbar .zb{width:30px;height:30px;font-size:17px;padding:0;font-family:Orbitron}
+#coords{min-width:170px}
+#toggle{display:none}
+@media (max-width:760px){
+  #panel{width:calc(100% - 24px);left:12px;top:12px;max-height:48%;}
+  #panel.collapsed .body{display:none}
+  #toggle{display:inline-block;position:absolute;right:12px;top:12px}
+  #card{width:calc(100% - 24px);right:12px;top:auto;bottom:70px;max-height:42%;overflow:auto}
+  #hudbar{right:12px;bottom:12px}
+  #coords{display:none}
+}
+/* svg */
+.state{fill:url(#landGrad);stroke:rgba(56,225,255,.55);stroke-width:.6;vector-effect:non-scaling-stroke;transition:fill .2s}
+.state:hover{fill:rgba(56,225,255,.16)}
+.coast{fill:none;stroke:#38e1ff;stroke-width:1.6;vector-effect:non-scaling-stroke;filter:url(#glow)}
+.neigh{fill:rgba(40,70,100,.18);stroke:rgba(120,170,210,.25);stroke-width:.5;vector-effect:non-scaling-stroke}
+.country{fill:rgba(40,70,100,.16);stroke:rgba(120,170,210,.28);stroke-width:.5;vector-effect:non-scaling-stroke;transition:fill .25s}
+.country.held{cursor:pointer}
+.country.held:hover{stroke:#fff;stroke-width:1.2}
+.wb{cursor:pointer}
+.wb .ring{fill:none;stroke-width:1.2;vector-effect:non-scaling-stroke;animation:pulse 3s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.wlabel{font-family:Orbitron;font-weight:700;fill:#fff;pointer-events:none;paint-order:stroke;stroke:#02060f;text-anchor:middle}
+.etf .ct{font-size:10.5px}
+.grat{fill:none;stroke:rgba(56,225,255,.07);stroke-width:.6;vector-effect:non-scaling-stroke}
+.mk{cursor:pointer;transition:opacity .2s}
+.mk .core{stroke:#02060f;stroke-width:.8;vector-effect:non-scaling-stroke}
+.mk .ring{fill:none;stroke-width:1.2;vector-effect:non-scaling-stroke;opacity:.9}
+.mk.market .ring{animation:pulse 2.6s ease-out infinite}
+@keyframes pulse{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(2.6)}}
+.mk .ring{transform-box:fill-box;transform-origin:center}
+.mk.sel .core{stroke:#fff;stroke-width:2}
+.clabel{font-family:Orbitron;fill:rgba(200,240,255,.55);letter-spacing:.12em;pointer-events:none;paint-order:stroke;stroke:#02060f;stroke-width:3px}
+.slabel{font-family:Rajdhani;fill:rgba(140,200,230,.32);font-weight:600;letter-spacing:.18em;text-transform:uppercase;pointer-events:none}
+</style>
+</head>
+<body>
+<svg id="map"></svg>
+<div class="fx scan"></div><div class="fx sweep"></div><div class="fx vig"></div>
+
+<div id="panel" class="hud">
+  <button id="toggle" class="btn">☰</button>
+  <h1>FIBRAS · MÉXICO · ETFs</h1>
+  <div class="sub">Portafolios inmobiliarios y exposición global</div>
+  <div class="body">
+    <div class="kpis" id="kpis"></div>
+    <div class="sbox"><input type="search" id="q" placeholder="Buscar empresa, ticker, propiedad o ciudad…" autocomplete="off"><div id="results" class="hud"></div></div>
+    <div class="sec">FIBRAS</div>
+    <div id="fibras"></div>
+    <div class="sec">MI DINERO · CIUDAD MAREA</div>
+    <div class="mode tabs" style="margin:0 0 8px"><button class="tab on" data-m="pct" style="--c:#38e1ff">% del fondo</button><button class="tab" data-m="mxn" style="--c:#fde047">Mis pesos</button></div>
+    <div class="btnrow"><button class="btn" id="mBtn">Capturar mi dinero</button><button class="btn" id="rBtn">Reporte de Marea</button></div>
+    <div class="note" id="moneySum" style="margin-top:6px"></div>
+    <div class="sec">ETFs · MUNDO</div>
+    <div id="etfs"></div>
+    <div class="note" style="margin-top:4px">Haz zoom out (o usa “Mundo”) para ver todos los países. Color de cada país = ETF que invierte ahí; intensidad y burbuja = peso en el fondo. Haz clic en un país para ver sus empresas.</div>
+    <div class="sec">SEGMENTO (FIBRAS)</div>
+    <div class="chips" id="segs"></div>
+    <div class="sec">IR A</div>
+    <div class="btnrow" id="goto"></div>
+    <div class="sec">LEYENDA</div>
+    <div class="legend">
+      <div><svg width="22" height="16"><circle cx="11" cy="8" r="4" fill="#38e1ff"/></svg> Propiedad individual</div>
+      <div><svg width="22" height="16"><circle cx="11" cy="8" r="5" fill="#38e1ff"/><circle cx="11" cy="8" r="7.5" fill="none" stroke="#38e1ff"/></svg> Mercado / clúster (tamaño ≈ peso en portafolio)</div>
+      <div><svg width="22" height="16"><circle cx="11" cy="8" r="4" fill="none" stroke="#38e1ff" stroke-dasharray="2 2" stroke-width="1.5"/></svg> Presencia (ciudad o conteo no publicado)</div>
+    </div>
+    <div class="note">Las ubicaciones son aproximadas (nivel colonia/municipio para propiedades y nivel ciudad para mercados). FUNO, Prologis, NEXT y Fibra Mty suman más de 1,700 propiedades y no publican coordenadas de cada nave, así que sus portafolios industriales se muestran por mercado con los conteos oficiales. Datos de reportes trimestrales 2T26–3T26. Pesos de ETFs y empresas: archivos de “Detalles del portafolio” de Vanguard con datos al 30-sep-2026.</div>
+  </div>
+</div>
+
+<div id="card" class="hud"><button class="x" onclick="closeCard()">×</button><div id="cardBody"></div></div>
+<div id="tip"></div>
+<div id="money" class="hud"><div id="moneyBody"></div></div>
+<div id="hudbar" class="hud">
+  <span id="coords">LAT —  LON —</span>
+  <span id="zlvl">ZOOM 1.0×</span>
+  <button class="btn zb" id="zin">+</button><button class="btn zb" id="zout">−</button><button class="btn" id="zreset">⟲</button>
+</div>
+
+<script>
+/* ============================================================
+   MAPA MAREA · FIBRAs + ETFs   (formato de intercambio: marea-mapa-v1)
+   Configuración opcional: define window.MAREA_MAPA_CONFIG ANTES de este script.
+     base:       carpeta donde viven geo/ y data/ (por defecto "./")
+     guardarLocal: true = guarda montos en este navegador (modo independiente)
+     origenes:   lista de orígenes que pueden mandar posiciones por postMessage
+   API pública: window.MareaMapa.setPosiciones(posiciones) · .getResumen() · .abrirReporte()
+   ============================================================ */
+const CFG = Object.assign({ base:"./", guardarLocal:true, origenes:["https://ehm949.github.io"] }, window.MAREA_MAPA_CONFIG||{});
+try{ if(new URLSearchParams(location.search).get("embed")==="1") CFG.guardarLocal=false; }catch(e){}
+const BASE = CFG.base.endsWith("/") ? CFG.base : CFG.base+"/";
+let DVER = "";
+const getJSON = (path) => fetch(BASE+path+(DVER?"?v="+encodeURIComponent(DVER):"")).then(r=>{ if(!r.ok) throw new Error(path+" "+r.status); return r.json(); });
+// Claves que la Ciudad puede mandar y a qué instrumento del mapa equivalen (exposición 100% EE.UU. → pesos de VUAA)
+const TICKER_ALIAS = { VTI:"VUAA", IVVPESO:"VUAA", VIG:"VUAA", VOO:"VUAA", NEXT23:"NEXT25" };
+const FIBRAS = {
+  FUNO11:   {color:"#22d3ee", name:"Fibra Uno", desc:"616 propiedades · comercial, oficinas, usos mixtos (3T26)"},
+  DANHOS13: {color:"#f472b6", name:"Fibra Danhos", desc:"18 en operación + 6 en desarrollo · 1.27 M m² (2T26)"},
+  FNOVA17:  {color:"#fbbf24", name:"Fibra Nova", desc:"125 propiedades en 20 estados · 717 mil m² (1T26)"},
+  FIBRAPL14:{color:"#a3e635", name:"FIBRA Prologis", desc:"515 propiedades · 8.1 M m² industrial (3T26)"},
+  NEXT25:   {color:"#a78bfa", name:"Fibra NEXT", desc:"222 propiedades / 446 edificios · 8.2 M m² (3T26)"},
+  FMTY14:   {color:"#fb923c", name:"Fibra Mty", desc:"382 propiedades (incl. FIBRA Macquarie) · 5.6 M m² (3T26)"}
+};
+const SEGS = ["Comercial","Oficinas","Usos mixtos","Industrial","Hotel","Otros"];
+const segOf = s => {
+  if(/Comercial/i.test(s)) return "Comercial";
+  if(/Oficina/i.test(s)) return "Oficinas";
+  if(/mixto/i.test(s)) return "Usos mixtos";
+  if(/Industrial|Agro/i.test(s)) return "Industrial";
+  if(/Hotel/i.test(s)) return "Hotel";
+  return "Otros";
+};
+const CITIES = [["Ciudad de México",19.43,-99.13,3],["Monterrey",25.67,-100.31,3],["Guadalajara",20.67,-103.35,3],["Tijuana",32.51,-117.04,2],
+ ["Cd. Juárez",31.69,-106.42,2],["Cancún",21.16,-86.85,2],["Mérida",20.97,-89.62,2],["Querétaro",20.59,-100.39,2],["Chihuahua",28.63,-106.07,2],
+ ["Puebla",19.04,-98.21,2],["Hermosillo",29.07,-110.96,2],["Reynosa",26.08,-98.29,2],["Saltillo",25.42,-101.0,2],["Toluca",19.29,-99.66,2],
+ ["San Luis Potosí",22.15,-100.98,2],["Oaxaca",17.07,-96.73,2],["Acapulco",16.85,-99.82,2],["Veracruz",19.17,-96.13,2],["Tuxtla",16.75,-93.12,2],
+ ["Los Cabos",22.95,-109.8,2],["Mexicali",32.62,-115.45,2],["Aguascalientes",21.88,-102.29,2],["Villahermosa",17.99,-92.93,2],["Culiacán",24.8,-107.39,1],
+ ["Durango",24.02,-104.66,1],["Morelia",19.7,-101.19,1],["León",21.12,-101.68,1],["Nvo. Laredo",27.48,-99.51,1],["Matamoros",25.87,-97.5,1]];
+
+const state = {on:new Set(Object.keys(FIBRAS)), segs:new Set(SEGS), q:"", sel:null};
+let DATA=[], k=1, ETFD=null, CW={}, etfOn=new Set(['VUAA','VEA','VWO']);
+
+const svg = d3.select("#map");
+const W = () => window.innerWidth, H = () => window.innerHeight;
+const defs = svg.append("defs");
+defs.html(`
+ <radialGradient id="ocean" cx="50%" cy="45%" r="75%"><stop offset="0%" stop-color="#062038"/><stop offset="55%" stop-color="#03101f"/><stop offset="100%" stop-color="#01050c"/></radialGradient>
+ <linearGradient id="landGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0b2a45"/><stop offset="50%" stop-color="#0a2238"/><stop offset="100%" stop-color="#071a2c"/></linearGradient>
+ <pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".9" fill="rgba(56,225,255,.13)"/></pattern>
+ <pattern id="hex" width="10" height="17.32" patternUnits="userSpaceOnUse" patternTransform="scale(.6)"><path d="M5 0 L10 2.89 L10 8.66 L5 11.55 L0 8.66 L0 2.89Z" fill="none" stroke="rgba(56,225,255,.10)" stroke-width=".6"/></pattern>
+ <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="mglow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#38e1ff" flood-opacity=".18"/></filter>`);
+const bgRect = svg.append("rect").attr("fill","url(#ocean)");
+const bgDots = svg.append("rect").attr("fill","url(#dots)");
+const g = svg.append("g");
+const gGrat = g.append("g"), gNeigh = g.append("g"), gLand = g.append("g"),
+      gHex = g.append("g"), gCoast = g.append("g"), gSLab = g.append("g"), gCLab = g.append("g"), gMk = g.append("g"), gWB = g.append("g");
+
+const projection = d3.geoMercator();
+const path = d3.geoPath(projection);
+let mexico;
+
+const zoom = d3.zoom().scaleExtent([0.03, 220]).on("zoom", (e) => {
+  g.attr("transform", e.transform); k = e.transform.k;
+  d3.select("#zlvl").text("ZOOM " + k.toFixed(1) + "×");
+  rescale();
+});
+svg.call(zoom).on("dblclick.zoom", null);
+
+fetch(BASE+"data/manifest.json",{cache:"no-cache"}).then(r=>r.ok?r.json():{}).catch(()=>({})).then(m=>{ DVER=m.version||""; return Promise.all([getJSON("geo/mexico.json"), getJSON("geo/world.json"), getJSON("data/fibras.json"), getJSON("data/etfs.json")]); })
+.then(([mx, nb, data, ed]) => {
+  mexico = mx; DATA = data.map((d,i)=>({...d, id:i, sg:segOf(d.seg)})); ETFD = ed; buildEtf();
+  draw(nb); buildPanel(); initMoneyUI(); render(); fit();
+}).catch(err => { document.body.insertAdjacentHTML("beforeend", `<div class="hud" style="position:fixed;top:40%;left:50%;transform:translate(-50%);padding:20px">No se pudieron cargar los datos del mapa.</div>`); console.error(err); });
+
+function fit(){
+  svg.attr("width",W()).attr("height",H());
+  bgRect.attr("width",W()).attr("height",H()); bgDots.attr("width",W()).attr("height",H());
+  const padL = W()>760 ? 360 : 20, padT = W()>760 ? 30 : H()*0.36;
+  projection.fitExtent([[padL, padT],[W()-40, H()-60]], mexico);
+  redraw();
+}
+let neighData;
+function draw(nb){ neighData = nb; }
+function redraw(){
+  const grat = d3.geoGraticule().step([10,10]).extent([[-180,-60],[180,80]]);
+  gGrat.selectAll("path").data([grat()]).join("path").attr("class","grat").attr("d",path);
+  gNeigh.selectAll("path").data(neighData.features).join("path").attr("d",path)
+    .on("mousemove",(e,d)=>{ const c=CW[d.properties.id];
+       showTip(e, c? tipCountry(d.properties.id) : `<b>${d.properties.name}</b><br><span style="color:var(--dim)">Sin exposición en los ETFs activos</span>`); })
+    .on("mouseleave",hideTip)
+    .on("click",(e,d)=>{ e.stopPropagation(); const c=CW[d.properties.id]; if(c) openCountry(d.properties.id); });
+  styleWorld();
+  gLand.selectAll("path").data(mexico.features).join("path").attr("class","state").attr("d",path)
+    .on("mousemove",(e,d)=>{ if(e.target.closest(".mk")) return; const n=countIn(d.properties.name); showTip(e, `<b>${d.properties.name==="México"?"Estado de México":d.properties.name}</b><br>${n} punto${n===1?"":"s"} visible${n===1?"":"s"} en el mapa`); })
+    .on("mouseleave",hideTip)
+    .on("click",(e,d)=>{ zoomTo(d); });
+  gHex.selectAll("path").data([mexico]).join("path").attr("d",path).attr("fill","url(#hex)").style("pointer-events","none");
+  gCoast.selectAll("path").data([mexico]).join("path").attr("class","coast").attr("d",path);
+  gSLab.selectAll("text").data(mexico.features).join("text").attr("class","slabel").attr("text-anchor","middle")
+    .attr("transform",d=>{const c=path.centroid(d);return `translate(${c})`;}).text(d=>d.properties.name==="México"?"Edo. de México":d.properties.name);
+  gCLab.selectAll("text").data(CITIES).join("text").attr("class","clabel")
+    .attr("transform",d=>`translate(${projection([d[2],d[1]])})`).text(d=>d[0].toUpperCase());
+  render();
+}
+const norm = s => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const ALIAS = {"cdmx":"ciudad de mexico","estado de mexico":"mexico"};
+function stateMatch(st, name){ const a=norm(st); return (ALIAS[a]||a)===norm(name); }
+function visible(d){
+  if(!state.on.has(d.f) || !state.segs.has(d.sg)) return false;
+  if(state.q && state.qHit){ const q=norm(state.q); return norm(d.n+" "+d.city+" "+d.st+" "+d.f+" "+FIBRAS[d.f].name).includes(q); }
+  return true;
+}
+function countIn(name){ return DATA.filter(d=>visible(d) && stateMatch(d.st,name)).length; }
+
+function render(){
+  if(!projection.scale) return;
+  const vis = DATA.filter(visible).sort((a,b)=>b.w-a.w);
+  const sel = gMk.selectAll("g.mk").data(vis, d=>d.id);
+  sel.exit().remove();
+  const en = sel.enter().append("g").attr("class",d=>"mk "+(d.kind==="mercado"?"market":"")+(d.kind==="presencia"?" pres":""))
+    .on("mousemove",(e,d)=>showTip(e,`<b>${d.n}</b><br><span style="color:${FIBRAS[d.f].color}">${d.f}</span> · ${d.city}`))
+    .on("mouseleave",hideTip)
+    .on("click",(e,d)=>{ e.stopPropagation(); openCard(d); });
+  en.append("circle").attr("class","ring");
+  en.append("circle").attr("class","core").attr("filter","url(#mglow)");
+  const all = en.merge(sel);
+  all.attr("transform",d=>`translate(${projection([d.lng,d.lat])})`).classed("sel",d=>state.sel===d.id);
+  all.select(".ring").attr("stroke",d=>FIBRAS[d.f].color).style("display",d=>d.kind==="prop"?"none":null)
+     .attr("stroke-dasharray",d=>d.kind==="presencia"?"2 2":null);
+  all.select(".core").attr("fill",d=>d.kind==="presencia"?"rgba(0,0,0,.35)":FIBRAS[d.f].color)
+     .attr("stroke",d=>d.kind==="presencia"?FIBRAS[d.f].color:null).style("stroke-dasharray",d=>d.kind==="presencia"?"2 2":null);
+  renderWorld(); rescale(); updateCounts();
+}
+function buildEtf(){
+  const box=d3.select("#etfs");
+  Object.entries(ETFD.etfs).forEach(([e,o])=>{
+    const n=Object.keys(o.w).length;
+    box.append("div").attr("class","fibra etf").attr("data-e",e).html(
+      `<span class="dot" style="color:${o.color}"></span><div><div class="nm">${e} <span style="font-weight:500;color:var(--dim)">· ${o.name}</span></div><div class="ds">${o.holdings.toLocaleString("es-MX")} empresas · ${n} país${n>1?"es":""} · datos al ${o.asof}</div></div><div class="ct"></div>`)
+      .on("click",function(){ etfOn.has(e)?etfOn.delete(e):etfOn.add(e); this.classList.toggle("off"); computeCW(); styleWorld(); renderWorld(); rescale(); });
+  });
+  computeCW();
+}
+function rescale(){
+  const s = Math.pow(k, 0.9);
+  gHex.style("opacity", k>2.5?0:1);
+  gMk.selectAll("g.mk").each(function(d){
+    const r = (2.6 + d.w*1.9) / s;
+    const el = d3.select(this);
+    el.select(".core").attr("r", r);
+    el.select(".ring").attr("r", r*1.45);
+  });
+  gCLab.selectAll("text").style("font-size",(10/k)+"px").style("stroke-width",(3/k)+"px").attr("dx",(7/k)).attr("dy",(-6/k))
+    .style("display",d=> (d[3]>=3 || (d[3]===2 && k>1.6) || k>4) ? null : "none");
+  gMk.style("display", k<0.35 ? "none" : null);
+  gCLab.style("display", k<0.6 ? "none" : null);
+  const sw = Math.pow(k,0.95);
+  gWB.selectAll("g.wb").each(function(d){
+    const r = (3 + Math.sqrt(d.w)*3.2)/sw;
+    const el=d3.select(this); el.select(".core").attr("r",r); el.select(".ring").attr("r",r*1.4);
+    el.select("text").style("font-size",(10/k)+"px").style("stroke-width",(3/k)+"px").attr("dy",(-r-4/k))
+      .style("display", (d.w>=5 || k>0.22) ? null : "none");
+  });
+  gWB.style("display", k>3 ? "none" : null);
+  gSLab.selectAll("text").style("font-size",(11/k)+"px").style("display", (k>1.3 && k<14) ? null : "none");
+}
+function updateCounts(){
+  Object.keys(FIBRAS).forEach(f=>{
+    const was = state.on.has(f); state.on.add(f);
+    const n = DATA.filter(d=>d.f===f && visible(d)).length;
+    if(!was) state.on.delete(f);
+    const el = document.querySelector(`.fibra[data-f="${f}"] .ct`); if(el) el.textContent = n+" pts";
+  });
+  const vis = DATA.filter(visible);
+  const states = new Set(vis.map(d=>d.st).filter(s=>s!=="Varios"));
+  document.getElementById("kpis").innerHTML =
+    `<div class="kpi"><b>${state.on.size}</b><span>FIBRAs</span></div>
+     <div class="kpi"><b>${vis.length}</b><span>Puntos</span></div>
+     <div class="kpi"><b>${states.size}</b><span>Estados</span></div>`;
+}
+function buildPanel(){
+  const fb = d3.select("#fibras");
+  Object.entries(FIBRAS).forEach(([f,o])=>{
+    fb.append("div").attr("class","fibra").attr("data-f",f).html(
+      `<span class="dot" style="color:${o.color}"></span><div><div class="nm">${f} <span style="font-weight:500;color:var(--dim)">· ${o.name}</span></div><div class="ds">${o.desc}</div></div><div class="ct"></div>`)
+      .on("click",function(){ state.on.has(f)?state.on.delete(f):state.on.add(f); this.classList.toggle("off"); render(); })
+      .on("dblclick",function(){ state.on=new Set([f]); document.querySelectorAll(".fibra").forEach(x=>x.classList.toggle("off",x.dataset.f!==f)); render(); });
+  });
+  const sg = d3.select("#segs");
+  SEGS.forEach(s=> sg.append("span").attr("class","chip").text(s).on("click",function(){ state.segs.has(s)?state.segs.delete(s):state.segs.add(s); this.classList.toggle("off"); render(); }));
+  const go = [["Mundo","world"],["México",null],["CDMX",[-99.16,19.43,30]],["Valle de México norte",[-99.15,19.66,22]],["Monterrey",[-100.28,25.72,22]],["Guadalajara",[-103.36,20.63,24]],["Frontera norte",[-108,30.5,3.2]],["Bajío",[-101.2,21.2,7]],["Cancún",[-86.85,21.1,16]]];
+  const gb = d3.select("#goto");
+  go.forEach(([n,c])=> gb.append("button").attr("class","btn").text(n).on("click",()=> c==="world"? worldView() : c? flyTo(c[0],c[1],c[2]) : resetZoom()));
+  document.getElementById("q").addEventListener("input",e=>{ state.q=e.target.value.trim(); const q=norm(state.q); state.qHit = !!q && DATA.some(d=>norm(d.n+" "+d.city+" "+d.st+" "+d.f+" "+FIBRAS[d.f].name).includes(q)); render(); });
+  document.getElementById("toggle").onclick=()=>document.getElementById("panel").classList.toggle("collapsed");
+  document.getElementById("zin").onclick=()=>svg.transition().duration(400).call(zoom.scaleBy,1.8);
+  document.getElementById("zout").onclick=()=>svg.transition().duration(400).call(zoom.scaleBy,1/1.8);
+  document.getElementById("zreset").onclick=resetZoom;
+  svg.on("click",()=>closeCard());
+  svg.on("mousemove.coords",(e)=>{
+    const t=d3.zoomTransform(svg.node()); const p=t.invert(d3.pointer(e)); const ll=projection.invert(p);
+    if(ll) document.getElementById("coords").textContent=`LAT ${ll[1].toFixed(3)}°  LON ${ll[0].toFixed(3)}°`;
+  });
+  if(window.innerWidth<=760) document.getElementById("panel").classList.add("collapsed");
+}
+function flyTo(lng,lat,scale){
+  const [x,y]=projection([lng,lat]);
+  svg.transition().duration(1100).ease(d3.easeCubicInOut)
+    .call(zoom.transform, d3.zoomIdentity.translate(W()/2 + (W()>760?150:0), H()/2).scale(scale).translate(-x,-y));
+}
+function zoomTo(feature){
+  const [[x0,y0],[x1,y1]] = path.bounds(feature);
+  const sc = Math.min(60, 0.8/Math.max((x1-x0)/(W()-(W()>760?380:40)), (y1-y0)/H()));
+  svg.transition().duration(900).call(zoom.transform, d3.zoomIdentity.translate(W()/2+(W()>760?150:0),H()/2).scale(sc).translate(-(x0+x1)/2,-(y0+y1)/2));
+}
+function worldView(){
+  const [[x0,y0],[x1,y1]] = path.bounds(neighData);
+  const off = W()>760?360:0;
+  const sc = Math.min((W()-off-40)/(x1-x0), (H()-40)/(y1-y0));
+  svg.transition().duration(1400).ease(d3.easeCubicInOut).call(zoom.transform, d3.zoomIdentity.translate(off+(W()-off)/2, H()/2).scale(sc).translate(-(x0+x1)/2,-(y0+y1)/2));
+}
+function resetZoom(){ svg.transition().duration(900).call(zoom.transform, d3.zoomIdentity); }
+function showTip(e,html){ const t=document.getElementById("tip"); t.innerHTML=html; t.style.display="block"; t.style.left=(e.clientX+14)+"px"; t.style.top=(e.clientY+12)+"px"; }
+function hideTip(){ document.getElementById("tip").style.display="none"; }
+const KIND = {prop:"Propiedad individual · ubicación aproximada (colonia/municipio)", mercado:"Mercado o clúster · punto ubicado en la ciudad principal; el conteo es oficial", presencia:"Presencia · la FIBRA no publica la ciudad exacta o el conteo en esta plaza"};
+function closeCard(){ document.getElementById("card").style.display="none"; if(state.sel!==null){ state.sel=null; render(); } }
+window.addEventListener("resize",()=>{ if(mexico){ fit(); } });
+
+/* ================= MI DINERO · CIUDAD MAREA + BUSCADOR ================= */
+let HOLD=null, MODE="pct", MONEY={};
+const MKEY="marea-mapa-v1";
+const MXN = v => "$" + Math.round(v).toLocaleString("es-MX");
+const MXNs = v => v>=1e6 ? "$"+(v/1e6).toFixed(1)+"M" : v>=1e3 ? "$"+(v/1e3).toFixed(1)+"k" : "$"+Math.round(v);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const KEYS = () => [...Object.keys(ETFD.etfs), ...Object.keys(FIBRAS)];
+// FIBRA name as it appears inside the ETF holdings
+const FIBRA_IN_ETF = {FUNO11:"Fibra Uno", FIBRAPL14:"Prologis Property Mexico", FMTY14:"Fibra MTY", DANHOS13:"Danhos", FNOVA17:"Fibra Nova", NEXT25:"Fibra Next"};
+
+function loadMoney(){ if(!CFG.guardarLocal) return; try{ MONEY = JSON.parse(localStorage.getItem(MKEY)||"{}")||{}; }catch(e){ MONEY={}; } }
+function saveMoney(){ if(!CFG.guardarLocal) return; try{ localStorage.setItem(MKEY, JSON.stringify(MONEY)); }catch(e){} }
+const mon = k => +MONEY[k]||0;
+const totalMoney = () => KEYS().reduce((a,k)=>a+mon(k),0);
+const fibraMoney = () => Object.keys(FIBRAS).filter(f=>state.on.has(f)).reduce((a,f)=>a+mon(f),0);
+const hasMoney = () => totalMoney()>0;
+
+function computeCW(){
+  CW={};
+  const money = MODE==="mxn";
+  Object.entries(ETFD.etfs).forEach(([e,o])=>{
+    if(!etfOn.has(e)) return;
+    if(money && !mon(e)) return;
+    Object.entries(o.w).forEach(([iso,v])=>{
+      const c=ETFD.countries[iso]; if(!c) return;
+      CW[iso]=CW[iso]||{iso,name:c[0],lng:c[1],lat:c[2],list:[],m:0};
+      const m = mon(e)*v.w/100;
+      CW[iso].list.push({e,w:v.w,m}); CW[iso].m+=m;
+    });
+  });
+  if(money && fibraMoney()>0){
+    const c=ETFD.countries.MX;
+    CW.MX = CW.MX || {iso:"MX",name:c[0],lng:c[1],lat:c[2],list:[],m:0};
+    CW.MX.fib = fibraMoney(); CW.MX.m += CW.MX.fib;
+  }
+  const T = totalMoney();
+  Object.values(CW).forEach(c=>{
+    c.list.sort((a,b)=> money ? b.m-a.m : b.w-a.w);
+    c.e = c.list.length ? c.list[0].e : null;
+    c.w = money ? (T? c.m/T*100 : 0) : c.list[0].w;
+  });
+}
+const colorOf = c => c.e ? ETFD.etfs[c.e].color : "#22d3ee";
+function styleWorld(){
+  gNeigh.selectAll("path").attr("class",d=>"country"+(CW[d.properties.id]?" held":""))
+    .style("fill",d=>{ const c=CW[d.properties.id]; if(!c) return null;
+      const col=d3.color(colorOf(c)); col.opacity = 0.18 + 0.62*Math.min(1,Math.sqrt(c.w/35)); return col.formatRgb(); })
+    .style("stroke",d=>CW[d.properties.id]? colorOf(CW[d.properties.id]) : null);
+  gCoast.selectAll("path").style("fill", CW.MX ? "rgba(34,197,94,.10)" : "none");
+}
+function tipCountry(d){
+  const c=CW[d.iso||d]; if(!c) return "";
+  const lines=c.list.map(x=>{ const v=ETFD.etfs[x.e].w[c.iso]; const t=v.top[0];
+    return `<span style="color:${ETFD.etfs[x.e].color}">${x.e}</span> ${MODE==="mxn"? MXN(x.m) : x.w.toFixed(2)+"%"} · líder: ${esc(t[0])}`; });
+  if(c.fib) lines.push(`<span style="color:#22d3ee">FIBRAs</span> ${MXN(c.fib)}`);
+  return `<b>${c.name}</b>${MODE==="mxn"?` · <b>${MXN(c.m)}</b>`:""}<br>${lines.join("<br>")}<br><span style="color:var(--dim)">Clic para ver empresas</span>`;
+}
+function renderWorld(){
+  if(!ETFD) return;
+  const data=Object.values(CW).sort((a,b)=>b.w-a.w);
+  const sel=gWB.selectAll("g.wb").data(data,d=>d.iso);
+  sel.exit().remove();
+  const en=sel.enter().append("g").attr("class","wb")
+    .on("mousemove",(e,d)=>showTip(e,tipCountry(d)))
+    .on("mouseleave",hideTip).on("click",(e,d)=>{e.stopPropagation(); openCountry(d.iso);});
+  en.append("circle").attr("class","ring"); en.append("circle").attr("class","core").attr("filter","url(#mglow)"); en.append("text").attr("class","wlabel");
+  const all=en.merge(sel);
+  all.attr("transform",d=>`translate(${projection([d.lng,d.lat])})`);
+  all.select(".core").attr("fill",d=>colorOf(d)).attr("fill-opacity",.85).attr("stroke","#02060f").attr("stroke-width",.8).attr("vector-effect","non-scaling-stroke");
+  all.select(".ring").attr("stroke",d=>colorOf(d));
+  all.select("text").text(d=>`${(d.iso==='AE'?'EAU':d.name).toUpperCase()} ${MODE==="mxn"? MXNs(d.m) : d.w.toFixed(1)+"%"}`);
+  document.querySelectorAll(".etf").forEach(el=>{ const e=el.dataset.e, o=ETFD.etfs[e];
+    el.querySelector(".ct").textContent = MODE==="mxn" ? (mon(e)? MXNs(mon(e)) : "sin monto") : Object.values(o.w).reduce((a,b)=>a+b.w,0).toFixed(1)+"% en acciones"; });
+  updateMoneyBox();
+}
+
+/* ---------- country card (with search highlight + money) ---------- */
+let cardState={iso:null,e:null,all:false,hl:null};
+function holdingsOf(e, iso){ if(!HOLD) return []; const ei=HOLD.etfs.indexOf(e); return HOLD.h.filter(r=>r[0]===ei && r[1]===iso); }
+function openCountry(iso, e, hl){
+  const c=CW[iso] || (()=>{ const k=ETFD.countries[iso]; const list=Object.keys(ETFD.etfs).filter(x=>ETFD.etfs[x].w[iso]).map(x=>({e:x,w:ETFD.etfs[x].w[iso].w,m:mon(x)*ETFD.etfs[x].w[iso].w/100})); return list.length?{iso,name:k[0],list,m:0}:null; })();
+  if(!c) return;
+  if(!c.list.length && c.fib){ return openMexicoFibras(c); }
+  e = e && c.list.some(x=>x.e===e) ? e : c.list[0].e;
+  const same = cardState.iso===iso && cardState.e===e;
+  cardState={iso,e,all: same ? cardState.all : false, hl: hl!==undefined ? hl : (same ? cardState.hl : null)};
+  const o=ETFD.etfs[e], v=o.w[iso], M=mon(e), money = M>0;
+  const tabs = c.list.length>1 ? `<div class="tabs">${c.list.map(x=>`<button class="tab ${x.e===e?"on":""}" style="--c:${ETFD.etfs[x.e].color}" onclick="event.stopPropagation();openCountry('${iso}','${x.e}')">${x.e} · ${MODE==="mxn"&&mon(x.e)? MXNs(x.m) : x.w.toFixed(2)+"%"}</button>`).join("")}</div>` : "";
+  const shown = cardState.all ? v.top : v.top.slice(0,10);
+  const maxW = v.top[0][2];
+  const row = (t,i,hlc)=>`<div class="co ${hlc?"hl":""}"><div class="co-h"><span class="co-r">${i+1}</span><span class="co-n">${esc(t[0])}</span><span class="co-w">${t[2].toFixed(t[2]<0.01?4:2)}%</span></div>
+      <div class="bar"><i style="width:${Math.max(0.5,t[2]/maxW*100).toFixed(1)}%;background:${o.color}"></i></div>
+      <div class="co-s">${t[1]} · ${esc(t[3])} · ${(t[2]/v.w*100).toFixed(t[2]/v.w*100<0.1?3:1)}% del país${money?` · <b class="mx">${MXN(M*t[2]/100)}</b> tuyos`:""}</div></div>`;
+  const list = shown.map((t,i)=>row(t,i,cardState.hl && t[0]===cardState.hl)).join("");
+  let found="";
+  if(cardState.hl){
+    const all=holdingsOf(e,iso); const idx=all.findIndex(r=>r[2]===cardState.hl);
+    if(idx>=0){ const r=all[idx]; found = `<div class="sec">EMPRESA BUSCADA</div>${row([r[2],HOLD.sectors[r[3]],r[4],r[5]],idx,true)}<div class="co-s" style="margin:4px 0 0 26px">Lugar #${idx+1} de ${all.length} en ${c.name} dentro de ${e}.</div>`; }
+  }
+  const top10 = v.top.slice(0,10).reduce((a,b)=>a+b[2],0);
+  const secs = Object.entries(v.sec).slice(0,6).map(([s,w])=>`<div class="sec-r"><span>${s}</span><span class="bar"><i style="width:${(w/v.w*100).toFixed(1)}%;background:${o.color}"></i></span><b>${(w/v.w*100).toFixed(0)}%</b></div>`).join("");
+  const notes = [];
+  if(e==="VWO" && iso==="CN") notes.push("Incluye acciones chinas listadas en Hong Kong y ADRs en EE.UU. (en el archivo vienen con región HK/US).");
+  if(e==="VWO" && iso!=="CN") notes.push("ADRs listados en EE.UU. se asignaron a su país de origen.");
+  const kpi3 = money ? `<div class="kpi"><b class="mx">${MXNs(M*v.w/100)}</b><span>tu dinero aquí</span></div>` : `<div class="kpi"><b>${(top10/v.w*100).toFixed(0)}%</b><span>top 10 / país</span></div>`;
+  const mxExtra = iso==="MX" ? fibrasInEtfBlock() + (MODE==="mxn" && fibraMoney()? `<div class="prec">Además tienes ${MXN(fibraMoney())} directo en FIBRAs (ver propiedades con zoom a México).</div>` : `<div class="prec">Haz zoom a México para ver las propiedades de las FIBRAs.</div>`) : "";
+  document.getElementById("cardBody").innerHTML =
+    `<span class="tag" style="color:${o.color}">${e}</span><h2>${c.name}</h2><div class="loc">${o.name}</div>${tabs}
+     <div class="kpis kc"><div class="kpi"><b>${v.w.toFixed(2)}%</b><span>del fondo</span></div><div class="kpi"><b>${v.n.toLocaleString("es-MX")}</b><span>empresas</span></div>${kpi3}</div>
+     ${found}
+     <div class="sec">TOP EMPRESAS</div>${list}
+     ${v.top.length>10?`<button class="btn more" onclick="event.stopPropagation();cardState.all=!cardState.all;openCountry('${iso}','${e}')">${cardState.all?"Ver solo top 10":"Ver top "+v.top.length}</button>`:""}
+     <div class="sec">SECTORES EN ${c.name.toUpperCase()}</div>${secs}
+     ${mxExtra}
+     <div class="prec">% = peso en el valor total del ETF. “% del país” = peso dentro de lo que el ETF tiene en ese país.${money?" “Tuyos” = tu monto en "+e+" × peso de la empresa.":""} ${notes.join(" ")} Fuente: ${o.src}; datos al ${o.asof}.</div>`;
+  const card=document.getElementById("card"); card.style.display="block"; card.scrollTop=0;
+}
+function openMexicoFibras(c){
+  document.getElementById("cardBody").innerHTML = `<span class="tag" style="color:#22d3ee">MÉXICO</span><h2>México</h2><div class="loc">Tus FIBRAs</div>
+    <div class="kpis kc"><div class="kpi"><b class="mx">${MXNs(c.fib)}</b><span>en FIBRAs</span></div></div>${fibrasInEtfBlock()}`;
+  document.getElementById("card").style.display="block";
+}
+function fibraInEtf(f){
+  if(!HOLD) return [];
+  const key=FIBRA_IN_ETF[f]; if(!key) return [];
+  return HOLD.h.filter(r=>r[1]==="MX" && r[2].includes(key)).map(r=>({e:HOLD.etfs[r[0]], w:r[4], name:r[2]}));
+}
+function fibrasInEtfBlock(){
+  const rows = Object.keys(FIBRAS).map(f=>{ const x=fibraInEtf(f); return x.length? `<div class="co-s" style="margin-left:0">• <b style="color:${FIBRAS[f].color}">${f}</b> está dentro de ${x.map(y=>`${y.e} (${y.w.toFixed(4)}%)`).join(", ")}${mon("VWO")?` → ${MXN(x.reduce((a,y)=>a+mon(y.e)*y.w/100,0))} tuyos vía ETF`:""}</div>` : ""; }).join("");
+  return rows ? `<div class="sec">FIBRAS DENTRO DE LOS ETFs</div>${rows}` : "";
+}
+/* FIBRA card: add ETF bridge + money */
+function openCard(d){
+  state.sel=d.id; render();
+  const o=FIBRAS[d.f];
+  const rows = [["FIBRA",`${d.f} · ${o.name}`],["Segmento",d.seg],["Estatus",d.status]];
+  if(d.metric) rows.push(["Dato",d.metric]);
+  if(d.note) rows.push(["Nota",d.note]);
+  rows.push(["Coordenadas",`${d.lat.toFixed(3)}, ${d.lng.toFixed(3)}`]);
+  const inE = fibraInEtf(d.f);
+  if(inE.length) rows.push(["En ETFs", inE.map(y=>`${y.e}: ${y.w.toFixed(4)}% del fondo`).join("<br>")]);
+  const direct = mon(d.f), via = inE.reduce((a,y)=>a+mon(y.e)*y.w/100,0);
+  if(direct||via) rows.push(["Tu dinero", `<b class="mx">${MXN(direct+via)}</b> en ${d.f}<br><span style="color:var(--dim);font-size:12px">${MXN(direct)} directo${via?` + ${MXN(via)} vía ETF`:""} (toda la FIBRA, no solo esta propiedad)</span>`]);
+  document.getElementById("cardBody").innerHTML =
+    `<span class="tag" style="color:${o.color}">${d.f}</span>
+     <h2>${d.n}</h2><div class="loc">${d.city} · ${d.st}</div>
+     <dl>${rows.map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join("")}</dl>
+     <div class="prec">${KIND[d.kind]||""}</div>`;
+  document.getElementById("card").style.display="block";
+}
+
+/* ---------- buscador ---------- */
+function searchAll(q){
+  const n=norm(q); if(n.length<2) return {co:[],pr:[]};
+  const co=[]; const seen=new Map();
+  if(HOLD) for(const r of HOLD.h){
+    if(norm(r[2]).includes(n) || norm(r[5])===n || norm(r[5]).split("/").includes(n)){
+      const k=r[2]+"|"+r[1];
+      if(!seen.has(k)){ seen.set(k,{name:r[2],iso:r[1],list:[]}); co.push(seen.get(k)); }
+      seen.get(k).list.push({e:HOLD.etfs[r[0]],w:r[4],t:r[5],s:HOLD.sectors[r[3]]});
+      if(co.length>=8 && !seen.has(k)) break;
+    }
+    if(co.length>=8) break;
+  }
+  const pr = DATA.filter(d=>norm(d.n+" "+d.city+" "+d.f).includes(n)).slice(0,5);
+  return {co,pr};
+}
+function renderResults(){
+  const box=document.getElementById("results"); const q=document.getElementById("q").value.trim();
+  if(q.length<2){ box.style.display="none"; return; }
+  const {co,pr}=searchAll(q);
+  if(!co.length && !pr.length){ box.innerHTML=`<div class="rs-empty">${HOLD? "Sin resultados" : "Cargando empresas…"}</div>`; box.style.display="block"; return; }
+  box.innerHTML = (co.length?`<div class="rs-h">EMPRESAS EN ETFs</div>`:"") + co.map((c,i)=>{
+      const tot=c.list.reduce((a,x)=>a+mon(x.e)*x.w/100,0);
+      return `<div class="rs" data-k="c${i}"><div><b>${esc(c.name)}</b><span>${ETFD.countries[c.iso][0]} · ${c.list[0].s} · ${esc(c.list[0].t)}</span></div><div class="rs-w">${c.list.map(x=>`<i style="color:${ETFD.etfs[x.e].color}">${x.e} ${x.w.toFixed(x.w<0.01?4:2)}%</i>`).join("")}${tot?`<i class="mx">${MXN(tot)}</i>`:""}</div></div>`; }).join("")
+    + (pr.length?`<div class="rs-h">PROPIEDADES FIBRA</div>`:"") + pr.map((d,i)=>`<div class="rs" data-k="p${i}"><div><b>${esc(d.n)}</b><span>${esc(d.city)} · ${d.st}</span></div><div class="rs-w"><i style="color:${FIBRAS[d.f].color}">${d.f}</i></div></div>`).join("");
+  box.style.display="block";
+  box.querySelectorAll(".rs").forEach(el=>el.onclick=(ev)=>{ ev.stopPropagation(); const k=el.dataset.k; box.style.display="none";
+    if(k[0]==="c"){ const c=co[+k.slice(1)]; goCompany(c); } else { const d=pr[+k.slice(1)]; flyTo(d.lng,d.lat,d.kind==="prop"?60:20); setTimeout(()=>openCard(d),900); } });
+}
+function goCompany(c){
+  const e=c.list[0].e;
+  if(!etfOn.has(e)){ etfOn.add(e); document.querySelector(`.etf[data-e="${e}"]`).classList.remove("off"); }
+  if(MODE==="mxn" && !mon(e)) setMode("pct");
+  computeCW(); styleWorld(); renderWorld(); rescale();
+  const k=ETFD.countries[c.iso]; const big=["US","CA","CN","AU","BR","RU","IN"].includes(c.iso);
+  flyTo(k[1],k[2], big?0.35:0.9);
+  setTimeout(()=>openCountry(c.iso,e,c.name),700);
+}
+
+/* ---------- Mi dinero (modal) ---------- */
+function setMode(m){
+  MODE = (m==="mxn" && !hasMoney()) ? "pct" : m;
+  document.querySelectorAll(".mode .tab").forEach(b=>b.classList.toggle("on", b.dataset.m===MODE));
+  computeCW(); styleWorld(); renderWorld(); rescale();
+}
+function openMoney(){
+  const rowsE = Object.entries(ETFD.etfs).map(([e,o])=>`<label><span style="color:${o.color}">${e}</span><input inputmode="decimal" data-k="${e}" value="${mon(e)||""}" placeholder="0"></label>`).join("");
+  const rowsF = Object.entries(FIBRAS).map(([f,o])=>`<label><span style="color:${o.color}">${f}</span><input inputmode="decimal" data-k="${f}" value="${mon(f)||""}" placeholder="0"></label>`).join("");
+  document.getElementById("moneyBody").innerHTML = `
+    <h2 class="mt">MI DINERO · CIUDAD MAREA</h2>
+    <div class="note" style="margin:0 0 10px">Escribe cuánto tienes en cada instrumento (en pesos). Se guarda solo en este navegador; no se envía a ningún lado.</div>
+    <div class="sec">ETFs</div><div class="mgrid">${rowsE}</div>
+    <div class="sec">FIBRAs</div><div class="mgrid">${rowsF}</div>
+    <div class="sec">IMPORTAR DESDE CIUDAD MAREA</div>
+    <textarea id="imp" placeholder='Pega aquí el JSON de Ciudad Marea {"formato":"marea-mapa-v1","posiciones":[{"clave":"VWO","monto":10000}]} o líneas tipo "VWO 10000"'></textarea>
+    <div class="btnrow" style="margin-top:10px"><button class="btn" id="mSave">Guardar y ver en el mapa</button><button class="btn" id="mImp">Importar</button><button class="btn" id="mClear">Borrar todo</button><button class="btn" id="mClose">Cerrar</button></div>
+    <div id="mMsg" class="note"></div>`;
+  const md=document.getElementById("money"); md.style.display="block";
+  const read=()=>{ md.querySelectorAll("input[data-k]").forEach(i=>{ const v=parseFloat(String(i.value).replace(/[$,\s]/g,"")); if(v>0) MONEY[i.dataset.k]=v; else delete MONEY[i.dataset.k]; }); };
+  document.getElementById("mSave").onclick=()=>{ read(); saveMoney(); md.style.display="none"; setMode("mxn"); if(hasMoney()) openReport(); };
+  document.getElementById("mClear").onclick=()=>{ MONEY={}; saveMoney(); setMode("pct"); openMoney(); };
+  document.getElementById("mClose").onclick=()=>{ md.style.display="none"; };
+  document.getElementById("mImp").onclick=()=>{
+    const t=document.getElementById("imp").value.trim(); let n=0; const SEEN={};
+    try{ const j=JSON.parse(t); (j.posiciones||j.positions||[]).forEach(p=>{ const k0=String(p.clave||p.ticker||"").toUpperCase(); const k=TICKER_ALIAS[k0]||k0; const v=+(p.monto??p.valor??p.value); if(KEYS().includes(k)&&v>0){ MONEY[k]=(SEEN[k]||0)+v; SEEN[k]=MONEY[k]; n++; } }); }
+    catch(e){ t.split(/\n|;/).forEach(l=>{ const m=l.trim().match(/^([A-Z0-9]+)[\s:=,]+\$?([\d,.]+)/i); if(m){ const k=TICKER_ALIAS[m[1].toUpperCase()]||m[1].toUpperCase(), v=parseFloat(m[2].replace(/,/g,"")); if(KEYS().includes(k)&&v>0){ MONEY[k]=(SEEN[k]||0)+v; SEEN[k]=MONEY[k]; n++; } } }); }
+    saveMoney(); openMoney(); document.getElementById("mMsg").textContent = n? `Importé ${n} posiciones.` : "No encontré posiciones de VUAA, VEA, VWO o FIBRAs en el texto.";
+  };
+}
+/* ---------- Reporte de Marea ---------- */
+function portfolioCompanies(){
+  if(!HOLD) return [];
+  const agg=new Map();
+  HOLD.h.forEach(r=>{ const e=HOLD.etfs[r[0]]; const M=mon(e); if(!M) return; const m=M*r[4]/100; const k=r[2];
+    const a=agg.get(k)||{name:r[2],iso:r[1],s:HOLD.sectors[r[3]],m:0,etfs:new Set()}; a.m+=m; a.etfs.add(e); agg.set(k,a); });
+  Object.keys(FIBRAS).forEach(f=>{ if(mon(f)){ const a=agg.get(f)||{name:FIBRAS[f].name+" ("+f+")",iso:"MX",s:"Inmobiliario",m:0,etfs:new Set()}; a.m+=mon(f); a.etfs.add("directo"); agg.set(f,a);} });
+  return [...agg.values()].sort((a,b)=>b.m-a.m);
+}
+function reportData(){
+  const T=totalMoney(); const cos=portfolioCompanies();
+  const byC={}; cos.forEach(c=>byC[c.iso]=(byC[c.iso]||0)+c.m);
+  const ctry=Object.entries(byC).sort((a,b)=>b[1]-a[1]);
+  const bySec={}; cos.forEach(c=>bySec[c.s]=(bySec[c.s]||0)+c.m);
+  const secs=Object.entries(bySec).sort((a,b)=>b[1]-a[1]);
+  const top10=cos.slice(0,10).reduce((a,c)=>a+c.m,0);
+  return {T,cos,ctry,secs,top10, invested: cos.reduce((a,c)=>a+c.m,0)};
+}
+function openReport(){
+  if(!hasMoney()){ openMoney(); return; }
+  const R=reportData();
+  const big=R.cos[0], cty=R.ctry[0];
+  const face = R.top10/R.invested>0.4 ? "😬" : R.ctry.length>20 ? "😎" : "🙂";
+  document.getElementById("cardBody").innerHTML = `
+    <span class="tag" style="color:#38e1ff">REPORTE DE MAREA</span><h2>Tu ciudad global ${face}</h2><div class="loc">Lo que hay detrás de tus ${MXN(R.T)}</div>
+    <div class="kpis kc"><div class="kpi"><b>${R.cos.length.toLocaleString("es-MX")}</b><span>empresas</span></div><div class="kpi"><b>${R.ctry.length}</b><span>países</span></div><div class="kpi"><b>${(R.top10/R.invested*100).toFixed(0)}%</b><span>en tus top 10</span></div></div>
+    <div class="vec">🏙️ Tu vecino más grande es <b>${esc(big.name)}</b>: tiene <b class="mx">${MXN(big.m)}</b> de tu dinero.</div>
+    <div class="vec">🌎 Tu barrio más poblado es <b>${ETFD.countries[cty[0]][0]}</b>, con ${(cty[1]/R.invested*100).toFixed(1)}% de tu dinero.</div>
+    <div class="vec">🧩 Tu empresa más pequeña recibe ${R.cos[R.cos.length-1].m<1?"menos de un peso":MXN(R.cos[R.cos.length-1].m)} (${esc(R.cos[R.cos.length-1].name)}).</div>
+    <div class="sec">TUS 15 EMPRESAS MÁS GRANDES</div>
+    ${R.cos.slice(0,15).map((c,i)=>`<div class="co"><div class="co-h"><span class="co-r">${i+1}</span><span class="co-n">${esc(c.name)}</span><span class="co-w mx">${MXN(c.m)}</span></div><div class="bar"><i style="width:${(c.m/R.cos[0].m*100).toFixed(1)}%;background:#38e1ff"></i></div><div class="co-s">${ETFD.countries[c.iso][0]} · ${c.s} · vía ${[...c.etfs].join(" + ")}</div></div>`).join("")}
+    <div class="sec">TUS PAÍSES</div>
+    ${R.ctry.slice(0,10).map(([iso,m])=>`<div class="sec-r"><span>${ETFD.countries[iso][0]}</span><span class="bar"><i style="width:${(m/R.ctry[0][1]*100).toFixed(1)}%;background:#38e1ff"></i></span><b>${(m/R.invested*100).toFixed(1)}%</b></div>`).join("")}
+    <div class="sec">TUS SECTORES</div>
+    ${R.secs.slice(0,8).map(([s,m])=>`<div class="sec-r"><span>${s}</span><span class="bar"><i style="width:${(m/R.secs[0][1]*100).toFixed(1)}%;background:#38e1ff"></i></span><b>${(m/R.invested*100).toFixed(1)}%</b></div>`).join("")}
+    <div class="btnrow" style="margin-top:12px"><button class="btn" onclick="event.stopPropagation();copyMarea(this)">Copiar para Ciudad Marea</button><button class="btn" onclick="event.stopPropagation();openMoney()">Editar montos</button></div>
+    <textarea id="expBox" readonly style="display:none"></textarea>
+    <div class="prec">Visualización con los pesos de cada fondo al ${ETFD.etfs.VEA.asof}; los montos por empresa son proporcionales, no posiciones reales. La parte en efectivo de cada ETF no se reparte. No es recomendación de inversión.</div>`;
+  const card=document.getElementById("card"); card.style.display="block"; card.scrollTop=0;
+}
+function mareaExport(){
+  const R=reportData();
+  return { formato:"marea-mapa-v1", generado:new Date().toISOString().slice(0,10), datos_al:ETFD.etfs.VEA.asof, moneda:"MXN",
+    posiciones: KEYS().filter(k=>mon(k)).map(k=>({clave:k, tipo: ETFD.etfs[k]?"ETF":"FIBRA", monto:mon(k)})),
+    resumen:{ total:R.T, empresas:R.cos.length, paises:R.ctry.length,
+      por_pais:R.ctry.map(([iso,m])=>({iso, nombre:ETFD.countries[iso][0], monto:Math.round(m)})),
+      por_sector:R.secs.map(([s,m])=>({sector:s, monto:Math.round(m)})),
+      top_empresas:R.cos.slice(0,25).map(c=>({nombre:c.name, pais:c.iso, sector:c.s, monto:Math.round(c.m*100)/100})) } };
+}
+function copyMarea(btn){
+  const txt=JSON.stringify(mareaExport(),null,1);
+  const done=()=>{ btn.textContent="¡Copiado! Pégalo en Ciudad Marea"; };
+  try{ navigator.clipboard.writeText(txt).then(done,()=>fallback()); }catch(e){ fallback(); }
+  function fallback(){ const t=document.getElementById("expBox"); t.style.display="block"; t.value=txt; t.focus(); t.select(); btn.textContent="Selecciona y copia el texto"; }
+}
+function updateMoneyBox(){
+  const el=document.getElementById("moneySum"); if(!el) return;
+  el.innerHTML = hasMoney() ? `Capturado: <b class="mx">${MXN(totalMoney())}</b> en ${KEYS().filter(k=>mon(k)).length} instrumentos` : "Aún no capturas montos.";
+}
+function initMoneyUI(){
+  loadMoney();
+  document.getElementById("mBtn").onclick=(e)=>{ e.stopPropagation(); openMoney(); };
+  document.getElementById("rBtn").onclick=(e)=>{ e.stopPropagation(); openReport(); };
+  document.querySelectorAll(".mode .tab").forEach(b=>b.onclick=(e)=>{ e.stopPropagation(); if(b.dataset.m==="mxn" && !hasMoney()){ openMoney(); return; } setMode(b.dataset.m); });
+  const q=document.getElementById("q");
+  q.addEventListener("input",renderResults); q.addEventListener("focus",renderResults);
+  document.addEventListener("click",(e)=>{ if(!e.target.closest("#results") && e.target!==q) document.getElementById("results").style.display="none"; });
+  getJSON("data/holdings.json").then(j=>{ HOLD=j; renderResults(); avisarListo(); }).catch(()=>{});
+  if(hasMoney()) setMode("mxn"); else updateMoneyBox();
+}
+
+/* ---------- API pública + puente con Ciudad Marea ---------- */
+function setPosiciones(pos, opts){
+  opts=opts||{};
+  const arr = Array.isArray(pos) ? pos : (pos && (pos.posiciones||pos.positions)) || Object.entries(pos||{}).map(([clave,monto])=>({clave,monto}));
+  const nuevo={};
+  arr.forEach(p=>{ const k0=String(p.clave||p.ticker||"").toUpperCase(); const k=TICKER_ALIAS[k0]||k0; const v=+(p.monto??p.valor??p.value);
+    if(ETFD && KEYS().includes(k) && v>0) nuevo[k]=(nuevo[k]||0)+v; });
+  MONEY=nuevo; if(opts.guardar) saveMoney();
+  setMode(hasMoney()?"mxn":"pct");
+  if(opts.reporte && hasMoney()) openReport();
+  return Object.keys(nuevo).length;
+}
+let PENDING=null;
+window.MareaMapa = {
+  setPosiciones:(p,o)=>{ if(!ETFD){ PENDING=[p,o]; return 0; } return setPosiciones(p,o); },
+  getResumen:()=> ETFD && HOLD ? mareaExport() : null,
+  abrirReporte:()=>openReport(),
+  listo:()=>!!(ETFD&&HOLD)
+};
+function avisarListo(){
+  if(PENDING){ setPosiciones(PENDING[0],PENDING[1]); PENDING=null; }
+  try{ window.parent!==window && window.parent.postMessage({type:"marea:listo"}, "*"); }catch(e){}
+}
+window.addEventListener("message",(ev)=>{
+  if(!CFG.origenes.includes(ev.origin) && ev.origin!==location.origin) return;
+  const d=ev.data||{};
+  if(d.type==="marea:posiciones"){ const n=window.MareaMapa.setPosiciones(d.posiciones, {reporte:d.abrirReporte}); ev.source && ev.source.postMessage({type:"marea:ok", recibidas:n}, ev.origin); }
+  if(d.type==="marea:pedirResumen"){ ev.source && ev.source.postMessage({type:"marea:resumen", resumen:window.MareaMapa.getResumen()}, ev.origin); }
+});
+</script>
+</body>
+</html>
