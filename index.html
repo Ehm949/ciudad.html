@@ -392,6 +392,19 @@ body.mt-foco{overflow:hidden}
 #metas.wz-full .phead{display:flex;align-items:center;gap:10px}
 .wz-salir{margin-left:auto;font:inherit;font-size:13px;font-weight:700;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);padding:6px 12px;cursor:pointer}
 .mt-empieza{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+
+.tj.tj-falta .tj-next:not(:disabled){animation:tjPide .9s ease 2}
+@keyframes tjPide{25%{transform:translateX(5px) scale(1.06)}50%{transform:translateX(-3px)}75%{transform:translateX(3px) scale(1.04)}}
+@media (prefers-reduced-motion:reduce){.tj.tj-falta .tj-next{animation:none;outline:3px solid #ffd166}}
+/* Mapa Marea: otra página encima de la ciudad */
+body.mapa-foco{overflow:hidden}
+.mapa-page{position:fixed;inset:0;z-index:195;background:var(--bg,#0b1020);display:flex;flex-direction:column}
+.mapa-bar{display:flex;align-items:center;gap:14px;padding-block:10px;padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));padding-top:max(10px,env(safe-area-inset-top,0px));border-bottom:1px solid var(--line);background:var(--panel,#141c33)}
+.mapa-bar button{font:inherit;font-weight:800;font-size:14px;border-radius:999px;border:2px solid #ffd166;background:#ffd166;color:#1a1020;padding:7px 14px;cursor:pointer;flex:none}
+.mapa-tit{min-width:0;display:flex;flex-direction:column}
+.mapa-tit b{font-size:15px}
+.mapa-tit small{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mapa-page iframe{flex:1;width:100%;border:0;background:#05070f}
 /* ---------- vistas de consulta (portafolio, buscador, producción, reportes, cierre) ---------- */
 .mn-tabs{width:max-content;max-width:100%;overflow-x:auto}
 .mn-tabs button{white-space:nowrap}
@@ -930,20 +943,20 @@ details.mcalc p{margin:6px 0 0}
 /* ventanas de decisión (tutorial de la Fundación) */
 .vguia.vg-ev{display:block;position:relative;padding:0;margin:26px 0 12px;background:none;border:0}
 .vguia.vg-ev canvas{animation:none!important;width:100%;height:100%;border:0;border-radius:0;background:none}
-.vg-ev .ev-ban{position:absolute;left:-4px;top:-20px;z-index:2;background:linear-gradient(180deg,#e9d9b4,#b89c6a);color:#3a2614;font-family:var(--f-display,system-ui);font-size:15px;letter-spacing:.02em;padding:9px 30px 8px;clip-path:polygon(0 18%,3% 0,96% 6%,100% 30%,97% 100%,4% 92%,0 70%);box-shadow:0 4px 0 #0006;min-width:44%;text-align:center}
-.vg-ev .ev-box{background:#05070f;border:2px solid #000;border-radius:14px;padding:36px 16px 16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:18px;box-shadow:0 10px 30px #0008}
+.vg-ev .ev-ban{position:absolute;left:-4px;top:-18px;z-index:2;max-width:min(560px,90%);background:linear-gradient(180deg,#e9d9b4,#b89c6a);color:#3a2614;font-family:var(--f-display,system-ui);font-size:15px;letter-spacing:.02em;padding:9px 30px 8px;clip-path:polygon(0 18%,3% 0,96% 6%,100% 30%,97% 100%,4% 92%,0 70%);box-shadow:0 4px 0 #0006;min-width:44%;text-align:center}
+.vg-ev .ev-box{background:#05070f;border:2px solid #000;border-radius:14px;padding:32px 14px 14px;display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:16px;box-shadow:0 10px 30px #0008;max-width:920px}
 .vg-ev .ev-art{position:relative;border-radius:12px;overflow:hidden;border:3px solid #2b2240;background:#120c22;aspect-ratio:120/90;align-self:start}
 .vg-ev .ev-art canvas{display:block;image-rendering:pixelated}
 .vg-ev .vg-globo{left:34%;right:auto;top:30%}
 .vg-ev .ev-txt{min-width:0;display:flex;flex-direction:column}
-.vg-ev .vg-t{font-size:15.5px;min-height:4.4em;margin:6px 0 8px}
+.vg-ev .vg-t{font-size:15px;min-height:4.4em;margin:4px 0 6px}
 .vg-ev .ev-ops{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .vguia.vg-ev .ev-ops .vg-op{display:block;width:100%;min-height:0;text-align:left;font:inherit;font-size:14px;font-weight:400;line-height:1.35;color:#ecebf5;background:#1d4a52;border:0;border-radius:0;padding:10px 26px 10px 22px;clip-path:polygon(2.5% 0,97.5% 0,100% 50%,97.5% 100%,2.5% 100%,0 50%);cursor:pointer;transition:background .15s,transform .15s}
 .vguia.vg-ev .ev-ops .vg-op:hover,.vguia.vg-ev .ev-ops .vg-op:focus-visible{background:#2a6670;transform:translateX(4px);outline:none;border:0}
 .vguia.vg-ev .ev-ops .vg-op b{color:#fff;font-weight:800}
 .vguia.vg-ev .ev-ops .vg-op .ok{color:#6ee39a}.vguia.vg-ev .ev-ops .vg-op .bad{color:#ff7d7d}.vguia.vg-ev .ev-ops .vg-op .cr{color:#ffd166;font-weight:700}
 .vguia.vg-ev .ev-ops .vg-op.sec{background:#2a2f45}
-@media (max-width:720px){.vg-ev .ev-box{grid-template-columns:1fr;padding-top:32px}.vg-ev .ev-ban{min-width:70%;font-size:13px}}
+@media (max-width:720px){.vg-ev .ev-box{grid-template-columns:1fr;padding-top:30px}.vg-ev .ev-art{max-width:260px;justify-self:center;width:100%}.vg-ev .ev-ban{min-width:70%;font-size:13px}}
 @media (prefers-reduced-motion:reduce){.vguia.vg-ev .ev-ops .vg-op{transition:none}}
 </style>
 </head>
@@ -2265,7 +2278,7 @@ $('btnOut').addEventListener('click', () => logout(false));
 async function logout(expired) {
   if (!expired) { try { await api('salir'); } catch (_) {} }
   if (window.LAB && LAB.on()) LAB.salir();
-  token = null;
+  token = null; if (window.MAPA) MAPA.salir();
   try { sessionStorage.removeItem('cm_token'); sessionStorage.removeItem('cm_name'); sessionStorage.removeItem('cm_datos'); } catch (_) {}
   resetState();
   $('resume').hidden = true; $('lgUser').value = '';
@@ -2493,13 +2506,16 @@ function renderCalc() {
   <p class="foot" style="margin-top:6px">Valor = títulos × precio de hoy en pesos. Los ETFs en dólares se convierten con el tipo de cambio de tu hoja. Costo = títulos × tu precio promedio, que debe estar en pesos. No incluye efectivo sin invertir en tu casa de bolsa.</p>`;
 }
 
+// renta fija de lo más líquido a lo más largo: Bondia, Cetes 3 meses, 6 meses, 1 año, Udibonos
+const RF_ORDEN = n => /bondia/i.test(n) ? 0 : /cetes\s*91/i.test(n) ? 1 : /cetes\s*182/i.test(n) ? 2 : /cetes\s*364/i.test(n) ? 3 : /udibono/i.test(n) ? 4 : 5;
+const ordenRF = its => its.map((x, j) => [x, j]).sort((a, b) => RF_ORDEN(a[0].activo) - RF_ORDEN(b[0].activo) || a[1] - b[1]).map(x => x[0]);
 function renderForm() {
   const f = $('pfForm');
   let html = '';
   ORDER.forEach(k => {
-    const its = model.classes[k].items.filter(i => !i.propia);
-    if (!its.length) return;
     const renta = k === 'RENTA_FIJA';
+    const its = (renta ? ordenRF(model.classes[k].items) : model.classes[k].items).filter(i => !i.propia);
+    if (!its.length) return;
     html += `<div class="fgroup" style="--c:${CLS[k].color}"><h3><span class="dot"></span>${CLS[k].name}</h3>`;
     html += renta ? `<div class="frow renta"><span></span><span class="fhead">Saldo actual (MXN)</span></div>`
                   : `<div class="frow"><span></span><span class="fhead">Títulos</span><span class="fhead">Precio promedio</span></div>`;
@@ -5169,7 +5185,7 @@ const AUTH = (() => {
 // ================= Tarjetas de instrumentos (una a la vez, estilo videojuego) =================
 // Los datos fijos (cuántas empresas, cuánto construido) se revisan a mano; costos, precios y países salen del catálogo de la hoja.
 const TJ = (() => {
-  const pos = {};
+  const pos = {}, vistas = {};   // vistas[id] = tarjetas que ya se vieron
   const NOM = { us: 'Estados Unidos', jp: 'Japón', gb: 'Reino Unido', ca: 'Canadá', kr: 'Corea del Sur', ch: 'Suiza', fr: 'Francia', tw: 'Taiwán', cn: 'China', in: 'India', br: 'Brasil', za: 'Sudáfrica', mx: 'México', de: 'Alemania', au: 'Australia' };
   const PAIS = { 'japón': 'jp', 'japon': 'jp', 'reino unido': 'gb', 'canadá': 'ca', 'canada': 'ca', 'corea': 'kr', 'corea del sur': 'kr', 'suiza': 'ch', 'francia': 'fr', 'taiwán': 'tw', 'taiwan': 'tw', 'china': 'cn', 'india': 'in', 'brasil': 'br', 'sudáfrica': 'za', 'sudafrica': 'za', 'méxico': 'mx', 'mexico': 'mx', 'estados unidos': 'us', 'alemania': 'de', 'australia': 'au' };
   const FLAG = {
@@ -5247,6 +5263,7 @@ const TJ = (() => {
   function html(id, acts, n) {
     acts = acts.filter(Boolean); if (!acts.length) return '';
     const k = Math.min(pos[id] || 0, acts.length - 1);
+    vistas[id] = vistas[id] || new Set([0]); vistas[id].add(k);
     return `<div class="tj" data-tj="${id}" data-n="${acts.length}">
       <div class="tj-stage">${acts.map((a, j) => `<div class="tj-slot"${j === k ? '' : ' hidden'}>${tarjeta(a)}</div>`).join('')}</div>
       ${acts.length > 1 ? `<div class="tj-nav"><button type="button" class="tj-prev" aria-label="Tarjeta anterior"${k ? '' : ' disabled'}>‹</button><span class="tj-dots" aria-hidden="true">${acts.map((_, j) => `<i class="${j === k ? 'on' : ''}"></i>`).join('')}</span><span class="tj-cnt">${k + 1} de ${acts.length}</span><button type="button" class="tj-next"${k < acts.length - 1 ? '' : ' disabled'}>Siguiente tarjeta ›</button></div>` : ''}
@@ -5258,7 +5275,7 @@ const TJ = (() => {
     (root || document).querySelectorAll('canvas[data-spr]').forEach(c => SPR[c.dataset.spr] && dibuja(c, SPR[c.dataset.spr]));
     (root || document).querySelectorAll('.tj').forEach(el => {
       const id = el.dataset.tj, n = +el.dataset.n;
-      const mover = d => { const k = Math.max(0, Math.min(n - 1, (pos[id] || 0) + d)); pos[id] = k;
+      const mover = d => { const k = Math.max(0, Math.min(n - 1, (pos[id] || 0) + d)); pos[id] = k; (vistas[id] = vistas[id] || new Set([0])).add(k); el.classList.remove('tj-falta');
         el.querySelectorAll('.tj-slot').forEach((s, j) => { s.hidden = j !== k; if (j === k) { s.classList.remove('tj-in'); void s.offsetWidth; s.classList.add('tj-in'); } });
         el.querySelectorAll('.tj-dots i').forEach((x, j) => x.classList.toggle('on', j === k));
         const c = el.querySelector('.tj-cnt'); if (c) c.textContent = `${k + 1} de ${n}`;
@@ -5267,7 +5284,62 @@ const TJ = (() => {
       if (p) p.onclick = () => mover(-1); if (nx) nx.onclick = () => mover(1);
     });
   }
-  return { html, wire };
+  // ¿ya vio todas las tarjetas de esta pantalla? Si no, señala el botón y dice cuántas faltan
+  function faltan(root) { let f = 0; (root || document).querySelectorAll('.tj').forEach(el => { const v = vistas[el.dataset.tj], n = +el.dataset.n, x = n - (v ? v.size : 1); if (x > 0) { f += x; el.classList.add('tj-falta'); } }); return f; }
+  return { html, wire, faltan };
+})();
+
+// ================= Mapa Marea: otra página (mapa/index.html) que se abre encima de la ciudad =================
+// Contrato marea-mapa-v1: el mapa avisa "marea:listo", la ciudad le manda las posiciones del usuario
+// (pesos MXN a valor de mercado) y le pide el resumen. Los montos solo viajan por postMessage, en memoria.
+const MAPA = (() => {
+  let page = null, fr = null, listo = false, primera = true;
+  const url = () => (CONFIG.MAPA_URL || 'mapa/index.html') + '?embed=1';
+  const destino = () => location.origin && location.origin !== 'null' ? location.origin : '*';
+  const info = t => { const e = document.getElementById('mapaInfo'); if (e) e.textContent = t; };
+  function posiciones() {
+    if (typeof model === 'undefined' || !model) return [];
+    return model.items.filter(i => +i.valor > 0).map(i => ({ clave: i.activo, monto: Math.round(i.valor * 100) / 100 }));
+  }
+  function enviar() {
+    if (!fr || !listo) return;
+    fr.contentWindow.postMessage({ type: 'marea:posiciones', posiciones: posiciones(), abrirReporte: primera }, destino());
+    primera = false;
+  }
+  window.addEventListener('message', ev => {
+    if (!fr || ev.source !== fr.contentWindow) return;
+    if (ev.origin !== location.origin && !(location.origin === 'null' && ev.origin === 'null')) return;   // solo el propio sitio
+    const d = ev.data || {};
+    if (d.type === 'marea:listo') { listo = true; enviar(); }
+    if (d.type === 'marea:ok') {
+      if (!d.recibidas) info('Todavía no tienes ETFs ni FIBRAs en la Tesorería: el mapa muestra los porcentajes de cada fondo.');
+      else { info('Calculando dónde está tu dinero…'); fr.contentWindow.postMessage({ type: 'marea:pedirResumen' }, destino()); }
+    }
+    if (d.type === 'marea:resumen' && d.resumen) {
+      const r = d.resumen.resumen || d.resumen, n = v => (+v || 0).toLocaleString('es-MX');
+      info(r.paises ? `Tus ${mxn.format(r.total || 0)} en Fábricas e Inmuebles llegan a ${n(r.paises)} países y ${n(r.empresas)} empresas. Cetes y bitcoin no salen en el mapa.` : 'Listo.');
+    }
+  });
+  function crear() {
+    page = document.createElement('div'); page.id = 'mapaPage'; page.className = 'mapa-page'; page.hidden = true;
+    page.setAttribute('role', 'dialog'); page.setAttribute('aria-label', 'Mapa Marea');
+    page.innerHTML = `<div class="mapa-bar"><button type="button" id="mapaVolver">‹ Volver a la ciudad</button><div class="mapa-tit"><b>Mapa de tu tesoro</b><small id="mapaInfo">Cargando el mapa…</small></div></div>
+      <iframe id="mapaMarea" title="Mapa Marea: dónde invierten tus ETFs y FIBRAs" loading="lazy"></iframe>`;
+    document.body.appendChild(page);
+    fr = page.querySelector('iframe');
+    page.querySelector('#mapaVolver').onclick = cerrar;
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && page && !page.hidden) cerrar(); });
+  }
+  function abrir() {
+    if (!page) crear();
+    if (!fr.src) { listo = false; primera = true; fr.src = url(); }
+    page.hidden = false; document.body.classList.add('mapa-foco');
+    if (listo) { info('Actualizando con tu tesoro de hoy…'); enviar(); }
+    page.querySelector('#mapaVolver').focus();
+  }
+  function cerrar() { if (!page) return; page.hidden = true; document.body.classList.remove('mapa-foco'); }
+  function salir() { if (page) { page.remove(); page = null; fr = null; listo = false; } document.body.classList.remove('mapa-foco'); }   // al cerrar sesión: nada del usuario se queda en el mapa
+  return { abrir, cerrar, salir };
 })();
 
 
@@ -5570,7 +5642,9 @@ function wireWizard(box) {
   if ($('wzBack')) $('wzBack').onclick = wzBack;
   if ($('wzCancel')) $('wzCancel').onclick = () => { metasEdit = false; WZ = null; renderMetas(); };
   if ($('wzSalir')) $('wzSalir').onclick = () => { if (metasList().length) { metasEdit = false; WZ = null; } else WZ.full = false; renderMetas(); };
-  if ($('wzNext')) $('wzNext').onclick = () => { const e = wzCheck(); if (e) { WZ.err = e; $('mtErr').textContent = e; return; } wzNext(); };
+  if ($('wzNext')) $('wzNext').onclick = () => {
+    const f = TJ.faltan(box); if (f) { const m = `Antes de seguir, mira ${f === 1 ? 'la tarjeta que falta' : 'las ' + f + ' tarjetas que faltan'}: toca «Siguiente tarjeta».`; $('mtErr').textContent = m; const t = box.querySelector('.tj-falta'); if (t) t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); return; }
+    const e = wzCheck(); if (e) { WZ.err = e; $('mtErr').textContent = e; return; } wzNext(); };
   if ($('mtSave')) $('mtSave').onclick = async () => {
     if (metasBusy) return;
     for (const st of wzSteps().slice(1, -1)) { const keep = WZ.step; WZ.step = st; const e = wzCheck(); WZ.step = keep; if (e) { $('mtErr').textContent = e; return; } }
@@ -6058,6 +6132,9 @@ window.VGUIA = (() => {
     const cielo = (a, b) => { const gr = g.createLinearGradient(0, 0, 0, 90); gr.addColorStop(0, a); gr.addColorStop(1, b); g.fillStyle = gr; g.fillRect(0, 0, 120, 90); };
     const estrellas = (t, n) => { for (let i = 0; i < n; i++) { const x = (i * 37) % 120, y = (i * 23) % 40; if ((t * 2 + i) % 5 > 1.2) R(x, y, 1, 1, '#ffffffaa'); } };
     const humo = (x, y, t, j) => { for (let s = 0; s < 5; s++) { const p = ((t * .35 + s / 5 + j * .3) % 1), r = 2 + p * 6; g.fillStyle = `rgba(220,210,230,${.55 * (1 - p)})`; g.beginPath(); g.arc(x + Math.sin(p * 6 + j) * 4 + p * 10, y - p * 34, r, 0, 7); g.fill(); } };
+    // letras de 3×5 pixeles: se ven nítidas a cualquier tamaño
+    const LET = { C: '111100100100111', E: '111100111100111', T: '111010010010010', S: '111100111001111', U: '101101101101111', D: '110101101101110', I: '111010010010111' };
+    const letrero = (txt, x, y, col) => [...txt].forEach((ch, n) => { const m = LET[ch]; if (m) for (let k = 0; k < 15; k++) if (m[k] === '1') R(x + n * 4 + (k % 3), y + Math.floor(k / 3), 1, 1, col); });
     const fuegos = t => { for (let k = 0; k < 3; k++) { const p = (t * .6 + k / 3) % 1, cx = 50 + k * 28, cy = 30 - k * 4, c = ['#ff7aa8', '#7af0b0', '#ffe14a'][k]; if (p > .3) for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5, r = (p - .3) * 26; R(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 1, 1, c); } else R(cx, 70 - p * 130, 1, 3, c); } };
     const S = {
       fab(t) { cielo('#3a1d4a', '#f08a4c'); estrellas(t, 10); R(0, 70, 120, 20, '#2a1a2e');
@@ -6071,12 +6148,12 @@ window.VGUIA = (() => {
       bank(t) { cielo('#14324a', '#3fa38f'); estrellas(t, 6); R(0, 74, 120, 16, '#123029');
         R(40, 36, 70, 38, '#d8d2c0'); g.fillStyle = '#c6bfa8'; g.beginPath(); g.moveTo(36, 37); g.lineTo(75, 18); g.lineTo(114, 37); g.fill();
         for (let i = 0; i < 6; i++) { R(44 + i * 11, 41, 5, 30, '#efe9d6'); R(44 + i * 11, 41, 1, 30, '#bdb59c'); }
-        R(38, 71, 74, 3, '#a89f86'); R(58, 24, 34, 6, '#a89f86'); g.fillStyle = '#123029'; g.font = '6px monospace'; g.fillText('CETES', 62, 29);
+        R(38, 71, 74, 3, '#a89f86'); R(62, 22, 27, 9, '#5d5545'); R(63, 23, 25, 7, '#efe6c8'); letrero('CETES', 66, 24, '#123029');
         for (let i = 0; i < 6; i++) { const p = (t * .5 + i / 6) % 1, x = 20 + (i * 17) % 90, y = 6 + p * 70; R(x, y, 4, 4, '#ffd166'); R(x + 1, y + 1, 2, 2, '#c99a2e'); } },
       muralla(t) { cielo('#1a2a4a', '#5b7fb0'); estrellas(t, 8); R(0, 74, 120, 16, '#1b2438');
         for (let x = 40; x < 120; x += 10) { R(x, 40, 9, 34, '#8a8f9e'); R(x, 40, 9, 1, '#b8bccb'); R(x + 2, 34, 5, 6, '#8a8f9e'); for (let y = 46; y < 72; y += 6) R(x + (y / 6 % 2 ? 1 : 4), y, 4, 1, '#6e7383'); }
         const lvl = 30 + (Math.sin(t * .8) * .5 + .5) * 22; R(56, 14, 5, 22, '#e9edf5'); R(57, 36 - lvl * .5, 3, lvl * .5, '#ff5a5a'); R(55, 34, 7, 5, '#ff5a5a');
-        R(92, 18, 14, 9, '#ffd166'); g.fillStyle = '#5a3a10'; g.font = '6px monospace'; g.fillText('UDI', 93, 25); R(98, 27, 2, 13, '#c99a2e'); },
+        R(92, 18, 15, 9, '#ffd166'); letrero('UDI', 94, 20, '#5a3a10'); R(98, 27, 2, 13, '#c99a2e'); },
       mina(t) { cielo('#140a26', '#3a1d5a'); estrellas(t, 20); R(0, 74, 120, 16, '#22142e');
         g.fillStyle = '#2e1d40'; g.beginPath(); g.moveTo(30, 74); g.lineTo(80, 24); g.lineTo(125, 74); g.fill(); R(66, 54, 22, 20, '#120a1c'); R(64, 52, 26, 3, '#6b4a2e'); R(64, 52, 3, 22, '#6b4a2e'); R(87, 52, 3, 22, '#6b4a2e');
         const b = Math.sin(t * 2) * 2; g.fillStyle = 'rgba(247,147,26,.25)'; g.beginPath(); g.arc(77, 36 + b, 12, 0, 7); g.fill(); g.fillStyle = '#f7931a'; g.beginPath(); g.arc(77, 36 + b, 8, 0, 7); g.fill(); R(75, 31 + b, 2, 10, '#fff2d6'); R(75, 31 + b, 5, 2, '#fff2d6'); R(75, 35 + b, 5, 2, '#fff2d6'); R(75, 39 + b, 5, 2, '#fff2d6');
@@ -7052,6 +7129,7 @@ window.MAREA = (() => {
     bitacora: '<rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
     cartas: '<rect x="3.5" y="6" width="10" height="14" rx="1.5" transform="rotate(-10 8.5 13)"/><rect x="10" y="4" width="10" height="14" rx="1.5" transform="rotate(8 15 11)"/><path d="M15 9.5l1 2 2 .3-1.5 1.4.4 2-1.9-1-1.9 1 .4-2-1.5-1.4 2-.3z"/>',
     simula: '<path d="M3 5v15h18"/><path d="M6 9l4 6 3-3 3 4 4-8"/><path d="M16 4h4v4"/>',
+    mapa: '<path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5"/><path d="M15 6.5V20"/>',
     ACCIONES: '<path d="M3 20V10l5 3V10l5 3V6h3v-2h3v16z"/>', FIBRAS: '<rect x="5" y="3" width="9" height="18" rx="1"/><path d="M14 9h5v12h-5M8 7h1M11 7h1M8 11h1M11 11h1M8 15h1M11 15h1"/>',
     RENTA_FIJA: '<path d="M3 10 12 4l9 6M5.5 10v8M10 10v8M14 10v8M18.5 10v8M3 20.5h18"/>', BITCOIN: '<circle cx="12" cy="12" r="8.5"/><path d="M10 7.5v9M13 7.5v9M9 8.5h4.5a2 2 0 0 1 0 4H9h5a2 2 0 0 1 0 4H9"/>',
     BOLSA: '<path d="M4 20h16M6 20V10M18 20V10M12 20v-6M3 10l9-6 9 6z"/>',
@@ -7255,7 +7333,7 @@ window.MAREA = (() => {
     return { falta, por, avisos: R.avisos || [] };
   }
   const montoPaso = (P, k) => (P.por[k] || []).reduce((a, x) => a + x.amt, 0);
-  const listaPaso = (P, k) => `<div class="mlist mcompra">${(P.por[k] || []).map(x => {
+  const listaPaso = (P, k) => `<div class="mlist mcompra">${(P.por[k] || []).slice().sort((a, b) => RF_ORDEN(a.i.activo) - RF_ORDEN(b.i.activo)).map(x => {
     const unit = x.units > 0 && +x.i.precio_mxn > 0, cri = x.i.key === 'BITCOIN';
     const det = unit ? `${x.units} ${x.units === 1 ? 'título' : 'títulos'} a unos ${mxn2.format(+x.i.precio_mxn)} cada uno` : cri && +x.i.precio_mxn > 0 ? `${(x.amt / x.i.precio_mxn).toFixed(5)} · se compra por monto` : 'se compra por monto, cualquier cantidad';
     return `<div class="mli"><span><b>${esc(x.i.activo)}</b><small>${det}</small></span><span class="n"><b>${money(x.amt)}</b></span></div>`; }).join('')}</div>`;
@@ -7334,7 +7412,6 @@ window.MAREA = (() => {
           ${VGUIA.html('fund-' + p.k + (m >= 1 ? '' : '-0'), guiaFund(p, P, m), { titulo: `${n + 1} · ${p.ed}`, escena: ESC_PASO[p.k],
             ops: m >= 1 ? OP(`data-reg="${p.g}"`, 'Ya lo tengo', '<span class="ok">Regístralo en la Tesorería y aparece tu edificio.</span> <span class="cr">+15 créditos</span>')
                 + OP(`data-calc="${Math.round(P.falta)}"`, 'Ver el reparto completo', `<span class="ok">Abre la calculadora con ${money(P.falta)}.</span>`, true)
-                + OP(`data-salta="${p.k}"`, 'No va en mi plan', '<span class="bad">Este piso se queda sin edificio.</span> <span class="cr">+15 créditos</span>', true)
               : OP(`data-salta="${p.k}"`, 'Entendido, sigo', '<span class="ok">Pasas al siguiente piso.</span> <span class="cr">+15 créditos</span>') })}
           ${m >= 1 ? `<p class="foot" style="margin:4px 0">Lo que te toca en este paso:</p>${listaPaso(P, p.k)}
             <p class="foot">Es el mismo cálculo de la Aportación del mes con ${money(P.falta)}. Los precios cambian cada día, así que el número de títulos puede variar un poco.</p>` : ''}</li>`;
@@ -7785,9 +7862,9 @@ window.MAREA = (() => {
     if (!has()) return;
     const P = pendientes(), F = fundInfo(), list = SCR.filter(([id]) => id !== 'fundacion' || F.etapa < 3);
     if (cur === 'fundacion' && F.etapa >= 3) cur = 'mercado';
-    nav.innerHTML = list.map(([id, n, s]) => { const lk = !abierta(id); return `<button type="button" class="mtab${lk ? ' lock' : ''}" data-scr="${id}" aria-current="${cur === id ? 'page' : 'false'}" title="${lk ? n + ' (cerrado)' : n}"${lk ? ' aria-disabled="true"' : ''}>${ico(id)}<span class="ml">${n}</span><span class="ms">${s}</span>${lk ? '<i class="mlock" aria-label="cerrado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></i>' : P[id] ? '<i class="mdot" aria-label="pendiente"></i>' : ''}</button>`; }).join('');
+    nav.innerHTML = list.map(([id, n, s]) => { const lk = !abierta(id); return `<button type="button" class="mtab${lk ? ' lock' : ''}" data-scr="${id}" aria-current="${cur === id ? 'page' : 'false'}" title="${lk ? n + ' (cerrado)' : n}"${lk ? ' aria-disabled="true"' : ''}>${ico(id)}<span class="ml">${n}</span><span class="ms">${s}</span>${lk ? '<i class="mlock" aria-label="cerrado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></i>' : P[id] ? '<i class="mdot" aria-label="pendiente"></i>' : ''}</button>`; }).join('') + `<button type="button" class="mtab" data-mapa title="Mapa: dónde está tu dinero en el mundo">${ico('mapa')}<span class="ml">Mapa</span><span class="ms">Mapa</span></button>`;
     const vb = $('mVis'); if (vb) vb.classList.toggle('lock', !abierta('visitas'));
-    nav.querySelectorAll('.mtab').forEach(b => b.onclick = () => go(b.dataset.scr));
+    nav.querySelectorAll('.mtab').forEach(b => b.onclick = () => b.dataset.mapa !== undefined ? MAPA.abrir() : go(b.dataset.scr));
     $('mCred').textContent = E ? E.creditos.toLocaleString('es-MX') : '—';
     $('mRacha').textContent = ST ? `${ST.s} ${ST.s === 1 ? 'mes' : 'meses'}` : '—';
     const n = Object.values(P).filter(Boolean).length; $('mBellN').textContent = n; $('mBellN').hidden = !n;
