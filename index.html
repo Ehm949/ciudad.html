@@ -316,17 +316,6 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;backg
 .lim{margin-top:10px}
 td.sinhoy{vertical-align:middle;text-align:center;font-size:12px;line-height:1.35;max-width:120px;white-space:normal}
 /* tolerancia{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600}
-.mt-ficha{display:flex;flex-direction:column;gap:6px}
-.mt-ficha dl{margin:0;padding:6px 0;border-top:1px solid var(--line);display:grid;gap:2px}
-.mt-ficha dt{font-weight:800;font-size:13px}
-.mt-ficha dl > div{display:grid;grid-template-columns:150px 1fr;gap:8px;font-size:12px}
-.mt-ficha dd{margin:0;min-width:0;overflow-wrap:anywhere}
-.mt-ficha dd.k{color:var(--muted)}
-.mt-ficha a{color:var(--acc)}
-.mt-nreb{margin:0;font-size:12px;color:var(--muted)}
-@media (max-width:700px){
-  .mt-ficha dl > div{grid-template-columns:110px 1fr}
-}
 /* la regla .under de otro bloque deformaba las filas "abajo de tu límite" del semáforo */
 .bands .band.under{display:grid;justify-content:normal;flex-wrap:nowrap;gap:6px 14px}
 /* ---------- asistente por ventanas ---------- */
@@ -351,6 +340,58 @@ td.sinhoy{vertical-align:middle;text-align:center;font-size:12px;line-height:1.3
 .foot.pos{color:var(--ok)}.foot.neg{color:var(--bad)}
 .wz-sum td{vertical-align:top}
 @media (max-width:700px){.wz-modes{grid-template-columns:1fr}.wz{padding:12px}}
+/* tarjetas de instrumentos: una a la vez */
+.tj{margin:12px 0 4px}
+.tj-stage{display:flex;justify-content:center}
+.tj-slot{width:min(420px,100%)}
+.tj-slot.tj-in{animation:tjIn .3s ease}
+@keyframes tjIn{from{opacity:0;transform:translateX(18px) rotate(1deg)}to{opacity:1;transform:none}}
+.tj-card{--c:#5a6ca6;background:#fff;color:#1b1f3a;border-radius:22px;border:4px solid #1b1f3a;box-shadow:0 6px 0 #1b1f3a;overflow:hidden}
+.tj-top{background:var(--c);padding:14px 16px 26px;position:relative;color:#fff}
+.tj-top::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:18px;background:#fff;border-radius:18px 18px 0 0}
+.tj-tag{display:inline-block;font:700 11px/1 var(--f-ui,system-ui);letter-spacing:.06em;text-transform:uppercase;background:#ffffff33;border:2px solid #ffffff88;border-radius:999px;padding:5px 9px}
+.tj-top h4{font:700 34px/1 var(--f-display,system-ui);margin:10px 90px 4px 0;text-shadow:0 3px 0 #0003;overflow-wrap:anywhere}
+.tj-top p{margin:0 90px 0 0;font-weight:700;font-size:14px}
+.tj-spr{position:absolute;right:14px;top:14px;width:72px;height:72px;image-rendering:pixelated;filter:drop-shadow(0 3px 0 #0003)}
+.tj-body{padding:2px 16px 14px;display:flex;flex-direction:column;gap:11px}
+.tj-lead{margin:0;font-size:14.5px;line-height:1.45}
+.tj-lead b{color:color-mix(in srgb,var(--c) 75%,#000)}
+.tj-st{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tj-st > div{background:#f2f3fb;border-radius:14px;padding:8px 10px;border:2px solid #e3e5f3;min-width:0}
+.tj-st small{display:block;font-weight:800;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#6a7096}
+.tj-st b{display:block;font:700 18px/1.2 var(--f-display,system-ui);margin-top:4px;overflow-wrap:anywhere}
+.tj-st i{font-style:normal;font-size:11.5px;color:#6a7096}
+.tj-coin{display:inline-block;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff6c4,#f5c12e 45%,#c98a12);border:1.5px solid #8a5a00;vertical-align:-1px;margin-right:4px}
+.tj-sec{font-weight:800;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:#6a7096;margin:2px 0 -4px}
+.tj-flags{display:flex;flex-direction:column;gap:6px}
+.tj-flags > div{display:grid;grid-template-columns:30px 100px 1fr 44px;align-items:center;gap:8px;font-size:13px;font-weight:700}
+.tj-flags span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tj-flags canvas,.tj-frow canvas{width:30px;height:20px;image-rendering:pixelated;border:2px solid #1b1f3a;border-radius:4px}
+.tj-flags i{height:12px;background:#eceef8;border-radius:999px;overflow:hidden;border:2px solid #1b1f3a;position:relative}
+.tj-flags em{position:absolute;inset:0 auto 0 0;background:var(--c);border-radius:999px}
+.tj-flags b{text-align:right;font:700 14px var(--f-display,system-ui)}
+.tj-frow{display:flex;flex-wrap:wrap;gap:6px}
+.tj-chips{display:flex;flex-wrap:wrap;gap:6px}
+.tj-chips span{font-weight:700;font-size:13px;padding:6px 9px 6px 6px;border-radius:12px;border:2px solid #1b1f3a;background:#fff;box-shadow:0 3px 0 #1b1f3a;display:inline-flex;align-items:center;gap:6px}
+.tj-chips b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;color:#fff;font-size:11px}
+.tj-foot{margin:0;font-size:11.5px;color:#6a7096}
+.tj-foot a{color:#5a4bd6}
+.tj-nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.tj-nav button{font:inherit;font-weight:800;border-radius:999px;border:2px solid #1b1f3a;background:#fff;color:#1b1f3a;padding:8px 16px;cursor:pointer;box-shadow:0 3px 0 #1b1f3a}
+.tj-nav button:disabled{opacity:.4;cursor:default;box-shadow:none}
+.tj-nav .tj-next:not(:disabled){background:#ffd166}
+.tj-dots{display:flex;gap:5px}.tj-dots i{width:9px;height:9px;border-radius:50%;background:var(--line);border:1px solid #0003}.tj-dots i.on{background:#ffd166}
+.tj-cnt{font-size:12px;color:var(--muted)}
+.tj-nreb{text-align:center;color:var(--muted);font-size:13px;margin:8px 0 0}
+@media (max-width:480px){.tj-top h4{font-size:28px}.tj-flags > div{grid-template-columns:28px 84px 1fr 40px}}
+@media (prefers-reduced-motion:reduce){.tj-slot.tj-in{animation:none}}
+/* el tutorial de metas ocupa toda la pantalla */
+body.mt-foco{overflow:hidden}
+#metas.wz-full{position:fixed;inset:0;z-index:190;max-width:none;width:auto;margin:0;border-radius:0;border:0;overflow-y:auto;background:var(--bg,#0b1020);padding-block:max(20px,env(safe-area-inset-top,0px)) max(40px,env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#metas.wz-full > *{max-width:760px;margin-left:auto;margin-right:auto}
+#metas.wz-full .phead{display:flex;align-items:center;gap:10px}
+.wz-salir{margin-left:auto;font:inherit;font-size:13px;font-weight:700;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);padding:6px 12px;cursor:pointer}
+.mt-empieza{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
 /* ---------- vistas de consulta (portafolio, buscador, producción, reportes, cierre) ---------- */
 .mn-tabs{width:max-content;max-width:100%;overflow-x:auto}
 .mn-tabs button{white-space:nowrap}
@@ -5125,11 +5166,115 @@ const AUTH = (() => {
   return { pedir };
 })();
 
+// ================= Tarjetas de instrumentos (una a la vez, estilo videojuego) =================
+// Los datos fijos (cuántas empresas, cuánto construido) se revisan a mano; costos, precios y países salen del catálogo de la hoja.
+const TJ = (() => {
+  const pos = {};
+  const NOM = { us: 'Estados Unidos', jp: 'Japón', gb: 'Reino Unido', ca: 'Canadá', kr: 'Corea del Sur', ch: 'Suiza', fr: 'Francia', tw: 'Taiwán', cn: 'China', in: 'India', br: 'Brasil', za: 'Sudáfrica', mx: 'México', de: 'Alemania', au: 'Australia' };
+  const PAIS = { 'japón': 'jp', 'japon': 'jp', 'reino unido': 'gb', 'canadá': 'ca', 'canada': 'ca', 'corea': 'kr', 'corea del sur': 'kr', 'suiza': 'ch', 'francia': 'fr', 'taiwán': 'tw', 'taiwan': 'tw', 'china': 'cn', 'india': 'in', 'brasil': 'br', 'sudáfrica': 'za', 'sudafrica': 'za', 'méxico': 'mx', 'mexico': 'mx', 'estados unidos': 'us', 'alemania': 'de', 'australia': 'au' };
+  const FLAG = {
+    us(R) { for (let y = 0; y < 11; y++) R(0, y, 16, 1, y % 2 ? '#fff' : '#d22'); R(0, 0, 7, 6, '#2a3a8c'); for (let y = 1; y < 6; y += 2) for (let x = 1; x < 7; x += 2) R(x, y, 1, 1, '#fff'); },
+    jp(R) { R(0, 0, 16, 11, '#fff'); R(6, 3, 4, 5, '#d22'); R(5, 4, 6, 3, '#d22'); },
+    gb(R) { R(0, 0, 16, 11, '#1f3a8a'); for (let i = 0; i < 16; i++) { const y = Math.round(i * 10 / 15); R(i, y, 1, 1, '#fff'); R(i, 10 - y, 1, 1, '#fff'); } R(6, 0, 4, 11, '#fff'); R(0, 4, 16, 3, '#fff'); R(7, 0, 2, 11, '#d22'); R(0, 5, 16, 1, '#d22'); },
+    ca(R) { R(0, 0, 16, 11, '#fff'); R(0, 0, 4, 11, '#d22'); R(12, 0, 4, 11, '#d22'); R(7, 3, 2, 6, '#d22'); R(6, 4, 4, 3, '#d22'); R(5, 5, 6, 1, '#d22'); },
+    kr(R) { R(0, 0, 16, 11, '#fff'); R(6, 3, 4, 2, '#d22'); R(5, 4, 6, 1, '#d22'); R(6, 6, 4, 2, '#1f3a8a'); R(5, 6, 6, 1, '#1f3a8a'); [[1, 1], [13, 1], [1, 8], [13, 8]].forEach(([x, y]) => R(x, y, 2, 2, '#222')); },
+    ch(R) { R(0, 0, 16, 11, '#d22'); R(7, 2, 2, 7, '#fff'); R(5, 4, 6, 3, '#fff'); },
+    fr(R) { R(0, 0, 6, 11, '#1f3a8a'); R(6, 0, 4, 11, '#fff'); R(10, 0, 6, 11, '#d22'); },
+    de(R) { R(0, 0, 16, 4, '#222'); R(0, 4, 16, 3, '#d22'); R(0, 7, 16, 4, '#ffcc00'); },
+    au(R) { R(0, 0, 16, 11, '#1f3a8a'); R(0, 0, 7, 1, '#fff'); R(3, 0, 1, 5, '#fff'); R(0, 2, 7, 1, '#d22'); R(3, 7, 1, 1, '#fff'); [[11, 2], [13, 5], [10, 7], [12, 9]].forEach(([x, y]) => R(x, y, 1, 1, '#fff')); },
+    tw(R) { R(0, 0, 16, 11, '#d22'); R(0, 0, 8, 6, '#1f3a8a'); R(3, 2, 2, 2, '#fff'); },
+    cn(R) { R(0, 0, 16, 11, '#d22'); R(2, 2, 3, 3, '#ffd23f'); R(3, 1, 1, 5, '#ffd23f'); R(1, 3, 5, 1, '#ffd23f'); [[6, 1], [7, 3], [7, 5], [6, 6]].forEach(([x, y]) => R(x, y, 1, 1, '#ffd23f')); },
+    in(R) { R(0, 0, 16, 4, '#ff9933'); R(0, 4, 16, 3, '#fff'); R(0, 7, 16, 4, '#138808'); R(7, 4, 2, 3, '#1f3a8a'); },
+    br(R) { R(0, 0, 16, 11, '#1a9a4a'); for (let y = 1; y < 10; y++) { const w = 14 - Math.abs(5 - y) * 2.6; R(8 - w / 2, y, w, 1, '#ffd23f'); } R(6, 3, 4, 5, '#1f3a8a'); R(5, 4, 6, 3, '#1f3a8a'); R(5, 5, 6, 1, '#fff'); },
+    za(R) { R(0, 0, 16, 4, '#d22'); R(0, 7, 16, 4, '#1f3a8a'); R(0, 4, 16, 3, '#fff'); R(0, 5, 16, 1, '#1a8a4a'); for (let y = 0; y < 11; y++) { const w = 7 - Math.abs(5 - y) * 1.2; R(0, y, w + 1, 1, '#ffd23f'); R(0, y, w, 1, '#1a8a4a'); R(0, y, w - 2, 1, '#222'); } },
+    mx(R) { R(0, 0, 5, 11, '#1a7a3a'); R(5, 0, 6, 11, '#fff'); R(11, 0, 5, 11, '#c22'); R(7, 4, 2, 3, '#8a5a2a'); R(6, 6, 4, 1, '#1a7a3a'); }
+  };
+  const SPR = {
+    rascacielos(R) { [[2, 10, 6, 14, '#7ec8ff'], [9, 4, 7, 20, '#a8dcff'], [17, 8, 5, 16, '#7ec8ff']].forEach(([x, y, w, h, c]) => { R(x, y, w, h, c); R(x, y, w, 1, '#fff'); for (let yy = y + 2; yy < 23; yy += 3) for (let xx = x + 1; xx < x + w - 1; xx += 2) R(xx, yy, 1, 1, '#ffe27a'); }); R(12, 1, 1, 3, '#fff'); R(0, 23, 24, 1, '#1b1f3a'); },
+    globo(R) { for (let y = 0; y < 22; y++) for (let x = 0; x < 22; x++) { const d = Math.hypot(x - 10.5, y - 10.5); if (d < 10.5) R(x + 1, y + 1, 1, 1, d > 9.4 ? '#1b1f3a' : ((x * 3 + y * 5) % 11 < 4 || (x > 4 && x < 10 && y > 3 && y < 9) || (x > 12 && y > 11 && x < 17) ? '#5ad17a' : '#4aa8ff')); } R(6, 4, 2, 1, '#fff'); },
+    torres(R) { [[3, 6, 6, 18, '#ffd166'], [10, 2, 6, 22, '#ffe08a'], [17, 9, 5, 15, '#ffd166']].forEach(([x, y, w, h, c]) => { R(x, y, w, h, c); for (let yy = y + 2; yy < 23; yy += 3) R(x + 1, yy, w - 2, 1, '#c98a12'); }); R(0, 23, 24, 1, '#1b1f3a'); },
+    fabrica(R) { R(2, 12, 20, 11, '#ffcf8a'); for (let x = 2; x < 22; x += 5) for (let k = 0; k < 4; k++) R(x + k, 12 - k, 1, k + 1, '#ffb347'); R(16, 4, 3, 8, '#c86a3a'); R(15, 1, 3, 2, '#ffffffaa'); R(13, 0, 2, 2, '#ffffff66'); for (let x = 4; x < 21; x += 4) R(x, 16, 2, 3, '#4aa8ff'); R(0, 23, 24, 1, '#1b1f3a'); },
+    casa(R) { R(4, 11, 16, 12, '#ffe0d0'); for (let k = 0; k < 9; k++) R(3 + k, 11 - k, 18 - k * 2, 1, '#ff7a6b'); R(10, 16, 4, 7, '#a0522d'); R(5, 14, 3, 3, '#4aa8ff'); R(16, 14, 3, 3, '#4aa8ff'); R(0, 23, 24, 1, '#1b1f3a'); },
+    nave(R) { R(1, 12, 22, 11, '#e8e4d8'); for (let k = 0; k < 5; k++) R(1 + k * 2, 12 - k, 22 - k * 4, 1, '#b8b3a6'); for (let x = 3; x < 21; x += 6) R(x, 16, 4, 7, '#7a869e'); R(3, 16, 4, 1, '#ffd166'); R(0, 23, 24, 1, '#1b1f3a'); },
+    plaza(R) { R(2, 9, 20, 14, '#ffd0ea'); R(2, 9, 20, 2, '#d64bb8'); for (let x = 4; x < 21; x += 4) R(x, 13, 3, 4, '#4aa8ff'); R(9, 18, 6, 5, '#7a5af8'); R(10, 4, 4, 5, '#fff'); R(11, 5, 2, 3, '#d64bb8'); R(0, 23, 24, 1, '#1b1f3a'); },
+    banco(R) { R(3, 9, 18, 13, '#f2ede0'); for (let k = 0; k < 6; k++) R(2 + k * 1.5, 9 - k, 20 - k * 3, 1, '#c6bfa8'); for (let x = 5; x < 20; x += 4) R(x, 11, 2, 10, '#fff'); R(2, 21, 20, 2, '#a89f86'); R(0, 23, 24, 1, '#1b1f3a'); },
+    escudo(R) { R(5, 3, 14, 12, '#4fc3b0'); for (let k = 0; k < 7; k++) R(5 + k, 15 + k, 14 - k * 2, 1, '#4fc3b0'); R(11, 6, 2, 10, '#fff'); R(8, 9, 8, 2, '#fff'); R(0, 23, 24, 1, '#1b1f3a'); },
+    moneda(R) { for (let y = 0; y < 22; y++) for (let x = 0; x < 22; x++) { const d = Math.hypot(x - 10.5, y - 10.5); if (d < 10.5) R(x + 1, y + 1, 1, 1, d > 9.4 ? '#8a4a00' : d > 8 ? '#ffb347' : '#f7931a'); } R(10, 6, 2, 12, '#fff2d6'); R(10, 6, 6, 2, '#fff2d6'); R(10, 11, 6, 2, '#fff2d6'); R(10, 16, 6, 2, '#fff2d6'); R(15, 7, 2, 4, '#fff2d6'); R(15, 12, 2, 5, '#fff2d6'); }
+  };
+  const RF = (plazo, quien, lema, lead, spr) => ({ c: '#13a39a', tag: 'Obras públicas', lema, spr: spr || 'banco', lead, rf: { plazo, quien } });
+  const INFO = {
+    VT: { c: '#7a5af8', tag: 'Fábricas · todo el mundo', lema: 'El planeta en una sola pieza', spr: 'globo', lead: 'Miles de empresas de <b>todo el mundo</b> en un solo instrumento. Nada que repartir.', emp: '≈ 10,200', banderas: ['us', 'jp', 'gb', 'cn', 'ca', 'fr', 'ch', 'tw', 'in', 'kr', 'br', 'mx'] },
+    VUAA: { c: '#2b6cff', tag: 'Fábricas · Estados Unidos', lema: 'Las 500 más grandes de EE.UU.', spr: 'rascacielos', lead: 'Copia al <b>S&P 500</b>: si a las gigantes de Estados Unidos les va bien, a ti también. Reinvierte los dividendos solito.', emp: '≈ 500', equipo: ['Nvidia', 'Apple', 'Microsoft', 'Amazon', 'Alphabet', 'Meta', 'Broadcom', 'Tesla'], banderas: ['us'] },
+    VEA: { c: '#ff5a5f', tag: 'Fábricas · desarrollados', lema: 'El mundo rico, sin EE.UU.', spr: 'fabrica', lead: 'Miles de empresas de <b>países desarrollados</b> fuera de Estados Unidos; las más grandes pesan más.', emp: '≈ 3,900' },
+    VWO: { c: '#1aa57a', tag: 'Fábricas · emergentes', lema: 'Los que vienen creciendo', spr: 'torres', lead: 'Miles de empresas de <b>países en desarrollo</b>. Más subidas y bajadas, pero mucho por crecer.', emp: '≈ 6,500' },
+    FIBRATC14: { c: '#ff7a6b', tag: 'Inmuebles · un solo fondo', lema: 'Todas las FIBRAs grandes en un boleto', spr: 'casa', lead: 'Un fondo que reúne a las <b>FIBRAs más grandes</b> de la Bolsa Mexicana.', banderas: ['mx'] },
+    FUNO11: { c: '#ff7a6b', tag: 'Inmuebles · de todo', lema: 'La casera más grande de México', spr: 'casa', km: 12.9, inm: '616', fecha: '30 sep 2026', lead: 'Oficinas, centros comerciales y naves industriales <b>en todo México</b>.' },
+    FIBRAPL14: { c: '#ff9f1c', tag: 'Inmuebles · naves', lema: 'Bodegas gigantes para mover cosas', spr: 'nave', km: 8.1, inm: '515', fecha: '30 sep 2026', lead: 'Naves industriales y de <b>logística</b> en las principales zonas industriales del país.' },
+    DANHOS13: { c: '#d64bb8', tag: 'Inmuebles · plazas', lema: 'Centros comerciales y oficinas premium', spr: 'plaza', km: 1.3, inm: '18', fecha: '30 jun 2026', lead: 'Pocos inmuebles, pero muy grandes y <b>premium</b>, casi todos en la Ciudad de México.' },
+    FNOVA17: { c: '#13a3b8', tag: 'Inmuebles · contratos largos', lema: 'Rentas largas y tranquilas', spr: 'nave', km: 0.74, inm: '126', fecha: '30 sep 2026', lead: 'Naves industriales, comercios y hasta tierras agrícolas, con <b>contratos de renta largos</b>.' },
+    FMTY14: { c: '#2b8cff', tag: 'Inmuebles · el norte', lema: 'Naves y oficinas del norte', spr: 'nave', km: 5.6, inm: '382', fecha: '30 sep 2026', lead: 'Naves industriales y oficinas, sobre todo en el <b>norte del país</b>. Ya incluye a Fibra Macquarie.' },
+    NEXT23: { c: '#1aa57a', tag: 'Inmuebles · naves nuevas', lema: 'La FIBRA industrial más nueva', spr: 'nave', km: 8.2, inm: '222', fecha: '30 sep 2026', lead: 'Naves industriales y de <b>logística</b>, muchas recién construidas.' },
+    'Bondia': RF('1 día', 'Gobierno de México', 'Tu dinero de bolsillo', 'Presta al gobierno <b>de un día para otro</b>: lo tienes de vuelta al día siguiente.'),
+    'Cetes 91 días': RF('3 meses', 'Gobierno de México', 'El préstamo corto', 'Le prestas al gobierno <b>3 meses</b> y desde el primer día sabes cuánto ganas.'),
+    'Cetes 182 días': RF('6 meses', 'Gobierno de México', 'El préstamo de medio año', 'Le prestas al gobierno <b>6 meses</b> con ganancia fija desde el día uno.'),
+    'Cetes 364 días': RF('1 año', 'Gobierno de México', 'El préstamo de un año', 'Le prestas al gobierno <b>un año</b>; normalmente paga un poco más que los cortos.'),
+    'Udibonos': RF('años', 'Gobierno de México', 'El escudo contra la inflación', 'Su valor <b>sube con los precios</b>: si todo se encarece, ellos también.', 'escudo'),
+    'Bitcoin': { c: '#f7931a', tag: 'Oro virtual', lema: 'La moneda que no tiene dueño', spr: 'moneda', lead: 'No la emite ningún gobierno ni empresa. Solo existirán <b>21 millones</b>. Sube y baja muchísimo.', btc: true }
+  };
+  const esc2 = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const precio = p => p > 0 ? '≈ ' + (p >= 1000 ? mxn.format(p) : mxn2.format(p)) : '—';
+  function paises(txt) {   // "Japón 21.9%, Reino Unido 11.1% …" → [['jp', 21.9], …]
+    const out = []; String(txt || '').replace(/([A-Za-zÁÉÍÓÚáéíóúñÑ ]+?)\s+(\d+(?:[.,]\d+)?)\s*%/g, (_, n, v) => { const k = PAIS[n.trim().toLowerCase().replace(/^(y|e)\s+/, '')]; if (k && !out.some(x => x[0] === k)) out.push([k, +v.replace(',', '.')]); });
+    return out;
+  }
+  function tarjeta(a) {
+    const i = itemOf(a), F = INFO[a] || { c: '#5a6ca6', tag: '', lema: '', spr: 'banco', lead: esc2(i.descripcion || '') }, ps = paises(i.indice);
+    const st = [];
+    if (F.rf) st.push(['Plazo', F.rf.plazo, ''], ['Tasa', i.tasa != null && i.tasa !== '' ? i.tasa + '%' : '—', 'anual, en tu hoja'], ['Quién te paga', 'Gobierno', 'de México'], ['Moneda', 'MXN', 'pesos']);
+    else if (F.btc) st.push(['Emisor', 'nadie', ''], ['Máximo', '21 millones', 'de bitcoins'], ['Un bitcoin', precio(+i.precio_mxn), 'pesos'], ['Se maneja', 'por monto', 'puedes tener un pedacito']);
+    else if (F.km != null) st.push(['Construido', F.km.toLocaleString('es-MX') + ' km²', `≈ ${Math.round(F.km * 140).toLocaleString('es-MX')} canchas de futbol`], ['Inmuebles', F.inm, 'en renta'], ['Un título', precio(+i.precio_mxn), 'pesos'], ['Rentas', 'cada trimestre', 'casi siempre']);
+    else st.push(['Empresas', F.emp || 'muchas', F.emp ? 'aprox.' : ''], ['Costo anual', i.costo_pct != null && i.costo_pct !== '' ? i.costo_pct + '%' : '—', 'de lo que tienes'], ['Un título', precio(+i.precio_mxn), 'pesos'], ['Moneda', i.moneda || '—', i.moneda === 'USD' ? 'dólares' : i.moneda === 'MXN' ? 'pesos' : '']);
+    const top = ps.length ? Math.max(...ps.map(x => x[1])) : 1;
+    const fuente = [F.emp ? 'empresas al 31 oct 2026' : '', F.km != null ? `superficie rentable al ${F.fecha}, reporte de la FIBRA` : '', i.costo_url ? `<a href="${esc2(i.costo_url)}" target="_blank" rel="noopener">costo y países</a>` : ''].filter(Boolean).join(' · ');
+    return `<article class="tj-card" style="--c:${F.c}"><div class="tj-top"><span class="tj-tag">${esc2(F.tag)}</span><h4>${esc2(a)}</h4><p>${esc2(F.lema)}</p><canvas class="tj-spr" width="24" height="24" data-spr="${F.spr}" aria-hidden="true"></canvas></div>
+      <div class="tj-body"><p class="tj-lead">${F.lead}</p>
+        <div class="tj-st">${st.map(([k, v, s]) => `<div><small>${k}</small><b>${k === 'Costo anual' ? '<span class="tj-coin"></span>' : ''}${esc2(v)}</b>${s ? `<i>${esc2(s)}</i>` : ''}</div>`).join('')}</div>
+        ${F.equipo ? `<p class="tj-sec">Algunas de sus empresas</p><div class="tj-chips">${F.equipo.map((n, k) => `<span><b style="background:${['#5a4bd6', '#ff5a5f', '#1aa57a', '#ff9f1c', '#2b8cff', '#d64bb8', '#13a3b8', '#7a5af8'][k % 8]}">${n[0]}</b>${n}</span>`).join('')}</div>` : ''}
+        ${ps.length > 1 ? `<p class="tj-sec">Dónde invierte</p><div class="tj-flags">${ps.slice(0, 6).map(([c, p]) => `<div><canvas width="16" height="11" data-flag="${c}" role="img" aria-label="${NOM[c]}"></canvas><span>${NOM[c]}</span><i><em style="width:${Math.max(4, p / top * 100)}%"></em></i><b>${p}%</b></div>`).join('')}</div>`
+          : (F.banderas || F.km != null || F.rf) ? `<p class="tj-sec">Dónde invierte</p><div class="tj-frow">${(F.banderas || ['mx']).map(c => `<canvas width="16" height="11" data-flag="${c}" role="img" aria-label="${NOM[c]}" title="${NOM[c]}"></canvas>`).join('')}</div>` : ''}
+        ${fuente ? `<p class="tj-foot">${fuente}</p>` : ''}</div></article>`;
+  }
+  function html(id, acts, n) {
+    acts = acts.filter(Boolean); if (!acts.length) return '';
+    const k = Math.min(pos[id] || 0, acts.length - 1);
+    return `<div class="tj" data-tj="${id}" data-n="${acts.length}">
+      <div class="tj-stage">${acts.map((a, j) => `<div class="tj-slot"${j === k ? '' : ' hidden'}>${tarjeta(a)}</div>`).join('')}</div>
+      ${acts.length > 1 ? `<div class="tj-nav"><button type="button" class="tj-prev" aria-label="Tarjeta anterior"${k ? '' : ' disabled'}>‹</button><span class="tj-dots" aria-hidden="true">${acts.map((_, j) => `<i class="${j === k ? 'on' : ''}"></i>`).join('')}</span><span class="tj-cnt">${k + 1} de ${acts.length}</span><button type="button" class="tj-next"${k < acts.length - 1 ? '' : ' disabled'}>Siguiente tarjeta ›</button></div>` : ''}
+      ${n != null ? `<p class="tj-nreb">Instrumentos que hay que rebalancear: <b>${n}</b></p>` : ''}</div>`;
+  }
+  const dibuja = (cv, fn) => { const g = cv.getContext('2d'); g.clearRect(0, 0, cv.width, cv.height); fn((x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); }); };
+  function wire(root) {
+    (root || document).querySelectorAll('canvas[data-flag]').forEach(c => FLAG[c.dataset.flag] && dibuja(c, FLAG[c.dataset.flag]));
+    (root || document).querySelectorAll('canvas[data-spr]').forEach(c => SPR[c.dataset.spr] && dibuja(c, SPR[c.dataset.spr]));
+    (root || document).querySelectorAll('.tj').forEach(el => {
+      const id = el.dataset.tj, n = +el.dataset.n;
+      const mover = d => { const k = Math.max(0, Math.min(n - 1, (pos[id] || 0) + d)); pos[id] = k;
+        el.querySelectorAll('.tj-slot').forEach((s, j) => { s.hidden = j !== k; if (j === k) { s.classList.remove('tj-in'); void s.offsetWidth; s.classList.add('tj-in'); } });
+        el.querySelectorAll('.tj-dots i').forEach((x, j) => x.classList.toggle('on', j === k));
+        const c = el.querySelector('.tj-cnt'); if (c) c.textContent = `${k + 1} de ${n}`;
+        const p = el.querySelector('.tj-prev'), nx = el.querySelector('.tj-next'); if (p) p.disabled = !k; if (nx) nx.disabled = k >= n - 1; };
+      const p = el.querySelector('.tj-prev'), nx = el.querySelector('.tj-next');
+      if (p) p.onclick = () => mover(-1); if (nx) nx.onclick = () => mover(1);
+    });
+  }
+  return { html, wire };
+})();
+
 
 // ================= Tus metas: asistente por ventanas =================
 // Cada ventana es una pregunta; al responder pasas a la siguiente. Nada se guarda hasta "Guardar mis metas".
 // Las tolerancias son fijas (las pone el servidor) y se muestran solo como información.
-let metasEdit = false, metasBusy = false, WZ = null;
+let metasEdit = false, metasBusy = false, WZ = null, metasHueco = null;
 GOV.limInput('simLim', 'cm_lim_compra', () => { if (model) renderSim(); });   // tu precio límite de compra
 const METAS_CONF_DEF = {
   'Acciones': { uno: 'VT', varios: ['VUAA', 'VEA', 'VWO'], ejemplo: { VUAA: 60, VEA: 30, VWO: 10 }, tol_uno: 7.5, tol_inst: { VUAA: 5, VEA: 3.5, VWO: 1.25 } },
@@ -5167,16 +5312,10 @@ function origenTxt(tag) {
   return `Punto de partida: plantilla «${esc(m ? m[1] : base)}»${ed ? ', después cambiada por ti' : ''}.`;
 }
 // ficha de un instrumento: mismo formato para todos, sin adjetivos
-function fichaHtml(acts, n) {
-  const fecha = f => { const d = /^\d{4}-\d{2}-\d{2}$/.test(f || '') ? parseYmd(f) : null; return d ? `${fechaLarga(d)} de ${d.getFullYear()}` : (f || ''); };
-  return `<div class="mt-ficha">${acts.map(a => { const i = itemOf(a), p = +i.precio_mxn;
-    return `<dl><dt>${esc(a)}</dt>
-      <div><dd class="k">Qué replica</dd><dd>${esc(i.indice || i.descripcion || '—')}</dd></div>
-      <div><dd class="k">Moneda</dd><dd>${esc(i.moneda || '—')}</dd></div>
-      <div><dd class="k">Costo anual</dd><dd>${i.costo_pct != null && i.costo_pct !== '' ? esc(String(i.costo_pct)) + '%' : '—'}${i.costo_url ? ` · <a href="${esc(i.costo_url)}" target="_blank" rel="noopener">fuente${i.costo_fecha ? ' al ' + esc(fecha(i.costo_fecha)) : ''}</a>` : ''}</dd></div>
-      <div><dd class="k">Precio aprox. de un título</dd><dd>${p > 0 ? '≈ ' + (p >= 1000 ? mxn.format(p) : mxn2.format(p)) : '—'}</dd></div></dl>`; }).join('')}
-    <p class="mt-nreb">Instrumentos que hay que rebalancear: <b>${n == null ? acts.length : n}</b></p></div>`;
-}
+function fichaHtml(acts, n) { return TJ.html('tj-' + (WZ ? WZ.step : 'x') + '-' + acts.join('-'), acts, n); }   // una tarjeta a la vez (tarjetas.js)
+// abre el tutorial de metas a pantalla completa (desde el botón, la Fundación o "Cambiar mis metas")
+function metasStart() { if (!WZ) WZ = wizardFrom(metasList()); if (metasList().length) metasEdit = true; WZ.full = true; renderMetas(); }
+window.metasStart = metasStart;
 // ---------- estado del asistente ----------
 function wizardFrom(metas) {
   const w = { step: 'inicio', origin: '', tplFab: null, pct: {}, modo: {}, rep: {}, auto: {} };
@@ -5190,7 +5329,7 @@ function wizardFrom(metas) {
   return w;
 }
 const wzSteps = () => ['inicio', 'pct'].concat(GRUPOS.map(([n]) => n).filter(n => num(WZ.pct[n], 0) > 0), ['resumen']);
-function wzGo(step) { WZ.step = step; WZ.err = ''; renderMetas(); const b = $('metas'); if (b && b.getBoundingClientRect().top < 0) b.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); }
+function wzGo(step) { WZ.step = step; WZ.err = ''; renderMetas(); const b = $('metas'); if (b && b.classList.contains('wz-full')) { b.scrollTop = 0; return; } if (b && b.getBoundingClientRect().top < 0) b.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); }
 function wzNext() { const s = wzSteps(), i = s.indexOf(WZ.step); wzGo(s[Math.min(s.length - 1, i + 1)]); }
 function wzBack() { const s = wzSteps(), i = s.indexOf(WZ.step); wzGo(s[Math.max(0, i - 1)]); }
 // reparto inicial al elegir la versión de varios instrumentos (igual para todos)
@@ -5303,12 +5442,12 @@ function stepHtml() {
       + `<div class="wz-modes">${C.uno ? opt('wzModo', 'uno', 'Versión fácil · un solo fondo', '<small>Ventaja: cero complicaciones. Desventaja: comisión extra del fondo y otro trato fiscal.</small>', modo === 'uno') : ''}
         ${opt('wzModo', 'varios', 'Versión divertida · varias FIBRAs', '<small>Ventaja: rentas directas y exención de ISR al venderlas en bolsa. Desventaja: más piezas que rebalancear.</small>', modo === 'varios')}</div>`
       + (modo === 'uno' ? fichaHtml([C.uno]) : '')
-      + (modo === 'varios' ? `<p class="wz-k" style="margin-top:6px">Reparto dentro de Inmuebles</p>${autoHtml('FIBRAs')}${pesosHtml('FIBRAs', C.varios)}` : '');
+      + (modo === 'varios' ? `${fichaHtml(C.varios)}<p class="wz-k" style="margin-top:6px">Reparto dentro de Inmuebles</p>${autoHtml('FIBRAs')}${pesosHtml('FIBRAs', C.varios)}` : '');
   }
   if (WZ.step === 'Renta fija') {
     const C = MC('Renta fija');
     return head('Obras públicas: tu renta fija', `Tu meta para Obras públicas es ${pct1(num(WZ.pct['Renta fija'], 0))} del tesoro.`)
-      + autoHtml('Renta fija') + pesosHtml('Renta fija', C.varios, i => (RF_TXT[i.activo] || i.descripcion || '') + (i.tasa != null && i.tasa !== '' ? ` Tasa en tu hoja: ${i.tasa}% anual.` : ''));
+      + fichaHtml(C.varios) + autoHtml('Renta fija') + pesosHtml('Renta fija', C.varios, i => (RF_TXT[i.activo] || i.descripcion || '') + (i.tasa != null && i.tasa !== '' ? ` Tasa en tu hoja: ${i.tasa}% anual.` : ''));
   }
   if (WZ.step === 'Cripto') {
     const C = MC('Cripto');
@@ -5364,6 +5503,17 @@ function renderMetasIn() {
   const box = $('metas'); if (!box || !raw) return;
   GOV.limSync();
   const metas = metasList();
+  const full = !!(WZ && WZ.full) && (!metas.length || metasEdit);
+  box.classList.toggle('wz-full', full); document.body.classList.toggle('mt-foco', full);
+  // a pantalla completa vive directo en <body>, encima de todo; al terminar regresa a su lugar
+  if (full && box.parentNode !== document.body) { metasHueco = document.createComment('metas'); box.parentNode.insertBefore(metasHueco, box); document.body.appendChild(box); }
+  else if (!full && metasHueco && metasHueco.parentNode) { metasHueco.parentNode.insertBefore(box, metasHueco); metasHueco.remove(); metasHueco = null; }
+  if (!metas.length && !full) {   // todavía sin metas: una invitación; el tutorial se abre a pantalla completa
+    box.classList.remove('collapsed');
+    box.innerHTML = `<div class="phead"><h2>Tus metas</h2><span class="pill hi">Pendiente</span></div><div class="mt-empieza">${VGUIA.html('wz-empieza', [VGUIA.L('ACCIONES', 'euforia', '¡Aquí armamos el plan de tu ciudad: qué parte de tu dinero vive en cada barrio! Toma unos minutos y nada se guarda hasta el final.')])}
+      <button type="button" id="mtStart">${WZ && WZ.step !== 'inicio' ? 'Seguir con mi plan' : 'Empezar'}</button></div>`;
+    $('mtStart').onclick = metasStart; VGUIA.wire(box); return;
+  }
   if (!metas.length || metasEdit) {
     if (!WZ) WZ = wizardFrom(metas);
     if (WZ.step === 'Renta fija') WZ.modo['Renta fija'] = 'varios';
@@ -5375,13 +5525,15 @@ function renderMetasIn() {
     }
     const s = wzSteps(), i = s.indexOf(WZ.step), last = WZ.step === 'resumen';
     box.classList.remove('collapsed');
-    box.innerHTML = `<div class="phead"><h2>Tus metas</h2><span class="pill hi">${metas.length ? 'Cambiando tus metas' : 'Pendiente'}</span></div>
+    box.innerHTML = `<div class="phead"><h2>Tus metas</h2><span class="pill hi">${metas.length ? 'Cambiando tus metas' : 'Pendiente'}</span><button type="button" class="wz-salir" id="wzSalir">${metas.length ? 'Salir sin guardar' : 'Salir por ahora'}</button></div>
       <div class="wz-dots" aria-hidden="true">${s.map((x, j) => `<i class="${j < i ? 'done' : j === i ? 'on' : ''}"></i>`).join('')}</div>
       <section class="wz" aria-live="polite">${stepHtml()}</section>
       <div class="err" id="mtErr">${WZ.err || ''}</div>
       <div class="simact">${i > 0 ? '<button type="button" class="ghost" id="wzBack">Atrás</button>' : ''}${last ? '<button type="button" id="mtSave">Guardar mis metas</button>' : '<button type="button" id="wzNext">Siguiente</button>'}${metas.length ? '<button type="button" class="ghost" id="wzCancel">Cancelar</button>' : ''}</div>`;
     wireWizard(box);
     if (window.VGUIA) VGUIA.wire(box);
+    TJ.wire(box);
+    if (full) box.scrollTop = 0;
     return;
   }
   // ya guardadas: resumen y botón para cambiarlas
@@ -5389,7 +5541,7 @@ function renderMetasIn() {
   box.innerHTML = `<div class="phead"><h2>Tus metas</h2><span class="pill ok">Guardadas</span></div>${resumenHtml(v)}
     <p class="foot" style="margin:0">${origenTxt(metas[0].plantilla)}</p>
     <div class="simact"><button type="button" class="ghost" id="mtEdit">Cambiar mis metas</button></div>`;
-  $('mtEdit').onclick = () => { metasEdit = true; WZ = wizardFrom(metas); renderMetas(); };
+  $('mtEdit').onclick = () => { metasEdit = true; WZ = wizardFrom(metas); WZ.full = true; renderMetas(); };
   collapsible(box, 'metas', GRUPOS.map(([n, k]) => { const p = num(v.pct[n], 0); return p > 0 ? `${CLS[k].scene} <b>${pct1(p)}</b>` : ''; }).filter(Boolean).join(' · '), true);
 }
 function wireWizard(box) {
@@ -5417,6 +5569,7 @@ function wireWizard(box) {
   showSums();
   if ($('wzBack')) $('wzBack').onclick = wzBack;
   if ($('wzCancel')) $('wzCancel').onclick = () => { metasEdit = false; WZ = null; renderMetas(); };
+  if ($('wzSalir')) $('wzSalir').onclick = () => { if (metasList().length) { metasEdit = false; WZ = null; } else WZ.full = false; renderMetas(); };
   if ($('wzNext')) $('wzNext').onclick = () => { const e = wzCheck(); if (e) { WZ.err = e; $('mtErr').textContent = e; return; } wzNext(); };
   if ($('mtSave')) $('mtSave').onclick = async () => {
     if (metasBusy) return;
@@ -7601,6 +7754,7 @@ window.MAREA = (() => {
     mapi('marea_guardar', { fund }).then(r => { const f = E.fund; fusionar(r); E.fund = f; copiaE(); }).catch(() => {});
   }
   function presenta(id) {
+    if (document.body.classList.contains('mt-foco')) return;   // durante el tutorial de metas no se abre nada más
     const A = id === 'bienvenida' ? { k: () => 'ACCIONES', e: 'feliz', fr: ['¡Bienvenido! Soy Chela, de Fábricas. Tu ciudad empieza como un terreno vacío.', 'Registra lo que tienes en la Tesorería y te construimos tu primer edificio.'], acc: 'Empezar a construir' } : ABRE[id];
     const k = A.k(), P = VECINOS.PERS[k];
     presentando = true; vistas.add(id); guardarVistas();
@@ -7684,7 +7838,7 @@ window.MAREA = (() => {
     else if (d.salta) saltar(d.salta);
     else if (d.per && !t.disabled) { per = d.per; rPerf(); }
     else if (d.ser) { if (serSel.has(d.ser) && serSel.size > 1) serSel.delete(d.ser); else serSel.add(d.ser); rPerf(); }
-    else if (d.go) { const [s, sub] = d.go.split(':'); go(s, sub); }
+    else if (d.go) { const [s, sub] = d.go.split(':'); go(s, sub); if (d.go === 'ayto:metas' && typeof metasStart === 'function') metasStart(); }
     else if (d.reg !== undefined && t.classList.contains('mbtn')) { go('tesoreria', 'portafolio'); if (typeof GOV !== 'undefined' && GOV.openTesoreria) GOV.openTesoreria(); }
   });
   $('mBell').onclick = () => {
