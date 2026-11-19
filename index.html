@@ -958,6 +958,13 @@ details.mcalc p{margin:6px 0 0}
 .vguia.vg-ev .ev-ops .vg-op.sec{background:#2a2f45}
 @media (max-width:720px){.vg-ev .ev-box{grid-template-columns:1fr;padding-top:30px}.vg-ev .ev-art{max-width:260px;justify-self:center;width:100%}.vg-ev .ev-ban{min-width:70%;font-size:13px}}
 @media (prefers-reduced-motion:reduce){.vguia.vg-ev .ev-ops .vg-op{transition:none}}
+
+/* ¿Qué es esto?: cómo se ganan créditos */
+.mfuentes-t{margin:16px 0 6px;font-size:15px}
+.mfuentes{width:100%;border-collapse:collapse;font-size:14px}
+.mfuentes th{text-align:left;font-weight:700;padding:7px 8px 7px 0;border-top:1px solid var(--line);vertical-align:top}
+.mfuentes th small{display:block;font-weight:400;color:var(--muted);font-size:12.5px;margin-top:2px}
+.mfuentes td{text-align:right;white-space:nowrap;padding:7px 0;border-top:1px solid var(--line);font-weight:800;color:#ffd166;vertical-align:top}
 </style>
 </head>
 <body>
@@ -2231,7 +2238,7 @@ function ceremonyInfo(st) {
   const daysLeft = Math.max(0, Math.ceil((endOfMonth - now) / 864e5));
   const daysTo = next ? Math.ceil((next - now) / 864e5) : null;
   const inRange = balanced();
-  return { months, active, test, next, daysLeft, daysTo, inRange, done: active && inRange && st.savedThisMonth };
+  return { months, active, test, next, daysLeft, daysTo, inRange, done: active && inRange };   // ceremonia en balance: todos los barrios dentro de su banda (el servidor lo verifica)
 }
 function eventsInfo() {
   const today = ymd(new Date()), evs = raw.eventos || [];
@@ -6373,7 +6380,7 @@ window.ESCENA = (() => {
 })();
 
 // ================= Juego: resumen al abrir, sobres de cartas y simulador de crisis =================
-// El álbum y la última visita se guardan en este dispositivo (por usuario). Los sobres se ganan con constancia.
+// La última visita se guarda en este dispositivo. El álbum y los sobres viven en tu usuario (servidor): 4 de bienvenida y luego 100 créditos cada uno.
 window.JUEGO = (() => {
   const $j = id => document.getElementById(id);
   const fmt = n => '$' + Math.round(n).toLocaleString('es-MX');
@@ -6632,23 +6639,33 @@ chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....
     root.querySelectorAll('canvas[data-jback]').forEach(cv => { const g = cv.getContext('2d'); PIXICO.RENTA_FIJA.forEach((r, j) => { for (let i = 0; i < 12; i++) if (r[i] !== '.') { g.fillStyle = r[i] === 'o' ? '#fff3c4' : '#ffc46b'; g.fillRect(i, j, 1, 1); } }); });
     root.querySelectorAll('canvas[data-jpk]').forEach(cv => { const S = SETS[cv.dataset.jpk]; const g = cv.getContext('2d'); g.clearRect(0, 0, 12, 12); drawIcon(g, S.pk, 0, 0, 1, '#fff3c4', S.c, S.c); });
   }
-  // sobres: 4 de bienvenida + 1 por cada mes en que aportaste
-  const ganados = () => 4 + (typeof ST !== 'undefined' && ST && ST.contribMonths ? ST.contribMonths.size : 0);
-  const abiertos = () => st.get(K('abiertos'), 0);
-  const sobres = () => listo() ? Math.max(0, ganados() - abiertos()) : 0;
-  const album = () => new Set(st.get(K('album'), []));
+  // sobres: los 4 de bienvenida son gratis; después cada uno cuesta 100 Créditos de Marea (el servidor cobra y guarda el álbum)
+  const EM = () => (typeof MAREA !== 'undefined' && MAREA.estado && MAREA.estado()) || null;
+  const PRECIO = () => (EM() && EM().sobre_precio) || 100;
+  const gratis = () => { const e = EM(); return listo() && e ? Math.max(0, e.sobres_gratis != null ? e.sobres_gratis : 4 - (e.sobres || 0)) : 0; };
+  const alcanzan = () => { const e = EM(); return e ? Math.max(0, Math.floor(e.creditos / PRECIO())) : 0; };
+  const sobres = () => gratis() + alcanzan();   // cuántos puedes abrir ahora
+  const album = () => new Set((EM() && EM().album) || []);
+  // el álbum que vivía en este dispositivo se sube una sola vez a tu usuario
+  function migrar() { const loc = st.get(K('album'), []), ab = st.get(K('abiertos'), 0); if ((loc.length || ab) && typeof MAREA !== 'undefined' && MAREA.subirAlbum) MAREA.subirAlbum(loc, ab); }
+  // mismas probabilidades que el servidor (la demo saca sus cartas aquí)
+  function sacarIds(set, own) { const o = new Set(own || []); const L = mazo(set), out = [];
+    for (let k = 0; k < 3; k++) { let src = L.filter(c => !o.has(c.id) && !out.includes(c)); if (!src.length) src = L.filter(c => !out.includes(c)); if (!src.length) break;
+      const w = src.map(c => c.r === 3 ? 1 : c.r === 2 ? 2 : 3), tot = w.reduce((a, b) => a + b, 0); let r = Math.random() * tot, i = 0; while (r > w[i]) { r -= w[i]; i++; } out.push(src[i]); }
+    return out.map(c => c.id); }
   let curSet = 'acc', box = null;
   function cartas(b) {
     box = b; if (!listo()) return;
-    const own = album(), n = sobres();
+    migrar();
+    const own = album(), n = sobres(), g = gratis(), precio = PRECIO();
     const foil = k => `<div class="jfoil" style="--c:${SETS[k].c}"><span class="br">CIUDAD MAREA</span><canvas width="12" height="12" data-jpk="${k}"></canvas><span class="pn">${SETS[k].n}</span></div>`;
     const L = mazo(curSet); numera(L);
     const tot = Object.keys(SETS).reduce((a, k) => a + mazo(k).length, 0), totOwn = Object.keys(SETS).reduce((a, k) => a + mazo(k).filter(c => own.has(c.id)).length, 0);
     const nOwn = L.filter(c => own.has(c.id)).length;
     b.innerHTML = `<div class="mlead"><h2>Sobres de cartas</h2><p>Ábrelos para descubrir cómo ganan dinero las empresas, los edificios de tus FIBRAs, las obras de México y los secretos del bitcoin.</p></div>
-      <article class="mcard" style="--c:#ffc46b"><div class="jsob"><b>${n}</b><span>${n === 1 ? 'sobre para abrir' : 'sobres para abrir'}${n ? ': elige cuál' : ''}</span></div>
-      <div class="jpacks">${Object.keys(SETS).map(k => `<button type="button" class="jpack" data-jpack="${k}" ${n ? '' : 'disabled'} aria-label="Abrir sobre ${SETS[k].n}">${foil(k)}<span class="cnt">${mazo(k).filter(c => own.has(c.id)).length}/${mazo(k).length} cartas</span></button>`).join('')}</div>
-      <p class="foot">Ganas un sobre por cada mes que registras tu aportación. Empiezas con 4 de regalo. El álbum se guarda en este dispositivo.</p></article>
+      <article class="mcard" style="--c:#ffc46b"><div class="jsob"><b>${g || precio}</b><span>${g ? (g === 1 ? 'sobre gratis de bienvenida' : 'sobres gratis de bienvenida') + ': elige cuál' : 'créditos por sobre' + (EM() ? ` · tienes ${EM().creditos.toLocaleString('es-MX')}` : '')}</span></div>
+      <div class="jpacks">${Object.keys(SETS).map(k => `<button type="button" class="jpack" data-jpack="${k}" ${n ? '' : 'disabled'} aria-label="Abrir sobre ${SETS[k].n}${g ? ' (gratis)' : ', ' + precio + ' créditos'}">${foil(k)}<span class="cnt">${mazo(k).filter(c => own.has(c.id)).length}/${mazo(k).length} cartas</span></button>`).join('')}</div>
+      <p class="foot">${g ? 'Empiezas con 4 sobres de regalo.' : n ? `Te alcanza para ${n} ${n === 1 ? 'sobre' : 'sobres'}.` : `Te faltan ${(precio - (EM() ? EM().creditos % precio : 0)).toLocaleString('es-MX')} créditos para el siguiente sobre: aporta este mes y recorre tus barrios.`} Después de los 4 de regalo, cada sobre cuesta ${precio} créditos. El álbum se guarda en tu usuario.</p></article>
       <article class="mcard jalb" style="--c:${SETS[curSet].c}"><h3>Tu álbum <span class="foot" style="font-weight:500">${totOwn} de ${tot} cartas</span></h3>
       <div class="jchips">${Object.keys(SETS).map(k => `<button type="button" class="jchip" style="--c:${SETS[k].c}" aria-pressed="${k === curSet}" data-jset="${k}">${SETS[k].sh} <span class="mono">${mazo(k).filter(c => own.has(c.id)).length}/${mazo(k).length}</span></button>`).join('')}</div>
       <div class="jprog" style="--c:${SETS[curSet].c}"><i style="width:${nOwn / L.length * 100}%"></i></div>
@@ -6665,27 +6682,20 @@ chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....
     $j('jStIn').innerHTML = `<div class="jflip open" style="cursor:default"><div class="in"><div class="face">${backHTML()}</div><div class="face front">${cardHTML(c)}</div></div></div>`; pinta($j('jStIn'));
     $j('jStHint').textContent = ''; $j('jStBar').innerHTML = '<button type="button" class="mbtn" id="jCls">Cerrar</button>'; $j('jCls').onclick = cerrarStage; $j('jCls').focus();
   }
-  function sacar(set) {
-    const L = mazo(set), own = album(), out = [];
-    for (let k = 0; k < 3; k++) {
-      let src = L.filter(c => !own.has(c.id) && !out.includes(c)); if (!src.length) src = L.filter(c => !out.includes(c)); if (!src.length) break;
-      const w = src.map(c => c.r === 3 ? 1 : c.r === 2 ? 2 : 3), tot = w.reduce((a, b) => a + b, 0); let r = Math.random() * tot, i = 0; while (r > w[i]) { r -= w[i]; i++; } out.push(src[i]);
-    }
-    return out;
-  }
   function abrirSobre(set) {
-    if (!sobres()) return; const S = SETS[set], s = stage(); s.hidden = false; $j('jStBar').innerHTML = '<button type="button" class="mbtn" id="jCls">Ahora no</button>'; $j('jCls').onclick = cerrarStage;
+    if (!sobres()) return; const S = SETS[set], s = stage(), g = gratis(); s.hidden = false; $j('jStBar').innerHTML = '<button type="button" class="mbtn" id="jCls">Ahora no</button>'; $j('jCls').onclick = cerrarStage;
     $j('jStIn').innerHTML = `<button type="button" class="jpack jbig" id="jBp" aria-label="Rasgar sobre"><div class="jfoil" style="--c:${S.c}"><span class="br">CIUDAD MAREA</span><canvas width="12" height="12" data-jpk="${set}"></canvas><span class="pn">${S.n}</span></div></button>`;
-    pinta($j('jStIn')); $j('jStHint').textContent = 'Toca el sobre para abrirlo';
+    pinta($j('jStIn')); $j('jStHint').textContent = g ? 'Toca el sobre para abrirlo (gratis)' : `Toca el sobre para abrirlo (${PRECIO()} créditos)`;
     const bp = $j('jBp'); bp.focus(); let busy = false;
     bp.onclick = () => {
       if (busy) return; busy = true; bp.classList.add('shake'); $j('jStHint').textContent = ''; $j('jStBar').innerHTML = '';
-      setTimeout(() => {
+      // el servidor cobra (o usa uno gratis), saca las cartas y las guarda en tu álbum; si no alcanza, no se abre
+      const pide = MAREA.comprarSobre(set), espera = new Promise(r => setTimeout(r, 900));
+      Promise.all([pide, espera]).then(([r]) => {
         bp.classList.remove('shake'); bp.classList.add('tear');
-        const got = sacar(set), own = album(), nuevo = got.map(c => !own.has(c.id)); got.forEach(c => own.add(c.id));
-        st.set(K('album'), [...own]); st.set(K('abiertos'), abiertos() + 1); numera(mazo(set));
+        const got = (r.cartas || []).map(i => CARDS[i]).filter(Boolean), nuevo = got.map((c, i) => !!(r.nuevas || [])[i]); numera(mazo(set));
         setTimeout(() => revela(got, nuevo, 0), 450);
-      }, 900);
+      }).catch(e => { bp.classList.remove('shake'); $j('jStHint').textContent = e.message || 'No se pudo abrir el sobre.'; $j('jStBar').innerHTML = '<button type="button" class="mbtn" id="jCls">Cerrar</button>'; $j('jCls').onclick = cerrarStage; busy = false; });
     };
   }
   function revela(got, nuevo, i) {
@@ -6911,7 +6921,9 @@ chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....
     if (accion === 'visita_quitar') { st.set('cm_vdemo', null); return { ok: true, codigo: null }; }
     if (accion === 'visitar') {
       if (String(data.codigo || '').toUpperCase() !== 'PRIMO1') throw new Error('Ese código no existe o ya no está activo. En la demo prueba con PRIMO1.');
-      return { ok: true, nombre: 'Primo', racha: 4, items: [{ activo: 'VUAA', clase: 'ACCIONES', cambio_dia: 1.1, pct: 38 }, { activo: 'VEA', clase: 'ACCIONES', cambio_dia: .6, pct: 4 }, { activo: 'FUNO11', clase: 'FIBRAS', cambio_dia: -0.8, pct: 6 }, { activo: 'FIBRAPL14', clase: 'FIBRAS', cambio_dia: -.3, pct: 4 }, { activo: 'Cetes 28', clase: 'RENTA_FIJA', cambio_dia: 0, pct: 18 }, { activo: 'Renta fija 1', clase: 'RENTA_FIJA', subclase: 'Propia', cambio_dia: 0, pct: 12 }, { activo: 'Bitcoin', clase: 'BITCOIN', cambio_dia: -2.4, pct: 18 }] };
+      const D = MAREA.demoE(), cl = 'visita:' + (() => { const d = new Date(); d.setHours(12); const w = d.getDay() || 7; d.setDate(d.getDate() - (w - 1)); return ymd(d); })();
+      let marea = null; if (!D.claves.includes(cl)) { D.claves.push(cl); D.creditos += 10; D.movimientos.unshift({ fecha: new Date().toISOString(), creditos: 10, motivo: 'Visitaste la ciudad de un amigo' }); marea = { ok: true, ...JSON.parse(JSON.stringify(D)), nuevo: 10, ganados: [{ clave: cl, creditos: 10, motivo: 'Visitaste la ciudad de un amigo' }] }; }
+      return { ok: true, marea, nombre: 'Primo', racha: 4, items: [{ activo: 'VUAA', clase: 'ACCIONES', cambio_dia: 1.1, pct: 38 }, { activo: 'VEA', clase: 'ACCIONES', cambio_dia: .6, pct: 4 }, { activo: 'FUNO11', clase: 'FIBRAS', cambio_dia: -0.8, pct: 6 }, { activo: 'FIBRAPL14', clase: 'FIBRAS', cambio_dia: -.3, pct: 4 }, { activo: 'Cetes 28', clase: 'RENTA_FIJA', cambio_dia: 0, pct: 18 }, { activo: 'Renta fija 1', clase: 'RENTA_FIJA', subclase: 'Propia', cambio_dia: 0, pct: 12 }, { activo: 'Bitcoin', clase: 'BITCOIN', cambio_dia: -2.4, pct: 18 }] };
     }
     throw new Error('Acción desconocida.');
   }
@@ -6922,7 +6934,7 @@ chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....
       <div class="jvbox"><div class="jlbl">Tu código de visita</div><div id="jVmia" class="jap">Cargando…</div></div>
       <div class="jvbox"><div class="jlbl">Visitar una ciudad</div><form id="jVf" class="jvform"><input id="jVc" maxlength="8" autocomplete="off" autocapitalize="characters" placeholder="Código de 6 letras" aria-label="Código de visita"><button type="submit" class="mbtn pri">Visitar</button></form><p class="jap" id="jVerr" role="alert"></p></div></div>`);
     $j('jVx').onclick = cerrarPop;
-    $j('jVf').onsubmit = async e => { e.preventDefault(); const c = $j('jVc').value.trim(); if (!c) return; $j('jVerr').textContent = 'Buscando esa ciudad…'; try { const d = await vapi('visitar', { codigo: c }); cerrarPop(); entrarVisita(d); } catch (err) { $j('jVerr').textContent = err.message || String(err); } };
+    $j('jVf').onsubmit = async e => { e.preventDefault(); const c = $j('jVc').value.trim(); if (!c) return; $j('jVerr').textContent = 'Buscando esa ciudad…'; try { const d = await vapi('visitar', { codigo: c }); cerrarPop(); entrarVisita(d); if (d.marea && typeof MAREA !== 'undefined') MAREA.acreditar(d.marea); } catch (err) { $j('jVerr').textContent = err.message || String(err); } };
     const pinta = c => { const m = $j('jVmia'); if (!m) return;
       m.innerHTML = c ? `<div class="jvcode"><b>${c}</b><button type="button" class="mbtn" id="jVcp">Copiar</button></div><div class="mbtns" style="margin-top:8px"><button type="button" class="mbtn" id="jVnew">Cambiar código</button><button type="button" class="mbtn no" id="jVoff">Desactivar</button></div><p class="jap">Compártelo solo con quien quieras que te visite.</p>`
         : `<p class="jap" style="margin:0 0 8px">Nadie puede visitar tu ciudad hasta que crees un código.</p><button type="button" class="mbtn pri" id="jVon">Crear mi código</button>`;
@@ -6954,7 +6966,7 @@ chart:['x...........','x.........o.','x........##.','x.......#...','x....#.#....
     const b = $j('jVisB'); if (b) b.hidden = true;
   }
   function reset() { revisado = false; parar(); if (simOn) finSim(true); salirVisita(); if (sbox) sbox.innerHTML = ''; }
-  return { alAbrir, cartas, simula, sobres, reset, simulacro, quizaSimulacro, visitas, salirVisita, visitando: () => !!VIS, simulando: () => simOn };
+  return { alAbrir, cartas, simula, sobres, gratis, sacarIds, reset, simulacro, quizaSimulacro, visitas, salirVisita, visitando: () => !!VIS, simulando: () => simOn };
 })();
 
 // ================= Laboratorio: cuenta de administrador para probar como usuario nuevo =================
@@ -7021,7 +7033,7 @@ window.LAB = (() => {
   async function recargar(msg) { guardar(); try { apply(await window.api('datos')); } catch (e) { aviso(e.message); return; } if (window.MAREA) MAREA.render(); if (msg) aviso(msg); pintarPanel(); }
   async function desdeCero() {
     S = nuevo(); ls.set('cm_lab_estado', S); borrarLocal(); demoPos = []; demoRfp = []; demoHist = []; demoMetas = []; mercado(null, true); window.CM_TEMP = undefined;
-    const E = MAREA.demoE(); Object.assign(E, S.E, { claves: [], movimientos: [], construidos: ['BOLSA'], fund: {} });
+    const E = MAREA.demoE(); Object.assign(E, S.E, { claves: [], movimientos: [], construidos: ['BOLSA'], fund: {}, album: [], sobres: 0, sobres_gratis: 4 });
     resetState(); await loadData(); if (window.MAREA) { MAREA.reset(); MAREA.render(); MAREA.go('fundacion'); }
     aviso('Eres un usuario nuevo: terreno vacío, sin metas, sin racha y sin pagos.'); pintarPanel();
   }
@@ -7046,6 +7058,7 @@ window.LAB = (() => {
     const k = { aperturas: ['cm_abre_'], resumen: ['cm_visita_'], cartas: ['cm_album_', 'cm_abiertos_'], simulacro: ['cm_simulacro_'] }[que] || [];
     try { Object.keys(localStorage).filter(x => k.some(p => x.startsWith(p)) && x.endsWith(NOMBRE)).forEach(x => localStorage.removeItem(x)); Object.keys(sessionStorage).filter(x => x.startsWith('cm_visto_')).forEach(x => sessionStorage.removeItem(x)); } catch (_) {}
     if (que === 'aperturas') { const E = MAREA.demoE(); E.fund = Object.assign({}, E.fund, { abiertas: [] }); }
+    if (que === 'cartas') Object.assign(MAREA.demoE(), { album: [], sobres: 0, sobres_gratis: 4 });   // el álbum ahora vive en el usuario
     if (que === 'resumen') { const f = { t: Date.now() - 2 * 864e5, c: {} }; ORDER.forEach(k => { const c = model.classes[k]; f.c[k] = [c.valor * (k === 'BITCOIN' ? 1.06 : k === 'ACCIONES' ? .985 : .995), c.costo]; }); ls.set('cm_visita_' + NOMBRE, f); }
     guardar(); aviso({ aperturas: 'Las aperturas y presentaciones se reiniciaron. Recarga la página para verlas como la primera vez.', resumen: 'Simulé que tu última visita fue hace 2 días. Recarga la página para ver el resumen.', cartas: 'Álbum y sobres reiniciados.', simulacro: 'Simulacro reiniciado.' }[que]);
   }
@@ -7180,11 +7193,11 @@ window.MAREA = (() => {
     fundacion: 'Así se funda tu ciudad: primero lo más seguro y al final lo más arriesgado. Cada paso te explica por qué se invierte ahí y qué puede pasar. Tú decides: puedes saltar lo que no esté en tu plan y ganas los mismos créditos.',
     mercado: 'Aquí ves cómo se movieron tus inversiones. Cada barrio es un tipo de inversión: si sube se encienden sus luces y si baja llueve. Es normal que el mercado suba y baje; lo importante es seguir tu plan.',
     plano: 'Tu plan dice qué parte de tu dinero va en cada tipo de inversión. La franja es el margen que aceptas. Si un barrio se sale de su franja, lo acomodas en la siguiente ceremonia.',
-    tesoreria: 'Cada mes registras lo que tienes y aportas algo nuevo. La misión te dice dónde conviene poner la aportación para acercarte a tu plan. Cualquier monto cuenta para tu racha.',
+    tesoreria: 'Cada mes registras lo que tienes y aportas algo nuevo: la primera aportación del mes da 100 créditos y un bono de 10 por cada mes seguido (hasta 120). La misión te dice dónde conviene poner la aportación para acercarte a tu plan.',
     ingresos: 'Tus inversiones también te pagan: los CETES dan intereses, las FIBRAs reparten rentas y algunos ETFs dan dividendos. Aquí ves un estimado de cuánto produce tu ciudad.',
     ayto: () => 'Tus metas, el cierre del mes y, en ' + mesesCeremonia() + ', la ceremonia de reordenamiento.',
     bitacora: 'Tus créditos y los reportes de tu ciudad mes a mes.',
-    cartas: 'Abre sobres y colecciona cartas que explican cómo ganan dinero las empresas, los edificios de tus FIBRAs, las obras de México y el bitcoin. Ganas un sobre por cada mes que registras tu aportación.',
+    cartas: 'Abre sobres y colecciona cartas que explican cómo ganan dinero las empresas, los edificios de tus FIBRAs, las obras de México y el bitcoin. Los primeros 4 sobres son gratis; después cada uno cuesta 100 créditos. Tu álbum se guarda en tu usuario.',
     simula: 'Tu dinero de hoy pasando por una crisis real del pasado: cuánto hubiera bajado y cuánto tardó en volver, con y sin aportaciones. Es aproximado y sirve para entender, no para predecir.'
   };
   const SCR = [['fundacion', 'Fundación', 'Fundar'], ['mercado', 'Mercado', 'Mercado'], ['plano', 'Plano', 'Plano'], ['tesoreria', 'Tesorería', 'Tesorería'], ['ingresos', 'Ingresos', 'Ingresos'],
@@ -7225,19 +7238,67 @@ window.MAREA = (() => {
   const nav = $('mNav');
 
   // ---------- estado de créditos (del servidor, por usuario) ----------
-  let E = null, cargado = null, ocupado = false;
-  const DEMO_E = { creditos: 0, claves: [], construidos: ['BOLSA'], ceremonias: 0, movimientos: [], fund: {}, udi: { hoy: 8.64, por_fecha: {} }, udibono_tasa_real: 4, banxico_actualizado: '' };
-  const VAL = k => { let m; if ((m = k.match(/^ronda:/))) return [1, 'Revisaste un distrito']; if (k.startsWith('leccion:')) return [2, 'Lección del día']; if (k.startsWith('plano:')) return [10, 'Revisaste el Plano'];
-    if (k.startsWith('tesoreria:')) return [20, 'Actualizaste la Tesorería']; if (k.startsWith('mision:')) return [30, 'Cumpliste la misión']; if (k.startsWith('ingresos:')) return [10, 'Revisaste tus ingresos'];
-    if (k.startsWith('cer-rev:')) return [20, 'Revisaste el plan de reordenamiento']; if (k.startsWith('cer-ok:')) return [80, 'Completaste la ceremonia']; if (k === 'plan') return [10, 'Definiste tu plan'];
-    if (k.startsWith('paso:')) return [15, 'Decidiste un paso de la Fundación']; if (k === 'etapa1') return [50, 'Terminaste la Etapa 1']; if (k.startsWith('nv2:')) return [20, 'Un barrio subió a nivel 2']; if (k === 'etapa2') return [80, 'Terminaste la Etapa 2']; return null; };
+  let E = null, cargado = null, ocupado = false, firmePedido = false;
+  const DEMO_E = { creditos: 0, claves: [], construidos: ['BOLSA'], ceremonias: 0, movimientos: [], fund: {}, album: [], sobres: 0, sobres_gratis: 4, sobre_precio: 100, udi: { hoy: 8.64, por_fecha: {} }, udibono_tasa_real: 4, banxico_actualizado: '' };
+  // Cuánto vale cada clave (el servidor decide y verifica; aquí solo se anota en pantalla mientras llega la respuesta).
+  // null = la calcula el servidor (bono de racha y "Mano firme"): se ve cuando responde.
+  const VAL = k => {
+    if (/^aporte:/.test(k)) return [100, 'Aportación del mes'];
+    if (/^ronda:/.test(k)) return [2, 'Recorrido de la semana'];
+    if (/^plano:/.test(k)) return [10, 'Revisaste el Plano'];
+    if (/^cer-ok:/.test(k)) return [80, 'Ceremonia en balance'];
+    if (/^visita:/.test(k)) return [10, 'Visitaste la ciudad de un amigo'];
+    if (/^duelo:.+:fin$/.test(k)) return [30, 'Completaste un duelo de cartas'];
+    if (/^duelo:.+:gana$/.test(k)) return [30, 'Ganaste un duelo de cartas'];
+    if (k === 'plan') return [10, 'Definiste tu plan']; if (/^paso:/.test(k)) return [15, 'Decidiste un paso de la Fundación'];
+    if (k === 'etapa1') return [50, 'Terminaste la Etapa 1']; if (/^nv2:/.test(k)) return [20, 'Un barrio subió a nivel 2']; if (k === 'etapa2') return [80, 'Terminaste la Etapa 2'];
+    return null;   // racha:, firme:… los calcula el servidor
+  };
+  const FUENTES = () => [['Aportación del mes', '100', 'Una vez al mes, la primera vez que registras una compra que suba tu inversión'], ['Bono de racha', '10 por mes', 'Por cada mes seguido aportando, hasta 12 meses (120)'],
+    ['Recorrido de los barrios', '2 por barrio', 'Cada semana, hasta 10'], ['Revisión del Plano', '10', 'Una vez por semana'], ['Mano firme', '50, 100, 150…', 'Cuando tu ciudad cae 10%, 20%, 30%… desde su máximo y no vendes'],
+    ['Ceremonia en balance', '80', 'En ' + mesesCeremonia() + ', si todos los barrios están dentro de su banda'], ['Visitar a un amigo', '10', 'Una vez por semana'], ['Duelos de cartas', '30 + 30', 'Muy pronto: por completar y por ganar']];
   const fechasUdi = () => has() ? model.items.filter(i => i.key === 'RENTA_FIJA' && /udi/i.test(i.activo) && i.pos && i.pos.actualizado).map(i => i.pos.actualizado) : [];
+  // demo: la caída se mide con la serie mensual sin aportaciones (rendDesde), igual que el servidor con la diaria
+  function firmeDemo() {
+    const pts = serieMeses(); if (pts.length < 2) return [];
+    let I = 1, max = 1, fmax = pts[0].mes, min = 1;
+    for (let j = 1; j < pts.length; j++) { const a = pts[j - 1], b = pts[j]; if (a.valor > 0) I *= 1 + (b.valor - a.valor - (b.costo - a.costo)) / a.valor; if (I >= max) { max = I; fmax = b.mes; min = I; } else if (I < min) min = I; }
+    const n = Math.floor((1 - min / max) * 10 + 1e-9), out = []; for (let k = 1; k <= n; k++) out.push('firme:' + fmax + ':' + k); return out;
+  }
   async function mapi(accion, data = {}) {
     data = Object.assign({ fechas: fechasUdi() }, data);
     if (!DEMO) return api(accion, data);
     await new Promise(r => setTimeout(r, 120));
-    const D = DEMO_E;
-    if (accion === 'marea_dar') { const g = []; (data.claves || [data.clave]).forEach(k => { const v = VAL(k); if (!v || D.claves.includes(k)) return; D.claves.push(k); D.creditos += v[0]; D.movimientos.unshift({ fecha: new Date().toISOString(), creditos: v[0], motivo: v[1] }); g.push({ creditos: v[0], motivo: v[1] }); }); return { ok: true, ...JSON.parse(JSON.stringify(D)), nuevo: g.reduce((a, x) => a + x.creditos, 0), ganados: g }; }
+    const D = DEMO_E, mes = mesActual(), sem = lunes();
+    const pagar = (k, v) => { D.claves.push(k); D.creditos += v[0]; D.movimientos.unshift({ fecha: new Date().toISOString(), creditos: v[0], motivo: v[1] }); };
+    if (accion === 'marea_dar') {
+      let ks = [].concat(data.claves || [data.clave]); const g = [], err = [];
+      if (ks.includes('firme')) ks = ks.filter(k => k !== 'firme').concat(firmeDemo());
+      ks.filter(k => /^aporte:/.test(k)).forEach(k => ks.push('racha:' + k.slice(7)));
+      ks.forEach(k => {
+        if (!k || D.claves.includes(k)) return;
+        let v = VAL(k), m;
+        if ((m = k.match(/^aporte:(.+)$/)) && !(m[1] === mes && ST && ST.contribMonths && ST.contribMonths.has(mes))) { err.push('Todavía no registras una aportación este mes en la Tesorería.'); return; }
+        if (/^racha:/.test(k)) { const r = Math.min(12, ST ? ST.s : 0); if (!(k.slice(6) === mes && D.claves.includes('aporte:' + mes) && r)) return; v = [10 * r, 'Bono de racha: ' + r + (r === 1 ? ' mes' : ' meses')]; }
+        if ((m = k.match(/^firme:.+:(\d+)$/))) v = [50 * +m[1], 'Mano firme: tu ciudad cayó ' + 10 * +m[1] + '% desde su máximo y seguiste tu plan'];
+        if ((m = k.match(/^(ronda:[A-Z_]+|plano):(.+)$/)) && m[2] !== sem) return;
+        if (/^cer-ok:/.test(k) && !(CE && CE.active && balanced())) { err.push('Para la ceremonia todos los barrios deben estar dentro de su banda.'); return; }
+        if (/^(duelo|visita):/.test(k)) return;
+        if (!v) return;
+        pagar(k, v); g.push({ clave: k, creditos: v[0], motivo: v[1] });
+      });
+      if (!g.length && err.length && !Array.isArray(data.claves)) throw new Error(err[0]);
+      return { ok: true, ...JSON.parse(JSON.stringify(D)), nuevo: g.reduce((a, x) => a + x.creditos, 0), ganados: g };
+    }
+    if (accion === 'marea_sobre') {
+      const gratis = D.sobres < 4;
+      if (!gratis && D.creditos < 100) throw new Error('Te faltan ' + (100 - D.creditos) + ' créditos para abrir un sobre (cuesta 100).');
+      const got = JUEGO.sacarIds(data.set, D.album), nuevas = got.map(i => !D.album.includes(i));
+      got.forEach(i => { if (!D.album.includes(i)) D.album.push(i); }); D.sobres++; D.sobres_gratis = Math.max(0, 4 - D.sobres);
+      if (!gratis) pagar('sobre:' + Date.now(), [-100, 'Abriste un sobre: −100']);
+      return { ok: true, ...JSON.parse(JSON.stringify(D)), cartas: got, nuevas, gratis };
+    }
+    if (accion === 'marea_album') { if (!D.album.length && !D.sobres) { D.album = (data.album || []).filter((x, i, a) => a.indexOf(x) === i); D.sobres = Math.min(4, +data.abiertos || 0); D.sobres_gratis = 4 - D.sobres; } }
     if (accion === 'marea_guardar') D.fund = data.fund;
     return { ok: true, ...JSON.parse(JSON.stringify(D)) };
   }
@@ -7261,7 +7322,7 @@ window.MAREA = (() => {
   // Cada botón responde al instante: el crédito se anota en pantalla y se escribe en el Excel en ese mismo momento
   // (una llamada por botón, sin esperas). Si el servidor lo rechaza, se deshace y se avisa.
   const enCurso = new Map();   // clave → créditos anotados en pantalla mientras llega la respuesta
-  const valorDe = k => k.startsWith('mision:') ? [30 + 2 * Math.min(12, ST ? ST.s : 0), 'Cumpliste la misión de aportación'] : (VAL(k) || [0, '']);
+  const valorDe = k => VAL(k) || [0, ''];
   function anotar(k, n, motivo) {
     enCurso.set(k, n); E.claves.push(k); E.creditos += n;
     if (k.startsWith('obra:')) E.construidos.push(k.slice(5));
@@ -7286,13 +7347,18 @@ window.MAREA = (() => {
     if (!E) return;
     claves = [].concat(claves).filter(k => !claimed(k) && !enCurso.has(k));
     if (!claves.length) return;
-    claves.forEach(k => { const [n, m] = valorDe(k); anotar(k, n, m); if (n) mtoast(`<b>+${n}</b> ${esc(m)}`); });
-    bump(); repintar();
+    // lo que tiene valor conocido se anota al instante; lo que calcula el servidor (racha, Mano firme) se ve al responder
+    const yaAnotadas = claves.filter(k => VAL(k));
+    yaAnotadas.forEach(k => { const [n, m] = valorDe(k); anotar(k, n, m); if (n) mtoast(`<b>+${n}</b> ${esc(m)}`); });
+    if (yaAnotadas.length) { bump(); repintar(); }
     try {
-      const r = await mapi('marea_dar', { claves, racha: ST ? ST.s : 0, ...extra });
+      const r = await mapi('marea_dar', { claves, ...extra });
       claves.forEach(k => enCurso.delete(k));
+      const pagadas = new Set((r.ganados || []).map(g => g.clave));
+      yaAnotadas.filter(k => !pagadas.has(k) && !(r.claves || []).includes(k)).forEach(deshacer);   // el servidor no la aceptó: se deshace
       fusionar(r); copiaE();
-    } catch (e) { claves.forEach(deshacer); mtoast(esc(e.message)); }
+      (r.ganados || []).filter(g => !yaAnotadas.includes(g.clave) && g.creditos).forEach(g => { mtoast(`<b>+${g.creditos}</b> ${esc(g.motivo)}`); bump(); });
+    } catch (e) { yaAnotadas.forEach(deshacer); mtoast(esc(e.message)); }
     repintar();
   }
   // lo que se detecta solo al cargar: Fundación, Tesorería del mes, misión y ceremonia
@@ -7304,9 +7370,9 @@ window.MAREA = (() => {
     if (F.etapa >= 2) ks.push('etapa1');
     F.niveles.filter(n => n.nv2).forEach(n => ks.push('nv2:' + n.k));
     if (F.etapa >= 3) ks.push('etapa2');
-    if (ST && ST.savedThisMonth) ks.push('tesoreria:' + mes);
-    if (MI && MI.done && MI.type === 'obra') ks.push('mision:' + mes);
-    if (CE && CE.active && CE.done) ks.push('cer-ok:' + mes);
+    if (ST && ST.contribMonths && ST.contribMonths.has(mes)) ks.push('aporte:' + mes);   // el bono de racha llega solo con la aportación
+    if (CE && CE.active && CE.inRange) ks.push('cer-ok:' + mes);
+    if (!firmePedido) { firmePedido = true; ks.push('firme'); }   // el servidor revisa si tu ciudad cayó desde su máximo (una vez por visita)
     dar(ks);
   }
 
@@ -7562,19 +7628,19 @@ window.MAREA = (() => {
     if (t <= -umbral(k)) return 'TOR'; if (t <= -1 || m <= -5) return 'BAJ'; if (prev <= -3 && m > 0 && t >= 0) return 'REC'; if (t >= 1 || m >= 3) return 'EXP'; return 'LAT';
   }
   function rRonda() {
-    const hoy = ymd(new Date()), ks = ['BOLSA', ...ORDER], hechos = ks.filter(k => claimed(`ronda:${k}:${hoy}`)).length;
-    B.ronda.innerHTML = `<div class="mlead mlead-row"><div><h2>Ronda del mercado</h2><p>Revisa cada distrito: 1 crédito al día por distrito, sin importar si subió o bajó.</p></div><span class="mpill" style="--c:#f8a43c">${hechos} de ${ks.length} revisados</span></div>
+    const sem = lunes(), ks = ['BOLSA', ...ORDER], hechos = ks.filter(k => claimed(`ronda:${k}:${sem}`)).length;
+    B.ronda.innerHTML = `<div class="mlead mlead-row"><div><h2>Ronda del mercado</h2><p>Recorre cada barrio: 2 créditos por barrio cada semana, sin importar si subió o bajó.</p></div><span class="mpill" style="--c:#f8a43c">${hechos} de ${ks.length} revisados</span></div>
       <div class="mgrid">${ks.map(k => {
-        const g = REG[regimen(k)], ins = claimed(`ronda:${k}:${hoy}`), c = k === 'BOLSA' ? null : model.classes[k];
+        const g = REG[regimen(k)], ins = claimed(`ronda:${k}:${sem}`), c = k === 'BOLSA' ? null : model.classes[k];
         const ch = k === 'BOLSA' ? (model.total - model.hoy > 0 ? model.hoy / (model.total - model.hoy) * 100 : 0) : c.chg;
         const nombre = k === 'BOLSA' ? 'Distrito bursátil' : { ACCIONES: 'Distrito industrial', FIBRAS: 'Distrito inmobiliario', RENTA_FIJA: 'Distrito gubernamental', BITCOIN: 'Distrito de reservas' }[k];
         const col = k === 'BOLSA' ? '#8ab4ff' : CLS[k].color, que = { BOLSA: 'Toda tu ciudad', ACCIONES: `Acciones y ${term('ETF', 'ETFs')}`, FIBRAS: term('FIBRA', 'FIBRAs'), RENTA_FIJA: `${term('CETE', 'CETES')} y ${term('Udibono', 'Udibonos')}`, BITCOIN: 'Bitcoin y cripto' }[k];
         const its = k === 'BOLSA' ? model.items.filter(i => i.valor > 0 && i.key !== 'RENTA_FIJA').sort((a, b) => b.cambio_dia - a.cambio_dia) : c.items.filter(i => i.valor > 0);
         const body = k === 'BOLSA' ? (its.length ? `<div class="mrow"><span>Mejor del día</span><b>${esc(its[0].activo)} <span class="pos">${pc(its[0].cambio_dia, 2)}</span></b></div><div class="mrow"><span>Peor del día</span><b>${esc(its[its.length - 1].activo)} <span class="neg">${pc(its[its.length - 1].cambio_dia, 2)}</span></b></div>` : '')
           : its.length ? its.map(i => `<div class="mrow"><span>${esc(i.activo)}</span><b>${k === 'RENTA_FIJA' ? `<span class="muted">${num(i.tasa, rateOf(i))}% anual</span>` : `<span class="${i.cambio_dia >= 0 ? 'pos' : 'neg'}">${pc(i.cambio_dia, 2)}</span>`} · ${money(i.valor)}</b></div>`).join('') : '<p class="foot">Terreno baldío: todavía no inviertes en este barrio.</p>';
-        return `<article class="mcard" style="--c:${col}"><div class="mrow-top"><span class="mbadge big">${ico(k)}</span><button type="button" class="msw" role="switch" aria-checked="${ins}" ${ins ? 'disabled' : `data-ronda="${k}"`} aria-label="${ins ? 'Revisado' : 'Revisar ' + nombre + ', 1 crédito'}"><i></i></button></div>
+        return `<article class="mcard" style="--c:${col}"><div class="mrow-top"><span class="mbadge big">${ico(k)}</span><button type="button" class="msw" role="switch" aria-checked="${ins}" ${ins ? 'disabled' : `data-ronda="${k}"`} aria-label="${ins ? 'Revisado esta semana' : 'Revisar ' + nombre + ', 2 créditos'}"><i></i></button></div>
           <h3>${nombre}</h3><div class="mrow"><span class="muted">${que}</span><b class="${k === 'RENTA_FIJA' ? '' : ch >= 0 ? 'pos' : 'neg'}" style="font-size:18px">${k === 'RENTA_FIJA' ? 'intereses' : pc(ch, 2)}</b></div>
-          <span class="mpill" style="--c:${g[1]}">${g[2]} ${g[0]}</span>${ins ? body : '<p class="foot">Activa el interruptor para revisarlo (+1).</p>'}</article>`;
+          <span class="mpill" style="--c:${g[1]}">${g[2]} ${g[0]}</span>${ins ? body : '<p class="foot">Activa el interruptor para revisarlo esta semana (+2).</p>'}</article>`;
       }).join('')}</div>`;
   }
 
@@ -7590,7 +7656,7 @@ window.MAREA = (() => {
         const tol = porParte ? (filas.length ? filas.reduce((a, b) => a + +b.tol, 0) : BAND()) : +g.tol, lo = Math.max(0, c.objetivo - tol), hi = c.objetivo + tol;
         const mx = Math.max(60, Math.ceil((Math.max(c.pct, hi) + 5) / 10) * 10);
         const corto = b => String(b.name).replace(/^[^·]+·\s*/, '').replace(/\s*\(.*\)\s*$/, '');
-        const malas = filas.filter(b => b.state === 'over' || b.state === 'under'), ok = porParte && filas.length ? !malas.length : Math.abs(c.pct - c.objetivo) <= tol + 1e-9;
+        const malas = filas.filter(b => b.state === 'over' || b.state === 'under'), ok = !BD.some(b => b.items.some(i => i.key === k) && (b.state === 'over' || b.state === 'under'));   // la misma regla que el Semáforo
         const est = ok ? ['En banda', 'var(--ok)'] : porParte && filas.length ? [malas.map(b => corto(b) + (b.state === 'over' ? ' arriba' : ' abajo')).join(', '), 'var(--warn)'] : c.pct > hi ? ['Arriba de su banda', 'var(--warn)'] : ['Abajo de su banda', 'var(--warn)'];
         const tolTxt = porParte && filas.length ? filas.map(b => corto(b) + ' ±' + b.tol).join(' · ') : '± ' + tol;
         return `<article class="mcard" style="--c:${CLS[k].color}"><h3><span class="mbadge">${ico(k)}</span>${CLS[k].scene} <span class="mpill" style="--c:${est[1]}">${est[0]}</span></h3>
@@ -7689,15 +7755,16 @@ window.MAREA = (() => {
       'Aproximado con los precios de tu hoja el día de cada registro; en renta fija, los intereses sin el dinero que agregaste o sacaste.');
   }
   function rTes() {
-    const mes = mesActual(), tes = claimed('tesoreria:' + mes), mis = claimed('mision:' + mes);
+    const mes = mesActual(), ap = claimed('aporte:' + mes), aporto = !!(ST && ST.contribMonths && ST.contribMonths.has(mes)), bono = 10 * Math.min(12, Math.max(1, (ST ? ST.s : 0) + (aporto ? 0 : 1)));
     let mision = '';
     if (MI && MI.type === 'obra' && MI.it) mision = `<article class="mcard hl" style="--c:${CLS[MI.it.key].color}"><h3><span class="mbadge">${ico(MI.it.key)}</span>Misión de aportación</h3>
       <p>Tus metas piden <b>${esc(MI.it.activo)}</b>: aporta unos <b>${money(MI.amt)}</b>.</p><p class="foot"><b>¿Por qué se invierte aquí?</b> ${POR_QUE(MI.it.key)}</p>
-      <div class="mrow"><span>Estado</span><b class="${MI.done ? 'pos' : 'muted'}">${MI.done ? 'Cumplida' + (mis ? ' · créditos cobrados' : '') : 'Pendiente'}</b></div>
-      <p class="foot">Se cumple sola cuando registras tu compra en la Tesorería: +${30 + 2 * Math.min(12, ST ? ST.s : 0)} créditos.</p></article>`;
+      <div class="mrow"><span>Estado</span><b class="${MI.done ? 'pos' : 'muted'}">${MI.done ? 'Cumplida' : 'Pendiente'}</b></div>
+      <p class="foot">Es una guía para acercarte a tu plan. Los créditos llegan con tu aportación del mes, la hagas donde la hagas.</p></article>`;
     B.tes.innerHTML = `<div class="mgrid">${mision}<article class="mcard" style="--c:#ff8a6a"><h3><span class="mbadge">${ico('flame')}</span>${term('Racha')} y Tesorería</h3>
       <div class="mrow"><span>Racha actual</span><b>${ST ? ST.s : 0} ${ST && ST.s === 1 ? 'mes' : 'meses'}</b></div><div class="mrow"><span>Récord</span><b>${ST ? ST.best : 0}</b></div>
-      <div class="mrow"><span>Tesorería de ${MESES[new Date().getMonth()]}</span><b class="${ST && ST.savedThisMonth ? 'pos' : 'muted'}">${ST && ST.savedThisMonth ? 'Al día' + (tes ? ' · +20 cobrados' : '') : 'Pendiente (+20)'}</b></div>
+      <div class="mrow"><span>Aportación de ${MESES[new Date().getMonth()]}</span><b class="${aporto ? 'pos' : 'muted'}">${ap ? 'Cobrada · +100 y bono de racha' : aporto ? 'Registrada' : 'Pendiente (+100 y +' + bono + ' de racha)'}</b></div>
+      <p class="foot">Se cobra una vez al mes: registrar más compras ese mes no da más créditos. El bono es de 10 por cada mes seguido, hasta 120.</p>
       <button type="button" class="mbtn pri" data-reg="">Registrar títulos y saldos</button></article></div>${cambiosCard()}${rfCard()}`;
   }
 
@@ -7761,9 +7828,7 @@ window.MAREA = (() => {
     fiestaRevisada = true; setTimeout(() => fiesta(nv), 900);
   }
   function rIng() {
-    const mes = mesActual(), hecho = claimed('ingresos:' + mes);
-    B.ing.innerHTML = `<div class="mlead mlead-row"><div><h2>Ingresos de la ciudad</h2><p>Lo que producen tus inversiones: intereses de ${term('CETE', 'CETES')}, ${term('Rentas', 'rentas')} de FIBRAs y ${term('Dividendo', 'dividendos')}.</p></div>
-      <button type="button" class="mbtn pri" data-ing="1" ${hecho ? 'disabled' : ''}>${hecho ? 'Ingresos del mes revisados' : 'Revisar los ingresos del mes'} <small>${hecho ? '' : '+10'}</small></button></div>${divCard()}`;
+    B.ing.innerHTML = `<div class="mlead"><div><h2>Ingresos de la ciudad</h2><p>Lo que producen tus inversiones: intereses de ${term('CETE', 'CETES')}, ${term('Rentas', 'rentas')} de FIBRAs y ${term('Dividendo', 'dividendos')}.</p></div></div>${divCard()}`;
   }
 
   function modal(html) {
@@ -7775,8 +7840,8 @@ window.MAREA = (() => {
   // ---------- Ayuntamiento y Bitácora ----------
   function rAyto() {
     const mes = mesActual(), meses = ST && ST.contribMonths ? ST.contribMonths.size : 0, rg = RANGOS.filter(r => meses >= r[0]).pop()[1];
-    const cer = CE && CE.active ? `<article class="mcard hl" style="--c:#f8a43c"><h3>Ceremonia de ${MESES[new Date().getMonth()]}</h3><p>Revisa el plan de reordenamiento de abajo y deja cada barrio dentro de su banda. Se completa sola cuando todos están en banda y actualizaste la Tesorería del mes.</p>
-      <div class="mbtns"><button type="button" class="mbtn pri" data-cer="1" ${claimed('cer-rev:' + mes) ? 'disabled' : ''}>${claimed('cer-rev:' + mes) ? 'Plan revisado' : 'Revisé el plan'} <small>+20</small></button><span class="mpill" style="--c:${CE.done ? 'var(--ok)' : 'var(--muted)'}">${CE.done ? 'Completada · +80' : 'Al completarla: +80'}</span></div></article>` : '';
+    const cer = CE && CE.active ? `<article class="mcard hl" style="--c:#f8a43c"><h3>Ceremonia de ${MESES[new Date().getMonth()]}</h3><p>Revisa el plan de reordenamiento de abajo y deja cada barrio dentro de su banda. Se completa sola cuando todos están en banda: +80.</p>
+      <div class="mbtns"><span class="mpill" style="--c:${CE.done ? 'var(--ok)' : 'var(--muted)'}">${claimed('cer-ok:' + mes) ? 'Completada · +80 cobrados' : CE.done ? 'En balance · +80' : 'Al completarla: +80'}</span></div></article>` : '';
     B.ayto.innerHTML = `<div class="mgrid">${cer}<article class="mcard" style="--c:#8a5cff"><h3>Tu rango: ${rg}</h3><p class="foot">Sube con meses de aportación, nunca con rendimiento. Llevas ${meses} ${meses === 1 ? 'mes' : 'meses'}.</p>${RANGOS.map(([n, t]) => `<div class="mrow"><span>${t}</span><b class="${meses >= n ? 'pos' : 'muted'}">${n} meses</b></div>`).join('')}</article></div>`;
   }
   function rLog() {
@@ -7790,9 +7855,9 @@ window.MAREA = (() => {
     if (!has()) return {};
     const mes = mesActual(), hoy = ymd(new Date()), F = fundInfo();
     const P = {
-      fundacion: F.etapa < 3, mercado: ['BOLSA', ...ORDER].some(k => !claimed(`ronda:${k}:${hoy}`)), plano: hasMetas() && !claimed('plano:' + lunes()),
-      tesoreria: !(ST && ST.savedThisMonth) || (MI && MI.type === 'obra' && !MI.done), ingresos: !claimed('ingresos:' + mes),
-      ayto: !!(CE && CE.active && !CE.done) || !hasMetas(), cartas: JUEGO.sobres() > 0
+      fundacion: F.etapa < 3, mercado: ['BOLSA', ...ORDER].some(k => !claimed(`ronda:${k}:${lunes()}`)), plano: hasMetas() && !claimed('plano:' + lunes()),
+      tesoreria: !claimed('aporte:' + mes), ingresos: false,
+      ayto: !!(CE && CE.active && !CE.done) || !hasMetas(), cartas: JUEGO.gratis() > 0
     };
     Object.keys(P).forEach(id => { if (P[id] && typeof ABRE !== 'undefined' && ABRE[id] && !ABRE[id].ok()) P[id] = false; });
     return P;
@@ -7906,10 +7971,8 @@ window.MAREA = (() => {
     const t = e.target.closest('button, a'); if (!t) { const g = $('mGloss'); if (g && !g.hidden && !e.target.closest('#mGloss')) g.hidden = true; return; }
     const d = t.dataset;
     if (t.classList.contains('mterm')) { let g = $('mGloss'); if (!g) { g = mk('div', ''); g.id = 'mGloss'; document.body.appendChild(g); } const [ti, de] = GLOS[d.g]; g.innerHTML = `<div><b>${esc(ti)}</b><p>${esc(de)}</p></div><button type="button" class="mbtn" id="mGlossX">Entendido</button>`; g.hidden = false; $('mGlossX').onclick = () => g.hidden = true; e.preventDefault(); return; }
-    if (d.ronda) { t.setAttribute('aria-checked', 'true'); t.disabled = true; dar(`ronda:${d.ronda}:${ymd(new Date())}`); }
+    if (d.ronda) { t.setAttribute('aria-checked', 'true'); t.disabled = true; dar(`ronda:${d.ronda}:${lunes()}`); }
     else if (d.plano) { t.disabled = true; dar('plano:' + lunes()); }
-    else if (d.ing) { t.disabled = true; dar('ingresos:' + mesActual()); }
-    else if (d.cer) { t.disabled = true; dar('cer-rev:' + mesActual()); }
     else if (d.calc) aCalculadora(+d.calc);
     else if (d.fiesta !== undefined) { if (d.fiesta === 'todos') fiesta(divRecientes()); else { const x = DIVS()[+d.fiesta]; if (x) fiesta(x); } }
     else if (d.salta) saltar(d.salta);
@@ -7919,7 +7982,7 @@ window.MAREA = (() => {
     else if (d.reg !== undefined && t.classList.contains('mbtn')) { go('tesoreria', 'portafolio'); if (typeof GOV !== 'undefined' && GOV.openTesoreria) GOV.openTesoreria(); }
   });
   $('mBell').onclick = () => {
-    const P = pendientes(), T = { fundacion: 'Sigue fundando tu ciudad', mercado: 'Termina la Ronda del mercado de hoy', plano: 'Revisa el Plano de esta semana', tesoreria: 'Actualiza la Tesorería y cumple tu misión del mes', ingresos: 'Revisa los ingresos del mes', cartas: 'Tienes sobres de cartas sin abrir', infra: 'Ya te alcanza para una obra nueva', ayto: hasMetas() ? 'Completa la ceremonia de reordenamiento' : 'Define tus metas' };
+    const P = pendientes(), T = { fundacion: 'Sigue fundando tu ciudad', mercado: 'Recorre los barrios de esta semana (2 por barrio)', plano: 'Revisa el Plano de esta semana (+10)', tesoreria: 'Registra tu aportación del mes (+100 y bono de racha)', cartas: 'Tienes sobres de bienvenida gratis', infra: 'Ya te alcanza para una obra nueva', ayto: hasMetas() ? 'Deja todos los barrios en su banda para la ceremonia (+80)' : 'Define tus metas' };
     const L = Object.keys(T).filter(k => P[k]);
     modal(`<div class="mmhead"><div><h2>Pendientes</h2><small>Lo que te da créditos ahora</small></div><button type="button" class="mbtn" data-close>Cerrar</button></div>${L.length ? L.map(k => `<button type="button" class="mbtn mpend" data-go="${k}">${ico(k)}<span>${T[k]}</span></button>`).join('') : '<p>Todo al día.</p>'}`);
     $('mModal').querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', cerrar));
@@ -7928,7 +7991,7 @@ window.MAREA = (() => {
     ['Tu ciudad es tu dinero', 'Cada edificio es una inversión que tienes: mientras más dinero tiene, más alto es. Si empiezas de cero, construyes de lo más seguro a lo más arriesgado en la Fundación.'],
     ['Cuatro barrios y la Bolsa', `<b style="color:${CLS.ACCIONES.color}">Fábricas:</b> acciones y ${term('ETF', 'ETFs')}. <b style="color:${CLS.FIBRAS.color}">Inmuebles:</b> ${term('FIBRA', 'FIBRAs')}. <b style="color:${CLS.RENTA_FIJA.color}">Obras públicas:</b> ${term('CETE', 'CETES')} y bonos. <b style="color:${CLS.BITCOIN.color}">Oro virtual:</b> bitcoin. La Bolsa resume el día de toda tu ciudad.`],
     ['El clima es el mercado', 'Si un barrio sube se encienden sus luces; si baja, llueve; si cae fuerte, hay tormenta. Nada se destruye: las caídas son parte de invertir.'],
-    ['Ganas por constancia', 'Revisa tu ciudad, aporta cada mes y sigue tu plan. Eso te da Créditos de Marea, que se guardan en tu usuario y muestran tu constancia. Ganar o perder dinero no cambia tus créditos.']
+    ['Ganas por constancia', 'Aporta cada mes (100 créditos y un bono por tu racha), recorre tus barrios cada semana y no vendas cuando el mercado cae. Eso te da Créditos de Marea, que se guardan en tu usuario y sirven para abrir sobres de cartas y construir obras. Que el mercado suba o baje nunca te da créditos; mantener la calma sí.']
   ];
   // Solo sale sola a usuarios nuevos (sin títulos registrados) hasta que tocan "No volver a aparecer".
   // Esa decisión se guarda en el usuario (no en el dispositivo). El botón "¿Cómo se juega?" la abre cuando quieras.
@@ -7954,7 +8017,8 @@ window.MAREA = (() => {
   }
   $('mGuia').onclick = () => guia(0);
   $('mVis').onclick = () => abierta('visitas') ? JUEGO.visitas() : bloqueada('visitas');
-  $('mQue').onclick = () => { const t = (SCR.find(x => x[0] === cur) || [, ''])[1]; modal(`<div class="mmhead"><div><small>¿Qué es esto?</small><h2>${t}</h2></div><button type="button" class="mbtn" data-close>Cerrar</button></div><p class="mguia">${typeof AYUDA[cur] === 'function' ? AYUDA[cur]() : AYUDA[cur] || ''}</p>`); };
+  $('mQue').onclick = () => { const t = (SCR.find(x => x[0] === cur) || [, ''])[1]; modal(`<div class="mmhead"><div><small>¿Qué es esto?</small><h2>${t}</h2></div><button type="button" class="mbtn" data-close>Cerrar</button></div><p class="mguia">${typeof AYUDA[cur] === 'function' ? AYUDA[cur]() : AYUDA[cur] || ''}</p>
+    <h3 class="mfuentes-t">Cómo se ganan créditos</h3><table class="mfuentes"><tbody>${FUENTES().map(([n, v, c]) => `<tr><th scope="row">${n}<small>${c}</small></th><td>${v}</td></tr>`).join('')}</tbody></table><p class="foot">Que el mercado suba o baje no da créditos. Los sobres cuestan 100 (los primeros 4, gratis).</p>`); };
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrar(); const g = $('mGloss'); if (g) g.hidden = true; } });
   // los saltos que hacía el menú anterior ahora llevan a las pantallas nuevas
   window.goSec = (sec, elId) => go(OLD[sec] || sec, elId);
@@ -7963,11 +8027,22 @@ window.MAREA = (() => {
     const h = (location.hash || '').slice(1), F = has() ? fundInfo() : { etapa: 3 };
     go(S[h] ? h : OLD[h] || (F.etapa < 3 ? 'fundacion' : 'mercado'));
   }
-  function reset() { JUEGO.reset(); enCurso.clear(); E = null; cargado = null; rawVisto = null; elegido = false; guiado = false; fiestaRevisada = false; revisaFiesta.aviso = false; cur = 'mercado'; }
+  function reset() { JUEGO.reset(); enCurso.clear(); firmePedido = false; E = null; cargado = null; rawVisto = null; elegido = false; guiado = false; fiestaRevisada = false; revisaFiesta.aviso = false; cur = 'mercado'; }
   function onOff() { document.body.classList.toggle('m-on', !$('app').hidden); }
   new MutationObserver(onOff).observe($('app'), { attributes: true, attributeFilter: ['hidden'] });
   inicio();
-  return { render, go, fromOld, reset, inicio, estado: () => E, demoE: () => DEMO_E };
+  // sobres de cartas: el servidor cobra (o usa uno de los 4 de bienvenida), saca las cartas y guarda el álbum
+  async function comprarSobre(set) {
+    if (!E) throw new Error('Tus créditos todavía no cargan. Intenta en un momento.');
+    const r = await mapi('marea_sobre', { set }); fusionar(r); copiaE(); if (!r.gratis) { mtoast('<b>−100</b> Abriste un sobre'); bump(); } repintar(); return r;
+  }
+  let albumSubido = false;
+  async function subirAlbum(ids, abiertos) {   // una sola vez: el álbum que vivía en este dispositivo pasa a tu usuario
+    if (albumSubido || !E || (E.album && E.album.length) || E.sobres) return; albumSubido = true;
+    try { const r = await mapi('marea_album', { album: ids, abiertos }); fusionar(r); copiaE(); repintar(); } catch (e) { albumSubido = false; }
+  }
+  function acreditar(r) { if (!r || !E) return; fusionar(r); copiaE(); (r.ganados || []).forEach(g => mtoast(`<b>+${g.creditos}</b> ${esc(g.motivo)}`)); bump(); repintar(); }
+  return { render, go, fromOld, reset, inicio, estado: () => E, demoE: () => DEMO_E, comprarSobre, subirAlbum, acreditar };
 })();
 
 </script>
